@@ -20,8 +20,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "Metrics: receive producer record",
-      "prov:startTime": "2026-10-08T15:47:21.103618+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.103618+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.282692+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.282692+00:00"
     },
     "yp:PlanningActivity_example_2_01": {
       "prov:type": {
@@ -29,8 +29,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "Metrics: choose chart",
-      "prov:startTime": "2026-10-08T15:47:21.103618+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.103618+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.282692+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.282692+00:00"
     },
     "yp:ToolCallActivity_example_2_02": {
       "prov:type": {
@@ -38,8 +38,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "Metrics: render chart (matplotlib)",
-      "prov:startTime": "2026-10-08T15:47:21.103618+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.103618+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.282692+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.282692+00:00"
     },
     "yp:ObservationActivity_example_2_03": {
       "prov:type": {
@@ -47,8 +47,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "Metrics: confirm the chart reached disk",
-      "prov:startTime": "2026-10-08T15:47:21.103618+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.103618+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.282692+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.282692+00:00",
       "yp:rendered_bytes": 12784
     },
     "yp:DecisionActivity_example_2_04": {
@@ -57,9 +57,9 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "Metrics: revise chart",
-      "prov:startTime": "2026-10-08T15:47:21.103618+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.103618+00:00",
-      "yp:justification": "The graph carries no numeric prov:value entities, so no measurement could be plotted; fell back to graph composition (11 activities / 78 entities / 98 relations), which describes the record rather than the run it documents. Rendered 12784 bytes to example_2_metrics.png with matplotlib; deterministic, no model involved. Verdict REVISE — the chart is valid but less informative than intended.",
+      "prov:startTime": "2026-10-08T16:08:39.282692+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.282692+00:00",
+      "yp:justification": "The graph carries no numeric prov:value entities, so no measurement could be plotted; fell back to graph composition (11 activities / 78 entities / 98 relations), which describes the record rather than the run it documents. Wrote a non-empty png file to example_2_metrics.png with matplotlib; deterministic, no model involved. Verdict REVISE — the chart is valid but less informative than intended.",
       "yp:verdict": "REVISE",
       "yp:chart_subject": "graph-composition",
       "yp:series_plotted": 3
@@ -70,8 +70,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "Metrics: respond",
-      "prov:startTime": "2026-10-08T15:47:21.103618+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.103618+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.282692+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.282692+00:00"
     }
   },
   "entity": {

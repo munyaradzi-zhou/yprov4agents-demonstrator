@@ -20,8 +20,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA3: receive provenance graph",
-      "prov:startTime": "2026-10-08T15:47:21.128677+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.128677+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.301759+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.301759+00:00"
     },
     "yp:PlanningActivity_example_2_01": {
       "prov:type": {
@@ -29,8 +29,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA3: select analytics algorithms",
-      "prov:startTime": "2026-10-08T15:47:21.128677+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.128677+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.301759+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.301759+00:00",
       "yp:algorithms": "structure,timing,sustainability,resource,anomaly"
     },
     "yp:AnalysisActivity_example_2_02": {
@@ -39,8 +39,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA3: mine the provenance graph",
-      "prov:startTime": "2026-10-08T15:47:21.128677+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.128677+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.301759+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.301759+00:00",
       "yp:activities_analysed": 11,
       "yp:entities_analysed": 78,
       "yp:energy_streams": 33,
@@ -53,8 +53,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA3: validate findings against invariants",
-      "prov:startTime": "2026-10-08T15:47:21.128677+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.128677+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.301759+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.301759+00:00"
     },
     "yp:DecisionActivity_example_2_04": {
       "prov:type": {
@@ -62,8 +62,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA3: ANOMALY",
-      "prov:startTime": "2026-10-08T15:47:21.128677+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.128677+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.301759+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.301759+00:00",
       "yp:justification": "Applied 5 algorithms (structure, timing, sustainability, resource, anomaly) to a 11-activity / 78-entity graph. Breached invariants: timing: gap before 'Training' is 9.659s — 8.6% of the run's 112.530s wall clock, against a median inter-activity gap of 0.000s; timing: gap before 'CrossEntropyLoss/Training' is 102.870s — 91.4% of the run's 112.530s wall clock, against a median inter-activity gap of 0.000s Separately, 2 completeness gap(s) in what the producer recorded: timing-completeness: 10 activity(ies) declare a start time but no end time (Training, Validation, Test...), so their durations are unknown; typing-completeness: 8 of 78 entities carry no prov:type (89.7% typed). Verdict ANOMALY.",
       "yp:verdict": "ANOMALY",
       "yp:anomaly_count": 2,
@@ -75,8 +75,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA3: publish analytics report",
-      "prov:startTime": "2026-10-08T15:47:21.128677+00:00",
-      "prov:endTime": "2026-10-08T15:47:21.128677+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.301759+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.301759+00:00"
     }
   },
   "entity": {

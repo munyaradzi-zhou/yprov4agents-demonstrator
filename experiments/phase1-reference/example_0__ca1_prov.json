@@ -20,8 +20,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA1: receive record from bus",
-      "prov:startTime": "2026-10-08T15:47:20.949271+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.949271+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.144845+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.144845+00:00"
     },
     "yp:PlanningActivity_example_0_01": {
       "prov:type": {
@@ -29,8 +29,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA1: await consumers, plan store path",
-      "prov:startTime": "2026-10-08T15:47:20.949271+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.949271+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.144845+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.144845+00:00",
       "yp:persist_policy": "after-consume",
       "yp:required_consumers": "cax,ca2,ca3",
       "yp:acknowledged_by": "ca2,ca3,cax"
@@ -41,8 +41,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA1: write to store (backend API)",
-      "prov:startTime": "2026-10-08T15:47:20.949271+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.949271+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.144845+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.144845+00:00",
       "yp:store": "LightweightStore",
       "yp:size_bytes": 21634
     },
@@ -52,8 +52,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA1: verify round-trip integrity",
-      "prov:startTime": "2026-10-08T15:47:20.949271+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.949271+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.144845+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.144845+00:00"
     },
     "yp:DecisionActivity_example_0_04": {
       "prov:type": {
@@ -61,8 +61,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA1: accept the stored record",
-      "prov:startTime": "2026-10-08T15:47:20.949271+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.949271+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.144845+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.144845+00:00",
       "yp:justification": "Persisted at quorum: all expected consumers acknowledged; acknowledged by [ca2, ca3, cax], the full set required. Record carries 9 activities / 39 entities / 55 relations, 21634 bytes. Integrity: round-trip read verified; sha-256 matched. Verdict ACCEPT.",
       "yp:verdict": "ACCEPT",
       "yp:persist_trigger": "quorum",
@@ -75,8 +75,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CA1: emit storage receipt",
-      "prov:startTime": "2026-10-08T15:47:20.949271+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.949271+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.144845+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.144845+00:00"
     }
   },
   "entity": {

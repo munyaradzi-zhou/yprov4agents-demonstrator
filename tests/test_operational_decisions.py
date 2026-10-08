@@ -199,4 +199,9 @@ def test_the_chart_is_confirmed_on_disk_before_being_claimed(ca2: CA2Metrics) ->
         if "yp:rendered_bytes" in attributes
     )
     assert observation["yp:rendered_bytes"] > 0
-    assert str(observation["yp:rendered_bytes"]) in decision_of(document)["yp:justification"]
+    # The count itself is deliberately NOT quoted in the justification: a rendered
+    # PNG's size varies with the matplotlib build and host fonts, so a run that did
+    # the same thing would otherwise produce a different claim on another platform.
+    justification = decision_of(document)["yp:justification"]
+    assert "non-empty" in justification
+    assert str(observation["yp:rendered_bytes"]) not in justification

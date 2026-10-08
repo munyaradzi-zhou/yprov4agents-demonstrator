@@ -158,8 +158,12 @@ class CA2Metrics(StreamingAgent):
                     f"{c['relations']} relations), which describes the record rather "
                     f"than the run it documents"
                 )
-                + f". Rendered {rendered_bytes} bytes to {png.name} with matplotlib; "
-                f"deterministic, no model involved. Verdict {verdict}"
+                # The exact byte count is evidence, not a claim: a rendered PNG's size
+                # depends on the matplotlib build and the host's fonts, so quoting it in
+                # prose would make the justification differ between platforms for a run
+                # that did the same thing. It stays available as yp:rendered_bytes.
+                + f". Wrote a non-empty {png.suffix.lstrip('.')} file to {png.name} with "
+                f"matplotlib; deterministic, no model involved. Verdict {verdict}"
                 + (
                     "."
                     if verdict == "ACCEPT"

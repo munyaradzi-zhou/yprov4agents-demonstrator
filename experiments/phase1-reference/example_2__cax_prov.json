@@ -20,8 +20,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CAx: receive producer record",
-      "prov:startTime": "2026-10-08T15:47:20.976278+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.976278+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.172455+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.172455+00:00"
     },
     "yp:PlanningActivity_example_2_01": {
       "prov:type": {
@@ -29,8 +29,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CAx: scope the summary",
-      "prov:startTime": "2026-10-08T15:47:20.976278+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.976278+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.172455+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.172455+00:00"
     },
     "yp:ToolCallActivity_example_2_02": {
       "prov:type": {
@@ -38,8 +38,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CAx: write NL summary",
-      "prov:startTime": "2026-10-08T15:47:20.976278+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.976278+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.172455+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.172455+00:00"
     },
     "yp:ObservationActivity_example_2_03": {
       "prov:type": {
@@ -47,8 +47,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CAx: check the summary's figures against the graph",
-      "prov:startTime": "2026-10-08T15:47:20.976278+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.976278+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.172455+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.172455+00:00",
       "yp:grounding_check": "numerals-against-graph-facts",
       "yp:ungrounded_figure_count": 0
     },
@@ -58,8 +58,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CAx: accept summary",
-      "prov:startTime": "2026-10-08T15:47:20.976278+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.976278+00:00",
+      "prov:startTime": "2026-10-08T16:08:39.172455+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.172455+00:00",
       "yp:justification": "Summary of 281 characters produced by the computed path over a 11-activity / 78-entity graph. Checked every figure of 10 or more against the graph's own counts: all supported. This establishes no invented figures, not that the summary is complete. Verdict ACCEPT.",
       "yp:verdict": "ACCEPT",
       "yp:summary_mode": "computed"
@@ -70,8 +70,8 @@
         "type": "prov:QUALIFIED_NAME"
       },
       "prov:label": "CAx: respond",
-      "prov:startTime": "2026-10-08T15:47:20.976278+00:00",
-      "prov:endTime": "2026-10-08T15:47:20.976278+00:00"
+      "prov:startTime": "2026-10-08T16:08:39.172455+00:00",
+      "prov:endTime": "2026-10-08T16:08:39.172455+00:00"
     }
   },
   "entity": {

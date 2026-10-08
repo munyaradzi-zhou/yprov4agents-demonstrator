@@ -54,6 +54,11 @@ packages = ["yprov4agenticai", "runtime", "eval"]
 # Use the operating system certificate store rather than the bundled roots. Required on
 # networks that terminate TLS at a proxy with a locally-trusted root CA, which would
 # otherwise fail package resolution with `invalid peer certificate: UnknownIssuer`.
+#
+# Newer uv releases deprecate this key in favour of `system-certs` and warn about it.
+# The old name is kept because uv 0.7.2 -- the version this project is developed
+# against -- does not recognise the new one, and silencing a cosmetic warning is not
+# worth an environment that cannot resolve its own dependencies.
 native-tls = true
 
 # ──────────────────────────────────────────────────────────────────────────────────
