@@ -24,6 +24,7 @@ from typing import Any
 
 from .envelope import ProvEventType, ProvRecordEnvelope
 from .net_bus import NetworkBus
+from .util import energy_tracker
 
 # PROV-JSON top-level sections we know how to merge when reassembling a stream.
 _PROV_SECTIONS = (
@@ -118,6 +119,11 @@ class StreamingAgent:
         self.bus = bus
         # merged docs, keyed by session_id, still streaming
         self._buffers: dict[str, dict[str, Any]] = {}
+        # One energy tracker for the life of the agent, or None when energy accounting is
+        # off (the default). Per-agent rather than per-message: a backend that samples
+        # hardware counters pays a start-up cost, and restarting it per message would
+        # mostly measure the restart.
+        self.energy = energy_tracker()
 
     # ── the one method each concrete agent implements ──────────────────────────
     def process(

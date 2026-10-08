@@ -24,17 +24,16 @@ uses ``activity()``, ``decide()`` and ``emit()``. Two things follow, and both ar
 from __future__ import annotations
 
 from collections.abc import Sequence
-from functools import partial
 from pathlib import Path
 from typing import Any, NamedTuple
 
 import matplotlib
 
-from yprov4agenticai import LightweightStore, ProvTracker
+from yprov4agenticai import LightweightStore
 
 from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
-from ..util import OUT_DIR, prov_counts, write_prov
+from ..util import OUT_DIR, agent_tracker, prov_counts
 
 matplotlib.use("Agg")  # headless: no display in a container
 import matplotlib.pyplot as plt  # imported after the backend is selected
@@ -168,12 +167,7 @@ class CA2Metrics(StreamingAgent):
     ) -> tuple[dict[str, Any], str]:
         # The sink is where the emitted document goes; giving it to the tracker keeps the
         # destination out of the lifecycle below, which is then purely about what happened.
-        tracker = ProvTracker(
-            sid=session_id,
-            agent_label="Metrics_Visualizer",
-            sink=partial(write_prov, self.role, session_id),
-            verbose=False,
-        )
+        tracker = agent_tracker(self.role, session_id, "Metrics_Visualizer", energy=self.energy)
 
         # S1 Receive — what arrived, and from where.
         with tracker.activity(

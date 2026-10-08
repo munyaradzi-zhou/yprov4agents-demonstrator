@@ -2,8 +2,11 @@
 util.py — small shared helpers for the runtime agents.
 
 Keeps the agents focused on their logic: where to make the yProv4AgenticAI core
-importable, timestamps, writing emitted PROV-JSON to the shared output volume, and
-an optional LLM handle (used only by CAx, only when a key is present).
+importable, the shared clock, writing emitted PROV-JSON to the output volume, and the one
+place a tracker is constructed — so the instrumentation mode a run was asked for is honoured
+by every agent or by none.
+
+The model call lives in ``runtime/llm.py``; it is a bigger subject than a helper.
 """
 
 from __future__ import annotations
@@ -12,9 +15,9 @@ import json
 import os
 import re
 import sys
-from collections.abc import Callable
+from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 # Make the canonical core importable whether we run from the repo (dev) or the
 # image (where /app is the repo root on PYTHONPATH).
@@ -26,17 +29,29 @@ if str(_REPO_ROOT) not in sys.path:
 # prov:startTime, and CA3 reads those values back as a timeline. A second definition here
 # would be a second opinion about when things happened. Imported after the path setup
 # above, which is what makes the package importable from a source checkout.
+from yprov4agenticai import (  # noqa: E402
+    GRANULARITIES,
+    PERSISTENCES,
+    CodeCarbonBackend,
+    EnergyTracker,
+    NullBackend,
+    ProvTracker,
+)
 from yprov4agenticai import now_iso as now_iso  # noqa: E402
 
 OUT_DIR = Path(os.environ.get("OUT_DIR", "/out"))
 
-# Model and sampling parameters for every LLM-bearing agent. Named here rather than
-# inlined at the call site because they are part of the experimental apparatus: change
-# them and the output distribution changes, so a run's provenance has to be able to cite
-# them (see todo.md F1 on recording model provenance in the emitted graph).
-DEFAULT_OPENAI_MODEL = "gpt-4o"
-LLM_TEMPERATURE = 0.2
-LLM_MAX_TOKENS = 400
+#: Environment variables that select the instrumentation mode for a whole run. They exist
+#: so the overhead study can sweep the modes without editing six agents, and so the modes
+#: get exercised by the real pipeline rather than only by a unit test (review finding F4:
+#: METADATA had never been executed by an agent, and TRANSIENT had no implementation).
+GRANULARITY_ENV = "PROV_GRANULARITY"
+PERSISTENCE_ENV = "PROV_PERSISTENCE"
+ENERGY_ENV = "PROV_ENERGY"
+#: Grid carbon intensity is an *input* to an emissions figure, not something to discover:
+#: a run that resolves it over the network cannot be repeated, and on Windows the lookup is
+#: a documented crash site. State the country instead (3-letter ISO code).
+ENERGY_COUNTRY_ENV = "PROV_ENERGY_COUNTRY"
 
 
 def write_prov(role: str, session_id: str, doc: dict[str, Any]) -> Path | None:
@@ -54,89 +69,93 @@ def write_prov(role: str, session_id: str, doc: dict[str, Any]) -> Path | None:
         return None
 
 
-def llm_is_required() -> bool:
-    """Whether a missing or failing model must abort the run instead of falling back.
+class ProvMode(NamedTuple):
+    """The instrumentation settings a run was asked for."""
 
-    Deterministic fallbacks exist so the demonstrator runs without a key, which is right
-    for a demo and wrong for a measurement: a run whose numbers are reported as LLM-backed
-    must not quietly produce stub output instead. Set ``LLM_REQUIRED=1`` whenever a run
-    will be archived or published.
+    granularity: str
+    persistence: str
+
+
+def prov_mode() -> ProvMode:
+    """The granularity and persistence this run was configured for.
+
+    Read from the environment once per tracker rather than baked into each agent, so a
+    sweep over the modes is a change of environment and not a change of code. An unknown
+    value fails here, at start-up, rather than inside ``ProvTracker`` once a session is
+    already in flight.
     """
-    return os.environ.get("LLM_REQUIRED", "").strip().lower() in {"1", "true", "yes"}
-
-
-def enable_system_trust_store() -> None:
-    """Verify TLS against the operating system's certificate store.
-
-    Networks that terminate TLS at a proxy present a locally-trusted root CA which is not
-    in certifi's bundle, so the API client fails to connect and every agent silently falls
-    back to deterministic output. Routing verification through the OS store is what the
-    corresponding ``native-tls`` setting does for the package installer.
-
-    Best-effort and idempotent: on a network that needs no interception this changes
-    nothing, and a missing ``truststore`` is reported rather than raised.
-    """
-    try:
-        import truststore
-
-        truststore.inject_into_ssl()
-    except ImportError:
-        print(
-            "[llm] truststore is not installed; TLS will use the bundled CA roots. "
-            "Install it if API calls fail with a connection error behind a proxy.",
-            flush=True,
+    granularity = os.environ.get(GRANULARITY_ENV, "DATA").strip().upper()
+    persistence = os.environ.get(PERSISTENCE_ENV, "PERSISTENT").strip().upper()
+    if granularity not in GRANULARITIES:
+        raise SystemExit(
+            f"{GRANULARITY_ENV} must be one of {GRANULARITIES}, got {granularity!r}"
         )
+    if persistence not in PERSISTENCES:
+        raise SystemExit(
+            f"{PERSISTENCE_ENV} must be one of {PERSISTENCES}, got {persistence!r}"
+        )
+    return ProvMode(granularity=granularity, persistence=persistence)
 
 
-def get_llm() -> Callable[[str], str] | None:
-    """Return an ``llm(prompt) -> text`` callable, or None when no model is configured.
+def energy_tracker() -> EnergyTracker | None:
+    """An energy tracker for this run, or None when energy accounting is off.
 
-    Returning None is the supported no-key path: every agent has a deterministic
-    fallback, so the pipeline runs end to end without an API key. When ``LLM_REQUIRED``
-    is set, both a missing key and an unusable client raise instead, so a run cannot be
-    archived under a label it did not earn.
+    Off by default, and that default is a measurement decision rather than laziness. A
+    CodeCarbon backend samples hardware counters on its own schedule, which would
+    contaminate every timing figure the overhead study reports.
 
-    Raises
-    ------
-    RuntimeError
-        ``LLM_REQUIRED`` is set and no usable model could be configured.
+    ``PROV_ENERGY=codecarbon`` for a run whose purpose is energy — with
+    ``PROV_ENERGY_COUNTRY`` set, so the grid intensity behind the emissions figure is a
+    stated parameter rather than a network lookup. ``PROV_ENERGY=null`` exercises the same
+    code path and has the record state ``yp:energy_source="null"``: an audited zero rather
+    than a silent absence, which is what the pipeline runs in CI.
+
+    The irony this closes is worth naming: CA3 reports "no energy or emission streams" as a
+    completeness gap in the graphs it analyses, and until Phase 4 it was right about the
+    agents that emitted it (review finding F3).
     """
-    key = os.environ.get("OPENAI_API_KEY")
-    if not key:
-        if llm_is_required():
-            raise RuntimeError(
-                "LLM_REQUIRED is set but OPENAI_API_KEY is empty: refusing to produce "
-                "deterministic output that would be reported as model output."
+    backend = os.environ.get(ENERGY_ENV, "off").strip().lower()
+    if backend in {"", "off", "0", "false", "no"}:
+        return None
+    if backend == "null":
+        tracker = EnergyTracker(backend=NullBackend())
+    else:
+        tracker = EnergyTracker(
+            backend=CodeCarbonBackend(
+                country_iso_code=os.environ.get(ENERGY_COUNTRY_ENV) or None
             )
-        return None
-
-    enable_system_trust_store()
-    model = os.environ.get("OPENAI_MODEL", DEFAULT_OPENAI_MODEL)
-
-    try:
-        from openai import OpenAI
-
-        client = OpenAI(api_key=key)
-    except Exception as exc:
-        if llm_is_required():
-            raise RuntimeError(
-                f"LLM_REQUIRED is set but the client is unusable: {exc}"
-            ) from exc
-        print(
-            f"[llm] model unavailable ({exc}); agents will use deterministic output", flush=True
         )
-        return None
+    tracker.carbon_init(project_name="yprov4agents")
+    return tracker
 
-    def call(prompt: str) -> str:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=LLM_TEMPERATURE,
-            max_tokens=LLM_MAX_TOKENS,
-        )
-        return (response.choices[0].message.content or "").strip()
 
-    return call
+def agent_tracker(
+    role: str,
+    session_id: str,
+    agent_label: str,
+    sid: str | None = None,
+    energy: EnergyTracker | None = None,
+) -> ProvTracker:
+    """The tracker an agent emits its own lifecycle into.
+
+    One construction site for all six agents. Before this, each built its own with the
+    same four arguments spelled out, which is how a mode flag ends up honoured by five
+    agents and forgotten by the sixth.
+
+    The sink writes the finished document to the shared output volume, and the mode comes
+    from the environment — so ``PROV_PERSISTENCE=TRANSIENT`` means no agent writes, without
+    any agent knowing about the flag.
+    """
+    mode = prov_mode()
+    return ProvTracker(
+        sid=sid or session_id,
+        granularity=mode.granularity,
+        persistence=mode.persistence,
+        agent_label=agent_label,
+        sink=partial(write_prov, role, session_id),
+        verbose=False,
+        energy=energy,
+    )
 
 
 def prov_counts(doc: dict[str, Any]) -> dict[str, int]:

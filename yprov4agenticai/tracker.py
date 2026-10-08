@@ -29,9 +29,30 @@ from contextlib import contextmanager
 from typing import Any, TypeVar
 
 from .api import SCOPE_PARAMETER, ActivityScope, Span
+from .energy import EnergyTracker
 from .observer import Observer
 
 YP_NAMESPACE = "http://hpci-lab.org/yProv4Agents#"
+
+#: Granularity: how much of the graph is built.
+GRANULARITY_DATA = "DATA"
+GRANULARITY_METADATA = "METADATA"
+GRANULARITIES = (GRANULARITY_DATA, GRANULARITY_METADATA)
+
+#: Persistence: whether ``emit()`` hands the finished document to its sink.
+#:
+#: TRANSIENT means the record is built and returned but not written out. It exists to
+#: isolate serialisation cost from construction cost in the overhead study, and for the
+#: case where a record is wanted in memory — forwarded, inspected, discarded — without
+#: touching a disk.
+#:
+#: This was a pure label until Phase 4: it was stored, reported in the bundle descriptor,
+#: and had no effect whatsoever, so a record marked TRANSIENT was written to disk like any
+#: other (review finding F4). A configuration flag that does not configure anything is
+#: worse than a missing feature, because the record asserts something untrue about itself.
+PERSISTENCE_PERSISTENT = "PERSISTENT"
+PERSISTENCE_TRANSIENT = "TRANSIENT"
+PERSISTENCES = (PERSISTENCE_PERSISTENT, PERSISTENCE_TRANSIENT)
 
 _R = TypeVar("_R")
 
@@ -68,7 +89,8 @@ class ProvTracker:
     sid          : session id (used to mint activity/entity URIs).
     granularity  : "DATA" (full graph: activities + entities + lineage) or
                    "METADATA" (typed activities only, no entities/entity relations).
-    persistence  : free label recorded in the self-documenting meta block.
+    persistence  : PERSISTENT (default) or TRANSIENT. TRANSIENT builds and returns the
+                   record but does not hand it to the sink — see ``emit``.
     agent_label  : prov:label for the single (operational) agent node.
     principal    : optional {"label": str, "type": qname} — the agent or person on
                    whose authority the operational agent acted. When set, emits a
@@ -90,6 +112,11 @@ class ProvTracker:
                    process-wide default. Steps recorded through ``record_activity``
                    directly are not observed — the hook sits in the capture API, which is
                    where a step's boundaries are known.
+    energy       : optional :class:`~yprov4agenticai.energy.EnergyTracker`. When given,
+                   every step closed through the capture API carries the energy and
+                   emissions attributable to it. Off by default: a sampling backend has a
+                   cost of its own, and a measurement run that is about time should not be
+                   paying it.
     """
 
     YP = YP_NAMESPACE
@@ -104,8 +131,15 @@ class ProvTracker:
         sink: Callable[[dict], Any] | None = None,
         verbose: bool = True,
         observer: Observer | None = None,
+        energy: EnergyTracker | None = None,
     ) -> None:
-        assert granularity in ("DATA", "METADATA"), f"bad granularity={granularity!r}"
+        if granularity not in GRANULARITIES:
+            raise ValueError(f"granularity must be one of {GRANULARITIES}, got {granularity!r}")
+        if persistence not in PERSISTENCES:
+            raise ValueError(
+                f"persistence must be one of {PERSISTENCES}, got {persistence!r}. It is a "
+                f"behavioural setting, not a free-text label: TRANSIENT suppresses the sink."
+            )
         self.sid = sid
         self.granularity = granularity
         self.persistence = persistence
@@ -115,6 +149,17 @@ class ProvTracker:
         # Layer-1 observation hook. None means "use the process-wide default, if any";
         # see yprov4agenticai.observer for why that default is global.
         self.observer = observer
+        # Optional energy source, read once per step (see `activity`). One tracker per
+        # agent, not per record: a backend that samples hardware counters has a start-up
+        # cost, and restarting it per message would measure the restart.
+        self.energy = energy
+        if energy is not None:
+            # Discard whatever accumulated before this record began. The energy tracker
+            # outlives any one record, so the first delta would otherwise cover the agent's
+            # idle time since the previous message and be charged to this record's first
+            # step. Measured before this line existed: 28.3 seconds of waiting attributed
+            # to "receive producer record".
+            energy.stop_carbon_tracked_block()
         # Optional delegation: the principal the operational agent acted for.
         # None (default) => no principal agent node and no prov:actedOnBehalfOf
         # edge, so to_prov_json is byte-identical to the output without a principal.
@@ -341,16 +386,30 @@ class ProvTracker:
                 try:
                     result = function(*args, **kwargs)
                 except BaseException as error:
+                    self._read_energy(scope)
                     scope.record(span.start_iso, span.end_iso(), error)
                     raise
                 if produces is not None and result is not None:
                     scope.produces(produces, str(result))
+                self._read_energy(scope)
                 scope.record(span.start_iso, span.end_iso(), None)
                 return result
 
             return wrapper
 
         return decorate
+
+    def _read_energy(self, scope: ActivityScope) -> None:
+        """Attribute the energy since the previous step boundary to this step.
+
+        Read at every boundary rather than around one chosen step, which is what makes the
+        attribution correct: ``stop_carbon_tracked_block`` returns the delta since it was
+        last called, so skipping a step would silently fold that step's consumption into
+        its successor's.
+        """
+        if self.energy is None:
+            return
+        scope.measured(self.energy.stop_carbon_tracked_block().to_attrs())
 
     @contextmanager
     def activity(self, kind: str, label: str | None = None) -> Iterator[ActivityScope]:
@@ -372,8 +431,10 @@ class ProvTracker:
         try:
             yield scope
         except BaseException as error:
+            self._read_energy(scope)
             scope.record(span.start_iso, span.end_iso(), error)
             raise
+        self._read_energy(scope)
         scope.record(span.start_iso, span.end_iso(), None)
 
     def decide(
@@ -441,6 +502,10 @@ class ProvTracker:
         scope.verdict = verdict
         scope.confidence = confidence
         scope.attributes = dict(attributes or {})
+        # Read the energy here too. Skipping it would not merely omit a decision's own
+        # consumption, it would fold that consumption into the next step's delta — and a
+        # misattributed measurement is worse than a missing one.
+        self._read_energy(scope)
         scope.record(started_at or span.start_iso, span.end_iso(), None)
 
     def emit(self, sink: Callable[[dict], Any] | None = None) -> dict:
@@ -449,8 +514,18 @@ class ProvTracker:
         Returns the document either way, so a caller that wants to inspect, archive or
         forward it can. The sink argument wins over the one given to the constructor,
         which is how a measurement run redirects output without reconfiguring the agent.
+
+        A ``TRANSIENT`` tracker builds and returns the document but does not call the
+        sink. The distinction is deliberately narrow and worth stating precisely: it
+        suppresses *handing the record out*, not building it. A transient record is still
+        serialised, still returned to the caller, and in this demonstrator still published
+        onto the bus by the agent that made it — what it is not is written to the output
+        volume. That is the layer the overhead study needs isolated, and it is the only
+        thing the flag has ever claimed.
         """
         doc = self.to_prov_json()
+        if self.persistence == PERSISTENCE_TRANSIENT:
+            return doc
         destination = sink if sink is not None else self.sink
         if destination is not None:
             destination(doc)
