@@ -108,10 +108,14 @@ jobs:
       # changed the emitted provenance deliberately. The baseline archive is kept as the
       # historical evidence behind the review measurements, and `eval.compare` against it
       # is how a phase reports what it changed — but the gate has to track the present.
+      #
+      # Phase 2 moved all six agents onto the capture API and changed nothing
+      # structural, which is the claim this gate now enforces: the ergonomic layer
+      # emits the same graph as the primitives it wraps.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/phase1-reference \
+            --before experiments/phase2-reference \
             --after out \
             --strict
 

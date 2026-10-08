@@ -1,0 +1,1 @@
+This ML provenance record captures 11 activities and 78 entities linked by 98 lineage relations. Tracked steps include example_GR0_2, Training, Validation, Test, CrossEntropyLoss/Training, codecarbon/Training. The graph documents inputs, parameters and outputs of the training run.

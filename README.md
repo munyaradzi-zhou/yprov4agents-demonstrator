@@ -165,3 +165,6 @@ paper/                paper outline and results
 | `docs/DESIGN.md` | why the demonstrator is shaped this way; scope; build plan; risks |
 | `docs/INSTRUMENTATION.md` | **how to instrument any agent** — library vs API vs OpenTelemetry |
 | `paper/OUTLINE.md` | the paper this demonstrator is the evaluation for |
+| `todo.md` | the review findings register — every defect found, its evidence, its status |
+| `PLAN.md` | the six phases to the paper deadline, and what each one unblocks |
+| `docs/phases/` | plain-language walkthrough of each completed phase, with diagrams |
