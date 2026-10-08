@@ -98,11 +98,18 @@ jobs:
           enable-cache: true
       - run: uv sync --frozen --all-extras
 
+      # --baseline attaches the Strategy A callback reconstruction to the same run, so
+      # E3 is measured over identical work rather than over two separate runs.
       - name: Run the demonstrator (in-process bus, deterministic agents)
-        run: uv run python run_local.py --out-dir out --persist-timeout 20
+        run: uv run python run_local.py --out-dir out --persist-timeout 20 --baseline
 
       - name: Evaluate
         run: uv run python -m eval.evaluate --out-dir out --markdown out/RESULTS.md
+
+      # The paper's central claim, as a gate: the rationale must not be recoverable from
+      # anything the callback layer observed. A hit here means the claim needs narrowing.
+      - name: Assert the rationale is unreachable from the callback stream
+        run: uv run pytest -v tests/test_baseline.py
 
       # Compared against the current reference, not the pre-review baseline: Phase 1
       # changed the emitted provenance deliberately. The baseline archive is kept as the
@@ -110,12 +117,14 @@ jobs:
       # is how a phase reports what it changed — but the gate has to track the present.
       #
       # Phase 2 moved all six agents onto the capture API and changed nothing
-      # structural, which is the claim this gate now enforces: the ergonomic layer
-      # emits the same graph as the primitives it wraps.
+      # structural, which is the claim this gate enforces: the ergonomic layer emits the
+      # same graph as the primitives it wraps. Phase 3's archive is structurally identical
+      # to Phase 2's — attaching the callback baseline observes the run without altering
+      # it — so pointing the gate at the newer archive keeps both claims under test.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/phase2-reference \
+            --before experiments/phase3-reference \
             --after out \
             --strict
 

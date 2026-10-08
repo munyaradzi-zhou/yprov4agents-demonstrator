@@ -29,6 +29,7 @@ from contextlib import contextmanager
 from typing import Any, TypeVar
 
 from .api import SCOPE_PARAMETER, ActivityScope, Span
+from .observer import Observer
 
 YP_NAMESPACE = "http://hpci-lab.org/yProv4Agents#"
 
@@ -84,6 +85,11 @@ class ProvTracker:
     verbose      : whether ``record_activity`` narrates each step on stdout. The
                    demonstrator's console trace is a teaching device; a measurement run
                    or a library embedded in someone else's agent wants it off.
+    observer     : optional Layer-1 hook, receiving a restricted view of each step as it
+                   finishes (:mod:`yprov4agenticai.observer`). Falls back to the
+                   process-wide default. Steps recorded through ``record_activity``
+                   directly are not observed — the hook sits in the capture API, which is
+                   where a step's boundaries are known.
     """
 
     YP = YP_NAMESPACE
@@ -97,6 +103,7 @@ class ProvTracker:
         principal: dict | None = None,
         sink: Callable[[dict], Any] | None = None,
         verbose: bool = True,
+        observer: Observer | None = None,
     ) -> None:
         assert granularity in ("DATA", "METADATA"), f"bad granularity={granularity!r}"
         self.sid = sid
@@ -105,6 +112,9 @@ class ProvTracker:
         self.agent_label = agent_label
         self.sink = sink
         self.verbose = verbose
+        # Layer-1 observation hook. None means "use the process-wide default, if any";
+        # see yprov4agenticai.observer for why that default is global.
+        self.observer = observer
         # Optional delegation: the principal the operational agent acted for.
         # None (default) => no principal agent node and no prov:actedOnBehalfOf
         # edge, so to_prov_json is byte-identical to the output without a principal.
@@ -415,22 +425,23 @@ class ProvTracker:
                 f"with an empty rationale cannot be told apart from an unexplained "
                 f"decision; state the evidence that produced the verdict."
             )
-        # Measured the same way as every other activity, so a decision's recorded extent
-        # is a real interval rather than a single wall-clock reading taken twice. The work
-        # of *reaching* the verdict happens in the caller; pass ``started_at`` to include
-        # it in the record.
+        # Routed through an ActivityScope like every other step, for two reasons. The
+        # extent is measured rather than being one wall-clock reading taken twice (the
+        # work of *reaching* the verdict happens in the caller; pass ``started_at`` to
+        # include it). And a decision is a step, so an installed Layer-1 observer has to
+        # see that it ran — denying it that would make the Strategy A baseline weaker than
+        # a real callback handler, which is the one thing a baseline must never be. What
+        # the observer does not receive is the verdict and the justification, because
+        # those never crossed a node boundary.
         span = Span()
-        self.record_activity(
-            kind,
-            label or f"decide: {verdict}",
-            started_at or span.start_iso,
-            span.end_iso(),
-            in_eid=consumed,
-            out_eid=generated,
-            justification=justification,
-            confidence_score=confidence,
-            extra_attrs={"yp:verdict": verdict, **(attributes or {})},
-        )
+        scope = ActivityScope(self, kind, label or f"decide: {verdict}")
+        scope.consumed = consumed
+        scope.generated = generated
+        scope.justification = justification
+        scope.verdict = verdict
+        scope.confidence = confidence
+        scope.attributes = dict(attributes or {})
+        scope.record(started_at or span.start_iso, span.end_iso(), None)
 
     def emit(self, sink: Callable[[dict], Any] | None = None) -> dict:
         """Serialise to PROV-JSON and hand the document to a sink.

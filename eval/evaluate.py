@@ -7,9 +7,13 @@ hand-copied:
 
     E1 Coverage              typed activities / entities / relations, per agent
     E2 Justification         % of DecisionActivities carrying a non-empty yp:justification
-    E3 Strategy A vs B       what callback-level instrumentation could have captured
+    E3 Strategy A vs B       measured against the callback baseline (eval/baseline.py)
     E4 Reflexivity           which agents were themselves governed, by whom
     E5 Governance            MC verdict tally
+
+E3 needs the Strategy A observation stream, which `python run_local.py --baseline`
+records alongside the run. Without it, E3 reports that it was not measured rather than
+substituting an assumption.
 
 Usage:
     python -m eval.evaluate                      # defaults to ./out
@@ -23,6 +27,8 @@ import json
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
+
+from eval.baseline import EVENTS_FILE, compare, render
 
 REL_KEYS = (
     "used",
@@ -110,6 +116,11 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Evaluate a demonstrator run.")
     ap.add_argument("--out-dir", default="out", help="directory holding *_prov.json")
     ap.add_argument("--markdown", help="also write the tables to this markdown file")
+    ap.add_argument(
+        "--baseline-dir",
+        default="out/baseline",
+        help="Strategy A's observation stream, for E3 (default: out/baseline)",
+    )
     args = ap.parse_args()
 
     out_dir = Path(args.out_dir)
@@ -177,27 +188,26 @@ def main() -> None:
     emit()
 
     # ── E3 Strategy A vs B ─────────────────────────────────────────────────────
-    tot = {"activities": 0, "entities": 0, "relations": 0}
-    for _, _, doc in runs:
-        c = coverage(doc)
-        for k in tot:
-            tot[k] += c[k]
-    emit("## E3 — Strategy A (callbacks) vs Strategy B (explicit instrumentation)")
-    emit()
-    emit(
-        "Same agents, same input. Strategy A figures are structural: a framework callback "
-        "fires *after* a node returns and cannot read that node's local variables, so the "
-        "decision rationale is unreachable by construction."
-    )
-    emit()
-    emit("| Signal | Strategy A | Strategy B (this demo) |")
-    emit("|---|--:|--:|")
-    emit(f"| Typed activities | 0 | {tot['activities']} |")
-    emit(f"| Typed entities | 0 | {tot['entities']} |")
-    emit(f"| Lineage relations | 0 | {tot['relations']} |")
-    emit(f"| Decisions with `yp:justification` | 0 (impossible) | {tot_j} |")
-    emit("| W3C PROV-JSON output | no | yes |")
-    emit()
+    #
+    # Measured, not asserted. The figures come from eval.baseline, which reconstructs the
+    # same run from the stream a framework callback handler would have seen. The previous
+    # version of this table filled Strategy A's column with zeros, and three of the four
+    # were false: a callback handler recovers activities, entities and dataflow. Only the
+    # rationale is out of reach. See todo.md B2 and PLAN.md R2.
+    baseline_dir = Path(args.baseline_dir)
+    events = baseline_dir / EVENTS_FILE
+    if events.is_file():
+        for line in render(compare(out_dir, baseline_dir)):
+            emit(line)
+    else:
+        emit("## E3 — Strategy A (callbacks) vs Strategy B (explicit instrumentation)")
+        emit()
+        emit(
+            f"*Not measured for this run: no observation stream at `{events}`. Produce "
+            f"one with `python run_local.py --baseline`, which records what a framework "
+            f"callback handler would have seen over the same work.*"
+        )
+        emit()
 
     # ── E4 reflexivity ─────────────────────────────────────────────────────────
     governed: dict[str, set] = defaultdict(set)

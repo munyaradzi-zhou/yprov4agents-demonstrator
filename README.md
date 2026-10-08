@@ -154,6 +154,7 @@ yprov4agenticai/      the instrumentation library (ProvTracker, store, energy)
 data/yprov4ml/        real yProv4ML provenance records to replay
 deploy/               Dockerfile + docker-compose.yml
 eval/evaluate.py      turns a run into the paper's result tables
+eval/baseline.py      the Strategy A callback baseline the comparison is measured against
 docs/                 design, architecture, and the instrumentation position
 paper/                paper outline and results
 ```
