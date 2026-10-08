@@ -46,6 +46,8 @@ import datetime
 import time
 from typing import TYPE_CHECKING, Any
 
+from .observer import StepEvent, get_default_observer
+
 if TYPE_CHECKING:  # import cycle: tracker imports this module at runtime
     from .tracker import ProvTracker
 
@@ -224,8 +226,47 @@ class ActivityScope:
         self.confidence = confidence
 
     # ── writing ───────────────────────────────────────────────────────────────────
+    def _notify(self, started_at: str, ended_at: str, error: BaseException | None) -> None:
+        """Hand this step to the Layer-1 observer, if one is installed.
+
+        Only what an outside observer could have seen — see :class:`~.observer.StepEvent`.
+        Entity *values* are passed, never the typed identifiers this scope holds, because a
+        callback handler is handed payloads and has to mint its own identity for them.
+
+        An observer that raises must not break the agent it is watching: provenance
+        collection is not allowed to be the reason a run fails. The failure is reported
+        once, on stderr, and the step is still recorded.
+        """
+        observer = self._tracker.observer or get_default_observer()
+        if observer is None:
+            return
+        values = self._tracker.ents
+        event = StepEvent(
+            session=self._tracker.sid,
+            agent=self._tracker.agent_label,
+            name=self.label,
+            started_at=started_at,
+            ended_at=ended_at,
+            inputs=tuple(
+                str(values[eid]["v"])
+                for eid in (self.consumed, self.memory)
+                if eid is not None and eid in values
+            ),
+            outputs=(
+                (str(values[self.generated]["v"]),)
+                if self.generated is not None and self.generated in values
+                else ()
+            ),
+            error=None if error is None else type(error).__name__,
+        )
+        try:
+            observer(event)
+        except Exception as exc:  # pragma: no cover - defensive; no observer here raises
+            print(f"[prov] observer failed on step {self.label!r}: {exc}", flush=True)
+
     def record(self, started_at: str, ended_at: str, error: BaseException | None) -> None:
         """Write this scope to the tracker as a single activity record."""
+        self._notify(started_at, ended_at, error)
         attributes = dict(self.attributes)
         if self.verdict is not None:
             attributes["yp:verdict"] = self.verdict
