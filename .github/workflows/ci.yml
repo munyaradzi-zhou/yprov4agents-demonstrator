@@ -12,6 +12,9 @@
 # No job calls a paid API. The LLM-backed path is exercised locally and archived under
 # experiments/; CI runs the deterministic path, which is why `--strict` comparison is
 # meaningful here.
+#
+# Extras are named rather than installed wholesale with --all-extras: the `energy` extra
+# pulls a backend that samples hardware counters, and no job here is measuring energy.
 
 name: CI
 
@@ -38,7 +41,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - run: uv sync --frozen --all-extras
+      - run: uv sync --frozen --extra eval --extra dev
       - name: ruff check
         run: uv run ruff check --output-format=github .
       - name: ruff format
@@ -58,7 +61,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - run: uv sync --frozen --all-extras --python ${{ matrix.python }}
+      - run: uv sync --frozen --extra eval --extra dev --python ${{ matrix.python }}
       - run: uv run --python ${{ matrix.python }} mypy yprov4agenticai runtime eval tests
 
   test:
@@ -77,7 +80,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - run: uv sync --frozen --all-extras --python ${{ matrix.python }}
+      - run: uv sync --frozen --extra eval --extra dev --python ${{ matrix.python }}
       - name: pytest
         run: uv run pytest -v --cov=yprov4agenticai --cov=runtime --cov-report=term-missing
       - name: Verify frozen archives still match their manifests
@@ -96,7 +99,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - run: uv sync --frozen --all-extras
+      - run: uv sync --frozen --extra eval --extra dev
 
       # --baseline attaches the Strategy A callback reconstruction to the same run, so
       # E3 is measured over identical work rather than over two separate runs.
@@ -120,11 +123,13 @@ jobs:
       # structural, which is the claim this gate enforces: the ergonomic layer emits the
       # same graph as the primitives it wraps. Phase 3's archive is structurally identical
       # to Phase 2's — attaching the callback baseline observes the run without altering
-      # it — so pointing the gate at the newer archive keeps both claims under test.
+      # it. Phase 4 differs from Phase 3 by exactly two declared attributes, yp:summary_mode
+      # and yp:report_mode, now recorded on the step that produced the text rather than only
+      # on the decision about it.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/phase3-reference \
+            --before experiments/phase4-reference \
             --after out \
             --strict
 

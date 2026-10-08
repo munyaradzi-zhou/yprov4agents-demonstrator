@@ -87,11 +87,26 @@ user how to buy less provenance when they need less.
 |---|---|---|
 | B-DATA | `granularity="DATA"` | full PROV: activities, entities, `used`, `wasGeneratedBy`, `wasDerivedFrom` |
 | B-META | `granularity="METADATA"` | activities only — no entity section, no entity-side relations |
-| B-TRANS | `persistence="TRANSIENT"` | model built, nothing written to disk (isolates L3) |
+| B-TRANS | `persistence="TRANSIENT"` | model built, nothing written to disk (isolates L3) — **implemented in Phase 4**; `emit()` suppresses the sink |
 | B-JUST | justification + `extra_attrs` populated vs omitted | cost of the headline field itself |
 
 **B-JUST is worth singling out.** "What does `yp:justification` cost?" is a question the
 paper should answer with a number, since it is the thing being argued for.
+
+**Selecting a mode is an environment variable, not a code edit.** `PROV_GRANULARITY` and
+`PROV_PERSISTENCE` are read in one place (`runtime/util.py::prov_mode`) and applied by the
+single factory all six agents construct their tracker through, so a sweep cannot end up
+honoured by five agents and forgotten by the sixth. An unrecognised value fails at
+start-up rather than inside a session already in flight.
+
+Both modes are now exercised by the real pipeline rather than only by a unit test, which
+was review finding F4: METADATA had never been executed by an agent, and TRANSIENT had no
+implementation at all — it was stored, reported in the record's own bundle descriptor, and
+did nothing. Measured through CA2 on a 6-activity record: METADATA drops the entity
+section and the entity-side relations, keeps the activities, the agent attribution and
+every justification, and is smaller by more than a tenth. **The justification survives in
+the lean mode by design** — the point is to buy less data, never less reasoning, and if
+METADATA shed justifications this table would stop being a comparison.
 
 ---
 
@@ -362,7 +377,18 @@ Plot: `to_prov_json()` cost vs activity count (log-log), with the fitted complex
 - **Small documents.** Two yProv4ML records of ~9 activities / 39 entities. The scaling
   study exists precisely to cover this, but real HPC runs are larger and untested.
 - **Network and LLM variance** dominate any wall-clock figure involving CAx; this is why
-  those rows are labelled context.
+  those rows are labelled context. The record now states the model, sampling parameters,
+  token counts and measured latency per call, so a reader can see how much of a CAx figure
+  is the model rather than the instrumentation.
+- **Energy is off during timing runs, deliberately.** A sampling backend has a cost of its
+  own and no run that is measuring time should pay it (`PROV_ENERGY` defaults to off).
+  There is a sharper reason not to report per-step energy at all: codecarbon's default
+  sampling period is 15 seconds and these steps last milliseconds, so a delta lands on
+  whichever step read after a tick. Measured here: a step of 0.000 s was handed 46.9 µWh
+  while the rendering step that did the work was handed 4.6 µWh. The emitted record
+  discloses this (`yp:energy_sampling_period_s`, `yp:energy_attributable`) rather than
+  presenting the figure as an attribution. **Energy belongs at session granularity**, and
+  any per-step energy claim needs a backend sampling faster than the steps.
 - **The A baseline is an upper bound, not a specific framework's handler.** It is our own
   reconstruction, and the event stream it consumes is built from the declarations the
   explicit instrumentation made — the entity each step said it read, the entity each step

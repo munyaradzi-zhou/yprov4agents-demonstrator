@@ -1,6 +1,6 @@
 # Review findings & fix plan — yProv4Agents demonstrator
 
-> **Phase 3 complete (2026-10-08).** The items below are the original review. Statuses:
+> **Phase 4 complete (2026-10-08).** The items below are the original review. Statuses:
 >
 > | | finding | status |
 > |---|---|---|
@@ -9,7 +9,7 @@
 > | C1 | justifications were static templates | **fixed** — CAx checks grounding, CA2 names which chart it made |
 > | C2 | integrity check compared a string with itself | **fixed** — the store reads through to disk |
 > | C3 | only 2 of 24 justifications varied by outcome | **fixed** — every agent's text now follows its verdict |
-> | C4 | model run indistinguishable from stub run | **partly** — `yp:summary_mode` separates them; model id and prompt hash are Phase 4 |
+> | C4 | model run indistinguishable from stub run | **fixed (Phase 4)** — the mode is on the step that produced the text, and the model path cites model, sampling parameters, token counts, latency and the prompt's id/version/sha |
 > | D1 | 8 PIDs cited, 2 in the manifest | **fixed** — 8/8 resolve from a cold start |
 > | D2 | no `load()`; cold process could not dereference | **fixed** |
 > | D3 | PID semantics undocumented | **fixed** — documented as mock handles |
@@ -27,7 +27,10 @@
 > | B2 | Strategy A column is unmeasured | **fixed (Phase 3)** — one shared callback baseline; A recovers 96/96 activities, 324/324 relations, 24/24 verdicts and 0/24 justifications |
 > | B3 | relation totals mix mechanical and observed | **open** — Phase 6 reporting |
 > | E | no `yp:` vocabulary artifact | **open** — Phase 7 |
-> | F1–F4 | no model/prompt provenance; dead modules | **open** — Phase 4 |
+> | F1 | no model provenance in LLM mode | **fixed (Phase 4)** — `runtime/llm.py`; every model call is accountable, archived in `experiments/phase4-llm` |
+> | F2 | `prompts.py` imported by nothing | **fixed (Phase 4)** — both LLM agents call through the registry; a prompt cannot reach a model without its identity reaching the record |
+> | F3 | `energy.py` entirely unused | **fixed (Phase 4)** — wired into the capture API, per step, opt-in via `PROV_ENERGY`. The wiring also found that per-step attribution is not sound at this granularity; the record now discloses that |
+> | F4 | METADATA never executed; TRANSIENT a no-op label | **fixed (Phase 4)** — both selectable by environment variable and exercised by the pipeline. `register_memory` and `actedOnBehalfOf` remain unexercised — Phase 6 decides |
 >
 > Walkthrough: [`docs/phases/PHASE_1.md`](docs/phases/PHASE_1.md). Plan: [`PLAN.md`](PLAN.md).
 

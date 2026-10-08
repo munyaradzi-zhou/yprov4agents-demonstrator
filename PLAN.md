@@ -234,13 +234,21 @@ made impossible.
 *Resolves [R2](#r2).* The single highest-leverage item in the plan: it fixes the most
 rejectable table in the paper and the baseline for the overhead study at the same time.
 
-### Phase 4 — Enable the modes E6 needs · ~1 day
+### Phase 4 — Enable the modes E6 needs · ~1 day ✅ *complete 2026-10-08*
 
-- [ ] Give `persistence="TRANSIENT"` actual behaviour (*[R5](#r5)* — currently a no-op label)
-- [ ] Smoke-test `granularity="METADATA"` through a real agent, not just the tracker
-- [ ] **P6 / F1 F2** — prompt provenance + model id, temperature, max_tokens, token counts
-      into CAx's PROV (~15 lines). Changes M6 and output bytes, so it lands before Level 1.
-- [ ] Decide on `energy.py` (F3): wire into CA2/CA3, or move to `experimental/`
+- [x] Give `persistence="TRANSIENT"` actual behaviour (*[R5](#r5)*) — `emit()` suppresses
+      the sink; the record is still built, returned and published, which is precisely the
+      layer E6c needs isolated
+- [x] Smoke-test `granularity="METADATA"` through a real agent — both modes are now
+      selected by environment variable through one tracker factory, so a sweep cannot be
+      honoured by five agents and forgotten by the sixth
+- [x] **P6 / F1 F2** — `runtime/llm.py`: model, temperature, max_tokens, token counts,
+      latency, finish reason and the prompt's id/version/sha, on both LLM-bearing agents.
+      Archived in `experiments/phase4-llm`
+- [x] Decide on `energy.py` (F3) — **wired in**, per step, opt-in via `PROV_ENERGY`.
+      Wiring it surfaced a methodological finding worth the paper: per-step energy
+      attribution is unsound when the backend samples less often than a step lasts, and
+      the record now discloses that rather than presenting the figure as an attribution
 
 ### Phase 5 — E6 proper · ~4–5 days, spread over two sittings
 
