@@ -29,14 +29,15 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+from functools import partial
 from typing import Any
 
-from yprov4agenticai import LightweightStore, ProvTracker, ptr_kwargs
+from yprov4agenticai import LightweightStore, ProvTracker
 
 from ..base_agent import StreamingAgent, _merge_payload, stream_document
 from ..envelope import ProvEventType, ProvRecordEnvelope
 from ..net_bus import NetworkBus
-from ..util import OUT_DIR, now_iso, prov_counts, write_prov
+from ..util import OUT_DIR, prov_counts, write_prov
 
 # consumer roles whose use of a record must precede persistence
 PERSIST_AFTER = [
@@ -179,142 +180,148 @@ class CA1Storage(StreamingAgent):
             doc=prov,
         )
 
+    def _verify(self, pid: str) -> tuple[bool, str]:
+        """Read the payload back out of the store and re-hash it.
+
+        A real round trip: a rooted store reads the file rather than handing back the copy
+        ``put`` just cached, so this check can actually fail — which is the only reason an
+        ACCEPT verdict means anything.
+        """
+        try:
+            self.store.resolve(pid, verify=True)
+        except Exception as exc:
+            return False, f"integrity check FAILED: {exc}"
+        return True, "round-trip read verified; sha-256 matched"
+
+    @staticmethod
+    def _justify(
+        verdict: str,
+        trigger: str,
+        reason: str,
+        acked: list[str],
+        missing: list[str],
+        counts: dict[str, int],
+        payload_chars: int,
+        integrity: str,
+    ) -> str:
+        """State which ordering actually held, and what the integrity check established.
+
+        Persisting at quorum is the property the architecture advertises: the record was
+        archived only after its consumers had used it, which is the ordering an audit
+        trail depends on. A timeout persist keeps the record safe but forfeits that
+        ordering, and reporting it as a plain ACCEPT made the two indistinguishable
+        without reading this prose.
+        """
+        if trigger == PERSIST_TRIGGER_QUORUM:
+            ordering = (
+                f"Persisted at quorum: {reason}; acknowledged by [{', '.join(acked)}], "
+                f"the full set required."
+            )
+        else:
+            ordering = (
+                f"Persisted WITHOUT confirmed consumption: {reason}. Acknowledged by "
+                f"[{', '.join(acked) or 'none'}]; still waiting on "
+                f"[{', '.join(missing)}] when the record was archived anyway to avoid "
+                f"losing it. The persist-after-consume ordering was not satisfied, so "
+                f"this record is archived but its consumption is unconfirmed."
+            )
+        return (
+            f"{ordering} Record carries {counts['activities']} activities / "
+            f"{counts['entities']} entities / {counts['relations']} relations, "
+            f"{payload_chars} bytes. Integrity: {integrity}. Verdict {verdict}."
+        )
+
     def _do_persist(
         self, sid: str, doc: dict[str, Any], acked: list, trigger: str, reason: str
     ) -> tuple[dict[str, Any], str]:
-        c = prov_counts(doc)
-        payload = json.dumps(doc, ensure_ascii=False, sort_keys=True)
+        tracker = ProvTracker(
+            sid=sid,
+            agent_label="StorageAgent",
+            sink=partial(write_prov, self.role, sid),
+            verbose=False,
+        )
 
-        # S3 Act — write through the store's own API (backend, NOT the bus)
-        ptr = self.store.put(payload, kind="provenance-record")
+        # S1 Receive — what is being held, and how big it is.
+        with tracker.activity("ReceiveTaskActivity", "CA1: receive record from bus") as prov:
+            counts = prov_counts(doc)
+            task = prov.produces(
+                "TaskEntity", f"provenance record '{sid}' held for persistence"
+            )
 
-        # S4 Observe — read the payload back from the store and re-hash it. This is a real
-        # round trip: a rooted store reads the file rather than returning the copy put()
-        # just cached, so the check can actually fail.
-        try:
-            self.store.resolve(ptr["yp:pid"], verify=True)
-            integrity_ok, integrity = True, "round-trip read verified; sha-256 matched"
-        except Exception as exc:
-            integrity_ok, integrity = False, f"integrity check FAILED: {exc}"
-        self.store.save()  # refresh the derived manifest index
+        # S2 Plan — who was required to consume this, and who actually did.
+        with tracker.activity(
+            "PlanningActivity", "CA1: await consumers, plan store path"
+        ) as prov:
+            prov.consumes(task)
+            missing = sorted(set(PERSIST_AFTER) - set(acked))
+            prov.note(
+                **{
+                    "yp:persist_policy": "after-consume",
+                    "yp:required_consumers": ",".join(PERSIST_AFTER),
+                    "yp:acknowledged_by": ",".join(acked) or "(none)",
+                }
+            )
+
+        # S3 Act — write through the store's own API (backend, NOT the bus).
+        with tracker.activity("PersistActivity", "CA1: write to store (backend API)") as prov:
+            prov.consumes(task)
+            payload = json.dumps(doc, ensure_ascii=False, sort_keys=True)
+            pointer = self.store.put(payload, kind="provenance-record")
+            stored = prov.produces(
+                "ToolResultEntity",
+                f"stored provenance record for {sid}",
+                pid=pointer["yp:pid"],
+                content_hash=pointer["yp:contentHash"],
+                derived_from=task,
+            )
+            prov.note(
+                **{
+                    "yp:store": "LightweightStore",
+                    "yp:size_bytes": len(payload.encode("utf-8")),
+                }
+            )
+
+        # S4 Observe — read it back and re-hash it. This block touches the disk twice,
+        # and the record now shows what that costs.
+        with tracker.activity(
+            "ObservationActivity", "CA1: verify round-trip integrity"
+        ) as prov:
+            prov.consumes(stored)
+            integrity_ok, integrity = self._verify(pointer["yp:pid"])
+            self.store.save()  # refresh the derived manifest index
 
         # S5 Decide — two independent conditions, so the verdict names which one failed.
-        #
-        # Persisting at quorum is the property the architecture advertises: the record was
-        # archived only after its consumers had used it, which is the ordering an audit
-        # trail depends on. A timeout persist keeps the record safe but forfeits that
-        # ordering, and reporting it as a plain ACCEPT made the two indistinguishable
-        # without reading the justification prose.
-        missing = sorted(set(PERSIST_AFTER) - set(acked))
         if not integrity_ok:
             verdict, escalation = "ESCALATE", "integrity"
         elif trigger != PERSIST_TRIGGER_QUORUM:
             verdict, escalation = "ESCALATE", "consumption-unconfirmed"
         else:
             verdict, escalation = "ACCEPT", ""
-
-        # ── reflexive PROV: CA1's own 6-step lifecycle ─────────────────────────
-        t = ProvTracker(sid=sid, agent_label="StorageAgent")
-        t0 = now_iso()
-        task = t.register_entity(
-            "TaskEntity", f"provenance record '{sid}' held for persistence"
-        )
-        t.record_activity(
-            "ReceiveTaskActivity",
-            "CA1: receive record from bus",
-            t0,
-            now_iso(),
-            out_eid=task,
-            verbose=False,
-        )
-        t.record_activity(
-            "PlanningActivity",
-            "CA1: await consumers, plan store path",
-            now_iso(),
-            now_iso(),
-            in_eid=task,
-            extra_attrs={
-                "yp:persist_policy": "after-consume",
-                "yp:required_consumers": ",".join(PERSIST_AFTER),
-                "yp:acknowledged_by": ",".join(acked) or "(none)",
-            },
-            verbose=False,
-        )
-        stored = t.register_entity(
-            "ToolResultEntity",
-            f"stored provenance record for {sid}",
-            **ptr_kwargs(ptr),
-            derived_from=task,
-        )
-        t.record_activity(
-            "PersistActivity",
-            "CA1: write to store (backend API)",
-            now_iso(),
-            now_iso(),
-            in_eid=task,
-            out_eid=stored,
-            extra_attrs={
-                "yp:store": "LightweightStore",
-                "yp:size_bytes": len(payload.encode("utf-8")),
-            },
-            verbose=False,
-        )
-        t.record_activity(
-            "ObservationActivity",
-            "CA1: verify round-trip integrity",
-            now_iso(),
-            now_iso(),
-            in_eid=stored,
-            verbose=False,
-        )
-        t.record_activity(
-            "DecisionActivity",
-            f"CA1: {verdict.lower()} the stored record",
-            now_iso(),
-            now_iso(),
-            in_eid=stored,
-            justification=(
-                (
-                    f"Persisted at quorum: {reason}; acknowledged by "
-                    f"[{', '.join(acked)}], the full set required."
-                    if trigger == PERSIST_TRIGGER_QUORUM
-                    else f"Persisted WITHOUT confirmed consumption: {reason}. "
-                    f"Acknowledged by [{', '.join(acked) or 'none'}]; still waiting on "
-                    f"[{', '.join(missing)}] when the record was archived anyway to avoid "
-                    f"losing it. The persist-after-consume ordering was not satisfied, so "
-                    f"this record is archived but its consumption is unconfirmed."
-                )
-                + f" Record carries {c['activities']} activities / {c['entities']} entities"
-                f" / {c['relations']} relations, {len(payload)} bytes. "
-                f"Integrity: {integrity}. Verdict {verdict}."
+        tracker.decide(
+            verdict,
+            self._justify(
+                verdict, trigger, reason, acked, missing, counts, len(payload), integrity
             ),
-            extra_attrs={
-                "yp:verdict": verdict,
+            label=f"CA1: {verdict.lower()} the stored record",
+            consumed=stored,
+            attributes={
                 "yp:persist_trigger": trigger,
                 "yp:consumers_required": len(PERSIST_AFTER),
                 "yp:consumers_acknowledged": len(acked),
                 **({"yp:escalation_reason": escalation} if escalation else {}),
             },
-            verbose=False,
-        )
-        receipt = t.register_entity(
-            "ResponseEntity",
-            f"storage receipt {ptr['yp:pid']} ({ptr['yp:contentHash'][:19]}...)",
-            derived_from=stored,
-        )
-        t.record_activity(
-            "ResponseActivity",
-            "CA1: emit storage receipt",
-            now_iso(),
-            now_iso(),
-            in_eid=stored,
-            out_eid=receipt,
-            verbose=False,
         )
 
-        prov = t.to_prov_json()
-        write_prov(self.role, sid, prov)
-        return prov, (
-            f"persisted '{sid}' -> {ptr['yp:pid']} [{verdict}] "
+        # S6 Respond — the receipt goes on the bus; the payload stays in the store.
+        with tracker.activity("ResponseActivity", "CA1: emit storage receipt") as prov:
+            prov.consumes(stored)
+            prov.produces(
+                "ResponseEntity",
+                f"storage receipt {pointer['yp:pid']} ({pointer['yp:contentHash'][:19]}...)",
+                derived_from=stored,
+            )
+
+        return tracker.emit(), (
+            f"persisted '{sid}' -> {pointer['yp:pid']} [{verdict}] "
             f"via {trigger}, acked by {acked or '(none)'}"
         )

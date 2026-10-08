@@ -33,13 +33,14 @@ from __future__ import annotations
 import re
 import statistics
 from datetime import UTC, datetime
+from functools import partial
 from typing import Any
 
-from yprov4agenticai import LightweightStore, ProvTracker, ptr_kwargs
+from yprov4agenticai import LightweightStore, ProvTracker
 
 from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
-from ..util import OUT_DIR, get_llm, llm_is_required, now_iso, write_prov
+from ..util import OUT_DIR, get_llm, llm_is_required, write_prov
 
 # Metric-family classifiers, matched against entity labels rather than a hard-coded
 # schema so the agent stays domain-agnostic. The families must partition: a label like
@@ -61,6 +62,15 @@ _MIN_GAPS_FOR_OUTLIERS = 5
 #: explodes and sub-second noise is reported beside a genuine multi-second stall.
 _MATERIAL_SHARE = 0.05
 _MIN_MATERIAL_GAP_S = 0.5
+
+#: The mining algorithms this agent applies, in the order the module docstring lists them.
+#: Named once so the figure in the justification and the ``yp:algorithms`` attribute on the
+#: planning step cannot disagree with each other or with the code that runs.
+_ALGORITHMS = ("structure", "timing", "sustainability", "resource", "anomaly")
+
+#: How many findings a justification quotes before summarising the remainder. A
+#: justification is an explanation, not a dump of the finding list.
+_JUSTIFICATION_EXAMPLES = 3
 
 
 def _clean_ts(value: Any) -> datetime | None:
@@ -354,138 +364,149 @@ class CA3Analytics(StreamingAgent):
             return head, f"computed-after-{type(exc).__name__}"
         return narration, "llm"
 
+    def _justify(
+        self,
+        verdict: str,
+        struct: dict[str, Any],
+        timing: dict[str, Any],
+        anomalies: list[str],
+        completeness: list[str],
+    ) -> str:
+        """State which algorithms ran, what they found, and what the verdict rests on.
+
+        The two halves are reported separately on purpose. An anomaly is a claim about how
+        the run behaved; a completeness gap is a claim about what the producer recorded.
+        Folding them together made ANOMALY the verdict for every real graph, which left
+        the verdict carrying no information.
+        """
+        if anomalies:
+            found = (
+                "Breached invariants: "
+                + "; ".join(anomalies[:_JUSTIFICATION_EXAMPLES])
+                + (
+                    f" (+{len(anomalies) - _JUSTIFICATION_EXAMPLES} more)"
+                    if len(anomalies) > _JUSTIFICATION_EXAMPLES
+                    else ""
+                )
+            )
+        elif len(timing["gaps"]) >= _MIN_GAPS_FOR_OUTLIERS:
+            found = (
+                f"No invariant breached: no ordering gap exceeds {_MAD_THRESHOLD:g} MAD "
+                f"above the median"
+            )
+        else:
+            # An outlier test over too few samples cannot fire, so it has to say it
+            # abstained rather than report a clean result it was never able to reach.
+            found = (
+                f"No invariant breached: only {len(timing['gaps'])} ordering gap(s), below "
+                f"the {_MIN_GAPS_FOR_OUTLIERS} needed to identify an outlier, so the "
+                f"timing check abstained"
+            )
+        if completeness:
+            gaps = (
+                f" Separately, {len(completeness)} completeness gap(s) in what the "
+                f"producer recorded: " + "; ".join(completeness[:_JUSTIFICATION_EXAMPLES]) + "."
+            )
+        else:
+            gaps = (
+                " No completeness gaps: every activity is closed, typing is complete, and "
+                "energy and resource streams are present."
+            )
+        return (
+            f"Applied {len(_ALGORITHMS)} algorithms ({', '.join(_ALGORITHMS)}) to a "
+            f"{struct['activities']}-activity / {struct['entities']}-entity graph. "
+            f"{found}{gaps} Verdict {verdict}."
+        )
+
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
     ) -> tuple[dict[str, Any], str]:
-        # ── run the algorithm set ─────────────────────────────────────────────
-        struct = self._structure(doc)
-        timing = self._timing(doc)
-        energy = self._streams(doc, _ENERGY_PAT)
-        resource = self._streams(doc, _RESOURCE_PAT, exclude=_ENERGY_PAT)
-        anomalies = self._anomalies(timing)
-        completeness = self._completeness(struct, timing, energy, resource)
-        findings = {
-            "structure": struct,
-            "timing": {k: v for k, v in timing.items() if k != "gaps"},
-            "sustainability": energy,
-            "resource": resource,
-        }
-        report, mode = self._narrate(
-            session_id, {**findings, "timing": timing}, anomalies, completeness
+        tracker = ProvTracker(
+            sid=session_id,
+            agent_label="Analytics_Agent",
+            sink=partial(write_prov, self.role, session_id),
+            verbose=False,
         )
-        verdict = "ANOMALY" if anomalies else "OK"
-        ptr = self.store.put(report, kind="analytics-report")
-        self.store.save()  # keep the shared index complete
 
-        # ── reflexive PROV: CA3's own 6-step lifecycle ────────────────────────
-        t = ProvTracker(sid=session_id, agent_label="Analytics_Agent")
-        t0 = now_iso()
-        task = t.register_entity("TaskEntity", f"provenance graph from {source_subject}")
-        t.record_activity(
-            "ReceiveTaskActivity",
-            "CA3: receive provenance graph",
-            t0,
-            now_iso(),
-            out_eid=task,
-            verbose=False,
-        )
-        t.record_activity(
-            "PlanningActivity",
-            "CA3: select analytics algorithms",
-            now_iso(),
-            now_iso(),
-            in_eid=task,
-            extra_attrs={"yp:algorithms": "structure,timing,sustainability,resource,anomaly"},
-            verbose=False,
-        )
-        result = t.register_entity(
-            "ToolResultEntity", report, **ptr_kwargs(ptr), derived_from=task
-        )
-        t.record_activity(
-            "AnalysisActivity",
-            "CA3: mine the provenance graph",
-            now_iso(),
-            now_iso(),
-            in_eid=task,
-            out_eid=result,
-            extra_attrs={
-                "yp:activities_analysed": struct["activities"],
-                "yp:entities_analysed": struct["entities"],
-                "yp:energy_streams": energy["count"],
-                "yp:resource_streams": resource["count"],
-                "yp:wall_clock_s": timing["wall_clock_s"],
-            },
-            verbose=False,
-        )
-        quality = t.register_entity(
-            "QualityEntity",
-            f"{len(anomalies)} invariant(s) breached, {len(completeness)} completeness gap(s)"
-            if (anomalies or completeness)
-            else "all invariants held, no completeness gaps",
-            derived_from=result,
-        )
-        t.record_activity(
-            "ObservationActivity",
-            "CA3: validate findings against invariants",
-            now_iso(),
-            now_iso(),
-            in_eid=result,
-            out_eid=quality,
-            verbose=False,
-        )
-        t.record_activity(
-            "DecisionActivity",
-            f"CA3: {verdict}",
-            now_iso(),
-            now_iso(),
-            in_eid=quality,
-            justification=(
-                f"Applied 5 algorithms (structure, timing, sustainability, resource, "
-                f"anomaly) to a {struct['activities']}-activity / "
-                f"{struct['entities']}-entity graph. "
-                + (
-                    "Breached invariants: "
-                    + "; ".join(anomalies[:3])
-                    + (f" (+{len(anomalies) - 3} more)" if len(anomalies) > 3 else "")
-                    if anomalies
-                    else (
-                        f"No invariant breached: no ordering gap exceeds "
-                        f"{_MAD_THRESHOLD:g} MAD above the median"
-                        if len(timing["gaps"]) >= _MIN_GAPS_FOR_OUTLIERS
-                        else f"No invariant breached: only {len(timing['gaps'])} ordering "
-                        f"gap(s), below the {_MIN_GAPS_FOR_OUTLIERS} needed to identify "
-                        f"an outlier, so the timing check abstained"
-                    )
-                )
-                + (
-                    f" Separately, {len(completeness)} completeness gap(s) in what the "
-                    f"producer recorded: " + "; ".join(completeness[:3]) + "."
-                    if completeness
-                    else " No completeness gaps: every activity is closed, typing is "
-                    "complete, and energy and resource streams are present."
-                )
-                + f" Verdict {verdict}."
-            ),
-            extra_attrs={
-                "yp:verdict": verdict,
+        # S1 Receive — the graph to mine, and where it came from.
+        with tracker.activity("ReceiveTaskActivity", "CA3: receive provenance graph") as prov:
+            task = prov.produces("TaskEntity", f"provenance graph from {source_subject}")
+
+        # S2 Plan — which algorithms to apply. Fixed in this agent, so it costs nothing;
+        # the record names the set so a reader knows what was and was not looked for.
+        with tracker.activity("PlanningActivity", "CA3: select analytics algorithms") as prov:
+            prov.consumes(task)
+            prov.note(**{"yp:algorithms": ",".join(_ALGORITHMS)})
+
+        # S3 Analyse — the algorithm set, then the narration of what it found. This block
+        # is where CA3's time actually goes, and the record now shows that.
+        with tracker.activity("AnalysisActivity", "CA3: mine the provenance graph") as prov:
+            prov.consumes(task)
+            struct = self._structure(doc)
+            timing = self._timing(doc)
+            energy = self._streams(doc, _ENERGY_PAT)
+            resource = self._streams(doc, _RESOURCE_PAT, exclude=_ENERGY_PAT)
+            anomalies = self._anomalies(timing)
+            completeness = self._completeness(struct, timing, energy, resource)
+            findings = {
+                "structure": struct,
+                "timing": timing,
+                "sustainability": energy,
+                "resource": resource,
+            }
+            report, mode = self._narrate(session_id, findings, anomalies, completeness)
+            pointer = self.store.put(report, kind="analytics-report")
+            self.store.save()  # keep the shared index complete
+            result = prov.produces(
+                "ToolResultEntity",
+                report,
+                pid=pointer["yp:pid"],
+                content_hash=pointer["yp:contentHash"],
+                derived_from=task,
+            )
+            prov.note(
+                **{
+                    "yp:activities_analysed": struct["activities"],
+                    "yp:entities_analysed": struct["entities"],
+                    "yp:energy_streams": energy["count"],
+                    "yp:resource_streams": resource["count"],
+                    "yp:wall_clock_s": timing["wall_clock_s"],
+                }
+            )
+
+        # S4 Observe — summarise what the invariant checks concluded.
+        with tracker.activity(
+            "ObservationActivity", "CA3: validate findings against invariants"
+        ) as prov:
+            prov.consumes(result)
+            quality = prov.produces(
+                "QualityEntity",
+                f"{len(anomalies)} invariant(s) breached, "
+                f"{len(completeness)} completeness gap(s)"
+                if (anomalies or completeness)
+                else "all invariants held, no completeness gaps",
+                derived_from=result,
+            )
+
+        # S5 Decide — OK, or name the invariant that broke.
+        verdict = "ANOMALY" if anomalies else "OK"
+        tracker.decide(
+            verdict,
+            self._justify(verdict, struct, timing, anomalies, completeness),
+            label=f"CA3: {verdict}",
+            consumed=quality,
+            attributes={
                 "yp:anomaly_count": len(anomalies),
                 "yp:completeness_gap_count": len(completeness),
             },
-            verbose=False,
-        )
-        t.record_activity(
-            "ResponseActivity",
-            "CA3: publish analytics report",
-            now_iso(),
-            now_iso(),
-            in_eid=result,
-            verbose=False,
         )
 
-        prov = t.to_prov_json()
-        write_prov(self.role, session_id, prov)
-        return prov, (
+        # S6 Respond — publish the report.
+        with tracker.activity("ResponseActivity", "CA3: publish analytics report") as prov:
+            prov.consumes(result)
+
+        return tracker.emit(), (
             f"analysed {session_id} ({mode}) -> {verdict}, "
             f"{len(anomalies)} anomaly(ies), {len(completeness)} completeness gap(s), "
-            f"PID {ptr['yp:pid']}"
+            f"PID {pointer['yp:pid']}"
         )

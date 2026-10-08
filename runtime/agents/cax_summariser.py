@@ -13,13 +13,14 @@ otherwise a deterministic stub summary is produced, so the pipeline runs with no
 from __future__ import annotations
 
 import re
+from functools import partial
 from typing import Any
 
-from yprov4agenticai import LightweightStore, ProvTracker, ptr_kwargs
+from yprov4agenticai import LightweightStore, ProvTracker
 
 from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
-from ..util import OUT_DIR, get_llm, llm_is_required, now_iso, prov_counts, write_prov
+from ..util import OUT_DIR, get_llm, llm_is_required, prov_counts, write_prov
 
 #: Numerals in prose that are units or ordinary language rather than claims about the
 #: graph ("3-4 sentences", "one of"). Grounding small integers against the fact set would
@@ -110,98 +111,103 @@ class CAxSummariser(StreamingAgent):
                 ungrounded.append(literal)
         return not ungrounded, ungrounded
 
+    def _justify(
+        self,
+        verdict: str,
+        summary: str,
+        mode: str,
+        counts: dict[str, int],
+        ungrounded: list[str],
+    ) -> str:
+        """State what was summarised, by which path, and what the grounding check found."""
+        if not ungrounded:
+            finding = (
+                f"Checked every figure of {_UNGROUNDED_FLOOR} or more against the "
+                f"graph's own counts: all supported. This establishes no invented "
+                f"figures, not that the summary is complete."
+            )
+        else:
+            finding = (
+                f"Figure(s) {', '.join(ungrounded)} appear in the summary but not in the "
+                f"graph's counts, so the text asserts something the record does not "
+                f"support."
+            )
+        return (
+            f"Summary of {len(summary)} characters produced by the {mode} path over a "
+            f"{counts['activities']}-activity / {counts['entities']}-entity graph. "
+            f"{finding} Verdict {verdict}."
+        )
+
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
     ) -> tuple[dict[str, Any], str]:
-        c = prov_counts(doc)
-        summary, mode = self._summarise(doc, c)
-        grounded, ungrounded = self._check_grounding(summary, doc, c)
+        tracker = ProvTracker(
+            sid=session_id,
+            agent_label="NL_Summarizer",
+            sink=partial(write_prov, self.role, session_id),
+            verbose=False,
+        )
+
+        # S1 Receive — what arrived, and from where.
+        with tracker.activity("ReceiveTaskActivity", "CAx: receive producer record") as prov:
+            counts = prov_counts(doc)
+            task = prov.produces("TaskEntity", f"producer doc on {source_subject}")
+
+        # S2 Plan — scoping the summary is a no-op in this agent, and the record now says
+        # so honestly: an activity that does no work takes no measurable time.
+        with tracker.activity("PlanningActivity", "CAx: scope the summary") as prov:
+            prov.consumes(task)
+
+        # S3 Act — the model call (or the computed fallback), then the payload to the store.
+        with tracker.activity("ToolCallActivity", "CAx: write NL summary") as prov:
+            prov.consumes(task)
+            summary, mode = self._summarise(doc, counts)
+            pointer = self.store.put(summary, kind="summary")
+            self.store.save()  # keep the shared index complete
+            response = prov.produces(
+                "ResponseEntity",
+                summary,
+                pid=pointer["yp:pid"],
+                content_hash=pointer["yp:contentHash"],
+                derived_from=task,
+            )
+
+        # S4 Observe — test the summary's figures against the graph that produced them.
+        with tracker.activity(
+            "ObservationActivity", "CAx: check the summary's figures against the graph"
+        ) as prov:
+            prov.consumes(response)
+            grounded, ungrounded = self._check_grounding(summary, doc, counts)
+            prov.produces(
+                "QualityEntity",
+                f"{len(ungrounded)} ungrounded figure(s)"
+                if ungrounded
+                else "no ungrounded figures",
+                derived_from=response,
+            )
+            prov.note(
+                **{
+                    "yp:grounding_check": "numerals-against-graph-facts",
+                    "yp:ungrounded_figure_count": len(ungrounded),
+                }
+            )
+            quality = prov.generated
+
+        # S5 Decide — accept the summary, or say which figure it could not support.
         verdict = "ACCEPT" if grounded else "REVISE"
-        ptr = self.store.put(summary, kind="summary")
-        self.store.save()  # keep the shared index complete
-
-        # emit CAx's own 6-step lifecycle as typed PROV
-        t = ProvTracker(sid=session_id, agent_label="NL_Summarizer")
-        t0 = now_iso()
-        task = t.register_entity("TaskEntity", f"producer doc on {source_subject}")
-        t.record_activity(
-            "ReceiveTaskActivity",
-            "CAx: receive producer record",
-            t0,
-            now_iso(),
-            out_eid=task,
-            verbose=False,
-        )
-        t.record_activity(
-            "PlanningActivity",
-            "CAx: scope the summary",
-            now_iso(),
-            now_iso(),
-            in_eid=task,
-            verbose=False,
-        )
-        resp = t.register_entity(
-            "ResponseEntity", summary, **ptr_kwargs(ptr), derived_from=task
-        )
-        t.record_activity(
-            "ToolCallActivity",
-            "CAx: write NL summary",
-            now_iso(),
-            now_iso(),
-            in_eid=task,
-            out_eid=resp,
-            verbose=False,
-        )
-        quality = t.register_entity(
-            "QualityEntity",
-            f"{len(ungrounded)} ungrounded figure(s)"
-            if ungrounded
-            else "no ungrounded figures",
-            derived_from=resp,
-        )
-        t.record_activity(
-            "ObservationActivity",
-            "CAx: check the summary's figures against the graph",
-            now_iso(),
-            now_iso(),
-            in_eid=resp,
-            out_eid=quality,
-            extra_attrs={
-                "yp:grounding_check": "numerals-against-graph-facts",
-                "yp:ungrounded_figure_count": len(ungrounded),
-            },
-            verbose=False,
-        )
-        t.record_activity(
-            "DecisionActivity",
-            f"CAx: {verdict.lower()} summary",
-            now_iso(),
-            now_iso(),
-            in_eid=quality,
-            justification=(
-                f"Summary of {len(summary)} characters produced by the {mode} path over a "
-                f"{c['activities']}-activity / {c['entities']}-entity graph. "
-                + (
-                    f"Checked every figure of {_UNGROUNDED_FLOOR} or more against the "
-                    f"graph's own counts: all supported. This establishes no invented "
-                    f"figures, not that the summary is complete."
-                    if grounded
-                    else f"Figure(s) {', '.join(ungrounded)} appear in the summary but not "
-                    f"in the graph's counts, so the text asserts something the record "
-                    f"does not support."
-                )
-                + f" Verdict {verdict}."
-            ),
-            extra_attrs={"yp:verdict": verdict, "yp:summary_mode": mode},
-            verbose=False,
-        )
-        t.record_activity(
-            "ResponseActivity", "CAx: respond", now_iso(), now_iso(), in_eid=resp, verbose=False
+        tracker.decide(
+            verdict,
+            self._justify(verdict, summary, mode, counts, ungrounded),
+            label=f"CAx: {verdict.lower()} summary",
+            consumed=quality,
+            attributes={"yp:summary_mode": mode},
         )
 
-        prov = t.to_prov_json()
-        write_prov(self.role, session_id, prov)
-        return prov, (
+        # S6 Respond — hand the summary on.
+        with tracker.activity("ResponseActivity", "CAx: respond") as prov:
+            prov.consumes(response)
+
+        return tracker.emit(), (
             f"summarised {session_id} ({mode}) -> {len(summary)} chars "
-            f"[{verdict}], PID {ptr['yp:pid']}"
+            f"[{verdict}], PID {pointer['yp:pid']}"
         )

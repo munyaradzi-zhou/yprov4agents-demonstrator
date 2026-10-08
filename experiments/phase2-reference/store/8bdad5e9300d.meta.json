@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-8bdad5e9300d",
+  "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/8bdad5e9300d.txt",
+  "yp:contentHash": "sha256:8bdad5e9300d98eb80a13b922484627e1934a34e5f6dccd375af07b5f5eefdc4",
+  "size_bytes": 250,
+  "kind": "analytics-report",
+  "preview": "Provenance analytics for 'example_0': 9 activities and 39 entities (82.1% typed), 7 derivations, 30 terminal entities. Wall-clock span 7.81s…",
+  "created_at": "2026-10-08T16:55:24.395563+00:00"
+}

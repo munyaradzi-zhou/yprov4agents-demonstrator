@@ -8,6 +8,11 @@ optional energy delta, optional confidence, the decision ``justification``, and 
 extra attributes (e.g. prompt provenance). ``to_prov_json`` emits a standard W3C
 PROV-JSON document.
 
+Two layers, one buffer. ``register_entity`` / ``record_activity`` / ``to_prov_json`` are
+the primitives; ``step`` / ``activity`` / ``decide`` / ``emit`` are the capture API a
+developer writes against, and they are thin — they add no record kind of their own (see
+:mod:`yprov4agenticai.api`).
+
 No external PROV library is required — the document is built directly. Granularity
 (DATA vs METADATA), persistence label, and the agent label are per-instance config
 that round-trips through ``to_state``/``from_state`` so the tracker can be carried
@@ -17,9 +22,28 @@ inside an agent's serialisable state (e.g. a LangGraph ``State`` dict).
 from __future__ import annotations
 
 import datetime
-from collections.abc import Callable, Sequence
+import functools
+import inspect
+from collections.abc import Callable, Iterator, Sequence
+from contextlib import contextmanager
+from typing import Any, TypeVar
+
+from .api import SCOPE_PARAMETER, ActivityScope, Span
 
 YP_NAMESPACE = "http://hpci-lab.org/yProv4Agents#"
+
+_R = TypeVar("_R")
+
+
+def now_iso() -> str:
+    """Current UTC instant, ISO 8601, as recorded in ``prov:startTime``/``prov:endTime``.
+
+    The one clock in the system. Timestamps from different clocks are the usual reason two
+    records of the same run disagree about ordering, and the analytics agent reads these
+    values as a timeline — so the library that writes them owns the definition and the
+    runtime imports it rather than re-deriving it.
+    """
+    return datetime.datetime.now(datetime.UTC).isoformat()
 
 
 def _library_version() -> str:
@@ -51,6 +75,15 @@ class ProvTracker:
                    (harmonised from yProv4WFs; standard PROV relation, no new
                    predicate). Default None => no principal node/edge is emitted
                    (the default output stays byte-identical).
+    sink         : optional callable invoked by ``emit()`` with the serialised
+                   document — a bus publish, a file write, an HTTP POST. Keeping it a
+                   plain callable is what keeps this module free of any transport
+                   dependency. Not part of ``to_state``: a tracker restored from a
+                   state dict has no sink, because a destination is a property of the
+                   process that is running, not of the record it is building.
+    verbose      : whether ``record_activity`` narrates each step on stdout. The
+                   demonstrator's console trace is a teaching device; a measurement run
+                   or a library embedded in someone else's agent wants it off.
     """
 
     YP = YP_NAMESPACE
@@ -62,12 +95,16 @@ class ProvTracker:
         persistence: str = "PERSISTENT",
         agent_label: str = "NL_Summarizer",
         principal: dict | None = None,
+        sink: Callable[[dict], Any] | None = None,
+        verbose: bool = True,
     ) -> None:
         assert granularity in ("DATA", "METADATA"), f"bad granularity={granularity!r}"
         self.sid = sid
         self.granularity = granularity
         self.persistence = persistence
         self.agent_label = agent_label
+        self.sink = sink
+        self.verbose = verbose
         # Optional delegation: the principal the operational agent acted for.
         # None (default) => no principal agent node and no prov:actedOnBehalfOf
         # edge, so to_prov_json is byte-identical to the output without a principal.
@@ -181,7 +218,7 @@ class ProvTracker:
         confidence_score: float | None = None,
         extra_attrs: dict | None = None,
         used_mem: str | None = None,
-        verbose: bool = True,
+        verbose: bool | None = None,
     ) -> None:
         # extra_attrs carries any additional yp: attributes to stamp onto the
         # activity — e.g. prompt provenance (yp:prompt_id / _version / _sha) so the
@@ -208,7 +245,9 @@ class ProvTracker:
         )
         if used_mem:
             self.used_mem.append((f"yp:{aid}", used_mem))
-        if not verbose:
+        # None means "whatever this tracker was configured for"; an explicit argument
+        # still wins, so a caller can silence one noisy step without touching the rest.
+        if not (self.verbose if verbose is None else verbose):
             return
         ms = self._ms(t0, t1)
         mark = "  <- yp:justification SET" if justification else ""
@@ -227,6 +266,184 @@ class ProvTracker:
             return str(int(d.total_seconds() * 1000))
         except Exception:
             return "?"
+
+    # ── the capture API: a decorator, a context manager, one explicit call ─────
+    #
+    # These four methods are the surface a developer writes against; everything above is
+    # the buffer they write into. See yprov4agenticai/api.py for the design argument and
+    # docs/INSTRUMENTATION.md §3 for the walkthrough.
+    #
+    # They add no record kind of their own. Anything expressible through them is
+    # expressible through record_activity, which is what makes the layer safe to adopt
+    # incrementally and what tests/test_capture_api.py asserts directly.
+
+    def step(
+        self,
+        kind: str,
+        label: str | None = None,
+        *,
+        produces: str | None = None,
+    ) -> Callable[[Callable[..., _R]], Callable[..., _R]]:
+        """Decorate a function so that calling it records a typed activity.
+
+        Automatic: the activity's type, its label, its start and end instants, its
+        attribution to this tracker's agent, and its position in the sequence. Also the
+        failure case — a call that raises is recorded as having run and failed.
+
+        Declared, never inferred: lineage. A function that needs to state what it read or
+        wrote declares a ``prov`` parameter and receives its :class:`ActivityScope`::
+
+            @tracker.step("ToolCallActivity")
+            def run(payload: str, *, prov: ActivityScope) -> str:
+                prov.consumes(task_entity)
+                return tool.run(payload)
+
+        Parameters
+        ----------
+        kind
+            ``yp:`` activity type, without the prefix (e.g. ``"PlanningActivity"``).
+        label
+            ``prov:label``. Defaults to the function's qualified name, which is accurate
+            but rarely what a reader of the graph wants to see.
+        produces
+            Entity type to register the return value as, for the common case of a step
+            whose output *is* its return value. The value is stringified, so a heavy
+            payload should go to the store and be declared with
+            :meth:`ActivityScope.produces` instead.
+
+        Notes
+        -----
+        The decorator binds to this tracker instance, so it applies to functions defined
+        where the tracker is already in scope — a module-level pipeline, or a closure
+        inside a session handler. Code whose tracker is created per request (every agent
+        in this demonstrator) reads better with :meth:`activity`.
+        """
+
+        def decorate(function: Callable[..., _R]) -> Callable[..., _R]:
+            wants_scope = SCOPE_PARAMETER in inspect.signature(function).parameters
+
+            @functools.wraps(function)
+            def wrapper(*args: Any, **kwargs: Any) -> _R:
+                scope = ActivityScope(self, kind, label or function.__qualname__)
+                if wants_scope:
+                    kwargs[SCOPE_PARAMETER] = scope
+                span = Span()
+                try:
+                    result = function(*args, **kwargs)
+                except BaseException as error:
+                    scope.record(span.start_iso, span.end_iso(), error)
+                    raise
+                if produces is not None and result is not None:
+                    scope.produces(produces, str(result))
+                scope.record(span.start_iso, span.end_iso(), None)
+                return result
+
+            return wrapper
+
+        return decorate
+
+    @contextmanager
+    def activity(self, kind: str, label: str | None = None) -> Iterator[ActivityScope]:
+        """Record a typed activity around a block, and hand it a scope to declare with.
+
+        The activity is written when the block exits, by either path::
+
+            with tracker.activity("ToolCallActivity", "render the chart") as prov:
+                prov.consumes(task)
+                chart = render(payload)
+                prov.produces("ToolResultEntity", chart.name, derived_from=task)
+
+        A body that raises is recorded with ``yp:outcome`` and ``yp:error_type``, and the
+        exception propagates untouched. The record then shows a step that ran and failed,
+        rather than a hole where a step should be.
+        """
+        scope = ActivityScope(self, kind, label or kind)
+        span = Span()
+        try:
+            yield scope
+        except BaseException as error:
+            scope.record(span.start_iso, span.end_iso(), error)
+            raise
+        scope.record(span.start_iso, span.end_iso(), None)
+
+    def decide(
+        self,
+        verdict: str,
+        justification: str,
+        *,
+        confidence: float | None = None,
+        label: str | None = None,
+        kind: str = "DecisionActivity",
+        consumed: str | None = None,
+        generated: str | None = None,
+        attributes: dict[str, Any] | None = None,
+        started_at: str | None = None,
+    ) -> None:
+        """Record a decision: the verdict, and the reasoning that produced it.
+
+        The one call in this API that a machine could not have written. Everything else
+        here observes what happened; this states *why* it happened, which is available
+        only at the moment of decision and only to the code making it.
+
+        ``justification`` is mandatory and must not be blank. The alternative — a decision
+        activity with an empty rationale — is indistinguishable in the record from a
+        decision nobody could explain, so the API rejects it at the call site where the
+        reasoning still exists.
+
+        Parameters
+        ----------
+        verdict
+            The outcome, recorded as ``yp:verdict`` (ACCEPT, REVISE, ESCALATE, …).
+        justification
+            Why that verdict, in terms of the evidence that produced it.
+        confidence
+            Optional score behind the verdict, recorded as ``yp:confidence_score``.
+        started_at
+            When the deliberation began. Defaults to now, making the decision
+            instantaneous in the record — right for a threshold comparison, wrong for a
+            verdict that took work to reach, which should pass the instant that work
+            started.
+
+        Raises
+        ------
+        ValueError
+            ``justification`` is empty or whitespace.
+        """
+        if not justification.strip():
+            raise ValueError(
+                f"verdict {verdict!r} was given no justification. A decision activity "
+                f"with an empty rationale cannot be told apart from an unexplained "
+                f"decision; state the evidence that produced the verdict."
+            )
+        # Measured the same way as every other activity, so a decision's recorded extent
+        # is a real interval rather than a single wall-clock reading taken twice. The work
+        # of *reaching* the verdict happens in the caller; pass ``started_at`` to include
+        # it in the record.
+        span = Span()
+        self.record_activity(
+            kind,
+            label or f"decide: {verdict}",
+            started_at or span.start_iso,
+            span.end_iso(),
+            in_eid=consumed,
+            out_eid=generated,
+            justification=justification,
+            confidence_score=confidence,
+            extra_attrs={"yp:verdict": verdict, **(attributes or {})},
+        )
+
+    def emit(self, sink: Callable[[dict], Any] | None = None) -> dict:
+        """Serialise to PROV-JSON and hand the document to a sink.
+
+        Returns the document either way, so a caller that wants to inspect, archive or
+        forward it can. The sink argument wins over the one given to the constructor,
+        which is how a measurement run redirects output without reconfiguring the agent.
+        """
+        doc = self.to_prov_json()
+        destination = sink if sink is not None else self.sink
+        if destination is not None:
+            destination(doc)
+        return doc
 
     # ── serialise/restore (the tracker can ride inside an agent State dict) ────
     def to_state(self) -> dict:

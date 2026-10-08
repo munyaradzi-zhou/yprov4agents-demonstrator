@@ -1,8 +1,8 @@
 # Review findings & fix plan — yProv4Agents demonstrator
 
-> **Phase 1 complete (2026-10-08).** The items below are the original review. Statuses:
+> **Phase 2 complete (2026-10-08).** The items below are the original review. Statuses:
 >
-> | | finding | status after Phase 1 |
+> | | finding | status |
 > |---|---|---|
 > | E1 | non-standard root key; 0/24 documents parsed | **fixed** — 24/24 valid, verified by the reference parser |
 > | E2 | `yp:value` instead of `prov:value` | **fixed** |
@@ -20,6 +20,8 @@
 > | B4 | lineage fabricated from registration order | **fixed** — derivation declared, informed-by derived from dataflow |
 > | G1–G5 | five CA3 defects | **fixed** — including a check that could never fire |
 > | H4 | persist-after-consume was a race | **fixed** — guard cancelled at quorum |
+> | A1 | the documented API did not exist | **fixed (Phase 2)** — `step`/`activity`/`decide`/`emit`; all six agents ported, zero structural change |
+> | J1 | every activity recorded a zero duration (96/96) | **fixed (Phase 2)** — found while porting; the wall clock's 15.6 ms granularity exceeded the steps it was timing. Now 0/96 |
 > | A4 | nothing consumes `governance.*` | **open** — Phase 6 decides: implement or narrow the claim |
 > | B1 | E2 coverage metric is tautological | **open** — Phase 6 |
 > | B2 | Strategy A column is unmeasured | **open** — Phase 3 |
@@ -48,8 +50,10 @@
 Items P2, P3 and P6 are each under an hour and each converts a contested claim into a
 measured one.
 
-- [ ] **P1 — Implement `step` / `activity` / `decide` / `emit`** so `INSTRUMENTATION.md` §5
-      describes real code. See [A1](#a1).
+- [x] **P1 — Implement `step` / `activity` / `decide` / `emit`** so `INSTRUMENTATION.md` §5
+      describes real code. See [A1](#a1). *Done in Phase 2: `yprov4agenticai/api.py` plus
+      four methods on `ProvTracker`; all six agents ported; raw-vs-API equivalence tested;
+      structural diff against `phase1-reference` is empty.*
 - [ ] **P2 — Fix the dangling PIDs and add `LightweightStore.load()`**, then report
       "% of cited PIDs resolvable". See [D1](#d1), [D2](#d2).
 - [ ] **P3 — Fault-injection experiment** so MC1 emits FAIL and CA1 emits ESCALATE; fix the
@@ -500,6 +504,42 @@ E5, and the yProv4ML completeness result gets its own, more credible category.
       strongest existing counter-example to [C1](#c1), and worth the paper's worked example.
 - [ ] **NATS core is at-most-once, no JetStream.** A provenance bus that can silently drop
       records deserves an explicit sentence in a provenance paper.
+
+---
+
+<a id="j-found-while-fixing"></a>
+## J. Found while fixing (not in the original review)
+
+<a id="j1"></a>
+### J1. Every activity recorded a zero duration — 96 of 96 ✅ *fixed in Phase 2*
+
+Found while porting the agents to the capture API. Every emitted activity carried
+`prov:startTime == prov:endTime`, exactly, in all 24 documents.
+
+The cause was the clock, not the agents. Both instants were read with
+`datetime.datetime.now()`, and the Windows system clock advances in steps of roughly
+15.6 ms — longer than almost every step being timed. Verified directly: three consecutive
+`now()` calls on the development host returned one identical timestamp.
+
+Two consequences, and the second is the serious one:
+
+* A fast step and an unmeasured step are indistinguishable in the record.
+* **CA3 mines these exact fields.** Its timing algorithms look for where a run spent its
+  time; against a timeline of zero-length events they can only see the gaps *between*
+  activities, never the activities. The E6 overhead study has the same dependency — a
+  record that cannot say how long anything took cannot support a claim about cost.
+
+Fixed by taking the start instant from the wall clock (it has to be comparable across
+processes) and the duration from `time.perf_counter()` (monotonic, nanosecond resolution),
+with the end instant derived as start + duration. See `yprov4agenticai.api.Span`.
+
+| | activities recording zero duration | work attributed to the steps that did it |
+|---|--:|--:|
+| before | 96 of 96 | 0.000 ms |
+| after | **0 of 96** | 272.829 ms |
+
+Enforced by `test_every_activity_has_a_measurable_extent`, which runs against freshly
+emitted provenance in CI.
 
 ---
 

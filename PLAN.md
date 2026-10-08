@@ -204,13 +204,20 @@ Everything that changes *what the PROV says*. All of it precedes all measurement
 Checkpoint: re-run `run_local.py` + `eval.evaluate`, diff against `out.baseline/`, and write
 down what moved. That diff is itself a result.
 
-### Phase 2 — The documented API · ~1–2 days
+### Phase 2 — The documented API · ~1–2 days ✅ *complete 2026-10-08*
 
-- [ ] **P1** — `step()` / `activity()` / `decide()` / `emit()` as thin wrappers (~60 lines)
-- [ ] Rewrite `INSTRUMENTATION.md` §3 against the code that now exists
-- [ ] Port one agent to the new API as the worked example
+- [x] **P1** — `step()` / `activity()` / `decide()` / `emit()` as thin wrappers
+      (`yprov4agenticai/api.py` + four methods on `ProvTracker`)
+- [x] Rewrite `INSTRUMENTATION.md` §3 against the code that now exists
+- [x] Port one agent to the new API as the worked example — and then **all six**, because
+      the port surfaced [J1](todo.md#j1): 96 of 96 activities recorded a zero duration,
+      which no single-agent port would have fixed. Structural diff against
+      `phase1-reference`: **empty**, across 24 documents.
+- [x] Measure durations monotonically (`api.Span`) — zero-duration activities 96/96 → 0/96
 
-*Unblocks [R4](#r4).* Do this before Level 1 so E6a times the API readers will call.
+*Unblocks [R4](#r4).* Done before Level 1, so E6a can time the API readers will call — and
+can now also read per-step durations out of the record itself, which [J1](todo.md#j1) had
+made impossible.
 
 ### Phase 3 — The shared baseline · ~2 days
 

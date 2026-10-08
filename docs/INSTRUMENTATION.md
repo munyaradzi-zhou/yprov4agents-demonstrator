@@ -49,31 +49,105 @@ PROV-JSON onto the bus. That bridge is the whole integration surface.
 
 ## 3. The API
 
-A decorator, a context manager, and **one** explicit call. That last call is the only place
-a developer writes something a machine could not have inferred:
+A decorator, a context manager, and **one** explicit call. The decorator and the context
+manager observe what a machine can observe; the explicit call states what only the code
+making the decision knows.
 
 ```python
 from yprov4agenticai import ProvTracker
 
-tracker = ProvTracker(sid=session, agent_label="NL_Summarizer")
+tracker = ProvTracker(sid=session, agent_label="NL_Summarizer", sink=publish_to_bus)
 
-@tracker.step("PlanningActivity")                 # S2 — auto: timing, typing, lineage
-def plan(task): ...
+# S2 — a decorated function. Automatic: type, label, start instant, measured duration,
+# agent attribution, sequence position, and the failure case.
+@tracker.step("PlanningActivity")
+def plan(task: str) -> str:
+    ...
 
-with tracker.activity("ToolCallActivity") as act: # S3 — auto: inputs, outputs, energy
-    result = tool.run(task)
+# S3 — a block. The scope is where the step declares what it touched.
+with tracker.activity("ToolCallActivity", "write the summary") as prov:
+    prov.consumes(task)
+    summary = llm(prompt)
+    prov.produces("ResponseEntity", summary, pid=pointer, derived_from=task)
+    prov.note(**{"yp:model": model_id})
 
-tracker.decide(                                   # S5 — THE hand-written line
+# S5 — THE hand-written line. `justification` is mandatory; a blank one raises.
+tracker.decide(
     verdict="REVISE",
     confidence=0.41,
     justification="Self-consistency 0.41 < 0.70 threshold; the drafted efficiency claim "
                   "contradicts recorded execution times for activity Training. Regenerating.",
 )
 
-tracker.emit()                                    # → PROV-JSON envelope → bus
+tracker.emit()                                    # → PROV-JSON → the sink → the bus
 ```
 
 Everything except `decide(...)` can be generated. `decide(...)` cannot, and that is the point.
+
+### What is automatic, and what has to be declared
+
+The split is not a matter of effort budget. It follows from what a wrapper can see.
+
+| | Observed, so automatic | Declared, because unobservable |
+|---|---|---|
+| **Activity** | type, label, start instant, duration, ordering, agent, exception on failure | — |
+| **Entity** | — | that it exists, its type, its pointer |
+| **Lineage** | `wasInformedBy` (*derived* from declared dataflow) | `used`, `wasGeneratedBy`, `wasDerivedFrom` |
+| **Decision** | — | verdict, confidence, **`yp:justification`** |
+
+A wrapper sees that a function ran. It does not see which of the values in scope that
+function treated as its input — so lineage is stated through the scope, never guessed. An
+earlier version of the tracker did guess, by linking each record to the one before it, and
+produced 74 confident and wrong edges out of 250. `wasInformedBy` is the one relation that
+*is* automatic, because PROV defines it exactly: *a₂* was informed by *a₁* when *a₁*
+generated an entity *a₂* used. That is derivable from declarations already made.
+
+### Three properties the layer commits to
+
+**It adds no record kind of its own.** Anything expressible through the API is expressible
+through `register_entity`/`record_activity`. This is tested directly — the same lifecycle
+built both ways reduces to an identical document — and it is why moving all six agents onto
+the API produced a structural diff of exactly zero across 24 emitted documents.
+
+**A step that raises is still recorded**, with `yp:outcome` and `yp:error_type`, before the
+exception propagates. A failed step that leaves no trace is the worst case for an audit: the
+record then shows a gap where it should show a failure.
+
+**A decision without a justification raises `ValueError`.** Every other field can be filled
+in by machinery. This one cannot, so it is the one field the API refuses to let a caller
+skip — at the call site, where the reasoning still exists in a local variable.
+
+### Measuring *when*, not just *that*
+
+An activity is two instants in PROV, which invites reading both off the wall clock. That
+loses short steps. On a Windows host the system clock advances in steps of about 15.6 ms, so
+two `datetime.now()` readings either side of a sub-millisecond operation return the **same**
+value — and the record says the step took no time at all, indistinguishable from a step
+nobody measured.
+
+So the start instant comes from the wall clock, where it must (it has to be comparable with
+timestamps from other processes), and the duration comes from `time.perf_counter()`, which
+is monotonic and nanosecond-resolution. The end instant is the start plus that duration.
+
+The effect, on the same run, same agents, same graph:
+
+| | activities with zero recorded duration | work attributed to the steps that did it |
+|---|--:|--:|
+| Before (both instants off the wall clock) | **96 of 96** | 0.000 ms |
+| After (monotonic duration, wall-clock anchor) | **0 of 96** | 272.829 ms |
+
+This is a precondition for anything else reading the timeline: CA3's timing algorithms
+mine exactly these fields, and an overhead study cannot measure a step the record calls
+instantaneous.
+
+### Where the decorator fits, and where it does not
+
+`tracker.step(...)` binds to a tracker instance, so it decorates functions defined where a
+tracker is already in scope — a module-level pipeline, or a closure inside a session
+handler. Every agent in this demonstrator creates its tracker per incoming message, so all
+six use the context manager; the decorator is for the long-lived-tracker case. A
+context-variable-based module-level decorator would cover both and is a deliberate
+non-decision: it is worth adding when a framework adapter needs it, not before.
 
 ### "For any agent" — how framework-agnosticism actually works
 
@@ -81,10 +155,10 @@ The vocabulary (PROV-O + `yp:`) is framework-independent; only a **thin adapter*
 6-step lifecycle to a given framework's events:
 
 ```
-        ┌────────────────────────────────────────────┐
-        │   yprov4agenticai  —  core (framework-free) │
-        │   ProvTracker · vocabulary · store · energy │
-        └───────────────┬────────────────────────────┘
+        ┌─────────────────────────────────────────────┐
+        │   yprov4agenticai  —  core (framework-free)  │
+        │   ProvTracker · capture API · store · energy │
+        └───────────────┬─────────────────────────────┘
       ┌─────────────────┼─────────────────┬───────────────────┐
  LangGraphAdapter  CrewAIAdapter   AutoGenAdapter      (bare daemon)
 ```
@@ -92,8 +166,6 @@ The vocabulary (PROV-O + `yp:`) is framework-independent; only a **thin adapter*
 The demonstrator in this folder is the bare-daemon case: six agents, no agent framework at
 all, same instrumentation, same output. That is the strongest possible evidence that the
 library is not welded to one runtime.
-
----
 
 ## 4. The strategic position — and the tech-scouting answer
 
@@ -126,9 +198,18 @@ This de-risks us (we do not fight the ecosystem) *and* sharpens the differentiat
 ## 5. What this demonstrator already proves
 
 Layer 2 is **built and running**. Across two records and six agents it emits 24 PROV
-documents with **78 typed activities, 44 typed entities, 250 lineage relations, and
-`yp:justification` on 24/24 decisions (100%)** — against a structural 0 for any
-callback-level approach.
+documents with **96 typed activities, 78 typed entities, 324 relations, and
+`yp:justification` on 24/24 decisions** — and all 24 documents are accepted by the
+reference `prov` parser, not merely by this project's own code.
+
+Read those numbers with their denominators. The 324 relations are 126 observed dataflow
+edges, 72 derived `wasInformedBy`, 30 declared derivations and 96 agent attributions (one
+per activity); the first three are the structural claim, and quoting the total invites
+"that counts steps, not structure". The 24/24 justification figure is instrumentation
+coverage, not a quality result — the code that counts decisions is the code that justifies
+them, so no run of this system could report another number. What a callback-level approach
+structurally cannot reach is the rationale row alone, and that single earned zero is the
+stronger claim (see `paper/OUTLINE.md` E0–E3).
 
 Layer 1 (the OTel bridge) is **not built**; it is the scouting target and the natural next
 increment. Nothing in the architecture has to change to accept it: the bridge feeds the

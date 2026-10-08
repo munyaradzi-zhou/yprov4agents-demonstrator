@@ -185,3 +185,33 @@ def test_every_decision_carries_a_justification(
                 unjustified.append(f"{path.name}:{activity_id}")
 
     assert not unjustified, f"decisions without a justification: {unjustified}"
+
+
+def test_every_activity_has_a_measurable_extent(
+    prov_documents: list[tuple[Path, dict[str, Any]]],
+) -> None:
+    """An activity must record when it ran, not merely that it ran.
+
+    Before the capture API, every emitted activity carried ``prov:startTime ==
+    prov:endTime`` — 96 of 96 — because both instants were read off a wall clock whose
+    granularity (≈15.6 ms on Windows) exceeds the duration of most steps. A timeline of
+    zero-length events cannot answer where a run spent its time, which is the question
+    CA3's timing algorithms exist to answer and the question the overhead study asks.
+
+    Durations are therefore measured monotonically and anchored to the wall clock
+    (``yprov4agenticai.api.Span``). This test fails if any agent regresses to reading the
+    same clock twice.
+    """
+    instantaneous: list[str] = []
+    for path, document in prov_documents:
+        for activity_id, attributes in (document.get("activity") or {}).items():
+            started, ended = attributes.get("prov:startTime"), attributes.get("prov:endTime")
+            if started is None or ended is None:
+                instantaneous.append(f"{path.name}:{activity_id} (missing an instant)")
+            elif ended <= started:
+                instantaneous.append(f"{path.name}:{activity_id} ({started} -> {ended})")
+
+    assert not instantaneous, (
+        f"{len(instantaneous)} activity(ies) record no measurable extent:\n  "
+        + "\n  ".join(instantaneous[:5])
+    )

@@ -16,14 +16,21 @@ Typical use::
     from yprov4agenticai.prompts import PROMPTS
 
     t = ProvTracker(sid="run01", granularity="DATA")
-    eid = t.register_entity("TaskEntity", "...")
-    t.record_activity("ReceiveTaskActivity", "receive", t0, t1, out_eid=eid)
-    doc = t.to_prov_json()          # standard W3C PROV-JSON
+
+    with t.activity("ReceiveTaskActivity", "receive the task") as prov:
+        task = prov.produces("TaskEntity", "summarise the run")
+
+    t.decide("ACCEPT", justification="...the evidence that produced this verdict...")
+    doc = t.emit()                  # standard W3C PROV-JSON
+
+The primitives underneath (``register_entity`` / ``record_activity`` / ``to_prov_json``)
+remain public and are what the capture API is built from.
 """
 
 from __future__ import annotations
 
 from . import prompts
+from .api import ActivityScope
 from .energy import (
     CodeCarbonBackend,
     EnergyBackend,
@@ -33,10 +40,11 @@ from .energy import (
     session_energy_summary,
 )
 from .store import LightweightStore, ptr_kwargs
-from .tracker import YP_NAMESPACE, ProvTracker
+from .tracker import YP_NAMESPACE, ProvTracker, now_iso
 
 __all__ = [
     "YP_NAMESPACE",
+    "ActivityScope",
     "CodeCarbonBackend",
     "EnergyBackend",
     "EnergyDelta",
@@ -44,6 +52,7 @@ __all__ = [
     "LightweightStore",
     "NullBackend",
     "ProvTracker",
+    "now_iso",
     "prompts",
     "ptr_kwargs",
     "session_energy_summary",
