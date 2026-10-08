@@ -118,24 +118,73 @@ was left unrecorded, across both the operational and governance layers.
 *Pending:* a real denominator — branch points counted from source — would make this a
 measurement. Scheduled Phase 6.
 
-### E3 — Strategy A vs Strategy B *(must not ship in its current form)*
+### E3 — Strategy A vs Strategy B *(measured, Phase 3)*
 
-| Signal | Strategy A | Strategy B |
-|---|--:|--:|
-| Typed activities | *to measure* | 96 |
-| Typed entities | *to measure* | 78 |
-| Lineage relations | *to measure* | 324 |
-| Decisions with `yp:justification` | **0 — unreachable** | **24** |
-| W3C PROV-JSON output | *to measure* | yes |
+One callback baseline (`eval/baseline.py`), the same agents, the same input, the **same
+run**. Strategy A is fed the 96 `StepEvent`s a framework callback handler receives — node
+name, timings, input and output payloads, errors — and reconstructs as much W3C PROV as
+that stream supports. Both A columns come from that one recorded stream.
 
-The zeros previously filled in for Strategy A were asserted, not measured, and three of the
-four were false: a framework callback handler sees run trees with inputs, outputs and
-parents, from which activities, entities and dataflow relations follow mechanically. Only
-the rationale row is structurally unreachable, and that single earned zero is a far stronger
-result than four unearned ones — it isolates exactly what explicit instrumentation buys.
+| Signal | A, zero config | A, with type map | B |
+|---|--:|--:|--:|
+| Documents emitted | 24 | 24 | 24 |
+| Activities | 96 | 96 | 96 |
+| …of them typed | 0 | 96 | 96 |
+| Entities | 54 | 54 | 78 |
+| …of them typed | 0 | 0 | 78 |
+| …carrying a resolvable pointer (`yp:pid`) | 0 | 0 | 8 |
+| `used` | 72 | 72 | 72 |
+| `wasGeneratedBy` | 54 | 54 | 54 |
+| `wasInformedBy` | 72 | 72 | 72 |
+| `wasDerivedFrom` | 30 | 30 | 30 |
+| `wasAssociatedWith` | 96 | 96 | 96 |
+| **Relations, total** | 324 | 324 | 324 |
+| Decisions carrying `yp:verdict` | 0 | **24** | 24 |
+| Decisions carrying **`yp:justification`** | **0** | **0** | **24** |
+| Accepted by the reference `prov` parser | 24 | 24 | 24 |
 
-Phase 3 builds one callback-level baseline over the same agents, used both here and as the
-`A` condition of E6, so the comparison and the overhead study rest on the same artifact.
+The last row is a concession, and it belongs in the table. The pre-Phase-3 version claimed
+Strategy A produced no W3C PROV-JSON; that was the fourth of its four wrong zeros. A
+callback reconstruction serialises to conformant PROV-JSON perfectly well. Syntax was never
+the differentiator, and a baseline that could be dismissed on syntax would make this
+comparison about serialisation rather than about what a record is able to say.
+
+**Four claims, in the order a reviewer will test them.**
+
+*A is an upper bound.* The event stream is built from the declarations the explicit
+instrumentation made: the entity each step said it read, the entity each step said it
+wrote. A real handler gets a node's whole input payload and must guess which part mattered,
+so it would over-report `used` and could not separate a load-bearing input from an
+incidental one. Conceding A every structural fact B declared is deliberate — it turns the
+last row from a comparison between implementations into a statement about the ceiling.
+**Even granted every structural fact explicit instrumentation declares, the rationale is
+unreachable.**
+
+*Structure is recoverable, and the baseline recovers all of it.* 96 activities, 324
+relations, identical to B. The four zeros this table carried before Phase 3 were asserted,
+and three of them were false. Saying so plainly is cheaper than having it pointed out.
+
+*Types and identity are where the structural gap actually is.* A types nothing with no
+configuration and everything with ten hand-written label patterns — so the types exist, but
+as a per-system artifact someone writes and maintains, and only because these labels are
+descriptive. Entities are worse: A is handed payloads rather than references, so it mints
+identity from content, types none of the 54, and carries no `yp:pid` at all. The
+pointers-not-payloads design has no analogue in a reconstruction that never saw where a
+payload was stored.
+
+*The verdict is often recoverable; the reasoning never is.* A recovers 24 of 24 verdicts —
+honestly reported, and reported as fragile: it recovers them by scraping a developer-chosen
+label, and a graph whose decision node is named `decide` yields none. The justifications are
+recoverable under no labelling convention at all. Searching everything the handler could
+read — 222 strings, 12,425 characters — finds 0 of 24. Each justification is prose composed
+at the moment of decision out of evidence the step never returned: a local variable, and the
+callback layer is outside the function.
+
+**This is the single earned zero.** It isolates exactly what explicit instrumentation buys,
+and it is worth more than the four unearned ones it replaces. §7's worked example (CA1's
+ESCALATE) is the qualitative companion: no callback could produce that sentence, because the
+sentence is assembled from a quorum set and an integrity result that the step reported
+nowhere but into the record.
 
 ### E4 — Reflexivity
 
@@ -163,12 +212,23 @@ reflexivity is one level deep. Either close the loop or say so — see Limitatio
 | `mc1:PASS` | 8 |
 | `mc3:COMPLETE` | 8 |
 
-Six verdict kinds, up from three. The reachability question matters more than the tally: a
-verdict that only ever takes one value carries no information, so fault injection
-establishes that the alternatives are reachable — CA1 emits `ESCALATE` on both a corrupted
-payload and an unconfirmed consumption, MC1 emits `FAIL` on an unjustified decision, MC3
-emits `PARTIAL` on an untimed trail. **Report the fault-injection table alongside the
-tally**, or a reviewer is entitled to ask whether any check can fail.
+Six verdict kinds, up from three — but the tally is the less interesting half. A verdict
+that only ever takes one value carries no information, so what has to be established is that
+the alternatives are *reachable*. **Report reachability alongside the tally**, or a reviewer
+is entitled to ask whether any of these checks can fail at all.
+
+| Verdict | Reached by | Evidence |
+|---|---|---|
+| `ca1:ESCALATE` (consumption-unconfirmed) | CA1 alone, no consumers, 3s patience | `experiments/fault-escalate` ✅ |
+| `ca1:ESCALATE` (integrity) | corrupting a stored payload | *to run* |
+| `mc1:FAIL` | an unjustified decision in the input | *to run* |
+| `mc3:PARTIAL` | an activity with no start or end time | *to run* |
+
+The archived case is the one that matters most, because it shows the two escalation paths are
+*distinguishable in the record*: `yp:escalation_reason` separates `integrity` from
+`consumption-unconfirmed`, and the two demand opposite responses — corrupt storage versus a
+consumer that is down. See §7 below, where the same run is also the A-versus-B worked
+example.
 
 ### E6 — Instrumentation overhead *(to measure)*
 
@@ -183,6 +243,17 @@ discoverable in this order. See [`PLAN.md`](../PLAN.md) Part 1.
 ---
 
 ## Qualitative results worth a paragraph each
+
+**The same decision, under both instrumentation strategies.** `experiments/fault-escalate`
+runs CA1 with no consumers and a 3-second timeout, with the callback baseline attached. A
+recovers one fact about the decision — that the verdict was `ESCALATE`, scraped out of the
+node's label. B records why: the trigger (`timeout`), the quorum (0 of 3 acknowledged), the
+reason (`consumption-unconfirmed`), and the prose that assembles them, down to the integrity
+check that *passed* and the choice to archive anyway rather than lose the record. CA1
+escalates for two independent reasons that call for opposite responses, and A cannot tell
+which one fired — so it cannot distinguish "storage is corrupting records" from "ca3 is not
+running". **This is the paragraph to put next to E3's table**: the structural comparison
+says the rationale is absent, and this says what being absent costs.
 
 **CA3 locates where a run spent its time, from provenance alone.** In `example_2` the gap
 before `CrossEntropyLoss/Training` is 102.870s — 91.4% of the run's 112.530s wall clock; in
@@ -263,7 +334,7 @@ used for isolation in measurement, not as evidence of throughput.
 | F2 | Demonstrator architecture (bus, agents, store behind CA1) | `docs/DESIGN.md` §4 |
 | F3 | 6-step lifecycle in 3 phases, S5 starred, with the meta-agent subset marked | existing deck slide 5 |
 | F4 | Persist-after-consume: quorum path vs timeout path, with both justifications | `docs/phases/PHASE_1.md` §2.7 |
-| F5 | A-vs-B, rationale row isolated | E3, after Phase 3 |
+| F5 | A-vs-B: structure recovered in full, rationale row isolated | E3 |
 | F6 | Reflexivity chain and its depth limit | E4 |
 | **F7** | **Declared-or-derived lineage vs the index-order chain it replaced** | `docs/phases/PHASE_1.md` §2.4 |
 
@@ -271,14 +342,25 @@ F7 is new and earns its place: it shows the correction changed the graph's *topo
 only its size — the old chain asserted a single dependency spine where the real dataflow is
 a tree.
 
+F5 should be drawn to make A's *success* visible. A bar chart where A is near-zero
+everywhere is the figure the old table implied and it is not what was measured: A matches B
+on activities and on all 324 relations, and the one row that separates them is the one the
+paper is about. Drawing A as a near-equal that falls off a cliff at a single row is both
+more honest and more persuasive than drawing it as uniformly poor.
+
 ---
 
 ## To do
 
-1. **Phase 3** — the callback baseline, which unblocks E3 and E6's `A` condition.
+1. ~~**Phase 3** — the callback baseline~~ — **done**; E3 above is measured, and the same
+   artifact serves E6's `A` condition.
 2. **Phase 4** — model and prompt provenance, which closes the LLM-reproducibility gap.
 3. **Phase 5** — measure E6.
 4. **Phase 6** — reframe E2 with a real denominator; decide the reflexivity claim.
 5. **Phase 7** — the `yp:` vocabulary artifact, without which C3 has no artifact.
 6. Write §8 from the material above; render F1–F7.
 7. Decide authorship and venue date with Sandro.
+
+One claim-scope decision is the author's, not the implementer's: **A4**, that nothing
+consumes `governance.*`, so the reflexivity in contribution C2 is one level deep. It can be
+implemented as a real loop or narrowed in the text, and E4 reads differently depending which.

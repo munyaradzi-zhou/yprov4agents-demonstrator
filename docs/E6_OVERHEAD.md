@@ -72,7 +72,7 @@ overstates our cost relative to the baseline. Keep them in the table, outside th
 | ID | Condition | What runs |
 |---|---|---|
 | **OFF** | no provenance | agent business logic only — the true baseline |
-| **A** | callback-style | a minimal `on_step_start`/`on_step_end` logger appending dicts, matching what a framework callback handler can actually see |
+| **A** | callback-style | `eval.baseline.CallbackLogger`, fed the `StepEvent` stream a framework callback handler receives — and permitted to reconstruct everything that stream supports |
 | **B** | explicit (ours) | `ProvTracker` driven from inside each lifecycle step |
 
 `OFF` is the denominator. `A` matters because without it the comparison is "instrumented vs
@@ -249,10 +249,30 @@ class NullTracker:
     def to_prov_json(self): return {}
 ```
 
-`A` is a minimal callback logger that records only what a framework callback can actually
-observe — step name, start time, end time, and the serialised input/output — appending a
-dict per step. It must **not** record justification, types, or lineage, because the whole
-point of E3 is that it cannot.
+`A` is `eval.baseline.CallbackLogger`, attached to the process-wide observation hook
+(`yprov4agenticai.observer`). It receives one `StepEvent` per step — node name, start and
+end instants, serialised inputs and outputs, and the error if the step raised — and
+reconstructs as much W3C PROV as that stream supports.
+
+**This paragraph previously said A "must not record justification, types, or lineage,
+because the whole point of E3 is that it cannot." That was wrong on two of the three, and
+building to it would have hard-coded the error into the measurement.** A callback handler
+sees run trees with inputs, outputs and parents; activities, entities, `used`,
+`wasGeneratedBy` and `wasInformedBy` follow mechanically, and with a label-to-type map so
+do typed activities. Measured over the same run, A recovers 96 of 96 activities, all 324
+relations, and — by scraping the verdict out of a node label — 24 of 24 verdicts.
+
+What it recovers is **0 of 24 justifications**, and that is now a measurement rather than a
+stipulation: every justification in the explicit record is searched for across every string
+the handler was handed. See `eval/baseline.py` and the E3 table in `paper/OUTLINE.md`.
+
+Two consequences for this study, both good:
+
+- A does more work than this section assumed, so **A is slower**, so **B − A narrows** —
+  which is the number the paper actually wants. §11's "deliberately generous to A" now
+  means generous on capability as well as on timing.
+- A and E3 are the same artifact. The overhead study and the capability comparison cannot
+  drift apart, because there is only one baseline.
 
 ### Interleaving
 
@@ -343,9 +363,19 @@ Plot: `to_prov_json()` cost vs activity count (log-log), with the fitted complex
   study exists precisely to cover this, but real HPC runs are larger and untested.
 - **Network and LLM variance** dominate any wall-clock figure involving CAx; this is why
   those rows are labelled context.
-- **The A baseline is our own reconstruction** of what a callback handler captures, not a
-  specific framework's handler. It is deliberately generous to A — it does less work, so it
-  will look faster. Being generous to the baseline strengthens the result.
+- **The A baseline is an upper bound, not a specific framework's handler.** It is our own
+  reconstruction, and the event stream it consumes is built from the declarations the
+  explicit instrumentation made — the entity each step said it read, the entity each step
+  said it wrote. A real handler is handed a node's whole input payload and has to guess
+  which part mattered; it would over-report `used` and could not separate a load-bearing
+  input from an incidental one. Conceding A every structural fact B declared is deliberate:
+  it makes the capability claim a statement about the ceiling rather than about one
+  implementation's quality. State it this way in the paper — "even granted every structural
+  fact explicit instrumentation declares" is a stronger sentence than any comparison
+  against a handler someone could call unfair.
+- **A's timing is correspondingly optimistic.** It appends an event per step and does its
+  reconstruction offline, so the measured A cost excludes the serialisation a real handler
+  performs inline. B − A is therefore an upper bound on the difference, in B's disfavour.
 - **In-process bus** for Level 3; broker and container overheads are measured separately and
   are not instrumentation cost.
 

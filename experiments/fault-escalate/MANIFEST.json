@@ -1,0 +1,77 @@
+{
+  "schema": "yprov4agents/experiment-manifest/1",
+  "name": "fault-escalate",
+  "note": "fault injection: CA1 alone, no consumers running, persist-timeout 3s. The only archived run in which the timeout path and the ESCALATE verdict fire; evidence for E5 and the paper's section 7 worked example",
+  "created_at": "2026-10-08T17:43:25.787211+00:00",
+  "source": "out.fault",
+  "git": {
+    "commit": "3701b77b708acba6c05304a87f88b388b4a41124",
+    "branch": "phase-3-the-shared-baseline",
+    "describe": "v0.3.0-phase2-dirty",
+    "dirty": true
+  },
+  "environment": {
+    "python": "3.11.15",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840
+  },
+  "file_count": 10,
+  "total_bytes": 92991,
+  "files": [
+    {
+      "path": "baseline/_events.json",
+      "size_bytes": 4671,
+      "content_hash": "sha256:a8102e45457fb8534750865309e851052bc80e5250d4b894feb4beb7f554c3dc"
+    },
+    {
+      "path": "baseline/example_0__StorageAgent__A_prov.json",
+      "size_bytes": 5127,
+      "content_hash": "sha256:195a5a54b6f25642f1e312e912cb1170acf22d786431b2969599f6a9497ab296"
+    },
+    {
+      "path": "baseline/example_2__StorageAgent__A_prov.json",
+      "size_bytes": 5127,
+      "content_hash": "sha256:1d4f5f9e1aec370c060674ce9659022b30b02cded50107b19dab0184e8e19318"
+    },
+    {
+      "path": "example_0__ca1_prov.json",
+      "size_bytes": 7501,
+      "content_hash": "sha256:6252b706946b77c3413421c05e1074bb2e089cc02c79f1a5ab2856527d6b4a16"
+    },
+    {
+      "path": "example_2__ca1_prov.json",
+      "size_bytes": 7502,
+      "content_hash": "sha256:6ec406d3323a1aef4a80844bdd80af40f9eeb6022ef3a57f371b2aec95988fb4"
+    },
+    {
+      "path": "store/377895f2bbbd.meta.json",
+      "size_bytes": 533,
+      "content_hash": "sha256:f8edac1f34ba9b94e960043bc209c39908a6724d09d56e580795248b8f98aa09"
+    },
+    {
+      "path": "store/377895f2bbbd.txt",
+      "size_bytes": 39286,
+      "content_hash": "sha256:377895f2bbbd812727556946e2363f05dbdc872944699f1641d080e12c5fee9e"
+    },
+    {
+      "path": "store/_manifest.json",
+      "size_bytes": 1078,
+      "content_hash": "sha256:b9a6f4971afe6748b6114509410eb5c7d02865440ee3617cc85cc2b27c5641ef"
+    },
+    {
+      "path": "store/abfe4946dd38.meta.json",
+      "size_bytes": 532,
+      "content_hash": "sha256:2cd08926b079962ee6aa9a623e0fb0e1580e1b3c4d00bd3b218e73a5f2c69cf7"
+    },
+    {
+      "path": "store/abfe4946dd38.txt",
+      "size_bytes": 21634,
+      "content_hash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80"
+    }
+  ]
+}

@@ -219,12 +219,17 @@ down what moved. That diff is itself a result.
 can now also read per-step durations out of the record itself, which [J1](todo.md#j1) had
 made impossible.
 
-### Phase 3 — The shared baseline · ~2 days
+### Phase 3 — The shared baseline · ~2 days ✅ *complete 2026-10-08*
 
-- [ ] **P4 = E6 condition A** — one `CallbackLogger`, serving both E3 and E6b, permitted to
-      emit types and lineage (**not** crippled per E6 §8)
-- [ ] Rewrite E3 with measured A values; only the rationale row is zero
-- [ ] Amend E6 §8 and §11 to match
+- [x] **P4 = E6 condition A** — one `CallbackLogger` (`eval/baseline.py`), serving both E3
+      and E6b, permitted to emit types and lineage (**not** crippled per E6 §8)
+- [x] Rewrite E3 with measured A values; only the rationale row is zero — and A ties B on
+      activities, relations and PROV-JSON conformance, which is a stronger result than any
+      gap would have been
+- [x] Amend E6 §8 and §11 to match; §11 now states A as an **upper bound**, since its event
+      stream is built from B's own declarations
+- [x] Archive `experiments/fault-escalate` — the first run in which `ca1:ESCALATE` fires,
+      and the A-versus-B worked example for §7
 
 *Resolves [R2](#r2).* The single highest-leverage item in the plan: it fixes the most
 rejectable table in the paper and the baseline for the overhead study at the same time.

@@ -1,6 +1,6 @@
 # Review findings & fix plan — yProv4Agents demonstrator
 
-> **Phase 2 complete (2026-10-08).** The items below are the original review. Statuses:
+> **Phase 3 complete (2026-10-08).** The items below are the original review. Statuses:
 >
 > | | finding | status |
 > |---|---|---|
@@ -24,7 +24,7 @@
 > | J1 | every activity recorded a zero duration (96/96) | **fixed (Phase 2)** — found while porting; the wall clock's 15.6 ms granularity exceeded the steps it was timing. Now 0/96 |
 > | A4 | nothing consumes `governance.*` | **open** — Phase 6 decides: implement or narrow the claim |
 > | B1 | E2 coverage metric is tautological | **open** — Phase 6 |
-> | B2 | Strategy A column is unmeasured | **open** — Phase 3 |
+> | B2 | Strategy A column is unmeasured | **fixed (Phase 3)** — one shared callback baseline; A recovers 96/96 activities, 324/324 relations, 24/24 verdicts and 0/24 justifications |
 > | B3 | relation totals mix mechanical and observed | **open** — Phase 6 reporting |
 > | E | no `yp:` vocabulary artifact | **open** — Phase 7 |
 > | F1–F4 | no model/prompt provenance; dead modules | **open** — Phase 4 |
@@ -58,8 +58,13 @@ measured one.
       "% of cited PIDs resolvable". See [D1](#d1), [D2](#d2).
 - [ ] **P3 — Fault-injection experiment** so MC1 emits FAIL and CA1 emits ESCALATE; fix the
       no-op integrity check to make the latter reachable. See [A3](#a3), [C2](#c2).
-- [ ] **P4 — Build the real Strategy-A baseline** and rewrite E3 with only the rationale
-      row at zero. See [B2](#b2).
+- [x] **P4 — Build the real Strategy-A baseline** and rewrite E3 with only the rationale
+      row at zero. See [B2](#b2). *Done in Phase 3: `eval/baseline.py`, fed the restricted
+      `StepEvent` stream. A ties B on structure (96 activities, 324 relations) and on
+      PROV-JSON conformance, recovers 24/24 verdicts by scraping node labels, and recovers
+      0/24 justifications — measured by searching every string it was handed. Serves E6
+      condition A from the same artifact; E6 §8 amended, since it specified the baseline
+      wrong.*
 - [ ] **P5 — Drop or make explicit the auto-generated `wasDerivedFrom` / `wasInformedBy`
       chains**, and re-report E1/E3 split by mechanical vs. observed. See [B4](#b4), [B3](#b3).
 - [ ] **P6 — Wire prompt provenance into CAx** and record model + params (~15 lines; the
