@@ -44,6 +44,11 @@ PERSIST_AFTER = [
 ]
 PERSIST_TIMEOUT_S = float(os.environ.get("PERSIST_TIMEOUT_S", "25"))
 
+#: Why a record was archived. Recorded on the decision so a reader can distinguish the
+#: advertised ordering from the safety net without parsing the justification prose.
+PERSIST_TRIGGER_QUORUM = "quorum"
+PERSIST_TRIGGER_TIMEOUT = "timeout"
+
 
 class CA1Storage(StreamingAgent):
     """Persist-after-consume storage agent. Store lives behind it, not on the bus."""
@@ -60,11 +65,11 @@ class CA1Storage(StreamingAgent):
         self._acks: dict[str, set[str]] = {}
         # sessions already persisted (never persist twice)
         self._done: set[str] = set()
-        # Live timeout guards, held so the event loop keeps a strong reference. A task
-        # referenced only by `create_task`'s return value can be garbage-collected before
-        # it runs, which would drop the safety net that is supposed to make a record
-        # unloseable. See todo.md H4 on why this guard races the consumers at all.
-        self._guards: set[asyncio.Task[None]] = set()
+        # session_id -> its live timeout guard. Held for two reasons: a task referenced
+        # only by `create_task`'s return value can be garbage-collected before it runs,
+        # which would silently remove the safety net; and the guard has to be cancellable
+        # once quorum is reached, or it keeps racing a decision that has already been made.
+        self._guards: dict[str, asyncio.Task[None]] = {}
 
     # ── startup: two subscriptions, not one ────────────────────────────────────
     async def start(self) -> None:
@@ -100,9 +105,7 @@ class CA1Storage(StreamingAgent):
                 f"{sorted(set(PERSIST_AFTER) - self._acks.get(sid, set()))}",
                 flush=True,
             )
-            guard = asyncio.create_task(self._timeout_guard(sid))
-            self._guards.add(guard)
-            guard.add_done_callback(self._guards.discard)
+            self._guards[sid] = asyncio.create_task(self._timeout_guard(sid))
 
     # ── inbound: a consumer finished → one acknowledgement ─────────────────────
     async def _on_consumer_ack(self, subject: str, env: ProvRecordEnvelope) -> None:
@@ -126,27 +129,47 @@ class CA1Storage(StreamingAgent):
             flush=True,
         )
         if not waiting:
-            await self._persist(sid, reason="all expected consumers acknowledged")
+            # Stand the guard down before persisting. It is a fallback for a consumer that
+            # never reports, not a competitor to one that just did; leaving it running
+            # meant the decision could still be taken by whichever fired first.
+            self._cancel_guard(sid)
+            await self._persist(
+                sid,
+                trigger=PERSIST_TRIGGER_QUORUM,
+                reason="all expected consumers acknowledged",
+            )
+
+    def _cancel_guard(self, sid: str) -> None:
+        guard = self._guards.pop(sid, None)
+        if guard is not None and not guard.done():
+            guard.cancel()
 
     async def _timeout_guard(self, sid: str) -> None:
         """Safety net: never silently drop a record because a consumer died."""
         await asyncio.sleep(PERSIST_TIMEOUT_S)
+        self._guards.pop(sid, None)
         if sid in self._done or sid not in self._pending:
             return
         missing = sorted(set(PERSIST_AFTER) - self._acks.get(sid, set()))
         await self._persist(
-            sid, reason=f"timeout after {PERSIST_TIMEOUT_S}s; no acknowledgement from {missing}"
+            sid,
+            trigger=PERSIST_TRIGGER_TIMEOUT,
+            reason=f"timeout after {PERSIST_TIMEOUT_S}s; no acknowledgement from {missing}",
         )
 
     # ── the actual persist + reflexive PROV ────────────────────────────────────
-    async def _persist(self, sid: str, *, reason: str) -> None:
+    async def _persist(self, sid: str, *, trigger: str, reason: str) -> None:
         if sid in self._done:
             return
         self._done.add(sid)
         doc = self._pending.pop(sid, {})
         acked = sorted(self._acks.get(sid, set()))
+        # Session bookkeeping is finished with; holding it would grow without bound.
+        self._acks.pop(sid, None)
         loop = asyncio.get_event_loop()
-        prov, log = await loop.run_in_executor(None, self._do_persist, sid, doc, acked, reason)
+        prov, log = await loop.run_in_executor(
+            None, self._do_persist, sid, doc, acked, trigger, reason
+        )
         print(f"[{self.role}] {log}", flush=True)
         await stream_document(
             self.bus,
@@ -157,7 +180,7 @@ class CA1Storage(StreamingAgent):
         )
 
     def _do_persist(
-        self, sid: str, doc: dict[str, Any], acked: list, reason: str
+        self, sid: str, doc: dict[str, Any], acked: list, trigger: str, reason: str
     ) -> tuple[dict[str, Any], str]:
         c = prov_counts(doc)
         payload = json.dumps(doc, ensure_ascii=False, sort_keys=True)
@@ -165,13 +188,30 @@ class CA1Storage(StreamingAgent):
         # S3 Act — write through the store's own API (backend, NOT the bus)
         ptr = self.store.put(payload, kind="provenance-record")
 
-        # S4 Observe — round-trip integrity read (this is what makes the verdict real)
+        # S4 Observe — read the payload back from the store and re-hash it. This is a real
+        # round trip: a rooted store reads the file rather than returning the copy put()
+        # just cached, so the check can actually fail.
         try:
             self.store.resolve(ptr["yp:pid"], verify=True)
-            verdict, integrity = "ACCEPT", "round-trip read verified; sha-256 matched"
+            integrity_ok, integrity = True, "round-trip read verified; sha-256 matched"
         except Exception as exc:
-            verdict, integrity = "ESCALATE", f"integrity check FAILED: {exc}"
-        self.store.save()  # refresh the manifest on disk
+            integrity_ok, integrity = False, f"integrity check FAILED: {exc}"
+        self.store.save()  # refresh the derived manifest index
+
+        # S5 Decide — two independent conditions, so the verdict names which one failed.
+        #
+        # Persisting at quorum is the property the architecture advertises: the record was
+        # archived only after its consumers had used it, which is the ordering an audit
+        # trail depends on. A timeout persist keeps the record safe but forfeits that
+        # ordering, and reporting it as a plain ACCEPT made the two indistinguishable
+        # without reading the justification prose.
+        missing = sorted(set(PERSIST_AFTER) - set(acked))
+        if not integrity_ok:
+            verdict, escalation = "ESCALATE", "integrity"
+        elif trigger != PERSIST_TRIGGER_QUORUM:
+            verdict, escalation = "ESCALATE", "consumption-unconfirmed"
+        else:
+            verdict, escalation = "ACCEPT", ""
 
         # ── reflexive PROV: CA1's own 6-step lifecycle ─────────────────────────
         t = ProvTracker(sid=sid, agent_label="StorageAgent")
@@ -231,13 +271,27 @@ class CA1Storage(StreamingAgent):
             now_iso(),
             in_eid=stored,
             justification=(
-                f"Persisted after consumption ({reason}); acknowledged by "
-                f"[{', '.join(acked) or 'none'}]. Record carries "
-                f"{c['activities']} activities / "
-                f"{c['entities']} entities / {c['relations']} relations, {len(payload)} bytes. "
+                (
+                    f"Persisted at quorum: {reason}; acknowledged by "
+                    f"[{', '.join(acked)}], the full set required."
+                    if trigger == PERSIST_TRIGGER_QUORUM
+                    else f"Persisted WITHOUT confirmed consumption: {reason}. "
+                    f"Acknowledged by [{', '.join(acked) or 'none'}]; still waiting on "
+                    f"[{', '.join(missing)}] when the record was archived anyway to avoid "
+                    f"losing it. The persist-after-consume ordering was not satisfied, so "
+                    f"this record is archived but its consumption is unconfirmed."
+                )
+                + f" Record carries {c['activities']} activities / {c['entities']} entities"
+                f" / {c['relations']} relations, {len(payload)} bytes. "
                 f"Integrity: {integrity}. Verdict {verdict}."
             ),
-            extra_attrs={"yp:verdict": verdict},
+            extra_attrs={
+                "yp:verdict": verdict,
+                "yp:persist_trigger": trigger,
+                "yp:consumers_required": len(PERSIST_AFTER),
+                "yp:consumers_acknowledged": len(acked),
+                **({"yp:escalation_reason": escalation} if escalation else {}),
+            },
             verbose=False,
         )
         receipt = t.register_entity(
@@ -257,5 +311,6 @@ class CA1Storage(StreamingAgent):
         prov = t.to_prov_json()
         write_prov(self.role, sid, prov)
         return prov, (
-            f"persisted '{sid}' -> {ptr['yp:pid']} [{verdict}] after {acked or 'timeout'}"
+            f"persisted '{sid}' -> {ptr['yp:pid']} [{verdict}] "
+            f"via {trigger}, acked by {acked or '(none)'}"
         )
