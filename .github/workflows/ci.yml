@@ -104,10 +104,14 @@ jobs:
       - name: Evaluate
         run: uv run python -m eval.evaluate --out-dir out --markdown out/RESULTS.md
 
+      # Compared against the current reference, not the pre-review baseline: Phase 1
+      # changed the emitted provenance deliberately. The baseline archive is kept as the
+      # historical evidence behind the review measurements, and `eval.compare` against it
+      # is how a phase reports what it changed — but the gate has to track the present.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/baseline-pre-review \
+            --before experiments/phase1-reference \
             --after out \
             --strict
 

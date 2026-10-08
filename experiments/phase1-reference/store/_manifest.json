@@ -1,0 +1,66 @@
+{
+  "21.T11999/yprovstore-18ce7ed592a3": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/18ce7ed592a3.txt",
+    "yp:contentHash": "sha256:18ce7ed592a31b7c7d946531f8be4f93bf72b8c55bf80b91e9eb8fc80c0ff524",
+    "size_bytes": 78,
+    "kind": "chart",
+    "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out/charts/example_0_metrics.png",
+    "created_at": "2026-10-08T15:47:20.916665+00:00"
+  },
+  "21.T11999/yprovstore-25db730b9761": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/25db730b9761.txt",
+    "yp:contentHash": "sha256:25db730b976122835b29b9142d52e9616b0c9cd4edfbb2d6f04d589239fdc1fd",
+    "size_bytes": 281,
+    "kind": "summary",
+    "preview": "This ML provenance record captures 11 activities and 78 entities linked by 98 lineage relations. Tracked steps include example_GR0_2, Traini…",
+    "created_at": "2026-10-08T15:47:20.972279+00:00"
+  },
+  "21.T11999/yprovstore-377895f2bbbd": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/377895f2bbbd.txt",
+    "yp:contentHash": "sha256:377895f2bbbd812727556946e2363f05dbdc872944699f1641d080e12c5fee9e",
+    "size_bytes": 39286,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"CrossEntropyLoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:02:45.935328^^xsd:dateTime\"}, \"Test\": {\"prov:startedAtTime\"…",
+    "created_at": "2026-10-08T15:47:21.135692+00:00"
+  },
+  "21.T11999/yprovstore-5ba48b633524": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/5ba48b633524.txt",
+    "yp:contentHash": "sha256:5ba48b633524b91ff69bd2727ca88a40f16ba4768d9045726d31f9c6a0a755bf",
+    "size_bytes": 78,
+    "kind": "chart",
+    "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out/charts/example_2_metrics.png",
+    "created_at": "2026-10-08T15:47:21.097618+00:00"
+  },
+  "21.T11999/yprovstore-65a1c9861559": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/65a1c9861559.txt",
+    "yp:contentHash": "sha256:65a1c986155979d365657cccb313436b98af2f76692f5b0425176eef4a390d82",
+    "size_bytes": 289,
+    "kind": "summary",
+    "preview": "This ML provenance record captures 9 activities and 39 entities linked by 55 lineage relations. Tracked steps include example_GR0_0, Trainin…",
+    "created_at": "2026-10-08T15:47:20.705724+00:00"
+  },
+  "21.T11999/yprovstore-8bdad5e9300d": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/8bdad5e9300d.txt",
+    "yp:contentHash": "sha256:8bdad5e9300d98eb80a13b922484627e1934a34e5f6dccd375af07b5f5eefdc4",
+    "size_bytes": 250,
+    "kind": "analytics-report",
+    "preview": "Provenance analytics for 'example_0': 9 activities and 39 entities (82.1% typed), 7 derivations, 30 terminal entities. Wall-clock span 7.81s…",
+    "created_at": "2026-10-08T15:47:20.934754+00:00"
+  },
+  "21.T11999/yprovstore-abfe4946dd38": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/abfe4946dd38.txt",
+    "yp:contentHash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80",
+    "size_bytes": 21634,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"MSELoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:10:12.815807^^xsd:dateTime\"}, \"MSELoss/Validation\": {\"prov:startedAt…",
+    "created_at": "2026-10-08T15:47:20.943754+00:00"
+  },
+  "21.T11999/yprovstore-f59743e31274": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/f59743e31274.txt",
+    "yp:contentHash": "sha256:f59743e3127485c0abd83a109a71943c737ec774495d733d4f348311d2499a8d",
+    "size_bytes": 255,
+    "kind": "analytics-report",
+    "preview": "Provenance analytics for 'example_2': 11 activities and 78 entities (89.7% typed), 9 derivations, 70 terminal entities. Wall-clock span 112.…",
+    "created_at": "2026-10-08T15:47:21.121680+00:00"
+  }
+}
