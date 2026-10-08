@@ -398,7 +398,9 @@ class CA3Analytics(StreamingAgent):
             extra_attrs={"yp:algorithms": "structure,timing,sustainability,resource,anomaly"},
             verbose=False,
         )
-        result = t.register_entity("ToolResultEntity", report, **ptr_kwargs(ptr))
+        result = t.register_entity(
+            "ToolResultEntity", report, **ptr_kwargs(ptr), derived_from=task
+        )
         t.record_activity(
             "AnalysisActivity",
             "CA3: mine the provenance graph",
@@ -420,6 +422,7 @@ class CA3Analytics(StreamingAgent):
             f"{len(anomalies)} invariant(s) breached, {len(completeness)} completeness gap(s)"
             if (anomalies or completeness)
             else "all invariants held, no completeness gaps",
+            derived_from=result,
         )
         t.record_activity(
             "ObservationActivity",

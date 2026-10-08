@@ -91,6 +91,7 @@ class MC3Audit(StreamingAgent):
         report = t.register_entity(
             "QualityEntity",
             f"agent={who}; steps={len(acts)}; justifications={n_just}; trail={trail_str}",
+            derived_from=subj,
         )
         t.record_activity(
             "AuditActivity",

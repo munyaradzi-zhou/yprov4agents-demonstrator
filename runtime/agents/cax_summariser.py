@@ -140,7 +140,9 @@ class CAxSummariser(StreamingAgent):
             in_eid=task,
             verbose=False,
         )
-        resp = t.register_entity("ResponseEntity", summary, **ptr_kwargs(ptr))
+        resp = t.register_entity(
+            "ResponseEntity", summary, **ptr_kwargs(ptr), derived_from=task
+        )
         t.record_activity(
             "ToolCallActivity",
             "CAx: write NL summary",
@@ -155,6 +157,7 @@ class CAxSummariser(StreamingAgent):
             f"{len(ungrounded)} ungrounded figure(s)"
             if ungrounded
             else "no ungrounded figures",
+            derived_from=resp,
         )
         t.record_activity(
             "ObservationActivity",

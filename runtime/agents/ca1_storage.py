@@ -241,7 +241,10 @@ class CA1Storage(StreamingAgent):
             verbose=False,
         )
         stored = t.register_entity(
-            "ToolResultEntity", f"stored provenance record for {sid}", **ptr_kwargs(ptr)
+            "ToolResultEntity",
+            f"stored provenance record for {sid}",
+            **ptr_kwargs(ptr),
+            derived_from=task,
         )
         t.record_activity(
             "PersistActivity",
@@ -297,6 +300,7 @@ class CA1Storage(StreamingAgent):
         receipt = t.register_entity(
             "ResponseEntity",
             f"storage receipt {ptr['yp:pid']} ({ptr['yp:contentHash'][:19]}...)",
+            derived_from=stored,
         )
         t.record_activity(
             "ResponseActivity",

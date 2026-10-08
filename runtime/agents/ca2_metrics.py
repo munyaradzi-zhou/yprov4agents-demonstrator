@@ -120,7 +120,9 @@ class CA2Metrics(StreamingAgent):
             in_eid=task,
             verbose=False,
         )
-        chart = t.register_entity("ToolResultEntity", png.name, **ptr_kwargs(ptr))
+        chart = t.register_entity(
+            "ToolResultEntity", png.name, **ptr_kwargs(ptr), derived_from=task
+        )
         t.record_activity(
             "ToolCallActivity",
             "Metrics: render chart (matplotlib)",

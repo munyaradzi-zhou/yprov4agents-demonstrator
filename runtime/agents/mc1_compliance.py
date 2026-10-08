@@ -91,6 +91,7 @@ class MC1Compliance(StreamingAgent):
             f"{len(failures)} structural failure(s)"
             if failures
             else "all structural checks held",
+            derived_from=subj,
         )
         t.record_activity(
             "ComplianceCheckActivity",
