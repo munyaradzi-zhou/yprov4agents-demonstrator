@@ -23,7 +23,13 @@ from ..net_bus import NetworkBus
 from ..util import OUT_DIR, now_iso, prov_counts, write_prov
 
 matplotlib.use("Agg")  # headless: no display in a container
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # imported after the backend is selected
+
+#: What a rendered chart depicts. Recorded on the decision because the two are materially
+#: different deliverables: one shows the run's measurements, the other only how many nodes
+#: its provenance graph has.
+SUBJECT_METRICS = "numeric-metrics"
+SUBJECT_COMPOSITION = "graph-composition"
 
 
 class CA2Metrics(StreamingAgent):
@@ -47,7 +53,16 @@ class CA2Metrics(StreamingAgent):
                 out.append((str(label)[:18], float(v["$"])))
         return out[:10]
 
-    def _render(self, session_id: str, doc: dict[str, Any], c: dict[str, int]) -> Path:
+    def _render(
+        self, session_id: str, doc: dict[str, Any], c: dict[str, int]
+    ) -> tuple[Path, str, int]:
+        """Render the chart. Returns (path, what was plotted, how many series).
+
+        The two branches produce materially different charts — the graph's own numeric
+        metrics, or a fallback showing only its composition — and the emitted record
+        previously said which in neither case. A reader could not tell whether the chart
+        shows the run's measurements or just how many nodes the graph has.
+        """
         charts_dir = OUT_DIR / "charts"
         charts_dir.mkdir(parents=True, exist_ok=True)
         png = charts_dir / f"{session_id}_metrics.png"
@@ -57,11 +72,13 @@ class CA2Metrics(StreamingAgent):
         values: Sequence[float]
         fig, ax = plt.subplots(figsize=(7, 4))
         if metrics:
+            subject, series = SUBJECT_METRICS, len(metrics)
             labels, values = (list(axis) for axis in zip(*metrics, strict=True))
             ax.bar(labels, values, color="#2a52c9")
             ax.set_title(f"{session_id} — numeric metrics")
             ax.tick_params(axis="x", rotation=45)
         else:
+            subject, series = SUBJECT_COMPOSITION, 3
             labels = ["activities", "entities", "relations"]
             values = [c["activities"], c["entities"], c["relations"]]
             ax.bar(labels, values, color=["#2a52c9", "#3f7d68", "#b8801c"])
@@ -69,15 +86,20 @@ class CA2Metrics(StreamingAgent):
         fig.tight_layout()
         fig.savefig(png, dpi=110)
         plt.close(fig)
-        return png
+        return png, subject, series
 
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
     ) -> tuple[dict[str, Any], str]:
         c = prov_counts(doc)
-        png = self._render(session_id, doc, c)
+        png, subject, series = self._render(session_id, doc, c)
         ptr = self.store.put(png.as_posix(), kind="chart")  # store the pointer to the artifact
         self.store.save()  # keep the shared index complete
+
+        # S4 Observe — the chart is the deliverable, so confirm it reached the disk and is
+        # not an empty file before claiming it was rendered.
+        rendered_bytes = png.stat().st_size if png.is_file() else 0
+        verdict = "ACCEPT" if rendered_bytes > 0 and subject == SUBJECT_METRICS else "REVISE"
 
         t = ProvTracker(sid=session_id, agent_label="Metrics_Visualizer")
         t0 = now_iso()
@@ -109,16 +131,44 @@ class CA2Metrics(StreamingAgent):
             verbose=False,
         )
         t.record_activity(
+            "ObservationActivity",
+            "Metrics: confirm the chart reached disk",
+            now_iso(),
+            now_iso(),
+            in_eid=chart,
+            extra_attrs={"yp:rendered_bytes": rendered_bytes},
+            verbose=False,
+        )
+        t.record_activity(
             "DecisionActivity",
-            "Metrics: accept chart",
+            f"Metrics: {verdict.lower()} chart",
             now_iso(),
             now_iso(),
             in_eid=chart,
             justification=(
-                f"Rendered a chart summarising {c['activities']} activities / "
-                f"{c['entities']} entities of {session_id}; deterministic, no "
-                "model involved. Accepted."
+                (
+                    f"Plotted {series} numeric metric series read from the graph's "
+                    f"prov:value entities"
+                    if subject == SUBJECT_METRICS
+                    else f"The graph carries no numeric prov:value entities, so no "
+                    f"measurement could be plotted; fell back to graph composition "
+                    f"({c['activities']} activities / {c['entities']} entities / "
+                    f"{c['relations']} relations), which describes the record rather "
+                    f"than the run it documents"
+                )
+                + f". Rendered {rendered_bytes} bytes to {png.name} with matplotlib; "
+                f"deterministic, no model involved. Verdict {verdict}"
+                + (
+                    "."
+                    if verdict == "ACCEPT"
+                    else " — the chart is valid but less informative than intended."
+                )
             ),
+            extra_attrs={
+                "yp:verdict": verdict,
+                "yp:chart_subject": subject,
+                "yp:series_plotted": series,
+            },
             verbose=False,
         )
         t.record_activity(
@@ -132,4 +182,7 @@ class CA2Metrics(StreamingAgent):
 
         prov = t.to_prov_json()
         write_prov(self.role, session_id, prov)
-        return prov, f"visualised {session_id} -> {png.name}, PID {ptr['yp:pid']}"
+        return prov, (
+            f"visualised {session_id} -> {png.name} ({subject}, {series} series) "
+            f"[{verdict}], PID {ptr['yp:pid']}"
+        )
