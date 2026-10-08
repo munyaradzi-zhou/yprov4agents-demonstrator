@@ -33,7 +33,7 @@ from yprov4agenticai import LightweightStore, ProvTracker, ptr_kwargs
 
 from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
-from ..util import OUT_DIR, get_llm, now_iso, write_prov
+from ..util import OUT_DIR, get_llm, llm_is_required, now_iso, write_prov
 
 # metric-family classifiers — matched against entity labels/ids, not hard-coded schemas
 _ENERGY_PAT = re.compile(r"emission|energy|carbon|power", re.I)
@@ -203,7 +203,15 @@ class CA3Analytics(StreamingAgent):
         return found
 
     # ── report assembly ────────────────────────────────────────────────────────
-    def _narrate(self, sid: str, findings: dict[str, Any], anomalies: list[str]) -> str:
+    def _narrate(
+        self, sid: str, findings: dict[str, Any], anomalies: list[str]
+    ) -> tuple[str, str]:
+        """Return (report, mode), where mode records the path actually taken.
+
+        The numbers are computed either way; the model only narrates them, so a failed
+        call degrades presentation rather than correctness. It still has to be recorded:
+        a run reported as model-narrated must actually have been narrated.
+        """
         s, t = findings["structure"], findings["timing"]
         head = (
             f"Provenance analytics for '{sid}': {s['activities']} activities and "
@@ -215,17 +223,20 @@ class CA3Analytics(StreamingAgent):
             f"Anomalies: {len(anomalies)}."
         )
         if not self.llm:
-            return head
+            return head, "computed"
         try:
-            return self.llm(
+            narration = self.llm(
                 "You are CA3, a provenance analytics agent. Write 3-4 sentences of "
                 "root-cause commentary on these COMPUTED findings. Do not invent numbers; "
                 "use only what is given.\n\n"
                 f"Findings: {findings}\n\nAnomalies: {anomalies}"
             )
         except Exception as exc:
+            if llm_is_required():
+                raise RuntimeError(f"LLM_REQUIRED is set but narration failed: {exc}") from exc
             print(f"[ca3] LLM narration failed ({exc}); using computed report", flush=True)
-            return head
+            return head, f"computed-after-{type(exc).__name__}"
+        return narration, "llm"
 
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
@@ -242,7 +253,7 @@ class CA3Analytics(StreamingAgent):
             "sustainability": energy,
             "resource": resource,
         }
-        report = self._narrate(session_id, {**findings, "timing": timing}, anomalies)
+        report, mode = self._narrate(session_id, {**findings, "timing": timing}, anomalies)
         verdict = "ANOMALY" if anomalies else "OK"
         ptr = self.store.put(report, kind="analytics-report")
 
@@ -330,7 +341,6 @@ class CA3Analytics(StreamingAgent):
 
         prov = t.to_prov_json()
         write_prov(self.role, session_id, prov)
-        mode = "LLM" if self.llm else "computed"
         return prov, (
             f"analysed {session_id} ({mode}) -> {verdict}, "
             f"{len(anomalies)} anomaly(ies), PID {ptr['yp:pid']}"

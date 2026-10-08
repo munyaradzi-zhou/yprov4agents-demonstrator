@@ -25,6 +25,14 @@ if str(_REPO_ROOT) not in sys.path:
 
 OUT_DIR = Path(os.environ.get("OUT_DIR", "/out"))
 
+# Model and sampling parameters for every LLM-bearing agent. Named here rather than
+# inlined at the call site because they are part of the experimental apparatus: change
+# them and the output distribution changes, so a run's provenance has to be able to cite
+# them (see todo.md F1 on recording model provenance in the emitted graph).
+DEFAULT_OPENAI_MODEL = "gpt-4o"
+LLM_TEMPERATURE = 0.2
+LLM_MAX_TOKENS = 400
+
 
 def now_iso() -> str:
     return datetime.datetime.now(datetime.UTC).isoformat()
@@ -45,34 +53,89 @@ def write_prov(role: str, session_id: str, doc: dict[str, Any]) -> Path | None:
         return None
 
 
-def get_llm() -> Callable[[str], str] | None:
-    """Return an llm(prompt)->text callable if OPENAI_API_KEY is set, else None.
+def llm_is_required() -> bool:
+    """Whether a missing or failing model must abort the run instead of falling back.
 
-    CAx uses this; every other agent is deterministic and needs no key, so the whole
-    pipeline runs end-to-end with no LLM at all (CAx falls back to a stub summary).
+    Deterministic fallbacks exist so the demonstrator runs without a key, which is right
+    for a demo and wrong for a measurement: a run whose numbers are reported as LLM-backed
+    must not quietly produce stub output instead. Set ``LLM_REQUIRED=1`` whenever a run
+    will be archived or published.
+    """
+    return os.environ.get("LLM_REQUIRED", "").strip().lower() in {"1", "true", "yes"}
+
+
+def enable_system_trust_store() -> None:
+    """Verify TLS against the operating system's certificate store.
+
+    Networks that terminate TLS at a proxy present a locally-trusted root CA which is not
+    in certifi's bundle, so the API client fails to connect and every agent silently falls
+    back to deterministic output. Routing verification through the OS store is what the
+    corresponding ``native-tls`` setting does for the package installer.
+
+    Best-effort and idempotent: on a network that needs no interception this changes
+    nothing, and a missing ``truststore`` is reported rather than raised.
+    """
+    try:
+        import truststore
+
+        truststore.inject_into_ssl()
+    except ImportError:
+        print(
+            "[llm] truststore is not installed; TLS will use the bundled CA roots. "
+            "Install it if API calls fail with a connection error behind a proxy.",
+            flush=True,
+        )
+
+
+def get_llm() -> Callable[[str], str] | None:
+    """Return an ``llm(prompt) -> text`` callable, or None when no model is configured.
+
+    Returning None is the supported no-key path: every agent has a deterministic
+    fallback, so the pipeline runs end to end without an API key. When ``LLM_REQUIRED``
+    is set, both a missing key and an unusable client raise instead, so a run cannot be
+    archived under a label it did not earn.
+
+    Raises
+    ------
+    RuntimeError
+        ``LLM_REQUIRED`` is set and no usable model could be configured.
     """
     key = os.environ.get("OPENAI_API_KEY")
     if not key:
+        if llm_is_required():
+            raise RuntimeError(
+                "LLM_REQUIRED is set but OPENAI_API_KEY is empty: refusing to produce "
+                "deterministic output that would be reported as model output."
+            )
         return None
+
+    enable_system_trust_store()
+    model = os.environ.get("OPENAI_MODEL", DEFAULT_OPENAI_MODEL)
+
     try:
         from openai import OpenAI
 
         client = OpenAI(api_key=key)
-        model = os.environ.get("OPENAI_MODEL", "gpt-4o")
-
-        def _llm(prompt: str) -> str:
-            resp = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-                max_tokens=400,
-            )
-            return (resp.choices[0].message.content or "").strip()
-
-        return _llm
     except Exception as exc:
-        print(f"[cax] LLM unavailable ({exc}); using stub summariser", flush=True)
+        if llm_is_required():
+            raise RuntimeError(
+                f"LLM_REQUIRED is set but the client is unusable: {exc}"
+            ) from exc
+        print(
+            f"[llm] model unavailable ({exc}); agents will use deterministic output", flush=True
+        )
         return None
+
+    def call(prompt: str) -> str:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=LLM_TEMPERATURE,
+            max_tokens=LLM_MAX_TOKENS,
+        )
+        return (response.choices[0].message.content or "").strip()
+
+    return call
 
 
 def prov_counts(doc: dict[str, Any]) -> dict[str, int]:

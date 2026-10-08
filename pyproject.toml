@@ -19,6 +19,11 @@ dependencies = [
     "matplotlib>=3.8,<4",     # CA2 chart rendering (headless Agg backend)
     "nats-py>=2.6,<3",        # provenance bus client; containerised path only
     "openai>=1.40,<2",        # CAx summaries and CA3 narration
+    # Verifies TLS against the OS certificate store. Required wherever a proxy terminates
+    # TLS with a locally-trusted root: without it the API client cannot connect and the
+    # LLM-bearing agents silently degrade to deterministic output, which would be reported
+    # as model output. A silent downgrade is worse than a failure in a measured run.
+    "truststore>=0.9,<0.12",
 ]
 
 [project.optional-dependencies]

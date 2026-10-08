@@ -125,18 +125,19 @@ def compare_document(before: Document, after: Document) -> list[str]:
         differences.extend(f"{label}: {delta}" for delta in _counter_delta(was, now))
 
     for key in REL_KEYS:
-        was, now = before.relation_counts[key], after.relation_counts[key]
-        if was != now:
-            differences.append(f"relation {key}: {was} -> {now}")
+        before_count = before.relation_counts[key]
+        after_count = after.relation_counts[key]
+        if before_count != after_count:
+            differences.append(f"relation {key}: {before_count} -> {after_count}")
 
     for key in sorted(set(before.justifications) | set(after.justifications)):
-        was = before.justifications.get(key)
-        now = after.justifications.get(key)
-        if was == now:
+        before_text = before.justifications.get(key)
+        after_text = after.justifications.get(key)
+        if before_text == after_text:
             continue
-        if was is None:
+        if before_text is None:
             differences.append(f"justification added on {key}")
-        elif now is None:
+        elif after_text is None:
             differences.append(f"justification REMOVED from {key}")
         else:
             differences.append(f"justification text changed on {key}")

@@ -18,7 +18,7 @@ from yprov4agenticai import LightweightStore, ProvTracker, ptr_kwargs
 
 from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
-from ..util import OUT_DIR, get_llm, now_iso, prov_counts, write_prov
+from ..util import OUT_DIR, get_llm, llm_is_required, now_iso, prov_counts, write_prov
 
 
 class CAxSummariser(StreamingAgent):
@@ -30,8 +30,14 @@ class CAxSummariser(StreamingAgent):
         self.llm = get_llm()
         self.store = LightweightStore(root=str(OUT_DIR / "store"))
 
-    def _summarise(self, doc: dict[str, Any], c: dict[str, int]) -> str:
+    def _summarise(self, doc: dict[str, Any], c: dict[str, int]) -> tuple[str, str]:
+        """Return (summary, mode), where mode records the path actually taken.
+
+        The mode is an outcome, not a configuration: an agent that was given a model
+        but whose call failed produced computed output, and must say so.
+        """
         acts = list((doc.get("activity") or {}).keys())[:6]
+        fallback_reason = ""
         if self.llm:
             prompt = (
                 "You are CAx, a provenance summariser. In 3-4 sentences, summarise this "
@@ -40,21 +46,26 @@ class CAxSummariser(StreamingAgent):
                 f"Key activities: {', '.join(acts)}. Use only these facts."
             )
             try:
-                return self.llm(prompt)
+                return self.llm(prompt), "llm"
             except Exception as exc:
-                print(f"[cax] LLM call failed ({exc}); using stub", flush=True)
+                if llm_is_required():
+                    raise RuntimeError(
+                        f"LLM_REQUIRED is set but the summary call failed: {exc}"
+                    ) from exc
+                print(f"[cax] LLM call failed ({exc}); falling back to computed", flush=True)
+                fallback_reason = type(exc).__name__
         return (
             f"This ML provenance record captures {c['activities']} activities and "
             f"{c['entities']} entities linked by {c['relations']} lineage relations. "
             f"Tracked steps include {', '.join(a.split(':')[-1] for a in acts)}. "
             "The graph documents inputs, parameters and outputs of the training run."
-        )
+        ), (f"computed-after-{fallback_reason}" if fallback_reason else "computed")
 
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
     ) -> tuple[dict[str, Any], str]:
         c = prov_counts(doc)
-        summary = self._summarise(doc, c)
+        summary, mode = self._summarise(doc, c)
         ptr = self.store.put(summary, kind="summary")
 
         # emit CAx's own 6-step lifecycle as typed PROV
@@ -114,7 +125,6 @@ class CAxSummariser(StreamingAgent):
 
         prov = t.to_prov_json()
         write_prov(self.role, session_id, prov)
-        mode = "LLM" if self.llm else "stub"
         return prov, (
             f"summarised {session_id} ({mode}) -> {len(summary)} chars, PID {ptr['yp:pid']}"
         )
