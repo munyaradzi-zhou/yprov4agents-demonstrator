@@ -12,6 +12,7 @@ is the situation any later reader is actually in.
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -42,14 +43,6 @@ def test_resolve_returns_the_payload_within_one_process(tmp_path: Path) -> None:
     assert store.resolve(pointer["yp:pid"]) == PAYLOAD
 
 
-@pytest.mark.known_defect
-@pytest.mark.xfail(
-    strict=True,
-    reason="todo.md C2: resolve() returns the in-process copy held by put(), so the disk "
-    "file is never read and the hash is recomputed over the same object. The "
-    "round-trip CA1 cites as evidence for ACCEPT does not happen. Remove this "
-    "marker once resolve() reads through to the store root.",
-)
 def test_resolve_detects_a_corrupted_blob_on_disk(tmp_path: Path) -> None:
     """Corrupt the stored file; a real integrity check must notice."""
     store = LightweightStore(root=tmp_path)
@@ -63,13 +56,36 @@ def test_resolve_detects_a_corrupted_blob_on_disk(tmp_path: Path) -> None:
         store.resolve(pointer["yp:pid"], verify=True)
 
 
-@pytest.mark.known_defect
-@pytest.mark.xfail(
-    strict=True,
-    reason="todo.md D2: LightweightStore has no load(), so a fresh process cannot read the "
-    "manifest and cannot dereference any PID. Remove this marker once the store "
-    "loads its manifest on construction.",
+@pytest.mark.parametrize(
+    "payload",
+    [
+        pytest.param("one line, no breaks", id="single-line"),
+        pytest.param("first line\nsecond line\nthird", id="unix-newlines"),
+        pytest.param("first line\r\nsecond line", id="windows-newlines"),
+        pytest.param("trailing break\n", id="trailing-newline"),
+        pytest.param("ünïcödé — and a σ", id="non-ascii"),
+    ],
 )
+def test_stored_bytes_hash_to_what_the_pointer_promised(tmp_path: Path, payload: str) -> None:
+    """The bytes on disk must hash to the ``yp:contentHash`` the graph asserts.
+
+    This is the regression guard for a defect that would only have appeared on Windows and
+    only for multi-line payloads: hashing the in-memory string (one byte per line break)
+    while writing in text mode (two bytes per line break) makes the recorded hash describe
+    bytes that were never stored. Model output contains newlines, so the first real
+    LLM-backed run with an integrity check would have failed for a reason that looked like
+    the integrity check being wrong.
+    """
+    store = LightweightStore(root=tmp_path)
+    pointer = store.put(payload)
+
+    blob = tmp_path / f"{pointer['yp:pid'].rsplit('-', 1)[-1]}.txt"
+    on_disk = "sha256:" + hashlib.sha256(blob.read_bytes()).hexdigest()
+
+    assert on_disk == pointer["yp:contentHash"]
+    assert store.resolve(pointer["yp:pid"], verify=True) == payload
+
+
 def test_a_cold_process_can_resolve_a_previously_stored_pid(tmp_path: Path) -> None:
     """The situation every later reader is in: the writing process is long gone."""
     writer = LightweightStore(root=tmp_path)
@@ -80,13 +96,6 @@ def test_a_cold_process_can_resolve_a_previously_stored_pid(tmp_path: Path) -> N
     assert reader.resolve(pointer["yp:pid"]) == PAYLOAD
 
 
-@pytest.mark.known_defect
-@pytest.mark.xfail(
-    strict=True,
-    reason="todo.md D1: each agent keeps a private in-memory manifest and save() writes "
-    "only its own entries, so the shared manifest is whatever the last writer held. "
-    "Remove this marker once save() merges.",
-)
 def test_concurrent_writers_do_not_clobber_each_others_manifest(tmp_path: Path) -> None:
     """Four agents share one store directory, exactly as CA1/CA2/CA3/CAx do."""
     pids = []
@@ -104,12 +113,6 @@ def test_concurrent_writers_do_not_clobber_each_others_manifest(tmp_path: Path) 
 # ──────────────────────────────────────────────────────────────────────────────────
 # Artifacts from a real run
 # ──────────────────────────────────────────────────────────────────────────────────
-@pytest.mark.known_defect
-@pytest.mark.xfail(
-    strict=True,
-    reason="todo.md D1: measured at baseline, the emitted graphs cite 8 PIDs of which 2 "
-    "appear in the manifest. Remove this marker when every cited PID resolves.",
-)
 def test_every_pid_cited_in_provenance_is_in_the_store_manifest(
     prov_documents: list[tuple[Path, dict[str, Any]]],
     store_manifest: dict[str, Any],
@@ -129,8 +132,6 @@ def test_stored_blobs_match_their_recorded_hashes(
     prov_dir: Path, store_manifest: dict[str, Any]
 ) -> None:
     """Whatever the manifest does record must at least be internally consistent."""
-    import hashlib
-
     store_dir = prov_dir / "store"
     mismatched: list[str] = []
     for pid, entry in store_manifest.items():

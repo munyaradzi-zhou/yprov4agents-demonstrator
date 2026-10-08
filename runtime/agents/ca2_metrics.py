@@ -77,6 +77,7 @@ class CA2Metrics(StreamingAgent):
         c = prov_counts(doc)
         png = self._render(session_id, doc, c)
         ptr = self.store.put(png.as_posix(), kind="chart")  # store the pointer to the artifact
+        self.store.save()  # keep the shared index complete
 
         t = ProvTracker(sid=session_id, agent_label="Metrics_Visualizer")
         t0 = now_iso()

@@ -256,6 +256,7 @@ class CA3Analytics(StreamingAgent):
         report, mode = self._narrate(session_id, {**findings, "timing": timing}, anomalies)
         verdict = "ANOMALY" if anomalies else "OK"
         ptr = self.store.put(report, kind="analytics-report")
+        self.store.save()  # keep the shared index complete
 
         # ── reflexive PROV: CA3's own 6-step lifecycle ────────────────────────
         t = ProvTracker(sid=session_id, agent_label="Analytics_Agent")

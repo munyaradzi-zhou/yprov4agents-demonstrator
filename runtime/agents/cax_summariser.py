@@ -67,6 +67,7 @@ class CAxSummariser(StreamingAgent):
         c = prov_counts(doc)
         summary, mode = self._summarise(doc, c)
         ptr = self.store.put(summary, kind="summary")
+        self.store.save()  # keep the shared index complete
 
         # emit CAx's own 6-step lifecycle as typed PROV
         t = ProvTracker(sid=session_id, agent_label="NL_Summarizer")
