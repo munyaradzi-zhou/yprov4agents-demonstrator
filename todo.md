@@ -1,5 +1,34 @@
 # Review findings & fix plan — yProv4Agents demonstrator
 
+> **Phase 1 complete (2026-10-08).** The items below are the original review. Statuses:
+>
+> | | finding | status after Phase 1 |
+> |---|---|---|
+> | E1 | non-standard root key; 0/24 documents parsed | **fixed** — 24/24 valid, verified by the reference parser |
+> | E2 | `yp:value` instead of `prov:value` | **fixed** |
+> | C1 | justifications were static templates | **fixed** — CAx checks grounding, CA2 names which chart it made |
+> | C2 | integrity check compared a string with itself | **fixed** — the store reads through to disk |
+> | C3 | only 2 of 24 justifications varied by outcome | **fixed** — every agent's text now follows its verdict |
+> | C4 | model run indistinguishable from stub run | **partly** — `yp:summary_mode` separates them; model id and prompt hash are Phase 4 |
+> | D1 | 8 PIDs cited, 2 in the manifest | **fixed** — 8/8 resolve from a cold start |
+> | D2 | no `load()`; cold process could not dereference | **fixed** |
+> | D3 | PID semantics undocumented | **fixed** — documented as mock handles |
+> | D4 | `put()` hashed bytes it did not store | **fixed** — binary end to end, tested on Windows CI |
+> | A5 | MC1 failed its own check | **fixed** — MC1 and MC3 both emit a decision step |
+> | A3 | most advertised verdicts never occurred | **fixed** — 6 verdict kinds; ESCALATE and REVISE reachable |
+> | A2 | 6-step lifecycle not uniform | **fixed** — all four operational agents emit 6; meta agents emit a 3-step subset |
+> | B4 | lineage fabricated from registration order | **fixed** — derivation declared, informed-by derived from dataflow |
+> | G1–G5 | five CA3 defects | **fixed** — including a check that could never fire |
+> | H4 | persist-after-consume was a race | **fixed** — guard cancelled at quorum |
+> | A4 | nothing consumes `governance.*` | **open** — Phase 6 decides: implement or narrow the claim |
+> | B1 | E2 coverage metric is tautological | **open** — Phase 6 |
+> | B2 | Strategy A column is unmeasured | **open** — Phase 3 |
+> | B3 | relation totals mix mechanical and observed | **open** — Phase 6 reporting |
+> | E | no `yp:` vocabulary artifact | **open** — Phase 7 |
+> | F1–F4 | no model/prompt provenance; dead modules | **open** — Phase 4 |
+>
+> Walkthrough: [`docs/phases/PHASE_1.md`](docs/phases/PHASE_1.md). Plan: [`PLAN.md`](PLAN.md).
+
 > Expert provenance review, 2026-10-06. Captured from the review session so nothing is
 > lost. Working document: tick items as they are fixed.
 >

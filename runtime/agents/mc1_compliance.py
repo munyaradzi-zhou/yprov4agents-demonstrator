@@ -21,6 +21,15 @@ from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
 from ..util import now_iso, write_prov
 
+#: The structural standard MC1 enforces. Named so the emitted record can state which
+#: checks were applied rather than leaving a reader to infer it from a verdict.
+CHECK_NAMES = (
+    "namespace-declarations",
+    "typed-activities",
+    "decision-present",
+    "decision-justified",
+)
+
 
 def _iter_activities(doc: dict[str, Any]) -> Iterator[tuple[str, dict[str, Any]]]:
     yield from (doc.get("activity") or {}).items()
@@ -76,13 +85,48 @@ class MC1Compliance(StreamingAgent):
             out_eid=subj,
             verbose=False,
         )
+        # S3 Act — run the checks and record what was examined, not what was concluded.
+        findings = t.register_entity(
+            "QualityEntity",
+            f"{len(failures)} structural failure(s)"
+            if failures
+            else "all structural checks held",
+            derived_from=subj,
+        )
         t.record_activity(
             "ComplianceCheckActivity",
             f"MC1: check {src_role} compliance",
             now_iso(),
             now_iso(),
             in_eid=subj,
-            justification=f"Structural compliance of {src_role} PROV: {verdict} — {reason}.",
+            out_eid=findings,
+            extra_attrs={
+                "yp:target_agent": src_role,
+                "yp:checks_applied": ",".join(CHECK_NAMES),
+                "yp:activities_examined": len(doc.get("activity") or {}),
+                "yp:decisions_examined": len(decisions),
+            },
+            verbose=False,
+        )
+        # S5 Decide — the verdict, as a yp:DecisionActivity carrying the justification.
+        #
+        # This is the step MC1 previously omitted, which meant the compliance checker
+        # could not satisfy the rule it enforces on everyone else: it demanded a justified
+        # yp:DecisionActivity and emitted none. Applying MC1 to its own output is a
+        # one-line experiment and it failed. Recording the verdict in the canonical place
+        # makes the governance layer subject to its own standard.
+        t.record_activity(
+            "DecisionActivity",
+            f"MC1: {verdict.lower()} {src_role}",
+            now_iso(),
+            now_iso(),
+            in_eid=findings,
+            justification=(
+                f"Applied {len(CHECK_NAMES)} structural checks "
+                f"({', '.join(CHECK_NAMES)}) to {src_role}'s emitted PROV: "
+                f"{len(doc.get('activity') or {})} activities, {len(decisions)} of them "
+                f"decisions. {reason.capitalize()}. Verdict {verdict}."
+            ),
             extra_attrs={"yp:verdict": verdict, "yp:target_agent": src_role},
             verbose=False,
         )

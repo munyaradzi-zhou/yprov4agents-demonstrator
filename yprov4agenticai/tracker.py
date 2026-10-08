@@ -17,8 +17,22 @@ inside an agent's serialisable state (e.g. a LangGraph ``State`` dict).
 from __future__ import annotations
 
 import datetime
+from collections.abc import Callable, Sequence
 
 YP_NAMESPACE = "http://hpci-lab.org/yProv4Agents#"
+
+
+def _library_version() -> str:
+    """Version of the library that wrote a record, stamped into its bundle descriptor.
+
+    Read from installed distribution metadata so it cannot drift from pyproject.toml.
+    """
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("yprov4agents-demonstrator")
+    except PackageNotFoundError:
+        return "0.0.0+unknown"
 
 
 class ProvTracker:
@@ -61,6 +75,8 @@ class ProvTracker:
         self.acts: list = []
         self.ents: dict = {}  # eid -> {t: kind, v: value, [pid, hash]}
         self._ent_order: list = []
+        #: Declared (source, generated) entity pairs. Only what a caller stated.
+        self.derivations: list[tuple[str, str]] = []
         # ── Optional, additive features (memory model + lightweight PID) ──────
         # These stay EMPTY on a default lifecycle run, so to_prov_json emits the
         # exact same document (the default 6/6/27 graph is byte-identical).
@@ -76,15 +92,30 @@ class ProvTracker:
         suffix: str = "",
         pid: str | None = None,
         content_hash: str | None = None,
+        derived_from: str | Sequence[str] | None = None,
     ) -> str:
-        # pid / content_hash are OPTIONAL (lightweight-prov, pointers-not-payloads):
-        # when the heavy payload lives in a data store, the entity carries only
-        # yp:pid (pointer) + yp:contentHash (sha-256), not the payload. Omitting
-        # them (the default) leaves the emitted node byte-identical to before.
+        """Name the typed entity a step produced.
+
+        Parameters
+        ----------
+        pid, content_hash
+            Optional, for the pointers-not-payloads design: when the payload lives in a
+            data store the entity carries only ``yp:pid`` and ``yp:contentHash``.
+        derived_from
+            The entity or entities this one was actually derived from. Declaring it emits
+            ``prov:wasDerivedFrom``.
+
+            This must be stated, never inferred. The tracker previously asserted a
+            derivation between each entity and the one registered before it, so
+            registration order silently became lineage: two unrelated entities recorded in
+            sequence produced a claim that one came from the other. Those edges accounted
+            for a large share of the relations the evaluation counted, and a provenance
+            system cannot assert lineage it did not observe.
+        """
         eid = f"yp:{kind}_{self.sid}{suffix}"
-        # METADATA mode: skip entity storage entirely. The ID is still returned
-        # so callers' downstream string references don't break (filtered at
-        # serialisation time — see to_prov_json).
+        # METADATA mode: skip entity storage entirely. The ID is still returned so
+        # callers' downstream string references don't break (filtered at serialisation
+        # time — see to_prov_json).
         if self.granularity == "METADATA":
             return eid
         if eid not in self.ents:
@@ -95,6 +126,12 @@ class ProvTracker:
         if content_hash is not None:
             rec["hash"] = content_hash
         self.ents[eid] = rec
+
+        if derived_from:
+            sources = [derived_from] if isinstance(derived_from, str) else list(derived_from)
+            for source in sources:
+                if source and (source, eid) not in self.derivations:
+                    self.derivations.append((source, eid))
         return eid
 
     # ── optional: register a MemoryStateEntity for a loop turn ─────────────────
@@ -197,6 +234,7 @@ class ProvTracker:
             "acts": self.acts,
             "ents": self.ents,
             "eo": self._ent_order,
+            "derivations": self.derivations,
             "granularity": self.granularity,
             "persistence": self.persistence,
             "agent_label": self.agent_label,
@@ -218,21 +256,86 @@ class ProvTracker:
         t.acts = list(d["acts"])
         t.ents = dict(d["ents"])
         t._ent_order = list(d["eo"])
+        t.derivations = [tuple(pair) for pair in d.get("derivations", [])]
         t.mem_chain = list(d.get("mem_chain", []))  # backward-compatible
         t._mem_ids = set(t.mem_chain)  # rebuild O(1) dedup mirror
         t.used_mem = [tuple(x) for x in d.get("used_mem", [])]
         return t
 
     # ── builds W3C PROV-JSON document ─────────────────────────────────────────
+    def _informed_by(self) -> dict[str, dict[str, str]]:
+        """Derive ``prov:wasInformedBy`` from the dataflow the activities declared.
+
+        PROV defines the relation exactly: activity *a2* was informed by *a1* when *a1*
+        generated an entity that *a2* used. That makes it derivable rather than something
+        a caller has to assert, so it is computed here from the recorded in/out entities.
+
+        The previous implementation instead linked every activity to the one recorded
+        before it by index, which claimed a dataflow dependency between consecutive steps
+        whether or not one existed, and produced exactly n-1 edges for any n activities —
+        a count that measured how many steps ran, not how they were connected.
+        """
+        generated_by: dict[str, str] = {}
+        for activity in self.acts:
+            if activity["out_eid"]:
+                generated_by.setdefault(activity["out_eid"], f"yp:{activity['id']}")
+
+        edges: dict[str, dict[str, str]] = {}
+        seen: set[tuple[str, str]] = set()
+        for activity in self.acts:
+            consumed = activity["in_eid"]
+            if not consumed:
+                continue
+            informant = generated_by.get(consumed)
+            informed = f"yp:{activity['id']}"
+            if informant is None or informant == informed:
+                continue
+            if (informed, informant) in seen:
+                continue
+            seen.add((informed, informant))
+            edges[f"_:i{len(edges)}"] = {
+                "prov:informed": informed,
+                "prov:informant": informant,
+            }
+        return edges
+
+    def _bundle_descriptor(self, qn: Callable[[str], dict]) -> dict:
+        """Describe the emitted document, inside the document, as a ``prov:Bundle``.
+
+        A reader needs to know how the record was configured to interpret it: whether
+        entities were recorded at all (granularity), whether payloads were persisted
+        (persistence), and which library version wrote it.
+
+        PROV already has an idiom for this. A bundle is a named set of provenance
+        descriptions and is itself an entity, so describing it is an ordinary entity
+        record that any conforming consumer reads. The earlier approach — a top-level
+        ``_yprov4agents_meta`` key — put the same information somewhere the format does
+        not allow, and a conforming parser rejects the whole document rather than
+        skipping the key it does not recognise.
+        """
+        return {
+            "prov:type": qn("prov:Bundle"),
+            "prov:label": f"provenance record emitted by {self.agent_label}",
+            "yp:granularity": self.granularity,
+            "yp:persistence": self.persistence,
+            "yp:emitted_by": __name__.split(".")[0],
+            "yp:library_version": _library_version(),
+        }
+
     def to_prov_json(self) -> dict:
-        """Build a W3C PROV-JSON doc honouring the granularity flag.
+        """Build a W3C PROV-JSON document honouring the granularity flag.
 
         DATA mode (default): full PROV — activities, entities, used,
         wasGeneratedBy, wasDerivedFrom, wasAssociatedWith, wasInformedBy.
 
-        METADATA mode: activities ONLY (no entities), so used/wasGeneratedBy/
-        wasDerivedFrom are omitted; wasAssociatedWith and wasInformedBy are
-        retained (activity-level). Self-documenting via the meta block.
+        METADATA mode: typed activities only. No data entities, so used,
+        wasGeneratedBy and wasDerivedFrom are omitted; wasAssociatedWith and
+        wasInformedBy are activity-level and are retained.
+
+        The document stays self-describing in both modes through a ``prov:Bundle``
+        entity (see ``_bundle_descriptor``) rather than a bespoke top-level key. Only
+        the containers PROV-JSON defines appear at the document root, because an
+        unrecognised one makes a conforming parser reject the entire document.
         """
 
         def qn(name: str) -> dict:
@@ -252,30 +355,30 @@ class ProvTracker:
                 }
             },
             "activity": {},
-            # entity/relation sections are added below (keeps key order stable)
-            "_yprov4agents_meta": {
-                "granularity": self.granularity,
-                "persistence": self.persistence,
-            },
+            # entity and relation sections are added below (keeps key order stable)
         }
 
-        # ── Entity section + entity-side relations (DATA mode only) ──────────
+        # ── Entity section + entity-side relations ───────────────────────────
+        # The bundle descriptor is emitted in both modes: it is metadata about the
+        # record, not one of the data entities METADATA mode is defined to omit.
+        doc["entity"] = {f"yp:bundle_{self.sid}": self._bundle_descriptor(qn)}
+
         if self.granularity == "DATA":
-            ent_section = {}
             for eid, e in self.ents.items():
-                node = {"prov:type": qn(f"yp:{e['t']}"), "yp:value": e["v"]}
+                node = {"prov:type": qn(f"yp:{e['t']}"), "prov:value": e["v"]}
                 if "pid" in e:
                     node["yp:pid"] = e["pid"]  # lightweight-prov pointer
                 if "hash" in e:
                     node["yp:contentHash"] = e["hash"]  # integrity (sha-256)
-                ent_section[eid] = node
-            doc["entity"] = ent_section
+                doc["entity"][eid] = node
+            # Only derivations a caller declared. Nothing is inferred from the order in
+            # which entities happened to be registered.
             doc["wasDerivedFrom"] = {
                 f"_:d{i}": {
-                    "prov:generatedEntity": self._ent_order[i],
-                    "prov:usedEntity": self._ent_order[i - 1],
+                    "prov:generatedEntity": generated,
+                    "prov:usedEntity": source,
                 }
-                for i in range(1, len(self._ent_order))
+                for i, (source, generated) in enumerate(self.derivations)
             }
             # Memory revision chain (optional): m_k wasDerivedFrom m_{k-1}, typed
             # prov:Revision. PROV-JSON has no standalone wasRevisionOf record, so
@@ -313,11 +416,6 @@ class ProvTracker:
                     used[f"_:u{i}"] = {"prov:activity": aid, "prov:entity": a["in_eid"]}
                 if a["out_eid"]:
                     wgb[f"_:g{i}"] = {"prov:entity": a["out_eid"], "prov:activity": aid}
-            if i > 0:
-                wib[f"_:i{i}"] = {
-                    "prov:informed": aid,
-                    "prov:informant": f"yp:{self.acts[i - 1]['id']}",
-                }
 
         # Memory used-edges (optional): each LLM step used the MemoryStateEntity of
         # its turn. Empty used_mem => nothing added (default output unchanged).
@@ -325,6 +423,7 @@ class ProvTracker:
             for j, (aid, meid) in enumerate(self.used_mem):
                 used[f"_:um{j}"] = {"prov:activity": aid, "prov:entity": meid}
 
+        wib = self._informed_by()
         doc["wasAssociatedWith"] = wasc
         doc["wasInformedBy"] = wib
         if self.granularity == "DATA":

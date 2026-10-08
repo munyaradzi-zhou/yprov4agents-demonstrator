@@ -19,6 +19,7 @@ import pytest
 
 from runtime.agent_runner import REGISTRY
 from runtime.agents.mc1_compliance import MC1Compliance
+from runtime.agents.mc3_audit import MC3Audit
 from yprov4agenticai import ProvTracker
 
 T0 = "2026-10-08T09:00:00+00:00"
@@ -35,6 +36,15 @@ def mc1(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> MC1Compliance:
 
     monkeypatch.setattr(runtime.util, "OUT_DIR", tmp_path)
     return MC1Compliance(NO_BUS)  # type: ignore[arg-type]
+
+
+@pytest.fixture
+def mc3(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> MC3Audit:
+    """MC3 writing its artifacts to a temporary directory rather than the shared volume."""
+    import runtime.util
+
+    monkeypatch.setattr(runtime.util, "OUT_DIR", tmp_path)
+    return MC3Audit(NO_BUS)  # type: ignore[arg-type]
 
 
 def operational_agent_document() -> dict[str, Any]:
@@ -87,14 +97,6 @@ def test_mc1_fails_a_decision_with_no_justification(mc1: MC1Compliance) -> None:
     assert "justification" in log_line
 
 
-@pytest.mark.known_defect
-@pytest.mark.xfail(
-    strict=True,
-    reason="todo.md A5: MC1 emits ReceiveTaskActivity and ComplianceCheckActivity but no "
-    "yp:DecisionActivity, which is exactly what it requires of everyone else — so it "
-    "fails its own check. Remove this marker once MC1's verdict is recorded as a "
-    "DecisionActivity.",
-)
 def test_mc1_passes_its_own_output(mc1: MC1Compliance) -> None:
     """Apply the checker to the checker."""
     own_output, _ = mc1.process(
@@ -104,6 +106,50 @@ def test_mc1_passes_its_own_output(mc1: MC1Compliance) -> None:
     verdict_on_self, log_line = mc1.process("subject-mc1", own_output, "governance.mc1.subject")
 
     assert verdict_of(verdict_on_self) == "PASS", log_line
+
+
+def test_mc1_passes_mc3s_output(mc1: MC1Compliance, mc3: MC3Audit) -> None:
+    """The standard must hold across the whole governance layer, not just for MC1.
+
+    MC3 reconstructs trails rather than judging them, so it had no verdict step either and
+    would have failed the same check. An auditor that can never report a problem is not an
+    auditor, so MC3 now decides whether the trail it rebuilt is actually complete.
+    """
+    audit, _ = mc3.process(
+        "subject", operational_agent_document(), "agent.lifecycle.cax.subject"
+    )
+
+    verdict, log_line = mc1.process("subject-mc3", audit, "governance.mc3.subject")
+
+    assert verdict_of(verdict) == "PASS", log_line
+
+
+def test_mc3_reports_a_partial_trail_when_steps_cannot_be_ordered(mc3: MC3Audit) -> None:
+    """Real yProv4ML records declare start times without end times.
+
+    An audit over such a record cannot establish durations, and activities sharing an empty
+    start time are ordered by dictionary insertion rather than by evidence. Saying COMPLETE
+    there would be a false assurance.
+    """
+    document = operational_agent_document()
+    for attributes in document["activity"].values():
+        attributes.pop("prov:endTime", None)
+
+    audit, log_line = mc3.process("subject", document, "agent.lifecycle.cax.subject")
+
+    assert verdict_of(audit) == "PARTIAL", log_line
+    justification = next(
+        a["yp:justification"] for a in audit["activity"].values() if a.get("yp:justification")
+    )
+    assert "no end time" in justification
+
+
+def test_mc3_reports_a_complete_trail_when_every_step_is_timed(mc3: MC3Audit) -> None:
+    audit, log_line = mc3.process(
+        "subject", operational_agent_document(), "agent.lifecycle.cax.subject"
+    )
+
+    assert verdict_of(audit) == "COMPLETE", log_line
 
 
 @pytest.mark.known_defect

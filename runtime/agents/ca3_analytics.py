@@ -13,11 +13,17 @@ lifecycle record — and anomaly detection is one algorithm inside it:
     A2  timing      — activity span, ordering gaps, bottleneck, critical path (wasInformedBy)
     A3  sustainability — energy/emission metric streams by source and context
     A4  resource    — CPU/GPU/RAM/disk/thermal streams by source and context
-    A5  anomaly     — invariant checks over A1–A4 (3σ gap, missing end times, empty streams)
+    A5  anomaly     — ordering-gap outliers against the run's own distribution
 
 Everything is derived from PROV itself (types, roles, timestamps, relations), so the agent
 is domain-agnostic by construction — the property Sandro asked for. The LLM, when a key is
 present, only *narrates* the already-computed findings; it never produces the numbers.
+
+Completeness gaps — unclosed activities, partial typing, absent instrumentation — are
+reported separately from anomalies. They describe what the producer recorded rather
+than how the run behaved, and folding them into the anomaly set made ANOMALY the
+verdict for essentially every real graph, which left the verdict carrying no
+information.
 
 Decide★ verdicts: OK (no invariant breached) / ANOMALY (records the breached invariant).
 """
@@ -26,7 +32,7 @@ from __future__ import annotations
 
 import re
 import statistics
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from yprov4agenticai import LightweightStore, ProvTracker, ptr_kwargs
@@ -35,10 +41,26 @@ from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
 from ..util import OUT_DIR, get_llm, llm_is_required, now_iso, write_prov
 
-# metric-family classifiers — matched against entity labels/ids, not hard-coded schemas
+# Metric-family classifiers, matched against entity labels rather than a hard-coded
+# schema so the agent stays domain-agnostic. The families must partition: a label like
+# "gpu_power_usage" matches both, so energy takes precedence and resource excludes it.
 _ENERGY_PAT = re.compile(r"emission|energy|carbon|power", re.I)
 _RESOURCE_PAT = re.compile(r"cpu|gpu|ram|memory|disk|temperature|usage|util", re.I)
-_SIGMA = 3.0  # anomaly threshold for timing gaps
+
+#: Outlier threshold in median-absolute-deviation units. 3.5 is the conventional
+#: equivalent of a 3-sigma rule for a normal distribution, and unlike sigma it remains
+#: attainable on the handful of gaps an agent lifecycle produces.
+_MAD_THRESHOLD = 3.5
+
+#: Below this many gaps there is no distribution to be an outlier against.
+_MIN_GAPS_FOR_OUTLIERS = 5
+
+#: A flagged gap must also account for at least this share of the run's wall clock, and be
+#: at least this many seconds. Producers log setup activities within the same millisecond,
+#: so the median gap is often near zero; without a materiality floor the normalised score
+#: explodes and sub-second noise is reported beside a genuine multi-second stall.
+_MATERIAL_SHARE = 0.05
+_MIN_MATERIAL_GAP_S = 0.5
 
 
 def _clean_ts(value: Any) -> datetime | None:
@@ -49,10 +71,17 @@ def _clean_ts(value: Any) -> datetime | None:
         return None
     text = value.split("^^")[0].strip().replace("Z", "+00:00")
     try:
-        dt = datetime.fromisoformat(text)
+        parsed = datetime.fromisoformat(text)
     except ValueError:
         return None
-    return dt.replace(tzinfo=None)  # compare naively; sources mix tz-awareness
+    # Sources mix offset-aware and naive timestamps, so normalise to one scale before
+    # returning a naive value for arithmetic. Discarding the offset instead of converting
+    # it -- as this did previously -- makes a +02:00 timestamp compare equal to a Z
+    # timestamp two hours earlier, injecting phantom gaps into the very series the timing
+    # and outlier algorithms analyse.
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone(UTC)
+    return parsed.replace(tzinfo=None)
 
 
 def _type_of(node: dict[str, Any]) -> str:
@@ -143,20 +172,31 @@ class CA3Analytics(StreamingAgent):
 
     # ── A3 + A4 metric-stream inventories ──────────────────────────────────────
     @staticmethod
-    def _streams(doc: dict[str, Any], pattern: re.Pattern) -> dict[str, Any]:
+    def _streams(
+        doc: dict[str, Any], pattern: re.Pattern, exclude: re.Pattern | None = None
+    ) -> dict[str, Any]:
+        """Inventory the metric streams whose label matches `pattern` but not `exclude`.
+
+        Classification is by label rather than by schema, which keeps the agent
+        domain-agnostic. `exclude` makes the families a partition: without it a label like
+        ``gpu_power_usage`` matches both the energy pattern (on "power") and the resource
+        pattern (on "usage"), so the same stream was counted twice and the two totals
+        could not be read as independent.
+        """
         by_source: dict[str, int] = {}
         by_context: dict[str, int] = {}
         names: list[str] = []
         for eid, e in (doc.get("entity") or {}).items():
             label = str(e.get("prov:label", eid))
-            if _type_of(e).endswith("Metric") or pattern.search(label):
-                if not pattern.search(label):
-                    continue
-                names.append(label)
-                src = str(e.get("yprov:source", "unknown"))
-                ctx = str(e.get("yprov:context", "unknown"))
-                by_source[src] = by_source.get(src, 0) + 1
-                by_context[ctx] = by_context.get(ctx, 0) + 1
+            if not pattern.search(label):
+                continue
+            if exclude is not None and exclude.search(label):
+                continue
+            names.append(label)
+            src = str(e.get("yprov:source", "unknown"))
+            ctx = str(e.get("yprov:context", "unknown"))
+            by_source[src] = by_source.get(src, 0) + 1
+            by_context[ctx] = by_context.get(ctx, 0) + 1
         return {
             "count": len(names),
             "by_source": by_source,
@@ -166,45 +206,117 @@ class CA3Analytics(StreamingAgent):
 
     # ── A5 anomaly detection — ONE algorithm among the set ─────────────────────
     @staticmethod
-    def _anomalies(
+    def _timing_outliers(timing: dict[str, Any]) -> list[str]:
+        """Flag ordering gaps that are outliers against the rest of the run.
+
+        Uses the median and the median absolute deviation rather than mean and standard
+        deviation. With a population standard deviation over *n* samples the largest
+        attainable z-score is (n-1)/sqrt(n), so a 3-sigma rule needs at least 11 gaps
+        before it can fire at all — and an agent lifecycle has six activities while the
+        bundled yProv4ML records have nine. The previous rule was unreachable on every
+        input in the repository, which is the worst kind of check: one that always passes.
+
+        MAD is also robust to the outlier itself, which a standard deviation is not: one
+        large gap inflates sigma enough to hide its own significance.
+        """
+        gaps = [g for _, g in timing["gaps"]]
+        if len(gaps) < _MIN_GAPS_FOR_OUTLIERS:
+            return []
+        median = statistics.median(gaps)
+        deviations = [abs(g - median) for g in gaps]
+
+        # Scale estimate. The median absolute deviation is the robust default, but it is
+        # exactly zero whenever more than half the gaps are identical — which is the
+        # common case here, since a producer logs most of its activities at a fixed
+        # cadence and then stalls once. A zero scale would reject the very outlier the
+        # check exists to find, so fall back to the mean absolute deviation, which is less
+        # robust but non-zero as soon as any gap differs at all.
+        scale = statistics.median(deviations)
+        if scale <= 0:
+            scale = statistics.fmean(deviations)
+        if scale <= 0:
+            # Every gap is identical: nothing is unusual relative to anything else.
+            return []
+
+        # Statistical unusualness alone is not enough to report. Producers log their setup
+        # activities within the same millisecond, so the median gap is often near zero and
+        # the MAD with it — which makes the normalised score explode and flags a 0.098s
+        # gap at 11 MAD alongside a genuine 103s stall. A finding has to be both unusual
+        # for this run and large enough to matter in it.
+        wall_clock = float(timing["wall_clock_s"])
+        material_floor = max(_MIN_MATERIAL_GAP_S, _MATERIAL_SHARE * wall_clock)
+
+        found = []
+        for aid, gap in timing["gaps"]:
+            if gap <= median or gap < material_floor:
+                continue
+            if abs(gap - median) / scale <= _MAD_THRESHOLD:
+                continue
+            share = 100.0 * gap / wall_clock if wall_clock > 0 else 0.0
+            found.append(
+                f"timing: gap before '{aid}' is {gap:.3f}s — {share:.1f}% of the run's "
+                f"{wall_clock:.3f}s wall clock, against a median inter-activity gap of "
+                f"{median:.3f}s"
+            )
+        return found
+
+    @classmethod
+    def _anomalies(cls, timing: dict[str, Any]) -> list[str]:
+        """Invariant breaches: something in this run looks wrong.
+
+        Deliberately narrow. Absent instrumentation and partial typing are facts about how
+        the producer was configured, not misbehaviour by the run, and reporting them here
+        made ANOMALY the verdict for essentially every real graph -- which left the verdict
+        carrying no information. Those are reported as completeness findings instead.
+        """
+        return cls._timing_outliers(timing)
+
+    @staticmethod
+    def _completeness(
         struct: dict[str, Any],
         timing: dict[str, Any],
         energy: dict[str, Any],
         resource: dict[str, Any],
     ) -> list[str]:
+        """Gaps in what the producer recorded, as distinct from anomalies in what it did.
+
+        These are the findings that make the analytics agent useful on real input -- the
+        bundled yProv4ML records trip the first two -- but they describe the provenance,
+        not the computation it documents.
+        """
         found: list[str] = []
-        gaps = [g for _, g in timing["gaps"]]
-        if len(gaps) >= 3:
-            mu, sd = statistics.mean(gaps), statistics.pstdev(gaps)
-            if sd > 0:
-                for aid, g in timing["gaps"]:
-                    if g > mu + _SIGMA * sd:
-                        found.append(
-                            f"timing: gap before '{aid}' is {g:.3f}s "
-                            f"(> mean {mu:.3f}s + {_SIGMA:g}σ {sd:.3f}s)"
-                        )
         if timing["activities_without_end_time"]:
             n = len(timing["activities_without_end_time"])
+            shown = ", ".join(timing["activities_without_end_time"][:3])
             found.append(
-                f"completeness: {n} activity(ies) declare prov:startedAtTime but no end time "
-                f"({', '.join(timing['activities_without_end_time'][:3])}"
-                f"{'...' if n > 3 else ''})"
+                f"timing-completeness: {n} activity(ies) declare a start time but no end "
+                f"time ({shown}{'...' if n > 3 else ''}), so their durations are unknown"
             )
-        if struct["typing_coverage"] < 100.0:
+        if struct["entities"] and struct["typing_coverage"] < 100.0:
+            untyped = struct["entities"] - struct["typed_entities"]
             found.append(
-                f"typing: only {struct['typing_coverage']}% of entities carry a prov:type"
+                f"typing-completeness: {untyped} of {struct['entities']} entities carry no "
+                f"prov:type ({struct['typing_coverage']}% typed)"
             )
         if energy["count"] == 0:
             found.append(
-                "sustainability: no energy/emission streams — run is not carbon-instrumented"
+                "sustainability-completeness: no energy or emission streams — this run is "
+                "not carbon-instrumented"
             )
         if resource["count"] == 0:
-            found.append("resource: no CPU/GPU/RAM streams — run is not resource-instrumented")
+            found.append(
+                "resource-completeness: no CPU/GPU/RAM streams — this run is not "
+                "resource-instrumented"
+            )
         return found
 
     # ── report assembly ────────────────────────────────────────────────────────
     def _narrate(
-        self, sid: str, findings: dict[str, Any], anomalies: list[str]
+        self,
+        sid: str,
+        findings: dict[str, Any],
+        anomalies: list[str],
+        completeness: list[str],
     ) -> tuple[str, str]:
         """Return (report, mode), where mode records the path actually taken.
 
@@ -220,7 +332,7 @@ class CA3Analytics(StreamingAgent):
             f"Wall-clock span {t['wall_clock_s']}s across {t['ordered_activities']} ordered "
             f"activities. Energy streams: {findings['sustainability']['count']}; "
             f"resource streams: {findings['resource']['count']}. "
-            f"Anomalies: {len(anomalies)}."
+            f"Anomalies: {len(anomalies)}; completeness findings: {len(completeness)}."
         )
         if not self.llm:
             return head, "computed"
@@ -228,8 +340,12 @@ class CA3Analytics(StreamingAgent):
             narration = self.llm(
                 "You are CA3, a provenance analytics agent. Write 3-4 sentences of "
                 "root-cause commentary on these COMPUTED findings. Do not invent numbers; "
-                "use only what is given.\n\n"
-                f"Findings: {findings}\n\nAnomalies: {anomalies}"
+                "use only what is given. Distinguish anomalies, which indicate the run "
+                "behaved unexpectedly, from completeness gaps, which indicate the "
+                "producer recorded less than it could have.\n\n"
+                f"Findings: {findings}\n\n"
+                f"Anomalies: {anomalies}\n\n"
+                f"Completeness gaps: {completeness}"
             )
         except Exception as exc:
             if llm_is_required():
@@ -245,17 +361,21 @@ class CA3Analytics(StreamingAgent):
         struct = self._structure(doc)
         timing = self._timing(doc)
         energy = self._streams(doc, _ENERGY_PAT)
-        resource = self._streams(doc, _RESOURCE_PAT)
-        anomalies = self._anomalies(struct, timing, energy, resource)
+        resource = self._streams(doc, _RESOURCE_PAT, exclude=_ENERGY_PAT)
+        anomalies = self._anomalies(timing)
+        completeness = self._completeness(struct, timing, energy, resource)
         findings = {
             "structure": struct,
             "timing": {k: v for k, v in timing.items() if k != "gaps"},
             "sustainability": energy,
             "resource": resource,
         }
-        report, mode = self._narrate(session_id, {**findings, "timing": timing}, anomalies)
+        report, mode = self._narrate(
+            session_id, {**findings, "timing": timing}, anomalies, completeness
+        )
         verdict = "ANOMALY" if anomalies else "OK"
         ptr = self.store.put(report, kind="analytics-report")
+        self.store.save()  # keep the shared index complete
 
         # ── reflexive PROV: CA3's own 6-step lifecycle ────────────────────────
         t = ProvTracker(sid=session_id, agent_label="Analytics_Agent")
@@ -278,7 +398,9 @@ class CA3Analytics(StreamingAgent):
             extra_attrs={"yp:algorithms": "structure,timing,sustainability,resource,anomaly"},
             verbose=False,
         )
-        result = t.register_entity("ToolResultEntity", report, **ptr_kwargs(ptr))
+        result = t.register_entity(
+            "ToolResultEntity", report, **ptr_kwargs(ptr), derived_from=task
+        )
         t.record_activity(
             "AnalysisActivity",
             "CA3: mine the provenance graph",
@@ -297,7 +419,10 @@ class CA3Analytics(StreamingAgent):
         )
         quality = t.register_entity(
             "QualityEntity",
-            f"{len(anomalies)} invariant(s) breached" if anomalies else "all invariants held",
+            f"{len(anomalies)} invariant(s) breached, {len(completeness)} completeness gap(s)"
+            if (anomalies or completeness)
+            else "all invariants held, no completeness gaps",
+            derived_from=result,
         )
         t.record_activity(
             "ObservationActivity",
@@ -315,19 +440,37 @@ class CA3Analytics(StreamingAgent):
             now_iso(),
             in_eid=quality,
             justification=(
-                f"Applied 5 algorithms (structure, timing, sustainability, resource, anomaly) "
-                f"to a {struct['activities']}-activity / {struct['entities']}-entity graph. "
+                f"Applied 5 algorithms (structure, timing, sustainability, resource, "
+                f"anomaly) to a {struct['activities']}-activity / "
+                f"{struct['entities']}-entity graph. "
                 + (
                     "Breached invariants: "
                     + "; ".join(anomalies[:3])
                     + (f" (+{len(anomalies) - 3} more)" if len(anomalies) > 3 else "")
                     if anomalies
-                    else "No invariant breached: timing gaps within 3σ, all activities closed, "
-                    "typing complete, energy and resource streams present."
+                    else (
+                        f"No invariant breached: no ordering gap exceeds "
+                        f"{_MAD_THRESHOLD:g} MAD above the median"
+                        if len(timing["gaps"]) >= _MIN_GAPS_FOR_OUTLIERS
+                        else f"No invariant breached: only {len(timing['gaps'])} ordering "
+                        f"gap(s), below the {_MIN_GAPS_FOR_OUTLIERS} needed to identify "
+                        f"an outlier, so the timing check abstained"
+                    )
+                )
+                + (
+                    f" Separately, {len(completeness)} completeness gap(s) in what the "
+                    f"producer recorded: " + "; ".join(completeness[:3]) + "."
+                    if completeness
+                    else " No completeness gaps: every activity is closed, typing is "
+                    "complete, and energy and resource streams are present."
                 )
                 + f" Verdict {verdict}."
             ),
-            extra_attrs={"yp:verdict": verdict, "yp:anomaly_count": len(anomalies)},
+            extra_attrs={
+                "yp:verdict": verdict,
+                "yp:anomaly_count": len(anomalies),
+                "yp:completeness_gap_count": len(completeness),
+            },
             verbose=False,
         )
         t.record_activity(
@@ -343,5 +486,6 @@ class CA3Analytics(StreamingAgent):
         write_prov(self.role, session_id, prov)
         return prov, (
             f"analysed {session_id} ({mode}) -> {verdict}, "
-            f"{len(anomalies)} anomaly(ies), PID {ptr['yp:pid']}"
+            f"{len(anomalies)} anomaly(ies), {len(completeness)} completeness gap(s), "
+            f"PID {ptr['yp:pid']}"
         )

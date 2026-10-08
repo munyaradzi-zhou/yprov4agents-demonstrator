@@ -58,30 +58,63 @@ def build_lifecycle(**tracker_kwargs: Any) -> dict[str, Any]:
 # ──────────────────────────────────────────────────────────────────────────────────
 # Library output
 # ──────────────────────────────────────────────────────────────────────────────────
-@pytest.mark.known_defect
-@pytest.mark.xfail(
-    strict=True,
-    reason="todo.md E1: the top-level `_yprov4agents_meta` block is not a PROV-N record "
-    "type, so the reference parser rejects the whole document. Remove this marker "
-    "when the meta block moves out of the document root.",
-)
 @pytest.mark.parametrize("granularity", ["DATA", "METADATA"])
 def test_tracker_output_is_valid_prov_json(granularity: str) -> None:
-    parse(build_lifecycle(granularity=granularity))
+    parsed = parse(build_lifecycle(granularity=granularity))
+    assert list(parsed.get_records()), "a parsed document should expose records"
 
 
-def test_tracker_output_is_valid_once_meta_block_is_removed() -> None:
-    """The same document parses cleanly with only the non-standard block dropped.
+def test_document_root_holds_only_containers_the_format_defines() -> None:
+    """No unrecognised top-level key, in either mode.
 
-    This isolates the defect: nothing else in the tracker's serialisation is at fault, so
-    the fix is confined to where that block lives rather than to how PROV is built.
+    This is the guard on the regression that made every emitted document unparseable: a
+    PROV-JSON consumer treats each root key as a record-type keyword and rejects the whole
+    document when it meets one it does not know, rather than skipping it.
     """
-    document = build_lifecycle()
-    document.pop("_yprov4agents_meta")
+    permitted = {
+        "prefix",
+        "entity",
+        "activity",
+        "agent",
+        "bundle",
+        "wasGeneratedBy",
+        "used",
+        "wasInformedBy",
+        "wasStartedBy",
+        "wasEndedBy",
+        "wasInvalidatedBy",
+        "wasDerivedFrom",
+        "wasAttributedTo",
+        "wasAssociatedWith",
+        "actedOnBehalfOf",
+        "wasInfluencedBy",
+        "specializationOf",
+        "alternateOf",
+        "hadMember",
+        "mentionOf",
+    }
+    for granularity in ("DATA", "METADATA"):
+        unknown = set(build_lifecycle(granularity=granularity)) - permitted
+        assert not unknown, f"{granularity} mode emits unrecognised root key(s): {unknown}"
 
-    parsed = parse(document)
-    records = list(parsed.get_records())
-    assert records, "a parsed document should expose records"
+
+def test_the_record_describes_its_own_configuration() -> None:
+    """Granularity and persistence must still be recoverable, in both modes.
+
+    Moving them out of a bespoke root key must not lose them: a reader cannot interpret a
+    record without knowing whether entities were captured at all.
+    """
+    for granularity in ("DATA", "METADATA"):
+        document = build_lifecycle(granularity=granularity)
+        bundles = [
+            entity
+            for entity in document["entity"].values()
+            if entity.get("prov:type", {}).get("$") == "prov:Bundle"
+        ]
+        assert len(bundles) == 1, f"{granularity}: expected exactly one bundle descriptor"
+        assert bundles[0]["yp:granularity"] == granularity
+        assert bundles[0]["yp:persistence"] == "PERSISTENT"
+        assert bundles[0]["yp:library_version"]
 
 
 def test_justification_survives_a_standard_round_trip() -> None:
@@ -92,7 +125,6 @@ def test_justification_survives_a_standard_round_trip() -> None:
     one thing the project exists to record.
     """
     document = build_lifecycle()
-    document.pop("_yprov4agents_meta")
 
     serialised = parse(document).serialize(format="json")
     assert serialised is not None, "serialize() returns a string when given no stream"
@@ -116,12 +148,6 @@ def test_prefixes_are_declared() -> None:
 # ──────────────────────────────────────────────────────────────────────────────────
 # Artifacts from a real run
 # ──────────────────────────────────────────────────────────────────────────────────
-@pytest.mark.known_defect
-@pytest.mark.xfail(
-    strict=True,
-    reason="todo.md E1: every emitted artifact carries the same non-standard top-level "
-    "block, so none of them parse. Measured at baseline: 0 of 24 accepted.",
-)
 def test_emitted_artifacts_are_valid_prov_json(
     prov_documents: list[tuple[Path, dict[str, Any]]],
 ) -> None:
