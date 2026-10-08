@@ -21,13 +21,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-
-def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption(
-        "--prov-dir",
-        default="out",
-        help="directory holding emitted *_prov.json artifacts (default: out)",
-    )
+# `--prov-dir` is declared in the root conftest.py, not here: pytest only honours
+# pytest_addoption in a conftest at the rootdir.
 
 
 @pytest.fixture(scope="session")

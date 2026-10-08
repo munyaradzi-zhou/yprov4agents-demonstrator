@@ -49,4 +49,20 @@ __all__ = [
     "session_energy_summary",
 ]
 
-__version__ = "0.1.0"
+
+def _installed_version() -> str:
+    """Read the version from installed distribution metadata.
+
+    Declared once, in pyproject.toml. Duplicating it here as a literal lets the two drift,
+    which is how a container ends up reporting a different version from the source tree it
+    was built from.
+    """
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("yprov4agents-demonstrator")
+    except PackageNotFoundError:  # running from a source tree without an install
+        return "0.0.0+unknown"
+
+
+__version__ = _installed_version()

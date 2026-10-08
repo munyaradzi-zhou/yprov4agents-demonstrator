@@ -1,0 +1,160 @@
+{
+  "prefix": {
+    "yp": "http://hpci-lab.org/yProv4Agents#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "agent": {
+    "yp:agent_example_0": {
+      "prov:type": {
+        "$": "yp:OperationalAgent",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics_Visualizer"
+    }
+  },
+  "activity": {
+    "yp:ReceiveTaskActivity_example_0_00": {
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: receive producer record",
+      "prov:startTime": "2026-10-08T14:18:06.996049+00:00",
+      "prov:endTime": "2026-10-08T14:18:06.996078+00:00"
+    },
+    "yp:PlanningActivity_example_0_01": {
+      "prov:type": {
+        "$": "yp:PlanningActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: choose chart",
+      "prov:startTime": "2026-10-08T14:18:06.996099+00:00",
+      "prov:endTime": "2026-10-08T14:18:06.996105+00:00"
+    },
+    "yp:ToolCallActivity_example_0_02": {
+      "prov:type": {
+        "$": "yp:ToolCallActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: render chart (matplotlib)",
+      "prov:startTime": "2026-10-08T14:18:06.996125+00:00",
+      "prov:endTime": "2026-10-08T14:18:06.996130+00:00"
+    },
+    "yp:DecisionActivity_example_0_03": {
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: accept chart",
+      "prov:startTime": "2026-10-08T14:18:06.996146+00:00",
+      "prov:endTime": "2026-10-08T14:18:06.996152+00:00",
+      "yp:justification": "Rendered a chart summarising 9 activities / 39 entities of example_0; deterministic, no model involved. Accepted."
+    },
+    "yp:ResponseActivity_example_0_04": {
+      "prov:type": {
+        "$": "yp:ResponseActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: respond",
+      "prov:startTime": "2026-10-08T14:18:06.996162+00:00",
+      "prov:endTime": "2026-10-08T14:18:06.996167+00:00"
+    }
+  },
+  "_yprov4agents_meta": {
+    "granularity": "DATA",
+    "persistence": "PERSISTENT"
+  },
+  "entity": {
+    "yp:TaskEntity_example_0": {
+      "prov:type": {
+        "$": "yp:TaskEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:value": "producer doc on producer.yprov4ml.example_0"
+    },
+    "yp:ToolResultEntity_example_0": {
+      "prov:type": {
+        "$": "yp:ToolResultEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:value": "example_0_metrics.png",
+      "yp:pid": "21.T11999/yprovstore-feef3fe4e9d9",
+      "yp:contentHash": "sha256:feef3fe4e9d91408ec941542910ba7588f4b48effe199f83acc0cdcaa92401a3"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d1": {
+      "prov:generatedEntity": "yp:ToolResultEntity_example_0",
+      "prov:usedEntity": "yp:TaskEntity_example_0"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "yp:ReceiveTaskActivity_example_0_00",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a1": {
+      "prov:activity": "yp:PlanningActivity_example_0_01",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a2": {
+      "prov:activity": "yp:ToolCallActivity_example_0_02",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a3": {
+      "prov:activity": "yp:DecisionActivity_example_0_03",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a4": {
+      "prov:activity": "yp:ResponseActivity_example_0_04",
+      "prov:agent": "yp:agent_example_0"
+    }
+  },
+  "wasInformedBy": {
+    "_:i1": {
+      "prov:informed": "yp:PlanningActivity_example_0_01",
+      "prov:informant": "yp:ReceiveTaskActivity_example_0_00"
+    },
+    "_:i2": {
+      "prov:informed": "yp:ToolCallActivity_example_0_02",
+      "prov:informant": "yp:PlanningActivity_example_0_01"
+    },
+    "_:i3": {
+      "prov:informed": "yp:DecisionActivity_example_0_03",
+      "prov:informant": "yp:ToolCallActivity_example_0_02"
+    },
+    "_:i4": {
+      "prov:informed": "yp:ResponseActivity_example_0_04",
+      "prov:informant": "yp:DecisionActivity_example_0_03"
+    }
+  },
+  "used": {
+    "_:u1": {
+      "prov:activity": "yp:PlanningActivity_example_0_01",
+      "prov:entity": "yp:TaskEntity_example_0"
+    },
+    "_:u2": {
+      "prov:activity": "yp:ToolCallActivity_example_0_02",
+      "prov:entity": "yp:TaskEntity_example_0"
+    },
+    "_:u3": {
+      "prov:activity": "yp:DecisionActivity_example_0_03",
+      "prov:entity": "yp:ToolResultEntity_example_0"
+    },
+    "_:u4": {
+      "prov:activity": "yp:ResponseActivity_example_0_04",
+      "prov:entity": "yp:ToolResultEntity_example_0"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "yp:TaskEntity_example_0",
+      "prov:activity": "yp:ReceiveTaskActivity_example_0_00"
+    },
+    "_:g2": {
+      "prov:entity": "yp:ToolResultEntity_example_0",
+      "prov:activity": "yp:ToolCallActivity_example_0_02"
+    }
+  }
+}

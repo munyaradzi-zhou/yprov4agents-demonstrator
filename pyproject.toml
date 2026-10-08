@@ -83,10 +83,24 @@ select = [
 ignore = [
     "ANN401",    # Any is legitimate for PROV-JSON documents, which are untyped by nature
     "B008",      # argparse/Path defaults in function signatures
+    # Prose in this codebase is scientific writing: en dashes, σ, ★ and arrows carry
+    # meaning in docstrings that quote the paper. Flagging them as homoglyph risks is a
+    # false positive here, and "fixing" them would corrupt the terminology.
+    "RUF001",    # ambiguous unicode in strings
+    "RUF002",    # ambiguous unicode in docstrings
+    "RUF003",    # ambiguous unicode in comments
+    # Agents implement two fixed contracts — StreamingAgent.process(session, doc,
+    # source_subject) and the bus handler (subject, envelope) — and an implementation that
+    # needs only some of those arguments must still accept all of them. Renaming the
+    # unused ones would obscure which contract is being satisfied.
+    "ARG002",    # unused method argument
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "ARG"]         # test signatures carry fixtures, not annotations
+# The prompt registry is a content store: each prompt's text is hashed and versioned, so
+# rewrapping a line changes its SHA and silently invalidates the prompt's identity.
+"yprov4agenticai/prompts.py" = ["E501"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["yprov4agenticai", "runtime", "eval"]

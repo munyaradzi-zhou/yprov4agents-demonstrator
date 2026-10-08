@@ -35,7 +35,7 @@ class MC3Audit(StreamingAgent):
     input_subject = "agent.lifecycle.>"
     output_prefix = "governance"
 
-    def __init__(self, bus: NetworkBus):
+    def __init__(self, bus: NetworkBus) -> None:
         super().__init__(role="mc3", bus=bus)
 
     def process(
@@ -47,7 +47,7 @@ class MC3Audit(StreamingAgent):
         acts.sort(key=lambda kv: kv[1].get("prov:startTime", ""))
         trail: list[str] = []
         n_just = 0
-        for aid, a in acts:
+        for _aid, a in acts:
             kind = _type_of(a).split(":")[-1] or "Activity"
             trail.append(kind)
             if a.get("yp:justification"):

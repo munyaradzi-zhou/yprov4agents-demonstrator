@@ -13,7 +13,6 @@ persistent — subscribers must be up before we publish), then streams each docu
 from __future__ import annotations
 
 import asyncio
-import glob
 import json
 import os
 from pathlib import Path
@@ -32,8 +31,7 @@ STREAM_DELAY_MS = float(os.environ.get("STREAM_DELAY_MS", "150"))
 
 
 def _find_docs() -> list[Path]:
-    files = sorted(glob.glob(os.path.join(DATA_DIR, "**", "*.json"), recursive=True))
-    return [Path(f) for f in files]
+    return sorted(Path(DATA_DIR).rglob("*.json"))
 
 
 def _session_for(path: Path) -> str:
@@ -47,7 +45,7 @@ async def _wait_for_agents(bus: NetworkBus, timeout: float = 30.0) -> None:
     want = set(EXPECTED)
     done = asyncio.Event()
 
-    async def on_ready(subject: str, env: ProvRecordEnvelope) -> None:
+    async def on_ready(subject: str, _env: ProvRecordEnvelope) -> None:
         role = subject.split(".")[-1]
         if role not in seen:
             seen.add(role)

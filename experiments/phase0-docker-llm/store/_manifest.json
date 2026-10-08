@@ -1,0 +1,16 @@
+{
+  "21.T11999/yprovstore-abfe4946dd38": {
+    "uri": "file:///out/store/abfe4946dd38.txt",
+    "yp:contentHash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80",
+    "size_bytes": 21634,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"MSELoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:10:12.815807^^xsd:dateTime\"}, \"MSELoss/Validation\": {\"prov:startedAt…"
+  },
+  "21.T11999/yprovstore-377895f2bbbd": {
+    "uri": "file:///out/store/377895f2bbbd.txt",
+    "yp:contentHash": "sha256:377895f2bbbd812727556946e2363f05dbdc872944699f1641d080e12c5fee9e",
+    "size_bytes": 39286,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"CrossEntropyLoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:02:45.935328^^xsd:dateTime\"}, \"Test\": {\"prov:startedAtTime\"…"
+  }
+}

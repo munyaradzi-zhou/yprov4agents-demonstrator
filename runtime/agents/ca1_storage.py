@@ -51,7 +51,7 @@ class CA1Storage(StreamingAgent):
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
-    def __init__(self, bus: NetworkBus):
+    def __init__(self, bus: NetworkBus) -> None:
         super().__init__(role="ca1", bus=bus)
         self.store = LightweightStore(root=str(OUT_DIR / "store"))
         # session_id -> reassembled original producer document, awaiting consumers
@@ -60,6 +60,11 @@ class CA1Storage(StreamingAgent):
         self._acks: dict[str, set[str]] = {}
         # sessions already persisted (never persist twice)
         self._done: set[str] = set()
+        # Live timeout guards, held so the event loop keeps a strong reference. A task
+        # referenced only by `create_task`'s return value can be garbage-collected before
+        # it runs, which would drop the safety net that is supposed to make a record
+        # unloseable. See todo.md H4 on why this guard races the consumers at all.
+        self._guards: set[asyncio.Task[None]] = set()
 
     # ── startup: two subscriptions, not one ────────────────────────────────────
     async def start(self) -> None:
@@ -95,7 +100,9 @@ class CA1Storage(StreamingAgent):
                 f"{sorted(set(PERSIST_AFTER) - self._acks.get(sid, set()))}",
                 flush=True,
             )
-            asyncio.create_task(self._timeout_guard(sid))
+            guard = asyncio.create_task(self._timeout_guard(sid))
+            self._guards.add(guard)
+            guard.add_done_callback(self._guards.discard)
 
     # ── inbound: a consumer finished → one acknowledgement ─────────────────────
     async def _on_consumer_ack(self, subject: str, env: ProvRecordEnvelope) -> None:
@@ -225,7 +232,8 @@ class CA1Storage(StreamingAgent):
             in_eid=stored,
             justification=(
                 f"Persisted after consumption ({reason}); acknowledged by "
-                f"[{', '.join(acked) or 'none'}]. Record carries {c['activities']} activities / "
+                f"[{', '.join(acked) or 'none'}]. Record carries "
+                f"{c['activities']} activities / "
                 f"{c['entities']} entities / {c['relations']} relations, {len(payload)} bytes. "
                 f"Integrity: {integrity}. Verdict {verdict}."
             ),

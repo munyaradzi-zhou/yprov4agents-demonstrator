@@ -23,8 +23,7 @@ from ..util import now_iso, write_prov
 
 
 def _iter_activities(doc: dict[str, Any]) -> Iterator[tuple[str, dict[str, Any]]]:
-    for aid, a in (doc.get("activity") or {}).items():
-        yield aid, a
+    yield from (doc.get("activity") or {}).items()
 
 
 def _type_of(a: dict[str, Any]) -> str:
@@ -38,7 +37,7 @@ class MC1Compliance(StreamingAgent):
     input_subject = "agent.lifecycle.>"
     output_prefix = "governance"
 
-    def __init__(self, bus: NetworkBus):
+    def __init__(self, bus: NetworkBus) -> None:
         super().__init__(role="mc1", bus=bus)
 
     def process(

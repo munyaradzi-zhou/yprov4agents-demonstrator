@@ -201,6 +201,37 @@ from ESCALATE — is unfalsifiable.
 **Fix:** make `resolve()` read from `self.root` when it exists (or add `verify_roundtrip()`
 forcing a disk read). ESCALATE then becomes reachable, which also gives you a real E5.
 
+<a id="c4"></a>
+### C4. The decision record cannot tell a GPT-4o call from a hardcoded string ⚠️
+
+*Measured 2026-10-08 by running the full containerised pipeline twice — once with the
+deterministic stub, once with real GPT-4o calls — and diffing the emitted provenance.*
+
+| | stub run | real GPT-4o run |
+|---|---|---|
+| typed activities / entities / relations | 78 / 44 / 250 | 78 / 44 / 250 |
+| CAx `yp:justification` | *byte-identical* | *byte-identical* |
+| `ResponseEntity` `yp:value` | stub prose | model prose |
+| `yp:pid`, `yp:contentHash` | differ | differ |
+| anything recording **that a model ran** | — | — |
+
+CAx asserts the same sentence in both runs: *"Summary covers all 9 activities and 39
+entities of the source record; grounded in the graph counts and activity labels.
+Accepted."* The summary payload changes and so does its hash, but the **decision** record
+does not move, and no attribute anywhere names the model, the temperature, the token
+count, or even the fact that an API was called.
+
+So a reviewer handed the provenance cannot determine whether the agent reasoned with a
+language model or returned an f-string. For a project whose thesis is that behavioural
+provenance must capture *why*, this is the sharpest statement of the gap — and it is now
+demonstrated rather than argued.
+
+It is also the cleanest possible motivation for the fixes: [C1](#c1) (justifications that
+reflect what was actually checked) and [F1](#f1)/[F2](#f2) (model and prompt provenance)
+are the same defect seen from two sides. Re-running this exact two-run diff after those
+land is a genuine evaluation result — *"before: the record cannot distinguish the two runs;
+after: it distinguishes them on N attributes"* — and it costs one pipeline run to produce.
+
 <a id="c3"></a>
 ### C3. Net effect
 

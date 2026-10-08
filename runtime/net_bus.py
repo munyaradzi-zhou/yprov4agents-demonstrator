@@ -38,7 +38,7 @@ Handler = Callable[[str, ProvRecordEnvelope], Awaitable[None]]
 class NetworkBus:
     """Broker-backed pub/sub with the same shape as the in-process ProvenanceBus."""
 
-    def __init__(self, url: str = "nats://localhost:4222", name: str = "yprov-agent"):
+    def __init__(self, url: str = "nats://localhost:4222", name: str = "yprov-agent") -> None:
         self.url = url
         self.name = name
         self._nc: Any = None

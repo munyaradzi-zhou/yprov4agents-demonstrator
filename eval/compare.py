@@ -153,8 +153,12 @@ def compare_runs(before_dir: Path, after_dir: Path) -> tuple[dict[str, list[str]
     """
     before, after = load(before_dir), load(after_dir)
     problems: list[str] = []
-    problems.extend(f"document missing from after: {name}" for name in sorted(set(before) - set(after)))
-    problems.extend(f"document new in after: {name}" for name in sorted(set(after) - set(before)))
+    problems.extend(
+        f"document missing from after: {name}" for name in sorted(set(before) - set(after))
+    )
+    problems.extend(
+        f"document new in after: {name}" for name in sorted(set(after) - set(before))
+    )
 
     differences: dict[str, list[str]] = {}
     for name in sorted(set(before) & set(after)):
@@ -211,8 +215,10 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  ! {problem}")
 
     if not differences:
-        print("\nNo structural differences: every document carries the same typed "
-              "activities, entities, relations, verdicts and justifications.")
+        print(
+            "\nNo structural differences: every document carries the same typed "
+            "activities, entities, relations, verdicts and justifications."
+        )
     else:
         print(f"\nStructural differences in {len(differences)} document(s):")
         for name, deltas in differences.items():

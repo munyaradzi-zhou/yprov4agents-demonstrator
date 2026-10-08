@@ -19,9 +19,18 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import os
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Annotations only. The runtime package is imported inside main() on purpose, after
+    # the environment variables the agent modules read at import time have been set, so
+    # pulling it in at module scope here would defeat that ordering.
+    from runtime.envelope import ProvRecordEnvelope
+    from runtime.net_bus import Handler
 
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
@@ -30,10 +39,8 @@ if str(HERE) not in sys.path:
 # Windows consoles default to cp1252, which cannot encode the box-drawing and arrow
 # characters the agents log. Never let a print() kill a run.
 for _stream in (sys.stdout, sys.stderr):
-    try:
+    with contextlib.suppress(Exception):
         _stream.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:
-        pass
 
 
 # ── a NATS-compatible in-process bus ───────────────────────────────────────────
@@ -53,17 +60,17 @@ def subject_matches(pattern: str, subject: str) -> bool:
 class LocalBus:
     """Drop-in replacement for NetworkBus with in-process delivery."""
 
-    def __init__(self, url: str = "local://", name: str = "local"):
+    def __init__(self, url: str = "local://", name: str = "local") -> None:
         self.url, self.name = url, name
         self._subs: list = []
 
-    async def connect(self, **_kw) -> None:
+    async def connect(self, **_kw: object) -> None:
         return None
 
-    async def subscribe(self, subject: str, handler) -> None:
+    async def subscribe(self, subject: str, handler: Handler) -> None:
         self._subs.append((subject, handler))
 
-    async def publish(self, subject: str, envelope) -> None:
+    async def publish(self, subject: str, envelope: ProvRecordEnvelope) -> None:
         # deliver to every matching subscriber; copy the list so handlers may subscribe
         for pattern, handler in list(self._subs):
             if subject_matches(pattern, subject):

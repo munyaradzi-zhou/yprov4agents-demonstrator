@@ -109,10 +109,11 @@ class StreamingAgent:
 
     #: subject pattern this agent listens on (NATS syntax, e.g. "producer.>")
     input_subject: str = "producer.>"
-    #: prefix for this agent's output subject; final subject = f"{output_prefix}.{role}.{session}"
+    #: Prefix for this agent's output subject. The full subject is
+    #: f"{output_prefix}.{role}.{session}".
     output_prefix: str = "agent.lifecycle"
 
-    def __init__(self, role: str, bus: NetworkBus):
+    def __init__(self, role: str, bus: NetworkBus) -> None:
         self.role = role
         self.bus = bus
         # merged docs, keyed by session_id, still streaming

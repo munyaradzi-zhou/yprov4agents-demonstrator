@@ -25,7 +25,7 @@ class CAxSummariser(StreamingAgent):
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
-    def __init__(self, bus: NetworkBus):
+    def __init__(self, bus: NetworkBus) -> None:
         super().__init__(role="cax", bus=bus)
         self.llm = get_llm()
         self.store = LightweightStore(root=str(OUT_DIR / "store"))

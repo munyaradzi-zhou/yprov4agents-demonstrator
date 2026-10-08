@@ -61,6 +61,7 @@ import threading
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 # ── Result type ───────────────────────────────────────────────────────────────
@@ -175,7 +176,7 @@ class CodeCarbonBackend(EnergyBackend):
             try:
                 self._tracker.stop()
             except Exception as exc:
-                warnings.warn(f"codecarbon stop raised: {exc}")
+                warnings.warn(f"codecarbon stop raised: {exc}", stacklevel=2)
             self._tracker = None
 
     @property
@@ -187,9 +188,8 @@ class CodeCarbonBackend(EnergyBackend):
         # root-locked by default; if it is unreadable codecarbon silently falls back to
         # TDP, so checking existence alone would MISLABEL a modelled number as measured.
         try:
-            uj = "/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
-            with open(uj) as f:
-                int(f.read().strip())
+            uj = Path("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj")
+            int(uj.read_text().strip())
             return "measured"
         except (OSError, ValueError):
             return "modelled"
@@ -255,7 +255,8 @@ class EnergyTracker:
             except ImportError:
                 warnings.warn(
                     "codecarbon not installed — energy tracking disabled. "
-                    "Activities will be annotated with yp:energy_source='null'."
+                    "Activities will be annotated with yp:energy_source='null'.",
+                    stacklevel=2,
                 )
                 backend = NullBackend()
         self._backend = backend

@@ -1,4 +1,0 @@
-# Runtime dependencies for the demonstrator image (one image, all roles).
-nats-py>=2.6.0          # the provenance bus client (NATS)
-matplotlib>=3.7.0       # CA2 chart rendering (headless Agg)
-openai>=1.0.0           # optional: CAx summaries / CA3 narration when a key is present

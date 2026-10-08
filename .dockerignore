@@ -1,25 +1,46 @@
-# Keep the Docker build context small: the image only needs yprov4agenticai/ + runtime/
-# (+ deploy/requirements-runtime.txt). Everything else is excluded from the build.
-venv/
+# Keep the build context small. The image needs pyproject.toml, uv.lock, README.md (named
+# by the project metadata), and the three packages: yprov4agenticai/, runtime/, eval/.
+#
+# Note on *.ttl: the yp: vocabulary is a build artifact of the image once MC1 validates
+# against it, so vocab/ is deliberately NOT excluded here.
+
+# Version control and local environments
 .git/
-_local/
-outputs/
-Results/
-artefacts/
-examples/
+.github/
+.venv/
+venv/
+
+# Run artifacts and frozen evidence: mounted at runtime, never baked in
+out/
 experiments/
-eScience2026/
+_smoke/
+emissions.csv
+.codecarbon-tracker.pid
+
+# Inputs are bind-mounted read-only by compose, not copied
+data/
+
+# Documentation and prose
 docs/
+paper/
 figures/
-improvements/
-tests/
-dist/
-*.egg-info/
-**/__pycache__/
-*.pyc
+*.md
+!README.md
 *.pdf
 *.pptx
 *.docx
-*.csv
-*.ttl
+
+# Tests and tooling caches
+tests/
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Secrets: compose injects these as environment variables
+.env
+.env.*

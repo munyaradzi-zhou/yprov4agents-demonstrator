@@ -48,7 +48,7 @@ class ProvTracker:
         persistence: str = "PERSISTENT",
         agent_label: str = "NL_Summarizer",
         principal: dict | None = None,
-    ):
+    ) -> None:
         assert granularity in ("DATA", "METADATA"), f"bad granularity={granularity!r}"
         self.sid = sid
         self.granularity = granularity
@@ -155,19 +155,19 @@ class ProvTracker:
         n = len(self.acts)  # unique counter keeps retry IDs distinct
         aid = f"{kind}_{self.sid}_{n:02d}"
         self.acts.append(
-            dict(
-                id=aid,
-                kind=kind,
-                label=label,
-                t0=t0,
-                t1=t1,
-                in_eid=in_eid,
-                out_eid=out_eid,
-                j=justification,
-                c=confidence_score,
-                e=energy_attrs or {},
-                x=extra_attrs or {},
-            )
+            {
+                "id": aid,
+                "kind": kind,
+                "label": label,
+                "t0": t0,
+                "t1": t1,
+                "in_eid": in_eid,
+                "out_eid": out_eid,
+                "j": justification,
+                "c": confidence_score,
+                "e": energy_attrs or {},
+                "x": extra_attrs or {},
+            }
         )
         if used_mem:
             self.used_mem.append((f"yp:{aid}", used_mem))
@@ -178,7 +178,9 @@ class ProvTracker:
         if confidence_score is not None:
             mark += f"  [conf={confidence_score:.2f}]"
         if energy_attrs and "yp:energy_kwh" in energy_attrs:
-            mark += f"  [{energy_attrs['yp:energy_kwh'] * 1e6:.2f} mWh, src={energy_attrs.get('yp:energy_source', '?')}]"
+            kwh = energy_attrs["yp:energy_kwh"]
+            source = energy_attrs.get("yp:energy_source", "?")
+            mark += f"  [{kwh * 1e6:.2f} mWh, src={source}]"
         print(f"  [PROV] {kind:<28} ({ms} ms){mark}")
 
     @staticmethod

@@ -1,0 +1,181 @@
+{
+  "prefix": {
+    "yp": "http://hpci-lab.org/yProv4Agents#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "agent": {
+    "yp:agent_example_0": {
+      "prov:type": {
+        "$": "yp:OperationalAgent",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "NL_Summarizer"
+    }
+  },
+  "activity": {
+    "yp:ReceiveTaskActivity_example_0_00": {
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CAx: receive producer record",
+      "prov:startTime": "2026-10-08T14:18:10.619243+00:00",
+      "prov:endTime": "2026-10-08T14:18:10.619269+00:00"
+    },
+    "yp:PlanningActivity_example_0_01": {
+      "prov:type": {
+        "$": "yp:PlanningActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CAx: scope the summary",
+      "prov:startTime": "2026-10-08T14:18:10.619286+00:00",
+      "prov:endTime": "2026-10-08T14:18:10.619289+00:00"
+    },
+    "yp:ToolCallActivity_example_0_02": {
+      "prov:type": {
+        "$": "yp:ToolCallActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CAx: write NL summary",
+      "prov:startTime": "2026-10-08T14:18:10.619300+00:00",
+      "prov:endTime": "2026-10-08T14:18:10.619303+00:00"
+    },
+    "yp:ObservationActivity_example_0_03": {
+      "prov:type": {
+        "$": "yp:ObservationActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CAx: evaluate summary quality",
+      "prov:startTime": "2026-10-08T14:18:10.619308+00:00",
+      "prov:endTime": "2026-10-08T14:18:10.619312+00:00"
+    },
+    "yp:DecisionActivity_example_0_04": {
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CAx: accept summary",
+      "prov:startTime": "2026-10-08T14:18:10.619317+00:00",
+      "prov:endTime": "2026-10-08T14:18:10.619320+00:00",
+      "yp:justification": "Summary covers all 9 activities and 39 entities of the source record; grounded in the graph counts and activity labels. Accepted."
+    },
+    "yp:ResponseActivity_example_0_05": {
+      "prov:type": {
+        "$": "yp:ResponseActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CAx: respond",
+      "prov:startTime": "2026-10-08T14:18:10.619326+00:00",
+      "prov:endTime": "2026-10-08T14:18:10.619328+00:00"
+    }
+  },
+  "_yprov4agents_meta": {
+    "granularity": "DATA",
+    "persistence": "PERSISTENT"
+  },
+  "entity": {
+    "yp:TaskEntity_example_0": {
+      "prov:type": {
+        "$": "yp:TaskEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:value": "producer doc on producer.yprov4ml.example_0"
+    },
+    "yp:ResponseEntity_example_0": {
+      "prov:type": {
+        "$": "yp:ResponseEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:value": "This W3C PROV document outlines a machine-learning run involving nine activities and a complex network of 39 entities and 55 lineage relations. Key activities include the initial setup (example_GR0_0), multiple training phases (Training, TrainingButDifferent, TrainingButDifferent2), and a validation phase, highlighting the iterative nature of the process. The document also details the use of MSELoss during the Training activity, indicating a focus on minimizing prediction errors. Overall, the provenance captures the intricate workflow and dependencies within the machine-learning experiment.",
+      "yp:pid": "21.T11999/yprovstore-966cacd52ae9",
+      "yp:contentHash": "sha256:966cacd52ae9d297d73c9fd742f2c70ea2203e02827b6fa174d5e38e91d0d5ce"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d1": {
+      "prov:generatedEntity": "yp:ResponseEntity_example_0",
+      "prov:usedEntity": "yp:TaskEntity_example_0"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "yp:ReceiveTaskActivity_example_0_00",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a1": {
+      "prov:activity": "yp:PlanningActivity_example_0_01",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a2": {
+      "prov:activity": "yp:ToolCallActivity_example_0_02",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a3": {
+      "prov:activity": "yp:ObservationActivity_example_0_03",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a4": {
+      "prov:activity": "yp:DecisionActivity_example_0_04",
+      "prov:agent": "yp:agent_example_0"
+    },
+    "_:a5": {
+      "prov:activity": "yp:ResponseActivity_example_0_05",
+      "prov:agent": "yp:agent_example_0"
+    }
+  },
+  "wasInformedBy": {
+    "_:i1": {
+      "prov:informed": "yp:PlanningActivity_example_0_01",
+      "prov:informant": "yp:ReceiveTaskActivity_example_0_00"
+    },
+    "_:i2": {
+      "prov:informed": "yp:ToolCallActivity_example_0_02",
+      "prov:informant": "yp:PlanningActivity_example_0_01"
+    },
+    "_:i3": {
+      "prov:informed": "yp:ObservationActivity_example_0_03",
+      "prov:informant": "yp:ToolCallActivity_example_0_02"
+    },
+    "_:i4": {
+      "prov:informed": "yp:DecisionActivity_example_0_04",
+      "prov:informant": "yp:ObservationActivity_example_0_03"
+    },
+    "_:i5": {
+      "prov:informed": "yp:ResponseActivity_example_0_05",
+      "prov:informant": "yp:DecisionActivity_example_0_04"
+    }
+  },
+  "used": {
+    "_:u1": {
+      "prov:activity": "yp:PlanningActivity_example_0_01",
+      "prov:entity": "yp:TaskEntity_example_0"
+    },
+    "_:u2": {
+      "prov:activity": "yp:ToolCallActivity_example_0_02",
+      "prov:entity": "yp:TaskEntity_example_0"
+    },
+    "_:u3": {
+      "prov:activity": "yp:ObservationActivity_example_0_03",
+      "prov:entity": "yp:ResponseEntity_example_0"
+    },
+    "_:u4": {
+      "prov:activity": "yp:DecisionActivity_example_0_04",
+      "prov:entity": "yp:ResponseEntity_example_0"
+    },
+    "_:u5": {
+      "prov:activity": "yp:ResponseActivity_example_0_05",
+      "prov:entity": "yp:ResponseEntity_example_0"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "yp:TaskEntity_example_0",
+      "prov:activity": "yp:ReceiveTaskActivity_example_0_00"
+    },
+    "_:g2": {
+      "prov:entity": "yp:ResponseEntity_example_0",
+      "prov:activity": "yp:ToolCallActivity_example_0_02"
+    }
+  }
+}

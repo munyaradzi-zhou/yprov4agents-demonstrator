@@ -1,0 +1,1 @@
+/out/charts/example_0_metrics.png

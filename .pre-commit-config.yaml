@@ -1,0 +1,64 @@
+# Local gates, matching the CI jobs so a push does not fail on something a commit could
+# have caught. Install once with: uv run pre-commit install
+#
+# Deliberately excludes the slow gates (end-to-end pipeline, container build): those
+# belong in CI, not in the path of every commit.
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.14
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=2048]
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+        # Frozen archives are byte-exact evidence: their manifests record a SHA-256 of
+        # each file, so appending a newline would invalidate every hash.
+        exclude: ^experiments/
+      - id: trailing-whitespace
+        exclude: ^experiments/
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: ^experiments/
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run mypy yprov4agenticai runtime eval tests
+        language: system
+        pass_filenames: false
+        types: [python]
+
+      - id: no-secrets-in-env-example
+        name: .env.example must never carry a real key
+        entry: >
+          uv run python -c "import pathlib,re,sys;
+          t=pathlib.Path('.env.example').read_text(encoding='utf-8');
+          sys.exit('.env.example contains what looks like a live key'
+          if re.search(r'sk-[A-Za-z0-9_-]{20,}', t) else 0)"
+        language: system
+        pass_filenames: false
+        files: ^\.env\.example$
+
+      - id: archives-verify
+        name: frozen experiment archives match their manifests
+        entry: >
+          uv run python -c "import pathlib,sys;
+          from eval.archive import verify;
+          bad=[d.name for d in sorted(pathlib.Path('experiments').glob('*'))
+          if (d/'MANIFEST.json').is_file() and not verify(d)[0]];
+          sys.exit('archives failed verification: '+', '.join(bad) if bad else 0)"
+        language: system
+        pass_filenames: false
+        files: ^experiments/

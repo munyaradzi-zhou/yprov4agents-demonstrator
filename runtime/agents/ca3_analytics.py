@@ -66,7 +66,7 @@ class CA3Analytics(StreamingAgent):
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
-    def __init__(self, bus: NetworkBus):
+    def __init__(self, bus: NetworkBus) -> None:
         super().__init__(role="ca3", bus=bus)
         self.llm = get_llm()
         self.store = LightweightStore(root=str(OUT_DIR / "store"))

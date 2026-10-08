@@ -1,0 +1,81 @@
+{
+  "prefix": {
+    "yp": "http://hpci-lab.org/yProv4Agents#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "agent": {
+    "yp:agent_example_0::ca3-mc1": {
+      "prov:type": {
+        "$": "yp:OperationalAgent",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "ComplianceChecker"
+    }
+  },
+  "activity": {
+    "yp:ReceiveTaskActivity_example_0::ca3-mc1_00": {
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "MC1: receive agent PROV",
+      "prov:startTime": "2026-10-08T14:18:09.791440+00:00",
+      "prov:endTime": "2026-10-08T14:18:09.791451+00:00"
+    },
+    "yp:ComplianceCheckActivity_example_0::ca3-mc1_01": {
+      "prov:type": {
+        "$": "yp:ComplianceCheckActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "MC1: check ca3 compliance",
+      "prov:startTime": "2026-10-08T14:18:09.791467+00:00",
+      "prov:endTime": "2026-10-08T14:18:09.791472+00:00",
+      "yp:justification": "Structural compliance of ca3 PROV: PASS — all structural checks passed.",
+      "yp:verdict": "PASS",
+      "yp:target_agent": "ca3"
+    }
+  },
+  "_yprov4agents_meta": {
+    "granularity": "DATA",
+    "persistence": "PERSISTENT"
+  },
+  "entity": {
+    "yp:TaskEntity_example_0::ca3-mc1": {
+      "prov:type": {
+        "$": "yp:TaskEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:value": "ca3 PROV under review (example_0::ca3)"
+    }
+  },
+  "wasDerivedFrom": {},
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "yp:ReceiveTaskActivity_example_0::ca3-mc1_00",
+      "prov:agent": "yp:agent_example_0::ca3-mc1"
+    },
+    "_:a1": {
+      "prov:activity": "yp:ComplianceCheckActivity_example_0::ca3-mc1_01",
+      "prov:agent": "yp:agent_example_0::ca3-mc1"
+    }
+  },
+  "wasInformedBy": {
+    "_:i1": {
+      "prov:informed": "yp:ComplianceCheckActivity_example_0::ca3-mc1_01",
+      "prov:informant": "yp:ReceiveTaskActivity_example_0::ca3-mc1_00"
+    }
+  },
+  "used": {
+    "_:u1": {
+      "prov:activity": "yp:ComplianceCheckActivity_example_0::ca3-mc1_01",
+      "prov:entity": "yp:TaskEntity_example_0::ca3-mc1"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "yp:TaskEntity_example_0::ca3-mc1",
+      "prov:activity": "yp:ReceiveTaskActivity_example_0::ca3-mc1_00"
+    }
+  }
+}

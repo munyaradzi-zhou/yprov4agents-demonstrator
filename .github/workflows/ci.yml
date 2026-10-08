@@ -1,0 +1,144 @@
+# Continuous integration for the demonstrator.
+#
+# The gates are ordered cheapest-first so a style slip fails in seconds rather than after
+# a full pipeline run. Two of them are unusual and deliberate:
+#
+#   * `conformance` judges emitted provenance with the reference `prov` parser, not with
+#     project code. The claim that this system emits standard W3C PROV-JSON is only worth
+#     something if an independent implementation agrees.
+#   * `pipeline` runs the demonstrator end to end and diffs the result against a frozen
+#     archive. A change that alters the provenance without saying so fails the build.
+#
+# No job calls a paid API. The LLM-backed path is exercised locally and archived under
+# experiments/; CI runs the deterministic path, which is why `--strict` comparison is
+# meaningful here.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_NATIVE_TLS: "1"
+  FORCE_COLOR: "1"
+
+jobs:
+  lint:
+    name: Lint and format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --all-extras
+      - name: ruff check
+        run: uv run ruff check --output-format=github .
+      - name: ruff format
+        run: uv run ruff format --check --diff .
+
+  types:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --all-extras
+      - run: uv run mypy yprov4agenticai runtime eval tests
+
+  test:
+    name: Tests (py${{ matrix.python }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Windows is in the matrix on purpose: the project asserts SHA-256 hashes over
+        # files it writes, and text-mode line-ending translation makes those hashes
+        # platform-dependent (todo.md D4). A Linux-only matrix would never catch it.
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --all-extras --python ${{ matrix.python }}
+      - name: pytest
+        run: uv run pytest -v --cov=yprov4agenticai --cov=runtime --cov-report=term-missing
+      - name: Verify frozen archives still match their manifests
+        shell: bash
+        run: |
+          for archive in experiments/*/; do
+            name=$(basename "$archive")
+            uv run python -m eval.archive verify --name "$name"
+          done
+
+  pipeline:
+    name: End-to-end pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --all-extras
+
+      - name: Run the demonstrator (in-process bus, deterministic agents)
+        run: uv run python run_local.py --out-dir out --persist-timeout 20
+
+      - name: Evaluate
+        run: uv run python -m eval.evaluate --out-dir out --markdown out/RESULTS.md
+
+      - name: Assert the provenance did not change unannounced
+        run: |
+          uv run python -m eval.compare \
+            --before experiments/baseline-pre-review \
+            --after out \
+            --strict
+
+      - name: Run the conformance suite against freshly emitted provenance
+        run: uv run pytest -v -m conformance --prov-dir out
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-provenance
+          path: out/
+          retention-days: 14
+
+  image:
+    name: Container image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          push: false
+          load: true
+          tags: yprov4agents-demonstrator:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: The image must run the agents it claims to contain
+        run: |
+          for role in ca1 cax ca2 ca3 mc1 mc3; do
+            docker run --rm --entrypoint python yprov4agents-demonstrator:ci -c "
+          from runtime.agent_runner import REGISTRY
+          module, cls = REGISTRY['$role']
+          mod = __import__(f'runtime.agents.{module}', fromlist=[cls])
+          assert getattr(mod, cls), '$role missing'
+          print('$role ok')"
+          done

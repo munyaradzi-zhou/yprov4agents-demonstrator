@@ -41,7 +41,7 @@ class LightweightStore:
            ``save()``; if omitted, the store is purely in-memory.
     """
 
-    def __init__(self, root: str | Path | None = None):
+    def __init__(self, root: str | Path | None = None) -> None:
         self.root = Path(root) if root else None
         if self.root:
             self.root.mkdir(parents=True, exist_ok=True)

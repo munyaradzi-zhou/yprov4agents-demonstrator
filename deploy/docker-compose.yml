@@ -1,6 +1,7 @@
 # The whole demonstrator, on a laptop, in one file.
 #
-#   cp .env.example .env         # optional: add OPENAI_API_KEY for CAx/CA3 LLM mode
+#   cp .env.example .env         # at the repository ROOT; loaded via env_file below
+#                                # set LLM_REQUIRED=1 to forbid silent stub fallback
 #   docker compose -f deploy/docker-compose.yml up --build
 #
 # Flow:
@@ -13,10 +14,15 @@ x-runtime: &runtime
   build:
     context: ..                      # folder root — image needs yprov4agenticai/ + runtime/
     dockerfile: deploy/Dockerfile
-  image: yprov4agents-demonstrator:latest
+  image: yprov4agents-demonstrator:0.2.0
   depends_on: [broker]
   volumes:
     - ../out:/out                    # emitted PROV-JSON + charts + store, on your host
+  # Compose resolves a bare `.env` against THIS file's directory, so the repository-root
+  # .env is invisible to `-f deploy/docker-compose.yml`. Name it explicitly.
+  env_file:
+    - path: ../.env
+      required: false
   restart: on-failure
 
 services:
@@ -42,8 +48,6 @@ services:
     environment:
       NATS_URL: nats://broker:4222
       ROLE: cax
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
 
   ca2:                               # CA2 — metrics visualiser (deterministic)
     <<: *runtime
@@ -56,8 +60,6 @@ services:
     environment:
       NATS_URL: nats://broker:4222
       ROLE: ca3
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
 
   # ── meta agents (govern the operational agents' own PROV) ───────────────────
   mc1:                               # MC1 — compliance (justification/standard checks)

@@ -1,9 +1,0 @@
-# Demonstrator dependencies.
-#
-# The in-process runner (`python run_local.py`) needs only matplotlib; `nats-py` is
-# imported lazily and is required only for the containerised path. `openai` is optional
-# everywhere — without a key, CAx and CA3 fall back to deterministic output.
-
-matplotlib>=3.7.0       # CA2 chart rendering (headless Agg)
-nats-py>=2.6.0          # the provenance bus client — containerised path only
-openai>=1.0.0           # optional: CAx summaries / CA3 narration
