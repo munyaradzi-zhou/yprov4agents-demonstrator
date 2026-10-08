@@ -50,7 +50,9 @@ class Document(NamedTuple):
     relation_counts: dict[str, int]
     verdicts: Counter[str]
     justifications: dict[str, str]
-    attribute_keys: Counter[str]
+    activity_attributes: Counter[str]
+    entity_attributes: Counter[str]
+    root_keys: frozenset[str]
 
 
 def _type_of(node: dict[str, Any]) -> str:
@@ -69,7 +71,7 @@ def reduce_document(name: str, doc: dict[str, Any]) -> Document:
     activities = doc.get("activity") or {}
     entities = doc.get("entity") or {}
 
-    attribute_keys: Counter[str] = Counter()
+    activity_attributes: Counter[str] = Counter()
     verdicts: Counter[str] = Counter()
     justifications: dict[str, str] = {}
 
@@ -77,11 +79,19 @@ def reduce_document(name: str, doc: dict[str, Any]) -> Document:
         key = _activity_key(activity_id, node)
         for attribute in node:
             if attribute not in VOLATILE_ATTRS:
-                attribute_keys[attribute] += 1
+                activity_attributes[attribute] += 1
         if "yp:verdict" in node:
             verdicts[str(node["yp:verdict"])] += 1
         if node.get("yp:justification"):
             justifications[key] = str(node["yp:justification"])
+
+    # Entity attributes are tracked separately. Renaming one — `yp:value` to the standard
+    # `prov:value`, say — changes what a conforming consumer can read, so a comparison
+    # that watched only activities would report such a change as no change at all.
+    entity_attributes: Counter[str] = Counter()
+    for node in entities.values():
+        for attribute in node:
+            entity_attributes[attribute] += 1
 
     return Document(
         name=name,
@@ -90,7 +100,11 @@ def reduce_document(name: str, doc: dict[str, Any]) -> Document:
         relation_counts={key: len(doc.get(key) or {}) for key in REL_KEYS},
         verdicts=verdicts,
         justifications=justifications,
-        attribute_keys=attribute_keys,
+        activity_attributes=activity_attributes,
+        entity_attributes=entity_attributes,
+        # An unrecognised root key makes a conforming parser reject the whole document,
+        # so a change at this level is always worth reporting.
+        root_keys=frozenset(doc),
     )
 
 
@@ -120,9 +134,14 @@ def compare_document(before: Document, after: Document) -> list[str]:
         ("activity types", before.activity_types, after.activity_types),
         ("entity types", before.entity_types, after.entity_types),
         ("verdicts", before.verdicts, after.verdicts),
-        ("attributes", before.attribute_keys, after.attribute_keys),
+        ("activity attributes", before.activity_attributes, after.activity_attributes),
+        ("entity attributes", before.entity_attributes, after.entity_attributes),
     ):
         differences.extend(f"{label}: {delta}" for delta in _counter_delta(was, now))
+
+    for key in sorted(before.root_keys ^ after.root_keys):
+        verb = "removed" if key in before.root_keys else "added"
+        differences.append(f"root key {verb}: {key}")
 
     for key in REL_KEYS:
         before_count = before.relation_counts[key]

@@ -17,8 +17,22 @@ inside an agent's serialisable state (e.g. a LangGraph ``State`` dict).
 from __future__ import annotations
 
 import datetime
+from collections.abc import Callable
 
 YP_NAMESPACE = "http://hpci-lab.org/yProv4Agents#"
+
+
+def _library_version() -> str:
+    """Version of the library that wrote a record, stamped into its bundle descriptor.
+
+    Read from installed distribution metadata so it cannot drift from pyproject.toml.
+    """
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("yprov4agents-demonstrator")
+    except PackageNotFoundError:
+        return "0.0.0+unknown"
 
 
 class ProvTracker:
@@ -224,15 +238,43 @@ class ProvTracker:
         return t
 
     # ── builds W3C PROV-JSON document ─────────────────────────────────────────
+    def _bundle_descriptor(self, qn: Callable[[str], dict]) -> dict:
+        """Describe the emitted document, inside the document, as a ``prov:Bundle``.
+
+        A reader needs to know how the record was configured to interpret it: whether
+        entities were recorded at all (granularity), whether payloads were persisted
+        (persistence), and which library version wrote it.
+
+        PROV already has an idiom for this. A bundle is a named set of provenance
+        descriptions and is itself an entity, so describing it is an ordinary entity
+        record that any conforming consumer reads. The earlier approach — a top-level
+        ``_yprov4agents_meta`` key — put the same information somewhere the format does
+        not allow, and a conforming parser rejects the whole document rather than
+        skipping the key it does not recognise.
+        """
+        return {
+            "prov:type": qn("prov:Bundle"),
+            "prov:label": f"provenance record emitted by {self.agent_label}",
+            "yp:granularity": self.granularity,
+            "yp:persistence": self.persistence,
+            "yp:emitted_by": __name__.split(".")[0],
+            "yp:library_version": _library_version(),
+        }
+
     def to_prov_json(self) -> dict:
-        """Build a W3C PROV-JSON doc honouring the granularity flag.
+        """Build a W3C PROV-JSON document honouring the granularity flag.
 
         DATA mode (default): full PROV — activities, entities, used,
         wasGeneratedBy, wasDerivedFrom, wasAssociatedWith, wasInformedBy.
 
-        METADATA mode: activities ONLY (no entities), so used/wasGeneratedBy/
-        wasDerivedFrom are omitted; wasAssociatedWith and wasInformedBy are
-        retained (activity-level). Self-documenting via the meta block.
+        METADATA mode: typed activities only. No data entities, so used,
+        wasGeneratedBy and wasDerivedFrom are omitted; wasAssociatedWith and
+        wasInformedBy are activity-level and are retained.
+
+        The document stays self-describing in both modes through a ``prov:Bundle``
+        entity (see ``_bundle_descriptor``) rather than a bespoke top-level key. Only
+        the containers PROV-JSON defines appear at the document root, because an
+        unrecognised one makes a conforming parser reject the entire document.
         """
 
         def qn(name: str) -> dict:
@@ -252,24 +294,22 @@ class ProvTracker:
                 }
             },
             "activity": {},
-            # entity/relation sections are added below (keeps key order stable)
-            "_yprov4agents_meta": {
-                "granularity": self.granularity,
-                "persistence": self.persistence,
-            },
+            # entity and relation sections are added below (keeps key order stable)
         }
 
-        # ── Entity section + entity-side relations (DATA mode only) ──────────
+        # ── Entity section + entity-side relations ───────────────────────────
+        # The bundle descriptor is emitted in both modes: it is metadata about the
+        # record, not one of the data entities METADATA mode is defined to omit.
+        doc["entity"] = {f"yp:bundle_{self.sid}": self._bundle_descriptor(qn)}
+
         if self.granularity == "DATA":
-            ent_section = {}
             for eid, e in self.ents.items():
-                node = {"prov:type": qn(f"yp:{e['t']}"), "yp:value": e["v"]}
+                node = {"prov:type": qn(f"yp:{e['t']}"), "prov:value": e["v"]}
                 if "pid" in e:
                     node["yp:pid"] = e["pid"]  # lightweight-prov pointer
                 if "hash" in e:
                     node["yp:contentHash"] = e["hash"]  # integrity (sha-256)
-                ent_section[eid] = node
-            doc["entity"] = ent_section
+                doc["entity"][eid] = node
             doc["wasDerivedFrom"] = {
                 f"_:d{i}": {
                     "prov:generatedEntity": self._ent_order[i],
