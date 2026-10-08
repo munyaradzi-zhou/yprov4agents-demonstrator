@@ -35,6 +35,12 @@ eval = [
     "rdflib>=7.0,<8",         # yp: vocabulary (Turtle)
     "pyshacl>=0.26,<0.31",    # SHACL validation of emitted provenance
 ]
+# Energy accounting. A separate extra because the backend samples hardware counters and
+# writes its own output, which no run that is measuring *time* should be paying for — see
+# runtime/util.py::energy_tracker. Install it for a run whose subject is energy.
+energy = [
+    "codecarbon>=2.5,<4",
+]
 dev = [
     "pytest>=8.2,<9",
     "pytest-cov>=5.0,<7",

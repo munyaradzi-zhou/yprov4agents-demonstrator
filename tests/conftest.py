@@ -14,10 +14,14 @@ every unit test passes through.
 from __future__ import annotations
 
 import json
+import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 import pytest
+
+AgentT = TypeVar("AgentT")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -70,3 +74,32 @@ def cited_pids(documents: list[tuple[Path, dict[str, Any]]]) -> dict[str, set[st
             if pid:
                 pids.setdefault(str(pid), set()).add(path.name)
     return pids
+
+
+@pytest.fixture
+def headless_agent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Callable[..., Any]:
+    """Build a real agent with no bus and a temporary output volume.
+
+    Constructed through its own ``__init__`` rather than ``__new__``: an agent assembled
+    attribute-by-attribute in a fixture silently stops matching the constructor the moment
+    the base class gains a field, and then every test using it fails for a reason that has
+    nothing to do with what it was testing. That happened once already, when
+    ``StreamingAgent`` gained an energy tracker.
+
+    ``OUT_DIR`` is patched both in ``runtime.util`` and in the agent's own module, because
+    agents bind it at import time.
+    """
+
+    def build(agent_class: type[AgentT], **kwargs: Any) -> AgentT:
+        import runtime.util
+
+        monkeypatch.setattr(runtime.util, "OUT_DIR", tmp_path)
+        monkeypatch.setattr(
+            sys.modules[agent_class.__module__], "OUT_DIR", tmp_path, raising=False
+        )
+        # No key and no requirement: the deterministic path, unless a test says otherwise.
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+        monkeypatch.delenv("LLM_REQUIRED", raising=False)
+        return agent_class(None, **kwargs)  # type: ignore[call-arg]
+
+    return build

@@ -40,9 +40,25 @@ from .energy import (
     session_energy_summary,
 )
 from .store import LightweightStore, ptr_kwargs
-from .tracker import YP_NAMESPACE, ProvTracker, now_iso
+from .tracker import (
+    GRANULARITIES,
+    GRANULARITY_DATA,
+    GRANULARITY_METADATA,
+    PERSISTENCE_PERSISTENT,
+    PERSISTENCE_TRANSIENT,
+    PERSISTENCES,
+    YP_NAMESPACE,
+    ProvTracker,
+    now_iso,
+)
 
 __all__ = [
+    "GRANULARITIES",
+    "GRANULARITY_DATA",
+    "GRANULARITY_METADATA",
+    "PERSISTENCES",
+    "PERSISTENCE_PERSISTENT",
+    "PERSISTENCE_TRANSIENT",
     "YP_NAMESPACE",
     "ActivityScope",
     "CodeCarbonBackend",

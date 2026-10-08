@@ -13,14 +13,11 @@ never re-triggers the meta layer.
 from __future__ import annotations
 
 from collections.abc import Iterator
-from functools import partial
 from typing import Any
-
-from yprov4agenticai import ProvTracker
 
 from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
-from ..util import write_prov
+from ..util import agent_tracker
 
 #: The structural standard MC1 enforces. Named so the emitted record can state which
 #: checks were applied rather than leaving a reader to infer it from a verdict.
@@ -83,11 +80,12 @@ class MC1Compliance(StreamingAgent):
 
         # The compliance check is itself provenance-tracked: the checker is auditable on
         # the same terms as the agents it checks.
-        tracker = ProvTracker(
+        tracker = agent_tracker(
+            self.role,
+            session_id,
+            "ComplianceChecker",
             sid=f"{session_id}-mc1",
-            agent_label="ComplianceChecker",
-            sink=partial(write_prov, self.role, session_id),
-            verbose=False,
+            energy=self.energy,
         )
 
         # S1 Receive — whose record is under review.

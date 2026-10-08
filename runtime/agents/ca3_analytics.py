@@ -33,14 +33,15 @@ from __future__ import annotations
 import re
 import statistics
 from datetime import UTC, datetime
-from functools import partial
 from typing import Any
 
-from yprov4agenticai import LightweightStore, ProvTracker
+from yprov4agenticai import LightweightStore
+from yprov4agenticai.prompts import NARRATE_FINDINGS
 
 from ..base_agent import StreamingAgent
+from ..llm import Completion, get_llm, llm_is_required
 from ..net_bus import NetworkBus
-from ..util import OUT_DIR, get_llm, llm_is_required, write_prov
+from ..util import OUT_DIR, agent_tracker
 
 # Metric-family classifiers, matched against entity labels rather than a hard-coded
 # schema so the agent stays domain-agnostic. The families must partition: a label like
@@ -327,7 +328,7 @@ class CA3Analytics(StreamingAgent):
         findings: dict[str, Any],
         anomalies: list[str],
         completeness: list[str],
-    ) -> tuple[str, str]:
+    ) -> tuple[str, str, Completion | None]:
         """Return (report, mode), where mode records the path actually taken.
 
         The numbers are computed either way; the model only narrates them, so a failed
@@ -345,24 +346,20 @@ class CA3Analytics(StreamingAgent):
             f"Anomalies: {len(anomalies)}; completeness findings: {len(completeness)}."
         )
         if not self.llm:
-            return head, "computed"
+            return head, "computed", None
         try:
-            narration = self.llm(
-                "You are CA3, a provenance analytics agent. Write 3-4 sentences of "
-                "root-cause commentary on these COMPUTED findings. Do not invent numbers; "
-                "use only what is given. Distinguish anomalies, which indicate the run "
-                "behaved unexpectedly, from completeness gaps, which indicate the "
-                "producer recorded less than it could have.\n\n"
+            completion = self.llm.complete(
+                NARRATE_FINDINGS,
                 f"Findings: {findings}\n\n"
                 f"Anomalies: {anomalies}\n\n"
-                f"Completeness gaps: {completeness}"
+                f"Completeness gaps: {completeness}",
             )
         except Exception as exc:
             if llm_is_required():
                 raise RuntimeError(f"LLM_REQUIRED is set but narration failed: {exc}") from exc
             print(f"[ca3] LLM narration failed ({exc}); using computed report", flush=True)
-            return head, f"computed-after-{type(exc).__name__}"
-        return narration, "llm"
+            return head, f"computed-after-{type(exc).__name__}", None
+        return completion.text, "llm", completion
 
     def _justify(
         self,
@@ -421,12 +418,7 @@ class CA3Analytics(StreamingAgent):
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
     ) -> tuple[dict[str, Any], str]:
-        tracker = ProvTracker(
-            sid=session_id,
-            agent_label="Analytics_Agent",
-            sink=partial(write_prov, self.role, session_id),
-            verbose=False,
-        )
+        tracker = agent_tracker(self.role, session_id, "Analytics_Agent", energy=self.energy)
 
         # S1 Receive — the graph to mine, and where it came from.
         with tracker.activity("ReceiveTaskActivity", "CA3: receive provenance graph") as prov:
@@ -454,7 +446,9 @@ class CA3Analytics(StreamingAgent):
                 "sustainability": energy,
                 "resource": resource,
             }
-            report, mode = self._narrate(session_id, findings, anomalies, completeness)
+            report, mode, completion = self._narrate(
+                session_id, findings, anomalies, completeness
+            )
             pointer = self.store.put(report, kind="analytics-report")
             self.store.save()  # keep the shared index complete
             result = prov.produces(
@@ -471,8 +465,13 @@ class CA3Analytics(StreamingAgent):
                     "yp:energy_streams": energy["count"],
                     "yp:resource_streams": resource["count"],
                     "yp:wall_clock_s": timing["wall_clock_s"],
+                    "yp:report_mode": mode,
                 }
             )
+            # The numbers are computed; the model only narrates them. Recording which model,
+            # under which prompt version, is what lets a reader tell the two apart later.
+            if completion is not None:
+                prov.note(**completion.provenance())
 
         # S4 Observe — summarise what the invariant checks concluded.
         with tracker.activity(

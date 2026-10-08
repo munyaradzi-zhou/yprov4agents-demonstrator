@@ -19,11 +19,32 @@ import pytest
 from runtime.agents import ca2_metrics, cax_summariser
 from runtime.agents.ca2_metrics import SUBJECT_COMPOSITION, SUBJECT_METRICS, CA2Metrics
 from runtime.agents.cax_summariser import CAxSummariser
+from runtime.llm import Completion
 from yprov4agenticai import ProvTracker
+from yprov4agenticai.prompts import ACT_SYSTEM
 
 NO_BUS = None
 T0 = "2026-10-08T09:00:00+00:00"
 T1 = "2026-10-08T09:00:01+00:00"
+
+
+def fake_completion(text: str, finish_reason: str = "stop") -> Completion:
+    """A model response with plausible accounting, for tests that must not call a model.
+
+    Built from the real :class:`Completion` rather than a stub dict, so a change to what
+    the record is supposed to carry about a model call breaks these tests too.
+    """
+    return Completion(
+        text=text,
+        model="gpt-4o",
+        temperature=0.2,
+        max_tokens=400,
+        latency_s=0.42,
+        prompt=ACT_SYSTEM,
+        prompt_tokens=310,
+        completion_tokens=88,
+        finish_reason=finish_reason,
+    )
 
 
 def producer_document(*, numeric_metrics: bool = False) -> dict[str, Any]:
@@ -95,7 +116,11 @@ def test_an_invented_figure_is_caught_and_the_summary_sent_back(
     monkeypatch.setattr(
         cax,
         "_summarise",
-        lambda _doc, _counts: ("This run logged 4096 training steps.", "llm"),
+        lambda _doc, _counts: (
+            "This run logged 4096 training steps.",
+            "llm",
+            fake_completion("This run logged 4096 training steps."),
+        ),
     )
 
     document, log_line = cax.process(

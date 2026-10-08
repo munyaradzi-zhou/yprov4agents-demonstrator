@@ -230,6 +230,74 @@ The archived case is the one that matters most, because it shows the two escalat
 consumer that is down. See §7 below, where the same run is also the A-versus-B worked
 example.
 
+### E5b — Model provenance: can an LLM step be repeated from the record? *(measured, Phase 4)*
+
+Before Phase 4, no. The emitted graph named no model, no sampling parameters, no prompt and
+no token counts, so the one step in the pipeline that was not deterministic was the one step
+the record could not account for (review findings F1, F2). For a paper about *agentic AI*
+provenance that was the most substantive gap in the artifact.
+
+`experiments/phase4-llm` is a gpt-4o run with `LLM_REQUIRED=1`. Every model-bearing step now
+carries:
+
+| Attribute | Example | Why the record needs it |
+|---|---|---|
+| `yp:model` | `gpt-4o` | the call cannot be repeated without it |
+| `yp:temperature` · `yp:max_tokens` | `0.2` · `400` | the output distribution is a function of these |
+| `yp:prompt_id` · `yp:prompt_version` · `yp:prompt_sha` | `act.system` · `2.0` · `3f831826f610` | a prompt is apparatus; the hash catches a forgotten version bump |
+| `yp:prompt_tokens` · `yp:completion_tokens` | `226` · `107` | cost, and how much context actually reached the model |
+| `yp:llm_latency_s` | `5.043` | separates model time from instrumentation time in E6 |
+| `yp:finish_reason` · `yp:response_sha` | `stop` · `eaae9be93d4d` | whether it finished, and over which exact bytes |
+
+Four model calls across the run: 2,071 prompt tokens, 473 completion tokens.
+
+Three details worth a sentence each in the text.
+
+*The prompt registry was already there and nothing imported it.* `prompts.py` is 238 lines
+with versions, changelogs and content hashes, written for exactly this; both LLM agents
+built their prompts as inline f-strings instead. The fix is not new infrastructure, it is
+making the call site go through the registry — `runtime/llm.py` takes a `Prompt`, not a
+string, so a prompt cannot reach a model without its identity reaching the record.
+
+*An absence is recorded as an absence.* The computed fallback path stamps no model
+attributes at all, rather than zeros or `"none"`. A zero token count is a measurement, and
+on that path no measurement was made.
+
+*The response hash and the entity pointer agree, and may legitimately disagree.*
+`yp:response_sha` on the activity and the `yp:pid` of the generated entity are both content
+hashes of the model's text, so they match here. They are attached to different claims — one
+says what the call returned, the other says what was stored — and an agent that
+post-processes model output before storing it would make them differ. That divergence is
+informative, which is why both are recorded.
+
+### E5c — A negative result: energy cannot be attributed per agent step *(Phase 4)*
+
+`energy.py` was 311 lines that nothing called, while CA3 reported "no energy or emission
+streams" as a completeness gap in the graphs it analysed — and was right about the agents
+that emitted it (finding F3). Phase 4 wired it into the capture API: every step closed
+through the API carries the energy attributable to it, opt-in via `PROV_ENERGY`.
+
+Wiring it produced a result worth reporting on its own terms. **A sampling backend cannot
+attribute energy to a step shorter than its sampling period.** codecarbon's default period
+is 15 seconds; these steps last milliseconds, so a delta lands on whichever step happens to
+read after a tick:
+
+| step | energy | step duration |
+|---|--:|--:|
+| choose what to plot | 46.9 µWh | 0.000 s |
+| render chart (matplotlib) | 4.6 µWh | 1.328 s |
+
+The step that did the work was charged a tenth of what the step that did nothing was
+charged. A second artifact was worse: the *first* step of each record was charged 28.3
+seconds of inter-message idle time, because the energy tracker outlives any one record.
+
+Both are now handled, and the handling is the contribution. The baseline resets when a
+record begins, so no step is charged for the gap before it. And the figure is published with
+`yp:energy_sampling_period_s` and `yp:energy_attributable`, so the record states that the
+number is real consumption in a real window but **not** an attribution. **Energy belongs at
+session granularity**; any per-step energy claim in this literature needs a backend sampling
+faster than the steps, and should say what its period was.
+
 ### E6 — Instrumentation overhead *(to measure)*
 
 Specified in [`docs/E6_OVERHEAD.md`](../docs/E6_OVERHEAD.md). Not "the one evaluation gap":
@@ -337,6 +405,7 @@ used for isolation in measurement, not as evidence of throughput.
 | F5 | A-vs-B: structure recovered in full, rationale row isolated | E3 |
 | F6 | Reflexivity chain and its depth limit | E4 |
 | **F7** | **Declared-or-derived lineage vs the index-order chain it replaced** | `docs/phases/PHASE_1.md` §2.4 |
+| **F8** | **One LLM step, fully accounted: prompt → model → response, with the attributes that make it repeatable** | E5b |
 
 F7 is new and earns its place: it shows the correction changed the graph's *topology*, not
 only its size — the old chain asserted a single dependency spine where the real dataflow is
@@ -354,7 +423,8 @@ more honest and more persuasive than drawing it as uniformly poor.
 
 1. ~~**Phase 3** — the callback baseline~~ — **done**; E3 above is measured, and the same
    artifact serves E6's `A` condition.
-2. **Phase 4** — model and prompt provenance, which closes the LLM-reproducibility gap.
+2. ~~**Phase 4** — model and prompt provenance~~ — **done**; see E5b, plus a negative
+   result on energy attribution (E5c) and both instrumentation modes made selectable.
 3. **Phase 5** — measure E6.
 4. **Phase 6** — reframe E2 with a real denominator; decide the reflexivity claim.
 5. **Phase 7** — the `yp:` vocabulary artifact, without which C3 has no artifact.

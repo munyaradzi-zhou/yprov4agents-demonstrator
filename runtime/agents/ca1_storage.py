@@ -29,15 +29,14 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-from functools import partial
 from typing import Any
 
-from yprov4agenticai import LightweightStore, ProvTracker
+from yprov4agenticai import LightweightStore
 
 from ..base_agent import StreamingAgent, _merge_payload, stream_document
 from ..envelope import ProvEventType, ProvRecordEnvelope
 from ..net_bus import NetworkBus
-from ..util import OUT_DIR, prov_counts, write_prov
+from ..util import OUT_DIR, agent_tracker, prov_counts
 
 # consumer roles whose use of a record must precede persistence
 PERSIST_AFTER = [
@@ -234,12 +233,7 @@ class CA1Storage(StreamingAgent):
     def _do_persist(
         self, sid: str, doc: dict[str, Any], acked: list, trigger: str, reason: str
     ) -> tuple[dict[str, Any], str]:
-        tracker = ProvTracker(
-            sid=sid,
-            agent_label="StorageAgent",
-            sink=partial(write_prov, self.role, sid),
-            verbose=False,
-        )
+        tracker = agent_tracker(self.role, sid, "StorageAgent", energy=self.energy)
 
         # S1 Receive — what is being held, and how big it is.
         with tracker.activity("ReceiveTaskActivity", "CA1: receive record from bus") as prov:

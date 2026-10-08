@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-58e0139bb29e",
+  "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/58e0139bb29e.txt",
+  "yp:contentHash": "sha256:58e0139bb29ef4e1e74467b2fbf43c0790acd988c89b8922b2d647f0b1149de1",
+  "size_bytes": 653,
+  "kind": "analytics-report",
+  "preview": "The anomalies indicate significant timing gaps in the process, particularly before 'Training' and 'CrossEntropyLoss/Training', which togethe…",
+  "created_at": "2026-10-08T18:25:57.094473+00:00"
+}

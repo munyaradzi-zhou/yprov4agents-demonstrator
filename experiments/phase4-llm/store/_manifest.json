@@ -1,0 +1,66 @@
+{
+  "21.T11999/yprovstore-377895f2bbbd": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/377895f2bbbd.txt",
+    "yp:contentHash": "sha256:377895f2bbbd812727556946e2363f05dbdc872944699f1641d080e12c5fee9e",
+    "size_bytes": 39286,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"CrossEntropyLoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:02:45.935328^^xsd:dateTime\"}, \"Test\": {\"prov:startedAtTime\"…",
+    "created_at": "2026-10-08T18:25:57.116070+00:00"
+  },
+  "21.T11999/yprovstore-3d68140bf27c": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/3d68140bf27c.txt",
+    "yp:contentHash": "sha256:3d68140bf27c2c05000569b31fe86613cb058d8dc89d0e3110aa41411e123364",
+    "size_bytes": 515,
+    "kind": "summary",
+    "preview": "The W3C PROV document details a machine-learning run involving 11 activities, 78 entities, and 98 lineage relations. Key activities include …",
+    "created_at": "2026-10-08T18:25:54.822840+00:00"
+  },
+  "21.T11999/yprovstore-58e0139bb29e": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/58e0139bb29e.txt",
+    "yp:contentHash": "sha256:58e0139bb29ef4e1e74467b2fbf43c0790acd988c89b8922b2d647f0b1149de1",
+    "size_bytes": 653,
+    "kind": "analytics-report",
+    "preview": "The anomalies indicate significant timing gaps in the process, particularly before 'Training' and 'CrossEntropyLoss/Training', which togethe…",
+    "created_at": "2026-10-08T18:25:57.094473+00:00"
+  },
+  "21.T11999/yprovstore-6ee3a8325759": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/6ee3a8325759.txt",
+    "yp:contentHash": "sha256:6ee3a8325759ccf123e67de33d025aa38783c71f965ecbaa89bbf3ad16271f62",
+    "size_bytes": 82,
+    "kind": "chart",
+    "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/charts/example_2_metrics.png",
+    "created_at": "2026-10-08T18:25:55.297915+00:00"
+  },
+  "21.T11999/yprovstore-719d690faada": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/719d690faada.txt",
+    "yp:contentHash": "sha256:719d690faada96269dc110476b9fa650f4b9664c16d6e66c25e29ee66480af3e",
+    "size_bytes": 651,
+    "kind": "analytics-report",
+    "preview": "The findings indicate two significant anomalies in the timing of activities. The gap before 'Training' is 5.049 seconds, which constitutes 6…",
+    "created_at": "2026-10-08T18:25:52.876442+00:00"
+  },
+  "21.T11999/yprovstore-79644751c584": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/79644751c584.txt",
+    "yp:contentHash": "sha256:79644751c584cc11816c90713e4ea2a7de4f7a58ff9ad0f309297fc08dfd3e90",
+    "size_bytes": 82,
+    "kind": "chart",
+    "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/charts/example_0_metrics.png",
+    "created_at": "2026-10-08T18:25:50.429462+00:00"
+  },
+  "21.T11999/yprovstore-7e29b28f9fab": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/7e29b28f9fab.txt",
+    "yp:contentHash": "sha256:7e29b28f9fab1b409a8f46febd39e95cf8eb55384a9a63934ebe16307a1e6b0b",
+    "size_bytes": 550,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine learning process involving nine activities and 39 entities, with 55 lineage relations connecting th…",
+    "created_at": "2026-10-08T18:25:49.604781+00:00"
+  },
+  "21.T11999/yprovstore-abfe4946dd38": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/abfe4946dd38.txt",
+    "yp:contentHash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80",
+    "size_bytes": 21634,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"MSELoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:10:12.815807^^xsd:dateTime\"}, \"MSELoss/Validation\": {\"prov:startedAt…",
+    "created_at": "2026-10-08T18:25:52.945366+00:00"
+  }
+}

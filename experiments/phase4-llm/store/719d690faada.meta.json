@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-719d690faada",
+  "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out.llm/store/719d690faada.txt",
+  "yp:contentHash": "sha256:719d690faada96269dc110476b9fa650f4b9664c16d6e66c25e29ee66480af3e",
+  "size_bytes": 651,
+  "kind": "analytics-report",
+  "preview": "The findings indicate two significant anomalies in the timing of activities. The gap before 'Training' is 5.049 seconds, which constitutes 6…",
+  "created_at": "2026-10-08T18:25:52.876442+00:00"
+}

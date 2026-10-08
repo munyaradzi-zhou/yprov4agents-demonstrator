@@ -10,14 +10,11 @@ Like MC1, it publishes to `governance.*` so it never re-triggers the meta layer.
 
 from __future__ import annotations
 
-from functools import partial
 from typing import Any, NamedTuple
-
-from yprov4agenticai import ProvTracker
 
 from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
-from ..util import write_prov
+from ..util import agent_tracker
 
 
 def _agent_label(doc: dict[str, Any]) -> str:
@@ -98,11 +95,12 @@ class MC3Audit(StreamingAgent):
 
         # The audit is itself provenance-tracked: an auditor that leaves no record of how
         # it reached its conclusion is asking for the trust it exists to establish.
-        tracker = ProvTracker(
+        tracker = agent_tracker(
+            self.role,
+            session_id,
+            "AuditabilityAgent",
             sid=f"{session_id}-mc3",
-            agent_label="AuditabilityAgent",
-            sink=partial(write_prov, self.role, session_id),
-            verbose=False,
+            energy=self.energy,
         )
 
         # S1 Receive — whose record is under audit.

@@ -16,6 +16,13 @@ WHY THIS EXISTS
    records not just *what* the agent did but *under which prompt contract* — a
    detail Strategy-A callbacks and other frameworks do not capture.
 
+   Until Phase 4 that was an aspiration: this module existed and nothing
+   imported it, while the two LLM-bearing agents built their prompts as inline
+   f-strings (review finding F2). The consumers are now ``runtime/llm.py``,
+   which requires a registered :class:`Prompt` rather than a string, and the
+   two agents that call it — so a prompt cannot reach a model without its
+   identity reaching the record.
+
 HOW TO EVOLVE A PROMPT
 ----------------------
 Edit the ``text``, bump the ``version`` (semver-ish: major = behavioural change,
@@ -221,9 +228,40 @@ OBSERVE_DEEP = Prompt(
 
 
 # ── Registry: id -> Prompt ───────────────────────────────────────────────────
+# ════════════════════════════════════════════════════════════════════════════
+#  Analytics narration (CA3). The findings are computed before the model is
+#  called and are passed in; the model's job is commentary, never arithmetic.
+# ════════════════════════════════════════════════════════════════════════════
+
+NARRATE_FINDINGS = Prompt(
+    id="analytics.narrate",
+    version="1.0",
+    changelog="v1: lifted verbatim from the inline f-string in ca3_analytics._narrate so "
+    "the prompt that drove a narration is recorded with it (todo.md F2). The "
+    "anomaly-versus-completeness distinction is in the prompt because it is the "
+    "distinction the agent's verdict rests on: an anomaly says the run behaved "
+    "unexpectedly, a completeness gap says the producer recorded less than it "
+    "could have, and conflating them made ANOMALY the verdict for every graph.",
+    text=(
+        "You are CA3, a provenance analytics agent. Write 3-4 sentences of "
+        "root-cause commentary on these COMPUTED findings. Do not invent numbers; "
+        "use only what is given. Distinguish anomalies, which indicate the run "
+        "behaved unexpectedly, from completeness gaps, which indicate the "
+        "producer recorded less than it could have."
+    ),
+)
+
 PROMPTS: dict[str, Prompt] = {
     p.id: p
-    for p in (PLAN_SYSTEM, ACT_SYSTEM, OBSERVE_SYSTEM, PLAN_DEEP, ACT_DEEP, OBSERVE_DEEP)
+    for p in (
+        PLAN_SYSTEM,
+        ACT_SYSTEM,
+        OBSERVE_SYSTEM,
+        PLAN_DEEP,
+        ACT_DEEP,
+        OBSERVE_DEEP,
+        NARRATE_FINDINGS,
+    )
 }
 
 

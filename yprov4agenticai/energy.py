@@ -82,15 +82,39 @@ class EnergyDelta:
     emissions_kg: float
     duration_s: float
     source: str = "measured"
+    sampling_period_s: float | None = None
+
+    @property
+    def attributable(self) -> bool:
+        """Whether this delta can honestly be attributed to the step it is recorded on.
+
+        It cannot, when the backend samples less often than the step lasts. A backend with
+        a 15-second period reading across a 2-millisecond step returns whatever its
+        background thread happened to accumulate, so the figure lands on whichever step
+        read after a tick rather than on the step that spent the energy. Measured on this
+        demonstrator: a step of 0.000 s was handed 46.9 µWh while the rendering step that
+        actually did the work was handed 4.6 µWh.
+
+        The number is still real — it was consumed, by this process, in this window — so it
+        is recorded rather than dropped. What is not real is the attribution, and the
+        record says so instead of leaving a reader to assume otherwise.
+        """
+        if self.sampling_period_s is None:
+            return True
+        return self.duration_s >= self.sampling_period_s
 
     def to_attrs(self, prefix: str = "yp") -> dict:
         """Render as PROV activity attributes attached to the activity being recorded."""
-        return {
+        attrs = {
             f"{prefix}:energy_kwh": round(self.energy_kwh, 9),
             f"{prefix}:emissions_kg": round(self.emissions_kg, 9),
             f"{prefix}:duration_s": round(self.duration_s, 3),
             f"{prefix}:energy_source": self.source,
         }
+        if self.sampling_period_s is not None:
+            attrs[f"{prefix}:energy_sampling_period_s"] = self.sampling_period_s
+            attrs[f"{prefix}:energy_attributable"] = self.attributable
+        return attrs
 
 
 # ── Backend interface ─────────────────────────────────────────────────────────
@@ -114,6 +138,14 @@ class EnergyBackend(ABC):
     def stop(self) -> None: ...
 
     @property
+    def sampling_period_s(self) -> float | None:
+        """How often this backend refreshes its totals, if it samples at all.
+
+        Recorded with every delta, because it bounds what the delta can be attributed to.
+        """
+        return None
+
+    @property
     @abstractmethod
     def source_label(self) -> str: ...
 
@@ -124,33 +156,67 @@ class EnergyBackend(ABC):
 class CodeCarbonBackend(EnergyBackend):
     """Default backend — matches the call sequence in yProv4ML's `_carbon_init`."""
 
-    def __init__(self, output_dir: str | None = None, measure_power_secs: int = 15) -> None:
+    def __init__(
+        self,
+        output_dir: str | None = None,
+        measure_power_secs: int = 15,
+        country_iso_code: str | None = None,
+    ) -> None:
         # Typed as Any because codecarbon is an optional dependency: annotating the
         # concrete class here would make importing this module require the package.
         self._tracker: Any = None
         self._output_dir = output_dir or "."
         self._measure_power_secs = measure_power_secs
+        self._country_iso_code = country_iso_code
         self._t_start: float | None = None
 
     def start(self, project_name: str) -> None:
+        """Start sampling. Offline when a country code is given, which it should be.
+
+        codecarbon's default tracker resolves the local grid's carbon intensity over the
+        network at start-up. Two reasons not to let it:
+
+        *Reproducibility.* Grid intensity is an input to the emissions figure, so a run
+        that discovers it rather than stating it cannot be repeated — the same workload on
+        the same machine yields a different number in a different place, or after the
+        upstream dataset is revised. ``country_iso_code`` makes it a declared parameter.
+
+        *It is also where this crashes.* On a Windows host with a conflicting OpenSSL in
+        the load path, the start-up lookup aborts the process with
+        ``OPENSSL_Uplink … no OPENSSL_Applink`` before any agent runs. An energy backend
+        is not allowed to take the pipeline down with it.
+        """
         try:
-            from codecarbon import EmissionsTracker
+            from codecarbon import EmissionsTracker, OfflineEmissionsTracker
         except ImportError as exc:
             raise RuntimeError(
-                "codecarbon is not installed. `pip install codecarbon` or use "
+                "codecarbon is not installed. Install the `energy` extra, or use "
                 "NullBackend explicitly via EnergyTracker(backend=NullBackend())."
             ) from exc
 
         # log_level=error to silence the per-N-seconds INFO chatter
-        self._tracker = EmissionsTracker(
-            project_name=project_name,
-            output_dir=self._output_dir,
-            measure_power_secs=self._measure_power_secs,
-            log_level="error",
-            save_to_file=False,  # we publish via PROV, not CSV
-            save_to_api=False,  # never phone home from agent code
-            allow_multiple_runs=True,  # the bus may instantiate multiple agents
-        )
+        options: dict[str, Any] = {
+            "project_name": project_name,
+            "output_dir": self._output_dir,
+            "measure_power_secs": self._measure_power_secs,
+            "log_level": "error",
+            "save_to_file": False,  # we publish via PROV, not CSV
+            "save_to_api": False,  # never phone home from agent code
+            "allow_multiple_runs": True,  # the bus may instantiate multiple agents
+        }
+        if self._country_iso_code:
+            self._tracker = OfflineEmissionsTracker(
+                country_iso_code=self._country_iso_code, **options
+            )
+        else:
+            warnings.warn(
+                "No country_iso_code given, so codecarbon will resolve grid intensity "
+                "over the network. The emissions figure is then not reproducible, and "
+                "the lookup is a documented crash site on Windows. Set "
+                "PROV_ENERGY_COUNTRY to a 3-letter ISO code.",
+                stacklevel=2,
+            )
+            self._tracker = EmissionsTracker(**options)
         self._tracker.start()
         import time
 
@@ -178,6 +244,15 @@ class CodeCarbonBackend(EnergyBackend):
             except Exception as exc:
                 warnings.warn(f"codecarbon stop raised: {exc}", stacklevel=2)
             self._tracker = None
+
+    @property
+    def sampling_period_s(self) -> float | None:
+        return float(self._measure_power_secs)
+
+    @property
+    def grid_intensity_source(self) -> str:
+        """Where the carbon intensity figure came from: a declared country, or a lookup."""
+        return self._country_iso_code or "network-lookup"
 
     @property
     def source_label(self) -> str:
@@ -298,6 +373,7 @@ class EnergyTracker:
             emissions_kg=d_emissions,
             duration_s=d_elapsed,
             source=self._backend.source_label,
+            sampling_period_s=self._backend.sampling_period_s,
         )
 
     def close(self) -> None:
