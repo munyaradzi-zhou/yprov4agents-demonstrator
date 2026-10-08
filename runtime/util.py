@@ -8,7 +8,6 @@ an optional LLM handle (used only by CAx, only when a key is present).
 
 from __future__ import annotations
 
-import datetime
 import json
 import os
 import re
@@ -23,6 +22,12 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+# One clock for the whole system: the library defines the timestamp format it writes into
+# prov:startTime, and CA3 reads those values back as a timeline. A second definition here
+# would be a second opinion about when things happened. Imported after the path setup
+# above, which is what makes the package importable from a source checkout.
+from yprov4agenticai import now_iso as now_iso  # noqa: E402
+
 OUT_DIR = Path(os.environ.get("OUT_DIR", "/out"))
 
 # Model and sampling parameters for every LLM-bearing agent. Named here rather than
@@ -32,10 +37,6 @@ OUT_DIR = Path(os.environ.get("OUT_DIR", "/out"))
 DEFAULT_OPENAI_MODEL = "gpt-4o"
 LLM_TEMPERATURE = 0.2
 LLM_MAX_TOKENS = 400
-
-
-def now_iso() -> str:
-    return datetime.datetime.now(datetime.UTC).isoformat()
 
 
 def write_prov(role: str, session_id: str, doc: dict[str, Any]) -> Path | None:
