@@ -13,6 +13,7 @@ small image started many times, not six different images.
     ROLE=mc3      python -m runtime.agent_runner   # meta: audit
     ROLE=producer python -m runtime.agent_runner   # replay real yProv4ML records
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -34,8 +35,7 @@ REGISTRY = {
 
 async def _run_agent(role: str) -> None:
     if role not in REGISTRY:
-        raise SystemExit(
-            f"unknown ROLE={role!r}; valid: {', '.join(REGISTRY)}, producer")
+        raise SystemExit(f"unknown ROLE={role!r}; valid: {', '.join(REGISTRY)}, producer")
     module_name, class_name = REGISTRY[role]
     module = __import__(f"runtime.agents.{module_name}", fromlist=[class_name])
     agent_cls = getattr(module, class_name)
@@ -44,7 +44,7 @@ async def _run_agent(role: str) -> None:
     await bus.connect()
     agent = agent_cls(bus)
     await agent.start()
-    while True:                       # stay up, reacting to the stream
+    while True:  # stay up, reacting to the stream
         await asyncio.sleep(3600)
 
 
@@ -52,6 +52,7 @@ def main() -> None:
     role = os.environ.get("ROLE", "").strip().lower()
     if role == "producer":
         from .producer import main as producer_main
+
         asyncio.run(producer_main())
         return
     asyncio.run(_run_agent(role))

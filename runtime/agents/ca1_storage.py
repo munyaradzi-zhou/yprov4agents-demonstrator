@@ -23,22 +23,25 @@ crashed agent cannot silently lose a record — the receipt records which case a
 
 Decide★ verdicts: ACCEPT (round-trip integrity verified) / ESCALATE (I/O or hash mismatch).
 """
+
 from __future__ import annotations
 
 import asyncio
 import json
 import os
-from typing import Any, Dict, Set, Tuple
+from typing import Any
+
+from yprov4agenticai import LightweightStore, ProvTracker, ptr_kwargs
 
 from ..base_agent import StreamingAgent, _merge_payload, stream_document
 from ..envelope import ProvEventType, ProvRecordEnvelope
 from ..net_bus import NetworkBus
-from ..util import now_iso, prov_counts, write_prov, OUT_DIR
-from yprov4agenticai import ProvTracker, LightweightStore, ptr_kwargs
+from ..util import OUT_DIR, now_iso, prov_counts, write_prov
 
 # consumer roles whose use of a record must precede persistence
-PERSIST_AFTER = [r.strip() for r in os.environ.get(
-    "PERSIST_AFTER", "cax,ca2,ca3").split(",") if r.strip()]
+PERSIST_AFTER = [
+    r.strip() for r in os.environ.get("PERSIST_AFTER", "cax,ca2,ca3").split(",") if r.strip()
+]
 PERSIST_TIMEOUT_S = float(os.environ.get("PERSIST_TIMEOUT_S", "25"))
 
 
@@ -52,23 +55,29 @@ class CA1Storage(StreamingAgent):
         super().__init__(role="ca1", bus=bus)
         self.store = LightweightStore(root=str(OUT_DIR / "store"))
         # session_id -> reassembled original producer document, awaiting consumers
-        self._pending: Dict[str, Dict[str, Any]] = {}
+        self._pending: dict[str, dict[str, Any]] = {}
         # session_id -> set of consumer roles that have acknowledged
-        self._acks: Dict[str, Set[str]] = {}
+        self._acks: dict[str, set[str]] = {}
         # sessions already persisted (never persist twice)
-        self._done: Set[str] = set()
+        self._done: set[str] = set()
 
     # ── startup: two subscriptions, not one ────────────────────────────────────
     async def start(self) -> None:
         await self.bus.subscribe("producer.>", self._on_producer)
         await self.bus.subscribe("agent.lifecycle.>", self._on_consumer_ack)
-        ready = ProvRecordEnvelope(session_id="_system", sequence_no=0,
-                                   producer_id=self.role,
-                                   event_type=ProvEventType.HEARTBEAT.value,
-                                   payload={"role": self.role})
+        ready = ProvRecordEnvelope(
+            session_id="_system",
+            sequence_no=0,
+            producer_id=self.role,
+            event_type=ProvEventType.HEARTBEAT.value,
+            payload={"role": self.role},
+        )
         await self.bus.publish(f"system.ready.{self.role}", ready)
-        print(f"[{self.role}] ready — persisting after {PERSIST_AFTER} "
-              f"(timeout {PERSIST_TIMEOUT_S}s)", flush=True)
+        print(
+            f"[{self.role}] ready — persisting after {PERSIST_AFTER} "
+            f"(timeout {PERSIST_TIMEOUT_S}s)",
+            flush=True,
+        )
 
     # ── inbound: the original record to hold ───────────────────────────────────
     async def _on_producer(self, subject: str, env: ProvRecordEnvelope) -> None:
@@ -81,8 +90,11 @@ class CA1Storage(StreamingAgent):
         if env.event_type == ProvEventType.RECORD_CHUNK.value:
             _merge_payload(buf, env.payload)
         elif env.event_type == ProvEventType.STREAM_END.value:
-            print(f"[{self.role}] holding '{sid}' — awaiting consumers "
-                  f"{sorted(set(PERSIST_AFTER) - self._acks.get(sid, set()))}", flush=True)
+            print(
+                f"[{self.role}] holding '{sid}' — awaiting consumers "
+                f"{sorted(set(PERSIST_AFTER) - self._acks.get(sid, set()))}",
+                flush=True,
+            )
             asyncio.create_task(self._timeout_guard(sid))
 
     # ── inbound: a consumer finished → one acknowledgement ─────────────────────
@@ -94,16 +106,18 @@ class CA1Storage(StreamingAgent):
         if len(parts) < 4:
             return
         role, sid = parts[2], parts[3]
-        if role == self.role:                      # never acknowledge ourselves
+        if role == self.role:  # never acknowledge ourselves
             return
         if sid in self._done or sid not in self._pending:
             return
         self._acks.setdefault(sid, set()).add(role)
         waiting = set(PERSIST_AFTER) - self._acks[sid]
-        print(f"[{self.role}] ack from '{role}' for '{sid}' "
-              f"({len(self._acks[sid])}/{len(PERSIST_AFTER)})"
-              + (f", waiting on {sorted(waiting)}" if waiting else ", quorum reached"),
-              flush=True)
+        print(
+            f"[{self.role}] ack from '{role}' for '{sid}' "
+            f"({len(self._acks[sid])}/{len(PERSIST_AFTER)})"
+            + (f", waiting on {sorted(waiting)}" if waiting else ", quorum reached"),
+            flush=True,
+        )
         if not waiting:
             await self._persist(sid, reason="all expected consumers acknowledged")
 
@@ -113,8 +127,9 @@ class CA1Storage(StreamingAgent):
         if sid in self._done or sid not in self._pending:
             return
         missing = sorted(set(PERSIST_AFTER) - self._acks.get(sid, set()))
-        await self._persist(sid, reason=f"timeout after {PERSIST_TIMEOUT_S}s; "
-                                        f"no acknowledgement from {missing}")
+        await self._persist(
+            sid, reason=f"timeout after {PERSIST_TIMEOUT_S}s; no acknowledgement from {missing}"
+        )
 
     # ── the actual persist + reflexive PROV ────────────────────────────────────
     async def _persist(self, sid: str, *, reason: str) -> None:
@@ -124,15 +139,19 @@ class CA1Storage(StreamingAgent):
         doc = self._pending.pop(sid, {})
         acked = sorted(self._acks.get(sid, set()))
         loop = asyncio.get_event_loop()
-        prov, log = await loop.run_in_executor(
-            None, self._do_persist, sid, doc, acked, reason)
+        prov, log = await loop.run_in_executor(None, self._do_persist, sid, doc, acked, reason)
         print(f"[{self.role}] {log}", flush=True)
-        await stream_document(self.bus, f"agent.lifecycle.{self.role}.{sid}",
-                              session_id=f"{sid}::{self.role}",
-                              producer_id=self.role, doc=prov)
+        await stream_document(
+            self.bus,
+            f"agent.lifecycle.{self.role}.{sid}",
+            session_id=f"{sid}::{self.role}",
+            producer_id=self.role,
+            doc=prov,
+        )
 
-    def _do_persist(self, sid: str, doc: Dict[str, Any],
-                    acked: list, reason: str) -> Tuple[Dict[str, Any], str]:
+    def _do_persist(
+        self, sid: str, doc: dict[str, Any], acked: list, reason: str
+    ) -> tuple[dict[str, Any], str]:
         c = prov_counts(doc)
         payload = json.dumps(doc, ensure_ascii=False, sort_keys=True)
 
@@ -143,49 +162,92 @@ class CA1Storage(StreamingAgent):
         try:
             self.store.resolve(ptr["yp:pid"], verify=True)
             verdict, integrity = "ACCEPT", "round-trip read verified; sha-256 matched"
-        except Exception as exc:                                     # noqa: BLE001
+        except Exception as exc:
             verdict, integrity = "ESCALATE", f"integrity check FAILED: {exc}"
-        self.store.save()                       # refresh the manifest on disk
+        self.store.save()  # refresh the manifest on disk
 
         # ── reflexive PROV: CA1's own 6-step lifecycle ─────────────────────────
         t = ProvTracker(sid=sid, agent_label="StorageAgent")
         t0 = now_iso()
-        task = t.register_entity("TaskEntity", f"provenance record '{sid}' held for persistence")
-        t.record_activity("ReceiveTaskActivity", "CA1: receive record from bus",
-                          t0, now_iso(), out_eid=task, verbose=False)
+        task = t.register_entity(
+            "TaskEntity", f"provenance record '{sid}' held for persistence"
+        )
         t.record_activity(
-            "PlanningActivity", "CA1: await consumers, plan store path",
-            now_iso(), now_iso(), in_eid=task,
-            extra_attrs={"yp:persist_policy": "after-consume",
-                         "yp:required_consumers": ",".join(PERSIST_AFTER),
-                         "yp:acknowledged_by": ",".join(acked) or "(none)"},
-            verbose=False)
-        stored = t.register_entity("ToolResultEntity",
-                                   f"stored provenance record for {sid}", **ptr_kwargs(ptr))
-        t.record_activity("PersistActivity", "CA1: write to store (backend API)",
-                          now_iso(), now_iso(), in_eid=task, out_eid=stored,
-                          extra_attrs={"yp:store": "LightweightStore",
-                                       "yp:size_bytes": len(payload.encode("utf-8"))},
-                          verbose=False)
-        t.record_activity("ObservationActivity", "CA1: verify round-trip integrity",
-                          now_iso(), now_iso(), in_eid=stored, verbose=False)
+            "ReceiveTaskActivity",
+            "CA1: receive record from bus",
+            t0,
+            now_iso(),
+            out_eid=task,
+            verbose=False,
+        )
         t.record_activity(
-            "DecisionActivity", f"CA1: {verdict.lower()} the stored record",
-            now_iso(), now_iso(), in_eid=stored,
+            "PlanningActivity",
+            "CA1: await consumers, plan store path",
+            now_iso(),
+            now_iso(),
+            in_eid=task,
+            extra_attrs={
+                "yp:persist_policy": "after-consume",
+                "yp:required_consumers": ",".join(PERSIST_AFTER),
+                "yp:acknowledged_by": ",".join(acked) or "(none)",
+            },
+            verbose=False,
+        )
+        stored = t.register_entity(
+            "ToolResultEntity", f"stored provenance record for {sid}", **ptr_kwargs(ptr)
+        )
+        t.record_activity(
+            "PersistActivity",
+            "CA1: write to store (backend API)",
+            now_iso(),
+            now_iso(),
+            in_eid=task,
+            out_eid=stored,
+            extra_attrs={
+                "yp:store": "LightweightStore",
+                "yp:size_bytes": len(payload.encode("utf-8")),
+            },
+            verbose=False,
+        )
+        t.record_activity(
+            "ObservationActivity",
+            "CA1: verify round-trip integrity",
+            now_iso(),
+            now_iso(),
+            in_eid=stored,
+            verbose=False,
+        )
+        t.record_activity(
+            "DecisionActivity",
+            f"CA1: {verdict.lower()} the stored record",
+            now_iso(),
+            now_iso(),
+            in_eid=stored,
             justification=(
                 f"Persisted after consumption ({reason}); acknowledged by "
                 f"[{', '.join(acked) or 'none'}]. Record carries {c['activities']} activities / "
                 f"{c['entities']} entities / {c['relations']} relations, {len(payload)} bytes. "
-                f"Integrity: {integrity}. Verdict {verdict}."),
-            extra_attrs={"yp:verdict": verdict}, verbose=False)
+                f"Integrity: {integrity}. Verdict {verdict}."
+            ),
+            extra_attrs={"yp:verdict": verdict},
+            verbose=False,
+        )
         receipt = t.register_entity(
             "ResponseEntity",
-            f"storage receipt {ptr['yp:pid']} ({ptr['yp:contentHash'][:19]}...)")
-        t.record_activity("ResponseActivity", "CA1: emit storage receipt",
-                          now_iso(), now_iso(), in_eid=stored, out_eid=receipt,
-                          verbose=False)
+            f"storage receipt {ptr['yp:pid']} ({ptr['yp:contentHash'][:19]}...)",
+        )
+        t.record_activity(
+            "ResponseActivity",
+            "CA1: emit storage receipt",
+            now_iso(),
+            now_iso(),
+            in_eid=stored,
+            out_eid=receipt,
+            verbose=False,
+        )
 
         prov = t.to_prov_json()
         write_prov(self.role, sid, prov)
-        return prov, (f"persisted '{sid}' -> {ptr['yp:pid']} [{verdict}] "
-                      f"after {acked or 'timeout'}")
+        return prov, (
+            f"persisted '{sid}' -> {ptr['yp:pid']} [{verdict}] after {acked or 'timeout'}"
+        )

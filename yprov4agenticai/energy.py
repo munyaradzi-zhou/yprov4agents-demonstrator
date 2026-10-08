@@ -54,16 +54,17 @@ PLATFORM NOTES
 A custom collector (Gabriele's plan) would replace `CodeCarbonBackend` with a
 new `EnergyBackend` subclass — no changes required in the agent layer.
 """
+
 from __future__ import annotations
 
 import threading
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
-
+from typing import Any
 
 # ── Result type ───────────────────────────────────────────────────────────────
+
 
 @dataclass
 class EnergyDelta:
@@ -75,22 +76,24 @@ class EnergyDelta:
       duration_s   — wall-clock seconds covered by this delta
       source       — 'measured' (RAPL/pynvml) | 'modelled' (TDP fallback) | 'null'
     """
-    energy_kwh:   float
+
+    energy_kwh: float
     emissions_kg: float
-    duration_s:   float
-    source:       str = "measured"
+    duration_s: float
+    source: str = "measured"
 
     def to_attrs(self, prefix: str = "yp") -> dict:
         """Render as PROV activity attributes attached to the activity being recorded."""
         return {
-            f"{prefix}:energy_kwh":   round(self.energy_kwh,   9),
+            f"{prefix}:energy_kwh": round(self.energy_kwh, 9),
             f"{prefix}:emissions_kg": round(self.emissions_kg, 9),
-            f"{prefix}:duration_s":   round(self.duration_s,   3),
+            f"{prefix}:duration_s": round(self.duration_s, 3),
             f"{prefix}:energy_source": self.source,
         }
 
 
 # ── Backend interface ─────────────────────────────────────────────────────────
+
 
 class EnergyBackend(ABC):
     """Pluggable backend. Implement this to swap codecarbon for a custom collector."""
@@ -116,19 +119,21 @@ class EnergyBackend(ABC):
 
 # ── codecarbon backend (mirrors yProv4ML energy_utils.py) ────────────────────
 
+
 class CodeCarbonBackend(EnergyBackend):
     """Default backend — matches the call sequence in yProv4ML's `_carbon_init`."""
 
-    def __init__(self, output_dir: Optional[str] = None,
-                 measure_power_secs: int = 15) -> None:
-        self._tracker = None
+    def __init__(self, output_dir: str | None = None, measure_power_secs: int = 15) -> None:
+        # Typed as Any because codecarbon is an optional dependency: annotating the
+        # concrete class here would make importing this module require the package.
+        self._tracker: Any = None
         self._output_dir = output_dir or "."
         self._measure_power_secs = measure_power_secs
-        self._t_start: Optional[float] = None
+        self._t_start: float | None = None
 
     def start(self, project_name: str) -> None:
         try:
-            from codecarbon import EmissionsTracker  # type: ignore
+            from codecarbon import EmissionsTracker
         except ImportError as exc:
             raise RuntimeError(
                 "codecarbon is not installed. `pip install codecarbon` or use "
@@ -141,12 +146,14 @@ class CodeCarbonBackend(EnergyBackend):
             output_dir=self._output_dir,
             measure_power_secs=self._measure_power_secs,
             log_level="error",
-            save_to_file=False,        # we publish via PROV, not CSV
-            save_to_api=False,         # never phone home from agent code
+            save_to_file=False,  # we publish via PROV, not CSV
+            save_to_api=False,  # never phone home from agent code
             allow_multiple_runs=True,  # the bus may instantiate multiple agents
         )
         self._tracker.start()
-        import time; self._t_start = time.monotonic()
+        import time
+
+        self._t_start = time.monotonic()
 
     def read_total(self) -> tuple[float, float, float]:
         if self._tracker is None or self._t_start is None:
@@ -158,7 +165,9 @@ class CodeCarbonBackend(EnergyBackend):
         except Exception:
             emissions_kg = float(getattr(self._tracker, "_total_emissions", 0.0) or 0.0)
         energy_kwh = float(getattr(self._tracker, "_total_energy", 0.0) or 0.0)
-        import time; elapsed = time.monotonic() - self._t_start
+        import time
+
+        elapsed = time.monotonic() - self._t_start
         return (energy_kwh, emissions_kg, elapsed)
 
     def stop(self) -> None:
@@ -188,6 +197,7 @@ class CodeCarbonBackend(EnergyBackend):
 
 # ── Null backend ──────────────────────────────────────────────────────────────
 
+
 class NullBackend(EnergyBackend):
     """Used when codecarbon is unavailable or explicitly disabled.
 
@@ -197,12 +207,16 @@ class NullBackend(EnergyBackend):
 
     def start(self, project_name: str) -> None:
         self._t_start = None
-        import time; self._t_start = time.monotonic()
+        import time
+
+        self._t_start = time.monotonic()
 
     def read_total(self) -> tuple[float, float, float]:
         if self._t_start is None:
             return (0.0, 0.0, 0.0)
-        import time; return (0.0, 0.0, time.monotonic() - self._t_start)
+        import time
+
+        return (0.0, 0.0, time.monotonic() - self._t_start)
 
     def stop(self) -> None:
         self._t_start = None
@@ -213,6 +227,7 @@ class NullBackend(EnergyBackend):
 
 
 # ── EnergyTracker — Gabriele's API surface ────────────────────────────────────
+
 
 class EnergyTracker:
     """Mirrors the yProv4ML API: `carbon_init()` + `stop_carbon_tracked_block()`.
@@ -231,10 +246,11 @@ class EnergyTracker:
     process-wide in its CPU readings).
     """
 
-    def __init__(self, backend: Optional[EnergyBackend] = None) -> None:
+    def __init__(self, backend: EnergyBackend | None = None) -> None:
         if backend is None:
             try:
                 import codecarbon  # noqa: F401
+
                 backend = CodeCarbonBackend()
             except ImportError:
                 warnings.warn(
@@ -244,10 +260,10 @@ class EnergyTracker:
                 backend = NullBackend()
         self._backend = backend
         self._lock = threading.Lock()
-        self._prev_energy_kwh   = 0.0
+        self._prev_energy_kwh = 0.0
         self._prev_emissions_kg = 0.0
-        self._prev_elapsed_s    = 0.0
-        self._started           = False
+        self._prev_elapsed_s = 0.0
+        self._started = False
 
     # ── public API matching yProv4ML ──────────────────────────────────────────
 
@@ -269,18 +285,18 @@ class EnergyTracker:
 
         with self._lock:
             total_e, total_co2, elapsed = self._backend.read_total()
-            d_energy    = max(0.0, total_e   - self._prev_energy_kwh)
+            d_energy = max(0.0, total_e - self._prev_energy_kwh)
             d_emissions = max(0.0, total_co2 - self._prev_emissions_kg)
-            d_elapsed   = max(0.0, elapsed   - self._prev_elapsed_s)
-            self._prev_energy_kwh   = total_e
+            d_elapsed = max(0.0, elapsed - self._prev_elapsed_s)
+            self._prev_energy_kwh = total_e
             self._prev_emissions_kg = total_co2
-            self._prev_elapsed_s    = elapsed
+            self._prev_elapsed_s = elapsed
 
         return EnergyDelta(
-            energy_kwh   = d_energy,
-            emissions_kg = d_emissions,
-            duration_s   = d_elapsed,
-            source       = self._backend.source_label,
+            energy_kwh=d_energy,
+            emissions_kg=d_emissions,
+            duration_s=d_elapsed,
+            source=self._backend.source_label,
         )
 
     def close(self) -> None:
@@ -293,19 +309,20 @@ class EnergyTracker:
 
 # ── Session-level summary ─────────────────────────────────────────────────────
 
+
 def session_energy_summary(per_activity_deltas: list[EnergyDelta]) -> dict:
     """Aggregate per-activity deltas into a session-level summary.
 
     Returns a dict ready to attach to an `yp:AgentSessionActivity` closing record.
     """
-    total_e   = sum(d.energy_kwh   for d in per_activity_deltas)
+    total_e = sum(d.energy_kwh for d in per_activity_deltas)
     total_co2 = sum(d.emissions_kg for d in per_activity_deltas)
-    total_s   = sum(d.duration_s   for d in per_activity_deltas)
-    sources   = {d.source for d in per_activity_deltas}
+    total_s = sum(d.duration_s for d in per_activity_deltas)
+    sources = {d.source for d in per_activity_deltas}
     return {
-        "yp:total_energy_kwh":   round(total_e,   9),
+        "yp:total_energy_kwh": round(total_e, 9),
         "yp:total_emissions_kg": round(total_co2, 9),
-        "yp:total_duration_s":   round(total_s,   3),
-        "yp:energy_source":      "mixed" if len(sources) > 1 else next(iter(sources), "null"),
-        "yp:n_activities":       len(per_activity_deltas),
+        "yp:total_duration_s": round(total_s, 3),
+        "yp:energy_source": "mixed" if len(sources) > 1 else next(iter(sources), "null"),
+        "yp:n_activities": len(per_activity_deltas),
     }

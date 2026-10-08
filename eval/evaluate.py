@@ -15,40 +15,50 @@ Usage:
     python -m eval.evaluate                      # defaults to ./out
     python -m eval.evaluate --out-dir ./out --markdown results.md
 """
+
 from __future__ import annotations
 
 import argparse
 import json
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
-REL_KEYS = ("used", "wasGeneratedBy", "wasInformedBy",
-            "wasDerivedFrom", "wasAssociatedWith", "actedOnBehalfOf")
+REL_KEYS = (
+    "used",
+    "wasGeneratedBy",
+    "wasInformedBy",
+    "wasDerivedFrom",
+    "wasAssociatedWith",
+    "actedOnBehalfOf",
+)
 
 #: display names, in lifecycle order
 ROLE_NAMES = {
-    "ca1": "CA1 StorageAgent", "cax": "CAx NL_Summarizer",
-    "ca2": "CA2 Metrics_Visualizer", "ca3": "CA3 Analytics_Agent",
-    "mc1": "MC1 ComplianceChecker", "mc3": "MC3 AuditabilityAgent",
+    "ca1": "CA1 StorageAgent",
+    "cax": "CAx NL_Summarizer",
+    "ca2": "CA2 Metrics_Visualizer",
+    "ca3": "CA3 Analytics_Agent",
+    "mc1": "MC1 ComplianceChecker",
+    "mc3": "MC3 AuditabilityAgent",
 }
 OPERATIONAL = ("ca1", "cax", "ca2", "ca3")
 META = ("mc1", "mc3")
 
 
-def _type_of(node: Dict[str, Any]) -> str:
+def _type_of(node: dict[str, Any]) -> str:
     t = node.get("prov:type")
     return str(t.get("$", "")) if isinstance(t, dict) else str(t or "")
 
 
-def _agent_label(doc: Dict[str, Any]) -> str:
+def _agent_label(doc: dict[str, Any]) -> str:
     for ag in (doc.get("agent") or {}).values():
         if ag.get("prov:label"):
             return str(ag["prov:label"])
     return "?"
 
 
-def load_runs(out_dir: Path) -> List[Tuple[str, str, Dict[str, Any]]]:
+def load_runs(out_dir: Path) -> list[tuple[str, str, dict[str, Any]]]:
     """Return (session, role, doc) for every emitted PROV file.
 
     Filenames look like  <session>__<role>_prov.json, where a governed record's
@@ -56,18 +66,18 @@ def load_runs(out_dir: Path) -> List[Tuple[str, str, Dict[str, Any]]]:
     """
     runs = []
     for path in sorted(out_dir.glob("*_prov.json")):
-        stem = path.stem[: -len("_prov")]          # strip the trailing _prov
+        stem = path.stem[: -len("_prov")]  # strip the trailing _prov
         session, _, role = stem.rpartition("__")
         if not session:
             session, role = stem, "?"
         try:
             runs.append((session, role, json.loads(path.read_text(encoding="utf-8"))))
-        except Exception as exc:                                   # noqa: BLE001
+        except Exception as exc:
             print(f"  ! skipped {path.name}: {exc}")
     return runs
 
 
-def coverage(doc: Dict[str, Any]) -> Dict[str, int]:
+def coverage(doc: dict[str, Any]) -> dict[str, int]:
     return {
         "activities": len(doc.get("activity") or {}),
         "entities": len(doc.get("entity") or {}),
@@ -75,7 +85,7 @@ def coverage(doc: Dict[str, Any]) -> Dict[str, int]:
     }
 
 
-def decisions(doc: Dict[str, Any]) -> Tuple[int, int]:
+def decisions(doc: dict[str, Any]) -> tuple[int, int]:
     """(number of DecisionActivity-like activities, number carrying a justification)."""
     total = justified = 0
     for a in (doc.get("activity") or {}).values():
@@ -101,7 +111,7 @@ def main() -> None:
     if not runs:
         raise SystemExit(f"no *_prov.json found in {out_dir} — run the demo first")
 
-    lines: List[str] = []
+    lines: list[str] = []
 
     def emit(text: str = "") -> None:
         print(text)
@@ -113,7 +123,7 @@ def main() -> None:
     emit()
 
     # ── E1 coverage ────────────────────────────────────────────────────────────
-    per_role: Dict[str, List[Dict[str, int]]] = defaultdict(list)
+    per_role: dict[str, list[dict[str, int]]] = defaultdict(list)
     for _, role, doc in runs:
         per_role[role].append(coverage(doc))
 
@@ -126,10 +136,12 @@ def main() -> None:
         if not rows:
             continue
         n = len(rows)
-        emit(f"| {ROLE_NAMES.get(role, role)} | {n} | "
-             f"{sum(r['activities'] for r in rows)/n:.1f} | "
-             f"{sum(r['entities'] for r in rows)/n:.1f} | "
-             f"{sum(r['relations'] for r in rows)/n:.1f} |")
+        emit(
+            f"| {ROLE_NAMES.get(role, role)} | {n} | "
+            f"{sum(r['activities'] for r in rows) / n:.1f} | "
+            f"{sum(r['entities'] for r in rows) / n:.1f} | "
+            f"{sum(r['relations'] for r in rows) / n:.1f} |"
+        )
     emit()
 
     # ── E2 justification ───────────────────────────────────────────────────────
@@ -149,9 +161,9 @@ def main() -> None:
             j += b
         tot_d += d
         tot_j += j
-        pct = f"{100.0*j/d:.0f}%" if d else "—"
+        pct = f"{100.0 * j / d:.0f}%" if d else "—"
         emit(f"| {ROLE_NAMES.get(role, role)} | {d} | {j} | {pct} |")
-    overall = f"{100.0*tot_j/tot_d:.0f}%" if tot_d else "—"
+    overall = f"{100.0 * tot_j / tot_d:.0f}%" if tot_d else "—"
     emit(f"| **All** | **{tot_d}** | **{tot_j}** | **{overall}** |")
     emit()
 
@@ -163,9 +175,11 @@ def main() -> None:
             tot[k] += c[k]
     emit("## E3 — Strategy A (callbacks) vs Strategy B (explicit instrumentation)")
     emit()
-    emit("Same agents, same input. Strategy A figures are structural: a framework callback "
-         "fires *after* a node returns and cannot read that node's local variables, so the "
-         "decision rationale is unreachable by construction.")
+    emit(
+        "Same agents, same input. Strategy A figures are structural: a framework callback "
+        "fires *after* a node returns and cannot read that node's local variables, so the "
+        "decision rationale is unreachable by construction."
+    )
     emit()
     emit("| Signal | Strategy A | Strategy B (this demo) |")
     emit("|---|--:|--:|")
@@ -177,7 +191,7 @@ def main() -> None:
     emit()
 
     # ── E4 reflexivity ─────────────────────────────────────────────────────────
-    governed: Dict[str, set] = defaultdict(set)
+    governed: dict[str, set] = defaultdict(set)
     for session, role, _ in runs:
         if role in META and "__" in session:
             target = session.split("__")[-1]
@@ -187,14 +201,16 @@ def main() -> None:
     emit("| Operational agent | Governed by |")
     emit("|---|---|")
     for target in sorted(governed):
-        emit(f"| {ROLE_NAMES.get(target, target)} | "
-             f"{', '.join(ROLE_NAMES.get(m, m) for m in sorted(governed[target]))} |")
+        emit(
+            f"| {ROLE_NAMES.get(target, target)} | "
+            f"{', '.join(ROLE_NAMES.get(m, m) for m in sorted(governed[target]))} |"
+        )
     if not governed:
         emit("| (none observed) | — |")
     emit()
 
     # ── E5 governance verdicts ─────────────────────────────────────────────────
-    verdicts: Dict[str, int] = defaultdict(int)
+    verdicts: dict[str, int] = defaultdict(int)
     for _, role, doc in runs:
         for a in (doc.get("activity") or {}).values():
             v = a.get("yp:verdict")

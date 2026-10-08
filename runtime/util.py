@@ -5,6 +5,7 @@ Keeps the agents focused on their logic: where to make the yProv4AgenticAI core
 importable, timestamps, writing emitted PROV-JSON to the shared output volume, and
 an optional LLM handle (used only by CAx, only when a key is present).
 """
+
 from __future__ import annotations
 
 import datetime
@@ -12,8 +13,9 @@ import json
 import os
 import re
 import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from typing import Any
 
 # Make the canonical core importable whether we run from the repo (dev) or the
 # image (where /app is the repo root on PYTHONPATH).
@@ -25,10 +27,10 @@ OUT_DIR = Path(os.environ.get("OUT_DIR", "/out"))
 
 
 def now_iso() -> str:
-    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+    return datetime.datetime.now(datetime.UTC).isoformat()
 
 
-def write_prov(role: str, session_id: str, doc: Dict[str, Any]) -> Optional[Path]:
+def write_prov(role: str, session_id: str, doc: dict[str, Any]) -> Path | None:
     """Write an emitted PROV-JSON doc to the shared output volume, best-effort."""
     try:
         OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -38,12 +40,12 @@ def write_prov(role: str, session_id: str, doc: Dict[str, Any]) -> Optional[Path
         path = OUT_DIR / f"{safe}__{role}_prov.json"
         path.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
         return path
-    except Exception as exc:                                          # noqa: BLE001
+    except Exception as exc:
         print(f"[{role}] could not write output: {exc}", flush=True)
         return None
 
 
-def get_llm() -> Optional[Callable[[str], str]]:
+def get_llm() -> Callable[[str], str] | None:
     """Return an llm(prompt)->text callable if OPENAI_API_KEY is set, else None.
 
     CAx uses this; every other agent is deterministic and needs no key, so the whole
@@ -54,26 +56,35 @@ def get_llm() -> Optional[Callable[[str], str]]:
         return None
     try:
         from openai import OpenAI
+
         client = OpenAI(api_key=key)
         model = os.environ.get("OPENAI_MODEL", "gpt-4o")
 
         def _llm(prompt: str) -> str:
             resp = client.chat.completions.create(
-                model=model, messages=[{"role": "user", "content": prompt}],
-                temperature=0.2, max_tokens=400,
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=400,
             )
             return (resp.choices[0].message.content or "").strip()
 
         return _llm
-    except Exception as exc:                                          # noqa: BLE001
+    except Exception as exc:
         print(f"[cax] LLM unavailable ({exc}); using stub summariser", flush=True)
         return None
 
 
-def prov_counts(doc: Dict[str, Any]) -> Dict[str, int]:
+def prov_counts(doc: dict[str, Any]) -> dict[str, int]:
     """Count activities, entities, and lineage relations in a PROV-JSON doc."""
-    rel_keys = ("used", "wasGeneratedBy", "wasInformedBy",
-                "wasDerivedFrom", "wasAssociatedWith", "actedOnBehalfOf")
+    rel_keys = (
+        "used",
+        "wasGeneratedBy",
+        "wasInformedBy",
+        "wasDerivedFrom",
+        "wasAssociatedWith",
+        "actedOnBehalfOf",
+    )
     return {
         "activities": len(doc.get("activity", {}) or {}),
         "entities": len(doc.get("entity", {}) or {}),

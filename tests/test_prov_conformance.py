@@ -94,7 +94,9 @@ def test_justification_survives_a_standard_round_trip() -> None:
     document = build_lifecycle()
     document.pop("_yprov4agents_meta")
 
-    round_tripped = json.loads(parse(document).serialize(format="json"))
+    serialised = parse(document).serialize(format="json")
+    assert serialised is not None, "serialize() returns a string when given no stream"
+    round_tripped = json.loads(serialised)
     justifications = [
         attributes["yp:justification"]
         for attributes in round_tripped["activity"].values()

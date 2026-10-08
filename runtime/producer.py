@@ -9,6 +9,7 @@ producer would. Point DATA_DIR at a folder of `.json` PROV documents to replay t
 It first waits for the agents to announce readiness (NATS core pub/sub is not
 persistent — subscribers must be up before we publish), then streams each document.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -16,15 +17,17 @@ import glob
 import json
 import os
 from pathlib import Path
-from typing import Set
 
 from .base_agent import stream_document
 from .envelope import ProvRecordEnvelope
 from .net_bus import NetworkBus
 
 DATA_DIR = os.environ.get("DATA_DIR", "/data")
-EXPECTED = [r.strip() for r in os.environ.get(
-    "EXPECTED_AGENTS", "ca1,cax,ca2,ca3,mc1,mc3").split(",") if r.strip()]
+EXPECTED = [
+    r.strip()
+    for r in os.environ.get("EXPECTED_AGENTS", "ca1,cax,ca2,ca3,mc1,mc3").split(",")
+    if r.strip()
+]
 STREAM_DELAY_MS = float(os.environ.get("STREAM_DELAY_MS", "150"))
 
 
@@ -40,7 +43,7 @@ def _session_for(path: Path) -> str:
 
 
 async def _wait_for_agents(bus: NetworkBus, timeout: float = 30.0) -> None:
-    seen: Set[str] = set()
+    seen: set[str] = set()
     want = set(EXPECTED)
     done = asyncio.Event()
 
@@ -56,7 +59,7 @@ async def _wait_for_agents(bus: NetworkBus, timeout: float = 30.0) -> None:
     try:
         await asyncio.wait_for(done.wait(), timeout=timeout)
         print("[producer] all expected agents ready", flush=True)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         print(f"[producer] timeout waiting for {want - seen}; streaming anyway", flush=True)
 
 
@@ -74,14 +77,19 @@ async def main() -> None:
     for path in docs:
         try:
             doc = json.loads(path.read_text(encoding="utf-8"))
-        except Exception as exc:                                     # noqa: BLE001
+        except Exception as exc:
             print(f"[producer] skip {path.name}: {exc}", flush=True)
             continue
         session = _session_for(path)
         subject = f"producer.yprov4ml.{session}"
-        n = await stream_document(bus, subject, session_id=session,
-                                  producer_id="yprov4ml-replay", doc=doc,
-                                  delay_ms=STREAM_DELAY_MS)
+        n = await stream_document(
+            bus,
+            subject,
+            session_id=session,
+            producer_id="yprov4ml-replay",
+            doc=doc,
+            delay_ms=STREAM_DELAY_MS,
+        )
         print(f"[producer] streamed {path.name} as '{session}' ({n} envelopes)", flush=True)
         await asyncio.sleep(0.5)
 

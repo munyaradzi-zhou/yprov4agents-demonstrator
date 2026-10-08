@@ -25,6 +25,7 @@ derived automatically, so a forgotten version bump is still detectable by hash.
 The faithfulness hardening (grounding rules in plan/act, a faithfulness-only
 evaluator, word-count-as-ceiling) is recorded here as the v1 -> v2 transition.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -34,8 +35,9 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class Prompt:
     """An immutable, versioned, content-addressed prompt."""
-    id: str            # stable key, e.g. "act.system"
-    version: str       # bump on ANY text change
+
+    id: str  # stable key, e.g. "act.system"
+    version: str  # bump on ANY text change
     text: str
     changelog: str = ""
 
@@ -47,9 +49,9 @@ class Prompt:
     def provenance(self) -> dict:
         """PROV attribute dict to stamp onto the activity that used this prompt."""
         return {
-            "yp:prompt_id":      self.id,
+            "yp:prompt_id": self.id,
             "yp:prompt_version": self.version,
-            "yp:prompt_sha":     self.sha,
+            "yp:prompt_sha": self.sha,
         }
 
 
@@ -61,7 +63,7 @@ PLAN_SYSTEM = Prompt(
     id="plan.system",
     version="2.0",
     changelog="v2: ground the plan strictly in present fields; forbid assuming "
-              "datasets/models/dates/hardware not in the records.",
+    "datasets/models/dates/hardware not in the records.",
     text=(
         "You are NL_Summarizer, a provenance summariser. You will be given provenance "
         "records as JSON. Plan a summary grounded STRICTLY in those records.\n"
@@ -76,8 +78,8 @@ ACT_SYSTEM = Prompt(
     id="act.system",
     version="2.0",
     changelog="v2: full faithfulness contract (records-only, omit-absent, copy-exactly) "
-              "and word count reframed as a CEILING not a target — the v1 '100-word' "
-              "target was causing the model to pad sparse inputs with invented facts.",
+    "and word count reframed as a CEILING not a target — the v1 '100-word' "
+    "target was causing the model to pad sparse inputs with invented facts.",
     text=(
         "You are NL_Summarizer. Write a natural-language provenance summary using ONLY "
         "the information in the provided records.\n"
@@ -96,14 +98,14 @@ OBSERVE_SYSTEM = Prompt(
     id="observe.system",
     version="2.1",
     changelog="v2.1: fix false-positive bias. The v2.0 'strict evaluator + always quote a "
-              "flagged claim' framing manufactured objections — it failed faithful "
-              "paraphrases (e.g. 'the dataset labeled train_dataset/Training' when that "
-              "string is literally in the records) and even miscounted records ('only three "
-              "models' when ten were present). v2.1 flips the default to PASS, treats "
-              "rewording/grouping/hedging of present facts as faithful, and requires the "
-              "judge to quote the record value it searched for and could NOT find BEFORE it "
-              "may FAIL — which kills invented objections while keeping real fabrications "
-              "(specifics absent from the records) caught.",
+    "flagged claim' framing manufactured objections — it failed faithful "
+    "paraphrases (e.g. 'the dataset labeled train_dataset/Training' when that "
+    "string is literally in the records) and even miscounted records ('only three "
+    "models' when ten were present). v2.1 flips the default to PASS, treats "
+    "rewording/grouping/hedging of present facts as faithful, and requires the "
+    "judge to quote the record value it searched for and could NOT find BEFORE it "
+    "may FAIL — which kills invented objections while keeping real fabrications "
+    "(specifics absent from the records) caught.",
     text=(
         "You are a provenance-summary faithfulness checker. Judge ONLY whether the summary "
         "invents information that is NOT in the input records.\n"
@@ -142,8 +144,8 @@ PLAN_DEEP = Prompt(
     id="plan.system.deep",
     version="1.0",
     changelog="v1: coverage-aware planning. Plan around the salient provenance STRUCTURE "
-              "in the records (phases + ordering, derivation/versioning lineage, notable/"
-              "anomalous choices, resources), still grounded strictly in present fields.",
+    "in the records (phases + ordering, derivation/versioning lineage, notable/"
+    "anomalous choices, resources), still grounded strictly in present fields.",
     text=(
         "You are NL_Summarizer, a provenance summariser. You are given provenance records "
         "as JSON, plus a DIGEST of their structure. Plan a summary grounded STRICTLY in the "
@@ -164,8 +166,8 @@ ACT_DEEP = Prompt(
     id="act.system.deep",
     version="1.0",
     changelog="v1: same strict faithfulness contract as act.system v2.0, but the length "
-              "framing is reframed from 'write less' to 'cover the salient structure the plan "
-              "identified' (lineage, phases, anomalies, resources) — grounded, never invented.",
+    "framing is reframed from 'write less' to 'cover the salient structure the plan "
+    "identified' (lineage, phases, anomalies, resources) — grounded, never invented.",
     text=(
         "You are NL_Summarizer. Write a natural-language provenance summary using ONLY the "
         "information in the provided records (a structure DIGEST is included to help you find "
@@ -191,9 +193,9 @@ OBSERVE_DEEP = Prompt(
     id="observe.system.deep",
     version="1.0",
     changelog="v1: two-axis judge = faithfulness (as observe.system v2.1) AND coverage. FAILs a "
-              "faithful-but-shallow summary that omits salient structure DEMONSTRABLY present in "
-              "the records, using the same quote-the-record discipline so coverage objections "
-              "cannot be manufactured. This is what makes the reflexion loop actually iterate.",
+    "faithful-but-shallow summary that omits salient structure DEMONSTRABLY present in "
+    "the records, using the same quote-the-record discipline so coverage objections "
+    "cannot be manufactured. This is what makes the reflexion loop actually iterate.",
     text=(
         "You are a provenance-summary checker with TWO criteria: FAITHFULNESS and COVERAGE. "
         "PASS only if BOTH hold.\n"
@@ -220,8 +222,8 @@ OBSERVE_DEEP = Prompt(
 
 # ── Registry: id -> Prompt ───────────────────────────────────────────────────
 PROMPTS: dict[str, Prompt] = {
-    p.id: p for p in (PLAN_SYSTEM, ACT_SYSTEM, OBSERVE_SYSTEM,
-                      PLAN_DEEP, ACT_DEEP, OBSERVE_DEEP)
+    p.id: p
+    for p in (PLAN_SYSTEM, ACT_SYSTEM, OBSERVE_SYSTEM, PLAN_DEEP, ACT_DEEP, OBSERVE_DEEP)
 }
 
 

@@ -16,23 +16,31 @@ agent is small — you write one method.
 `stream_document(...)` is the shared emitter used by both the producer and every agent
 to put a PROV-JSON document onto the bus as START → CHUNK(s) → END.
 """
+
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from .envelope import ProvEventType, ProvRecordEnvelope
 from .net_bus import NetworkBus
 
 # PROV-JSON top-level sections we know how to merge when reassembling a stream.
 _PROV_SECTIONS = (
-    "prefix", "agent", "activity", "entity",
-    "used", "wasGeneratedBy", "wasInformedBy", "wasDerivedFrom",
-    "wasAssociatedWith", "actedOnBehalfOf",
+    "prefix",
+    "agent",
+    "activity",
+    "entity",
+    "used",
+    "wasGeneratedBy",
+    "wasInformedBy",
+    "wasDerivedFrom",
+    "wasAssociatedWith",
+    "actedOnBehalfOf",
 )
 
 
-def _merge_payload(target: Dict[str, Any], payload: Dict[str, Any]) -> None:
+def _merge_payload(target: dict[str, Any], payload: dict[str, Any]) -> None:
     """Merge one chunk's payload into the reassembled document."""
     if not isinstance(payload, dict):
         return
@@ -43,9 +51,9 @@ def _merge_payload(target: Dict[str, Any], payload: Dict[str, Any]) -> None:
             target[section] = value
 
 
-def _chunk_document(doc: Dict[str, Any]) -> list[Dict[str, Any]]:
+def _chunk_document(doc: dict[str, Any]) -> list[dict[str, Any]]:
     """Split a PROV-JSON doc into a few section-wise chunks (to demonstrate streaming)."""
-    chunks: list[Dict[str, Any]] = []
+    chunks: list[dict[str, Any]] = []
     head = {k: doc[k] for k in ("prefix", "agent") if k in doc}
     if head:
         chunks.append(head)
@@ -53,26 +61,38 @@ def _chunk_document(doc: Dict[str, Any]) -> list[Dict[str, Any]]:
         chunks.append({"activity": doc["activity"]})
     if "entity" in doc:
         chunks.append({"entity": doc["entity"]})
-    rels = {k: doc[k] for k in doc
-            if k in _PROV_SECTIONS and k not in ("prefix", "agent", "activity", "entity")}
+    rels = {
+        k: doc[k]
+        for k in doc
+        if k in _PROV_SECTIONS and k not in ("prefix", "agent", "activity", "entity")
+    }
     if rels:
         chunks.append(rels)
     return chunks or [doc]
 
 
 async def stream_document(
-    bus: NetworkBus, subject: str, *, session_id: str, producer_id: str,
-    doc: Dict[str, Any], delay_ms: float = 0.0,
+    bus: NetworkBus,
+    subject: str,
+    *,
+    session_id: str,
+    producer_id: str,
+    doc: dict[str, Any],
+    delay_ms: float = 0.0,
 ) -> int:
     """Emit `doc` onto `subject` as STREAM_START → RECORD_CHUNK(s) → STREAM_END."""
     seq = 0
 
-    async def send(event_type: str, payload: Dict[str, Any]) -> None:
+    async def send(event_type: str, payload: dict[str, Any]) -> None:
         nonlocal seq
         seq += 1
-        env = ProvRecordEnvelope(session_id=session_id, sequence_no=seq,
-                                 producer_id=producer_id, event_type=event_type,
-                                 payload=payload)
+        env = ProvRecordEnvelope(
+            session_id=session_id,
+            sequence_no=seq,
+            producer_id=producer_id,
+            event_type=event_type,
+            payload=payload,
+        )
         await bus.publish(subject, env)
         if delay_ms:
             await asyncio.sleep(delay_ms / 1000.0)
@@ -96,11 +116,12 @@ class StreamingAgent:
         self.role = role
         self.bus = bus
         # merged docs, keyed by session_id, still streaming
-        self._buffers: Dict[str, Dict[str, Any]] = {}
+        self._buffers: dict[str, dict[str, Any]] = {}
 
     # ── the one method each concrete agent implements ──────────────────────────
-    def process(self, session_id: str, doc: Dict[str, Any],
-                source_subject: str) -> Tuple[Dict[str, Any], str]:
+    def process(
+        self, session_id: str, doc: dict[str, Any], source_subject: str
+    ) -> tuple[dict[str, Any], str]:
         """Do the agent's work on a completed document.
 
         Returns (prov_json, log_line):
@@ -113,10 +134,13 @@ class StreamingAgent:
     async def start(self) -> None:
         await self.bus.subscribe(self.input_subject, self._on_envelope)
         # announce readiness so the producer waits for us before streaming
-        ready = ProvRecordEnvelope(session_id="_system", sequence_no=0,
-                                   producer_id=self.role,
-                                   event_type=ProvEventType.HEARTBEAT.value,
-                                   payload={"role": self.role})
+        ready = ProvRecordEnvelope(
+            session_id="_system",
+            sequence_no=0,
+            producer_id=self.role,
+            event_type=ProvEventType.HEARTBEAT.value,
+            payload={"role": self.role},
+        )
         await self.bus.publish(f"system.ready.{self.role}", ready)
         print(f"[{self.role}] ready — listening on '{self.input_subject}'", flush=True)
 
@@ -136,15 +160,19 @@ class StreamingAgent:
             await self._finalize(sid, doc, src)
             self._buffers.pop(sid, None)
 
-    async def _finalize(self, session_id: str, doc: Dict[str, Any], source_subject: str) -> None:
+    async def _finalize(
+        self, session_id: str, doc: dict[str, Any], source_subject: str
+    ) -> None:
         loop = asyncio.get_event_loop()
         # run the (sync) domain logic off the event loop so a slow LLM call
         # doesn't block the subscription.
         prov_json, log_line = await loop.run_in_executor(
-            None, self.process, session_id, doc, source_subject)
+            None, self.process, session_id, doc, source_subject
+        )
         print(f"[{self.role}] {log_line}", flush=True)
         # re-emit this agent's own PROV as a stream on its output subject
         out_session = f"{session_id}::{self.role}"
         out_subject = f"{self.output_prefix}.{self.role}.{session_id}"
-        await stream_document(self.bus, out_subject, session_id=out_session,
-                              producer_id=self.role, doc=prov_json)
+        await stream_document(
+            self.bus, out_subject, session_id=out_session, producer_id=self.role, doc=prov_json
+        )

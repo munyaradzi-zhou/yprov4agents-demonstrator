@@ -13,10 +13,10 @@ No external PROV library is required — the document is built directly. Granula
 that round-trips through ``to_state``/``from_state`` so the tracker can be carried
 inside an agent's serialisable state (e.g. a LangGraph ``State`` dict).
 """
+
 from __future__ import annotations
 
 import datetime
-from typing import Optional
 
 YP_NAMESPACE = "http://hpci-lab.org/yProv4Agents#"
 
@@ -41,33 +41,42 @@ class ProvTracker:
 
     YP = YP_NAMESPACE
 
-    def __init__(self, sid: str, granularity: str = "DATA",
-                 persistence: str = "PERSISTENT",
-                 agent_label: str = "NL_Summarizer",
-                 principal: Optional[dict] = None):
+    def __init__(
+        self,
+        sid: str,
+        granularity: str = "DATA",
+        persistence: str = "PERSISTENT",
+        agent_label: str = "NL_Summarizer",
+        principal: dict | None = None,
+    ):
         assert granularity in ("DATA", "METADATA"), f"bad granularity={granularity!r}"
-        self.sid          = sid
-        self.granularity  = granularity
-        self.persistence  = persistence
-        self.agent_label  = agent_label
+        self.sid = sid
+        self.granularity = granularity
+        self.persistence = persistence
+        self.agent_label = agent_label
         # Optional delegation: the principal the operational agent acted for.
         # None (default) => no principal agent node and no prov:actedOnBehalfOf
         # edge, so to_prov_json is byte-identical to the output without a principal.
-        self.principal    = principal
-        self.acts: list   = []
-        self.ents: dict   = {}   # eid -> {t: kind, v: value, [pid, hash]}
+        self.principal = principal
+        self.acts: list = []
+        self.ents: dict = {}  # eid -> {t: kind, v: value, [pid, hash]}
         self._ent_order: list = []
         # ── Optional, additive features (memory model + lightweight PID) ──────
         # These stay EMPTY on a default lifecycle run, so to_prov_json emits the
         # exact same document (the default 6/6/27 graph is byte-identical).
-        self.mem_chain: list = []   # ordered MemoryStateEntity ids (revision chain)
-        self._mem_ids:  set  = set()  # O(1) dedup mirror of mem_chain (not serialised)
-        self.used_mem:  list = []   # (activity_id, memory_eid) extra used-edges
+        self.mem_chain: list = []  # ordered MemoryStateEntity ids (revision chain)
+        self._mem_ids: set = set()  # O(1) dedup mirror of mem_chain (not serialised)
+        self.used_mem: list = []  # (activity_id, memory_eid) extra used-edges
 
     # ── called once per lifecycle node to register the entity it produced ─────
-    def register_entity(self, kind: str, value: str, suffix: str = "",
-                        pid: Optional[str] = None,
-                        content_hash: Optional[str] = None) -> str:
+    def register_entity(
+        self,
+        kind: str,
+        value: str,
+        suffix: str = "",
+        pid: str | None = None,
+        content_hash: str | None = None,
+    ) -> str:
         # pid / content_hash are OPTIONAL (lightweight-prov, pointers-not-payloads):
         # when the heavy payload lives in a data store, the entity carries only
         # yp:pid (pointer) + yp:contentHash (sha-256), not the payload. Omitting
@@ -81,15 +90,21 @@ class ProvTracker:
         if eid not in self.ents:
             self._ent_order.append(eid)
         rec = {"t": kind, "v": value}
-        if pid is not None:          rec["pid"] = pid
-        if content_hash is not None: rec["hash"] = content_hash
+        if pid is not None:
+            rec["pid"] = pid
+        if content_hash is not None:
+            rec["hash"] = content_hash
         self.ents[eid] = rec
         return eid
 
     # ── optional: register a MemoryStateEntity for a loop turn ─────────────────
-    def register_memory(self, value: str, turn: Optional[int] = None,
-                        pid: Optional[str] = None,
-                        content_hash: Optional[str] = None) -> str:
+    def register_memory(
+        self,
+        value: str,
+        turn: int | None = None,
+        pid: str | None = None,
+        content_hash: str | None = None,
+    ) -> str:
         """Mint a yp:MemoryStateEntity (memory model). Each call
         appends to a revision chain: memory turn k prov:wasDerivedFrom turn k-1,
         typed prov:Revision at serialisation time (PROV-JSON has no standalone
@@ -105,36 +120,55 @@ class ProvTracker:
         if self.granularity == "METADATA":
             return eid
         rec = {"t": "MemoryStateEntity", "v": value}
-        if pid is not None:          rec["pid"] = pid
-        if content_hash is not None: rec["hash"] = content_hash
+        if pid is not None:
+            rec["pid"] = pid
+        if content_hash is not None:
+            rec["hash"] = content_hash
         self.ents[eid] = rec
-        if eid not in self._mem_ids:            # O(1) set membership (was O(N) on the list)
+        if eid not in self._mem_ids:  # O(1) set membership (was O(N) on the list)
             self.mem_chain.append(eid)
             self._mem_ids.add(eid)
         return eid
 
     # ── called once per lifecycle node to record the activity ─────────────────
-    def record_activity(self, kind: str, label: str, t0: str, t1: str,
-                        in_eid: Optional[str] = None,
-                        out_eid: Optional[str] = None,
-                        justification: Optional[str] = None,
-                        energy_attrs: Optional[dict] = None,
-                        confidence_score: Optional[float] = None,
-                        extra_attrs: Optional[dict] = None,
-                        used_mem: Optional[str] = None,
-                        verbose: bool = True):
+    def record_activity(
+        self,
+        kind: str,
+        label: str,
+        t0: str,
+        t1: str,
+        in_eid: str | None = None,
+        out_eid: str | None = None,
+        justification: str | None = None,
+        energy_attrs: dict | None = None,
+        confidence_score: float | None = None,
+        extra_attrs: dict | None = None,
+        used_mem: str | None = None,
+        verbose: bool = True,
+    ) -> None:
         # extra_attrs carries any additional yp: attributes to stamp onto the
         # activity — e.g. prompt provenance (yp:prompt_id / _version / _sha) so the
         # PROV record documents which prompt contract drove each LLM step.
         # used_mem (optional, memory model): the MemoryStateEntity this activity
         # reasoned over this turn — emitted as an extra prov:used edge. Omitting it
         # (the default) adds nothing to the graph.
-        n = len(self.acts)                      # unique counter keeps retry IDs distinct
+        n = len(self.acts)  # unique counter keeps retry IDs distinct
         aid = f"{kind}_{self.sid}_{n:02d}"
-        self.acts.append(dict(id=aid, kind=kind, label=label,
-                              t0=t0, t1=t1, in_eid=in_eid, out_eid=out_eid,
-                              j=justification, c=confidence_score, e=energy_attrs or {},
-                              x=extra_attrs or {}))
+        self.acts.append(
+            dict(
+                id=aid,
+                kind=kind,
+                label=label,
+                t0=t0,
+                t1=t1,
+                in_eid=in_eid,
+                out_eid=out_eid,
+                j=justification,
+                c=confidence_score,
+                e=energy_attrs or {},
+                x=extra_attrs or {},
+            )
+        )
         if used_mem:
             self.used_mem.append((f"yp:{aid}", used_mem))
         if not verbose:
@@ -144,7 +178,7 @@ class ProvTracker:
         if confidence_score is not None:
             mark += f"  [conf={confidence_score:.2f}]"
         if energy_attrs and "yp:energy_kwh" in energy_attrs:
-            mark += f"  [{energy_attrs['yp:energy_kwh']*1e6:.2f} mWh, src={energy_attrs.get('yp:energy_source', '?')}]"
+            mark += f"  [{energy_attrs['yp:energy_kwh'] * 1e6:.2f} mWh, src={energy_attrs.get('yp:energy_source', '?')}]"
         print(f"  [PROV] {kind:<28} ({ms} ms){mark}")
 
     @staticmethod
@@ -157,24 +191,34 @@ class ProvTracker:
 
     # ── serialise/restore (the tracker can ride inside an agent State dict) ────
     def to_state(self) -> dict:
-        return {"acts": self.acts, "ents": self.ents, "eo": self._ent_order,
-                "granularity": self.granularity, "persistence": self.persistence,
-                "agent_label": self.agent_label, "principal": self.principal,
-                # optional memory features (absent/empty on default runs)
-                "mem_chain": self.mem_chain, "used_mem": self.used_mem}
+        return {
+            "acts": self.acts,
+            "ents": self.ents,
+            "eo": self._ent_order,
+            "granularity": self.granularity,
+            "persistence": self.persistence,
+            "agent_label": self.agent_label,
+            "principal": self.principal,
+            # optional memory features (absent/empty on default runs)
+            "mem_chain": self.mem_chain,
+            "used_mem": self.used_mem,
+        }
 
     @classmethod
-    def from_state(cls, sid: str, d: dict) -> "ProvTracker":
-        t = cls(sid, granularity=d.get("granularity", "DATA"),
-                persistence=d.get("persistence", "PERSISTENT"),
-                agent_label=d.get("agent_label", "NL_Summarizer"),
-                principal=d.get("principal"))            # backward-compatible (None if absent)
+    def from_state(cls, sid: str, d: dict) -> ProvTracker:
+        t = cls(
+            sid,
+            granularity=d.get("granularity", "DATA"),
+            persistence=d.get("persistence", "PERSISTENT"),
+            agent_label=d.get("agent_label", "NL_Summarizer"),
+            principal=d.get("principal"),
+        )  # backward-compatible (None if absent)
         t.acts = list(d["acts"])
         t.ents = dict(d["ents"])
         t._ent_order = list(d["eo"])
-        t.mem_chain = list(d.get("mem_chain", []))            # backward-compatible
-        t._mem_ids  = set(t.mem_chain)                        # rebuild O(1) dedup mirror
-        t.used_mem  = [tuple(x) for x in d.get("used_mem", [])]
+        t.mem_chain = list(d.get("mem_chain", []))  # backward-compatible
+        t._mem_ids = set(t.mem_chain)  # rebuild O(1) dedup mirror
+        t.used_mem = [tuple(x) for x in d.get("used_mem", [])]
         return t
 
     # ── builds W3C PROV-JSON document ─────────────────────────────────────────
@@ -188,12 +232,23 @@ class ProvTracker:
         wasDerivedFrom are omitted; wasAssociatedWith and wasInformedBy are
         retained (activity-level). Self-documenting via the meta block.
         """
-        def qn(s): return {"$": s, "type": "prov:QUALIFIED_NAME"}
+
+        def qn(name: str) -> dict:
+            """Wrap a qualified name in the PROV-JSON typed-literal form."""
+            return {"$": name, "type": "prov:QUALIFIED_NAME"}
+
         doc: dict = {
-            "prefix":   {"yp": self.YP, "prov": "http://www.w3.org/ns/prov#",
-                         "xsd": "http://www.w3.org/2001/XMLSchema#"},
-            "agent":    {f"yp:agent_{self.sid}": {"prov:type": qn("yp:OperationalAgent"),
-                                                  "prov:label": self.agent_label}},
+            "prefix": {
+                "yp": self.YP,
+                "prov": "http://www.w3.org/ns/prov#",
+                "xsd": "http://www.w3.org/2001/XMLSchema#",
+            },
+            "agent": {
+                f"yp:agent_{self.sid}": {
+                    "prov:type": qn("yp:OperationalAgent"),
+                    "prov:label": self.agent_label,
+                }
+            },
             "activity": {},
             # entity/relation sections are added below (keeps key order stable)
             "_yprov4agents_meta": {
@@ -207,13 +262,17 @@ class ProvTracker:
             ent_section = {}
             for eid, e in self.ents.items():
                 node = {"prov:type": qn(f"yp:{e['t']}"), "yp:value": e["v"]}
-                if "pid" in e:  node["yp:pid"]         = e["pid"]   # lightweight-prov pointer
-                if "hash" in e: node["yp:contentHash"] = e["hash"]  # integrity (sha-256)
+                if "pid" in e:
+                    node["yp:pid"] = e["pid"]  # lightweight-prov pointer
+                if "hash" in e:
+                    node["yp:contentHash"] = e["hash"]  # integrity (sha-256)
                 ent_section[eid] = node
             doc["entity"] = ent_section
             doc["wasDerivedFrom"] = {
-                f"_:d{i}": {"prov:generatedEntity": self._ent_order[i],
-                            "prov:usedEntity":       self._ent_order[i - 1]}
+                f"_:d{i}": {
+                    "prov:generatedEntity": self._ent_order[i],
+                    "prov:usedEntity": self._ent_order[i - 1],
+                }
                 for i in range(1, len(self._ent_order))
             }
             # Memory revision chain (optional): m_k wasDerivedFrom m_{k-1}, typed
@@ -223,7 +282,7 @@ class ProvTracker:
             for i in range(1, len(self.mem_chain)):
                 doc["wasDerivedFrom"][f"_:rev{i}"] = {
                     "prov:generatedEntity": self.mem_chain[i],
-                    "prov:usedEntity":      self.mem_chain[i - 1],
+                    "prov:usedEntity": self.mem_chain[i - 1],
                     "prov:type": qn("prov:Revision"),
                 }
 
@@ -231,10 +290,16 @@ class ProvTracker:
         wasc, used, wgb, wib = {}, {}, {}, {}
         for i, a in enumerate(self.acts):
             aid = f"yp:{a['id']}"
-            act = {"prov:type": qn(f"yp:{a['kind']}"), "prov:label": a["label"],
-                   "prov:startTime": a["t0"], "prov:endTime": a["t1"]}
-            if a["j"]:          act["yp:justification"] = a["j"]
-            if a.get("c") is not None: act["yp:confidence_score"] = a["c"]
+            act = {
+                "prov:type": qn(f"yp:{a['kind']}"),
+                "prov:label": a["label"],
+                "prov:startTime": a["t0"],
+                "prov:endTime": a["t1"],
+            }
+            if a["j"]:
+                act["yp:justification"] = a["j"]
+            if a.get("c") is not None:
+                act["yp:confidence_score"] = a["c"]
             for k, v in (a.get("e") or {}).items():
                 act[k] = v
             for k, v in (a.get("x") or {}).items():
@@ -242,10 +307,15 @@ class ProvTracker:
             doc["activity"][aid] = act
             wasc[f"_:a{i}"] = {"prov:activity": aid, "prov:agent": f"yp:agent_{self.sid}"}
             if self.granularity == "DATA":
-                if a["in_eid"]:  used[f"_:u{i}"] = {"prov:activity": aid, "prov:entity": a["in_eid"]}
-                if a["out_eid"]: wgb[f"_:g{i}"]  = {"prov:entity": a["out_eid"], "prov:activity": aid}
-            if i > 0:            wib[f"_:i{i}"]  = {"prov:informed":  aid,
-                                                     "prov:informant": f"yp:{self.acts[i-1]['id']}"}
+                if a["in_eid"]:
+                    used[f"_:u{i}"] = {"prov:activity": aid, "prov:entity": a["in_eid"]}
+                if a["out_eid"]:
+                    wgb[f"_:g{i}"] = {"prov:entity": a["out_eid"], "prov:activity": aid}
+            if i > 0:
+                wib[f"_:i{i}"] = {
+                    "prov:informed": aid,
+                    "prov:informant": f"yp:{self.acts[i - 1]['id']}",
+                }
 
         # Memory used-edges (optional): each LLM step used the MemoryStateEntity of
         # its turn. Empty used_mem => nothing added (default output unchanged).
@@ -254,9 +324,9 @@ class ProvTracker:
                 used[f"_:um{j}"] = {"prov:activity": aid, "prov:entity": meid}
 
         doc["wasAssociatedWith"] = wasc
-        doc["wasInformedBy"]     = wib
+        doc["wasInformedBy"] = wib
         if self.granularity == "DATA":
-            doc["used"]           = used
+            doc["used"] = used
             doc["wasGeneratedBy"] = wgb
 
         # ── Optional delegation: who the operational agent acted for ─────────
@@ -267,11 +337,13 @@ class ProvTracker:
         if self.principal:
             principal_id = f"yp:principal_{self.sid}"
             doc["agent"][principal_id] = {
-                "prov:type":  qn(self.principal.get("type", "prov:Agent")),
+                "prov:type": qn(self.principal.get("type", "prov:Agent")),
                 "prov:label": self.principal["label"],
             }
             doc["actedOnBehalfOf"] = {
-                "_:aob0": {"prov:delegate":    f"yp:agent_{self.sid}",
-                           "prov:responsible": principal_id},
+                "_:aob0": {
+                    "prov:delegate": f"yp:agent_{self.sid}",
+                    "prov:responsible": principal_id,
+                },
             }
         return doc

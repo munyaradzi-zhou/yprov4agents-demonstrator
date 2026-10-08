@@ -17,10 +17,12 @@ Topics use NATS subject syntax directly:
     system.ready.<role>             a readiness ping (startup handshake)
 NATS wildcards: `*` = one token, `>` = the rest. e.g. `producer.>`, `agent.lifecycle.>`.
 """
+
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Awaitable, Callable
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from .envelope import ProvRecordEnvelope
 
@@ -43,7 +45,7 @@ class NetworkBus:
 
     async def connect(self, *, retries: int = 30, delay: float = 1.0) -> None:
         """Connect to the broker, retrying while it comes up (compose starts them together)."""
-        import nats                       # lazy: only the broker-backed path needs it
+        import nats  # lazy: only the broker-backed path needs it
 
         last: Exception | None = None
         for attempt in range(1, retries + 1):
@@ -51,7 +53,7 @@ class NetworkBus:
                 self._nc = await nats.connect(self.url, name=self.name)
                 print(f"[bus] connected to NATS at {self.url}", flush=True)
                 return
-            except Exception as exc:                                   # noqa: BLE001
+            except Exception as exc:
                 last = exc
                 print(f"[bus] NATS not ready ({attempt}/{retries}): {exc}", flush=True)
                 await asyncio.sleep(delay)
@@ -66,10 +68,10 @@ class NetworkBus:
         """Subscribe `handler(subject, envelope)` to a NATS subject pattern."""
         assert self._nc is not None, "connect() first"
 
-        async def _cb(msg) -> None:
+        async def _cb(msg: Any) -> None:
             try:
                 env = ProvRecordEnvelope.from_bytes(msg.data)
-            except Exception as exc:                                   # noqa: BLE001
+            except Exception as exc:
                 print(f"[bus] dropped un-decodable message on {msg.subject}: {exc}", flush=True)
                 return
             await handler(msg.subject, env)

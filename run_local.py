@@ -14,11 +14,11 @@ topology — six containers around a NATS broker.
     python run_local.py --out-dir out        # where artifacts land (default: ./out)
     python run_local.py --agents cax,mc1     # a subset
 """
+
 from __future__ import annotations
 
 import argparse
 import asyncio
-import fnmatch
 import os
 import sys
 from pathlib import Path
@@ -77,10 +77,14 @@ async def main() -> None:
     ap = argparse.ArgumentParser(description="Run the demonstrator in one process.")
     ap.add_argument("--out-dir", default="out", help="where artifacts land (default: ./out)")
     ap.add_argument("--data-dir", default="data/yprov4ml", help="yProv4ML records to replay")
-    ap.add_argument("--agents", default="ca1,cax,ca2,ca3,mc1,mc3",
-                    help="comma-separated roles to start")
-    ap.add_argument("--persist-timeout", default="30",
-                    help="CA1 seconds to wait for consumer acks (default: 30)")
+    ap.add_argument(
+        "--agents", default="ca1,cax,ca2,ca3,mc1,mc3", help="comma-separated roles to start"
+    )
+    ap.add_argument(
+        "--persist-timeout",
+        default="30",
+        help="CA1 seconds to wait for consumer acks (default: 30)",
+    )
     args = ap.parse_args()
 
     # these are read at import time by the agent modules, so set them first
@@ -117,6 +121,7 @@ async def main() -> None:
 
     # replay the records exactly as the containerised producer does
     import json
+
     from runtime.base_agent import stream_document
 
     data_dir = Path(os.environ["DATA_DIR"])
@@ -128,8 +133,13 @@ async def main() -> None:
     for path in docs:
         session = path.parent.name if path.parent != data_dir else path.stem
         doc = json.loads(path.read_text(encoding="utf-8"))
-        await stream_document(bus, f"producer.yprov4ml.{session}",
-                              session_id=session, producer_id="yprov4ml-replay", doc=doc)
+        await stream_document(
+            bus,
+            f"producer.yprov4ml.{session}",
+            session_id=session,
+            producer_id="yprov4ml-replay",
+            doc=doc,
+        )
         print(f"[local] streamed {path.name} as '{session}'")
 
     # let CA1's timeout guard fire for any session still awaiting acknowledgements
