@@ -13,6 +13,7 @@ topology — six containers around a NATS broker.
     python run_local.py                      # all six agents + producer
     python run_local.py --out-dir out        # where artifacts land (default: ./out)
     python run_local.py --agents cax,mc1     # a subset
+    python run_local.py --baseline           # also emit the Strategy A reconstruction
 """
 
 from __future__ import annotations
@@ -92,6 +93,12 @@ async def main() -> None:
         default="30",
         help="CA1 seconds to wait for consumer acks (default: 30)",
     )
+    ap.add_argument(
+        "--baseline",
+        action="store_true",
+        help="also reconstruct the run with the Strategy A callback baseline, writing its "
+        "PROV to <out-dir>/baseline (E3; docs/E6_OVERHEAD.md condition A)",
+    )
     args = ap.parse_args()
 
     # these are read at import time by the agent modules, so set them first
@@ -111,6 +118,20 @@ async def main() -> None:
                 os.environ.setdefault(k.strip(), v.strip())
 
     from runtime.agent_runner import REGISTRY
+
+    # Strategy A, when asked for. The baseline attaches to the process-wide observation
+    # hook, so the six agents run completely unmodified and both conditions describe the
+    # same work on the same input — which is what makes E3 a comparison rather than two
+    # separate experiments. It sees only what a framework callback handler is handed; see
+    # yprov4agenticai/observer.py for the restriction and why it is enforced by the type.
+    logger = None
+    if args.baseline:
+        from eval.baseline import DEFAULT_TYPE_MAP, CallbackLogger
+        from yprov4agenticai.observer import set_default_observer
+
+        logger = CallbackLogger(type_map=DEFAULT_TYPE_MAP)
+        set_default_observer(logger.record)
+        print("[local] Strategy A baseline attached (callback-level reconstruction)")
 
     roles = [r.strip() for r in args.agents.split(",") if r.strip()]
     bus = LocalBus()
@@ -153,6 +174,15 @@ async def main() -> None:
     wait = float(args.persist_timeout) + 2
     print(f"\n[local] settling for {wait:.0f}s (CA1 persist window)...")
     await asyncio.sleep(wait)
+
+    if logger is not None:
+        baseline_dir = Path(os.environ["OUT_DIR"]) / "baseline"
+        written = logger.write(baseline_dir)
+        print(f"\n[local] Strategy A reconstructed {written} document(s) -> {baseline_dir}")
+        print(
+            f"[local] compare with: python -m eval.baseline "
+            f"--prov-dir {args.out_dir} --baseline-dir {baseline_dir}"
+        )
     print(f"\n[local] done — artifacts in {os.environ['OUT_DIR']}")
 
 
