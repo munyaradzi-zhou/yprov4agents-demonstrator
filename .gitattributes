@@ -1,0 +1,18 @@
+# Normalise line endings in the repository to LF.
+#
+# This matters more here than in most projects: the demonstrator computes SHA-256 content
+# hashes over payloads it reads from disk (see yprov4agenticai/store.py) and asserts those
+# hashes inside emitted provenance. If a checkout on Windows rewrote LF to CRLF, the same
+# logical payload would hash differently on different platforms and the integrity claims in
+# the provenance record would not reproduce.
+
+* text=auto eol=lf
+
+# Binary assets — never touch these.
+*.png   binary
+*.pdf   binary
+*.pptx  binary
+*.docx  binary
+
+# Generated lockfile: keep verbatim, and keep it out of diff review noise.
+uv.lock linguist-generated=true

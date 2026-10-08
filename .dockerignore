@@ -1,0 +1,25 @@
+# Keep the Docker build context small: the image only needs yprov4agenticai/ + runtime/
+# (+ deploy/requirements-runtime.txt). Everything else is excluded from the build.
+venv/
+.git/
+_local/
+outputs/
+Results/
+artefacts/
+examples/
+experiments/
+eScience2026/
+docs/
+figures/
+improvements/
+tests/
+dist/
+*.egg-info/
+**/__pycache__/
+*.pyc
+*.pdf
+*.pptx
+*.docx
+*.csv
+*.ttl
+.pytest_cache/

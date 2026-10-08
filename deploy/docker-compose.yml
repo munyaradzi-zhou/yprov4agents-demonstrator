@@ -1,0 +1,87 @@
+# The whole demonstrator, on a laptop, in one file.
+#
+#   cp .env.example .env         # optional: add OPENAI_API_KEY for CAx/CA3 LLM mode
+#   docker compose -f deploy/docker-compose.yml up --build
+#
+# Flow:
+#   producer --(producer.yprov4ml.*)--> [cax, ca2, ca3] --(agent.lifecycle.*)--> [mc1, mc3]
+#                                   \__ ca1 holds the record, persists AFTER consumers ack
+#
+# Broker: NATS. Outputs (emitted PROV-JSON, charts, store) land in ./out on your host.
+
+x-runtime: &runtime
+  build:
+    context: ..                      # folder root — image needs yprov4agenticai/ + runtime/
+    dockerfile: deploy/Dockerfile
+  image: yprov4agents-demonstrator:latest
+  depends_on: [broker]
+  volumes:
+    - ../out:/out                    # emitted PROV-JSON + charts + store, on your host
+  restart: on-failure
+
+services:
+  # ── the broker: the "post office" every message passes through ──────────────
+  broker:
+    image: nats:2.10-alpine
+    command: ["-m", "8222"]          # HTTP monitoring on :8222
+    ports:
+      - "4222:4222"                  # client port
+      - "8222:8222"                  # monitoring
+
+  # ── operational agents ──────────────────────────────────────────────────────
+  ca1:                               # CA1 — persist, AFTER consumers have used the record
+    <<: *runtime
+    environment:
+      NATS_URL: nats://broker:4222
+      ROLE: ca1
+      PERSIST_AFTER: cax,ca2,ca3     # whose acknowledgement gates persistence
+      PERSIST_TIMEOUT_S: "25"        # safety net if a consumer dies
+
+  cax:                               # CAx — NL provenance summariser (LLM optional)
+    <<: *runtime
+    environment:
+      NATS_URL: nats://broker:4222
+      ROLE: cax
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
+
+  ca2:                               # CA2 — metrics visualiser (deterministic)
+    <<: *runtime
+    environment:
+      NATS_URL: nats://broker:4222
+      ROLE: ca2
+
+  ca3:                               # CA3 — analytics (heuristic core, LLM narration)
+    <<: *runtime
+    environment:
+      NATS_URL: nats://broker:4222
+      ROLE: ca3
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
+
+  # ── meta agents (govern the operational agents' own PROV) ───────────────────
+  mc1:                               # MC1 — compliance (justification/standard checks)
+    <<: *runtime
+    environment:
+      NATS_URL: nats://broker:4222
+      ROLE: mc1
+
+  mc3:                               # MC3 — auditability (who-did-what trail)
+    <<: *runtime
+    environment:
+      NATS_URL: nats://broker:4222
+      ROLE: mc3
+
+  # ── the producer: replays REAL yProv4ML records onto the bus ────────────────
+  producer:
+    <<: *runtime
+    depends_on: [broker, ca1, cax, ca2, ca3, mc1, mc3]
+    environment:
+      NATS_URL: nats://broker:4222
+      ROLE: producer
+      DATA_DIR: /data
+      EXPECTED_AGENTS: ca1,cax,ca2,ca3,mc1,mc3
+      STREAM_DELAY_MS: "150"
+    volumes:
+      - ../out:/out
+      - ../data/yprov4ml:/data:ro    # the real example_0 / example_2 records

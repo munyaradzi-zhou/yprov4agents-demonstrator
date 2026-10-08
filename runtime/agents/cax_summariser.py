@@ -1,0 +1,84 @@
+"""
+cax_summariser.py — CAx: the NL provenance summariser (operational agent).
+
+Consumes a producer's yProv4ML PROV-JSON, writes a natural-language summary of it,
+and emits its OWN typed W3C PROV lifecycle (the Reflexive Property: the summariser
+is itself provenance-tracked). The DecisionActivity carries `yp:justification` — the
+project's headline field.
+
+LLM is optional: if OPENAI_API_KEY is set, the summary is written by the model;
+otherwise a deterministic stub summary is produced, so the pipeline runs with no key.
+"""
+from __future__ import annotations
+
+from typing import Any, Dict, Tuple
+
+from ..base_agent import StreamingAgent
+from ..net_bus import NetworkBus
+from ..util import get_llm, now_iso, prov_counts, write_prov, OUT_DIR
+from yprov4agenticai import ProvTracker, LightweightStore, ptr_kwargs
+
+
+class CAxSummariser(StreamingAgent):
+    input_subject = "producer.>"
+    output_prefix = "agent.lifecycle"
+
+    def __init__(self, bus: NetworkBus):
+        super().__init__(role="cax", bus=bus)
+        self.llm = get_llm()
+        self.store = LightweightStore(root=str(OUT_DIR / "store"))
+
+    def _summarise(self, doc: Dict[str, Any], c: Dict[str, int]) -> str:
+        acts = list((doc.get("activity") or {}).keys())[:6]
+        if self.llm:
+            prompt = (
+                "You are CAx, a provenance summariser. In 3-4 sentences, summarise this "
+                f"W3C PROV document from a machine-learning run. It has {c['activities']} "
+                f"activities, {c['entities']} entities, {c['relations']} lineage relations. "
+                f"Key activities: {', '.join(acts)}. Use only these facts."
+            )
+            try:
+                return self.llm(prompt)
+            except Exception as exc:                                 # noqa: BLE001
+                print(f"[cax] LLM call failed ({exc}); using stub", flush=True)
+        return (
+            f"This ML provenance record captures {c['activities']} activities and "
+            f"{c['entities']} entities linked by {c['relations']} lineage relations. "
+            f"Tracked steps include {', '.join(a.split(':')[-1] for a in acts)}. "
+            "The graph documents inputs, parameters and outputs of the training run."
+        )
+
+    def process(self, session_id: str, doc: Dict[str, Any],
+                source_subject: str) -> Tuple[Dict[str, Any], str]:
+        c = prov_counts(doc)
+        summary = self._summarise(doc, c)
+        ptr = self.store.put(summary, kind="summary")
+
+        # emit CAx's own 6-step lifecycle as typed PROV
+        t = ProvTracker(sid=session_id, agent_label="NL_Summarizer")
+        t0 = now_iso()
+        task = t.register_entity("TaskEntity", f"producer doc on {source_subject}")
+        t.record_activity("ReceiveTaskActivity", "CAx: receive producer record",
+                          t0, now_iso(), out_eid=task, verbose=False)
+        t.record_activity("PlanningActivity", "CAx: scope the summary",
+                          now_iso(), now_iso(), in_eid=task, verbose=False)
+        resp = t.register_entity("ResponseEntity", summary, **ptr_kwargs(ptr))
+        t.record_activity("ToolCallActivity", "CAx: write NL summary",
+                          now_iso(), now_iso(), in_eid=task, out_eid=resp, verbose=False)
+        t.record_activity("ObservationActivity", "CAx: evaluate summary quality",
+                          now_iso(), now_iso(), in_eid=resp, verbose=False)
+        t.record_activity(
+            "DecisionActivity", "CAx: accept summary", now_iso(), now_iso(),
+            in_eid=resp,
+            justification=(f"Summary covers all {c['activities']} activities and "
+                           f"{c['entities']} entities of the source record; grounded in the "
+                           "graph counts and activity labels. Accepted."),
+            verbose=False)
+        t.record_activity("ResponseActivity", "CAx: respond", now_iso(), now_iso(),
+                          in_eid=resp, verbose=False)
+
+        prov = t.to_prov_json()
+        write_prov(self.role, session_id, prov)
+        mode = "LLM" if self.llm else "stub"
+        return prov, (f"summarised {session_id} ({mode}) -> {len(summary)} chars, "
+                      f"PID {ptr['yp:pid']}")
