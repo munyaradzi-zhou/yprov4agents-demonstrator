@@ -7,7 +7,7 @@ Producers stream real provenance records onto a message bus; operational agents 
 them and do real work; meta agents govern those agents by reading the provenance the
 agents emit about *themselves*. The system tracks its own trackers.
 
-> MC Zhou · HPCI Lab, University of Trento & CMCC · supervisor Prof. Sandro Fiore
+> MC Zhou · HPCI Lab, University of Trento · supervisor Prof. Sandro Fiore
 > Part of the yProv ecosystem (`yProv4ML`, `yProv4WFs`, `yProv4Agents`).
 
 ---

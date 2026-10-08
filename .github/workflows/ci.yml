@@ -45,15 +45,21 @@ jobs:
         run: uv run ruff format --check --diff .
 
   types:
-    name: Type check
+    name: Type check (py${{ matrix.python }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Every interpreter in requires-python. Checking only one would let a construct
+        # that is valid on 3.11 and broken on 3.12 (or the reverse) reach a release.
+        python: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - run: uv sync --frozen --all-extras
-      - run: uv run mypy yprov4agenticai runtime eval tests
+      - run: uv sync --frozen --all-extras --python ${{ matrix.python }}
+      - run: uv run --python ${{ matrix.python }} mypy yprov4agenticai runtime eval tests
 
   test:
     name: Tests (py${{ matrix.python }}, ${{ matrix.os }})

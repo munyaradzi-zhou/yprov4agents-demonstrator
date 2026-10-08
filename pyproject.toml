@@ -109,7 +109,10 @@ known-first-party = ["yprov4agenticai", "runtime", "eval"]
 # Types
 # ──────────────────────────────────────────────────────────────────────────────────
 [tool.mypy]
-python_version = "3.11"
+# python_version is deliberately NOT pinned here. Pinning it to 3.11 while the environment
+# runs 3.12 makes mypy parse third-party stubs built for the newer interpreter under older
+# syntax rules, which fails on constructs like PEP 695 `type` statements in numpy's stubs.
+# mypy follows the interpreter instead, and CI checks every version in requires-python.
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
