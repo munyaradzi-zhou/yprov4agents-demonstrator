@@ -86,11 +86,20 @@ def coverage(doc: dict[str, Any]) -> dict[str, int]:
 
 
 def decisions(doc: dict[str, Any]) -> tuple[int, int]:
-    """(number of DecisionActivity-like activities, number carrying a justification)."""
+    """(number of decision activities, number carrying a justification).
+
+    Counts ``yp:DecisionActivity`` only. The previous definition also admitted
+    ``ComplianceCheckActivity`` and ``AuditActivity``, which widened the denominator to
+    include the meta agents' work steps — and did so precisely because those agents
+    recorded a verdict without a decision activity. Rather than fitting the metric to that
+    omission, the agents now emit the decision step, so the metric can name one thing.
+
+    This is a coverage figure: it says every decision point is instrumented, not that the
+    justifications are informative. See todo.md B1 on why coverage cannot be the headline.
+    """
     total = justified = 0
     for a in (doc.get("activity") or {}).values():
-        kind = _type_of(a)
-        if kind.endswith(("DecisionActivity", "ComplianceCheckActivity", "AuditActivity")):
+        if _type_of(a) == "yp:DecisionActivity":
             total += 1
             if str(a.get("yp:justification", "")).strip():
                 justified += 1
