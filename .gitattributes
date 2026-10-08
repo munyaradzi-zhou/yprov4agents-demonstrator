@@ -8,6 +8,11 @@
 
 * text=auto eol=lf
 
+# Frozen experiment archives are evidence, and their manifests record a SHA-256 of each
+# file's exact bytes. Line-ending normalisation would rewrite those bytes on checkout and
+# every archive would fail verification on a fresh clone. Store them verbatim.
+experiments/** -text
+
 # Binary assets — never touch these.
 *.png   binary
 *.pdf   binary

@@ -1,0 +1,207 @@
+{
+  "schema": "yprov4agents/experiment-manifest/1",
+  "name": "baseline-pre-review",
+  "note": "Oct 6 run, before any review fixes; backs todo.md B3/D1 measurements",
+  "created_at": "2026-10-08T13:44:03.681960+00:00",
+  "source": "out",
+  "git": {
+    "commit": null,
+    "branch": null,
+    "describe": null,
+    "dirty": true
+  },
+  "environment": {
+    "python": "3.11.15",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840
+  },
+  "file_count": 36,
+  "total_bytes": 186853,
+  "files": [
+    {
+      "path": "charts/example_0_metrics.png",
+      "size_bytes": 12683,
+      "content_hash": "sha256:237b33bd848dbddb728e53247365de2cc200ba1b9b67595b3293d31da4b228cf"
+    },
+    {
+      "path": "charts/example_2_metrics.png",
+      "size_bytes": 12784,
+      "content_hash": "sha256:14ba113496b123bca2870149707ec341173282104106cd9fc7892d6b2fb43ebe"
+    },
+    {
+      "path": "example_0__ca1__mc1_prov.json",
+      "size_bytes": 2488,
+      "content_hash": "sha256:d29150a8b0cebd56c9e1f055b958bae6eee6697b4e2b79a9889bec1b458ae676"
+    },
+    {
+      "path": "example_0__ca1__mc3_prov.json",
+      "size_bytes": 3245,
+      "content_hash": "sha256:39cc510aebf937eaa4b10ff99b5bc45cc44b851130afc81a903e8209af2f89f7"
+    },
+    {
+      "path": "example_0__ca1_prov.json",
+      "size_bytes": 6824,
+      "content_hash": "sha256:5b1828485e0c7a3471dbcc16f1edfa60f8320c771f327a6c63202d22d1c78702"
+    },
+    {
+      "path": "example_0__ca2__mc1_prov.json",
+      "size_bytes": 2488,
+      "content_hash": "sha256:994f00f79812d3d5903ad9a757becc310c38bea01b34ac371269455172d06dbf"
+    },
+    {
+      "path": "example_0__ca2__mc3_prov.json",
+      "size_bytes": 3231,
+      "content_hash": "sha256:dd9468d801731078461a78f9126b161194031af7d8bda601fac8e803c9484c8a"
+    },
+    {
+      "path": "example_0__ca2_prov.json",
+      "size_bytes": 5137,
+      "content_hash": "sha256:a456abdb072ebae716398cf2d8d76c47afb72e1c2c2d4db169e68924a9ba92a6"
+    },
+    {
+      "path": "example_0__ca3__mc1_prov.json",
+      "size_bytes": 2488,
+      "content_hash": "sha256:605f4935cf9b109701e870abfed592c065966702107c47d7105659d928563fe1"
+    },
+    {
+      "path": "example_0__ca3__mc3_prov.json",
+      "size_bytes": 3262,
+      "content_hash": "sha256:455b34be543bdabd18a1a7f2a003bce0bfb5f470631b3e0e972ecf252fd3db72"
+    },
+    {
+      "path": "example_0__ca3_prov.json",
+      "size_bytes": 7103,
+      "content_hash": "sha256:5d5f80518003c0e3668c52914d85aeeada27c78a8ac1ebd35a7b1b1c0e16555d"
+    },
+    {
+      "path": "example_0__cax__mc1_prov.json",
+      "size_bytes": 2488,
+      "content_hash": "sha256:c724886b5cf88904646e91180f911b120d452873fe2fa1d01e1da737acf9d56f"
+    },
+    {
+      "path": "example_0__cax__mc3_prov.json",
+      "size_bytes": 3252,
+      "content_hash": "sha256:afe43722050df325eef180133b1af9fc600c375a7ee0d9fe061604e2d78efa46"
+    },
+    {
+      "path": "example_0__cax_prov.json",
+      "size_bytes": 6135,
+      "content_hash": "sha256:b29535086950f7101183865b8425de09815b24d5b578196e9571c7305e6be12f"
+    },
+    {
+      "path": "example_2__ca1__mc1_prov.json",
+      "size_bytes": 2488,
+      "content_hash": "sha256:78b33cbe4d03ec677a0b008ca11146fbf65bd5339b9b60679a454c03fef1157e"
+    },
+    {
+      "path": "example_2__ca1__mc3_prov.json",
+      "size_bytes": 3245,
+      "content_hash": "sha256:fb3c5819c80b43ebc61a4fa24679d2af7d966c6427997fd6279552090b50b705"
+    },
+    {
+      "path": "example_2__ca1_prov.json",
+      "size_bytes": 6825,
+      "content_hash": "sha256:a3d3fc1fd1180a8d6370e7ee851c69576818238128be37716f7913fe249f47cf"
+    },
+    {
+      "path": "example_2__ca2__mc1_prov.json",
+      "size_bytes": 2488,
+      "content_hash": "sha256:16e6e2e88b9da7125ec092963c51d7d166c49123422ef2b5d2779637e6420e5c"
+    },
+    {
+      "path": "example_2__ca2__mc3_prov.json",
+      "size_bytes": 3231,
+      "content_hash": "sha256:aa0a11fa8557d04be596ccd79c24c5a496d0beca3e420d80cb0d3c5f1ee2d5e6"
+    },
+    {
+      "path": "example_2__ca2_prov.json",
+      "size_bytes": 5138,
+      "content_hash": "sha256:9913bb52b1ac1e0525fcfd06e822f95cbdf56d414ab36b52cfc8c8e20d21182f"
+    },
+    {
+      "path": "example_2__ca3__mc1_prov.json",
+      "size_bytes": 2488,
+      "content_hash": "sha256:bfacf8b1febce13331be360db0eac6162e53a69f8d808d6e63a3b9ef4996bbc4"
+    },
+    {
+      "path": "example_2__ca3__mc3_prov.json",
+      "size_bytes": 3262,
+      "content_hash": "sha256:30db60cbce11f6a1d5abe625269f186a5a266f07425a1ca21f990014e470c7c0"
+    },
+    {
+      "path": "example_2__ca3_prov.json",
+      "size_bytes": 7096,
+      "content_hash": "sha256:f0e9aeb4b21b77e2153ee13fb9b609609f898180ad7e25630d0f238f70ecd76b"
+    },
+    {
+      "path": "example_2__cax__mc1_prov.json",
+      "size_bytes": 2488,
+      "content_hash": "sha256:cb4d21752fd226d950ffdc14f4487935da0d67fe8f51213985fa51a8eec8dacf"
+    },
+    {
+      "path": "example_2__cax__mc3_prov.json",
+      "size_bytes": 3252,
+      "content_hash": "sha256:38ca4c5762b69ec4c753ba235567b782e66310fcbdc51b1ac31079312305c83a"
+    },
+    {
+      "path": "example_2__cax_prov.json",
+      "size_bytes": 6128,
+      "content_hash": "sha256:9f45fec4fb95092d64d73beae43f7abff0e4efdc7584f451e113543e455c3c88"
+    },
+    {
+      "path": "RESULTS.md",
+      "size_bytes": 2012,
+      "content_hash": "sha256:e629e1ebae9fb77f66752a2b6fc1629c363fe29b22189aa496d1c8b00413df2e"
+    },
+    {
+      "path": "store/25db730b9761.txt",
+      "size_bytes": 281,
+      "content_hash": "sha256:25db730b976122835b29b9142d52e9616b0c9cd4edfbb2d6f04d589239fdc1fd"
+    },
+    {
+      "path": "store/377895f2bbbd.txt",
+      "size_bytes": 39286,
+      "content_hash": "sha256:377895f2bbbd812727556946e2363f05dbdc872944699f1641d080e12c5fee9e"
+    },
+    {
+      "path": "store/65a1c9861559.txt",
+      "size_bytes": 289,
+      "content_hash": "sha256:65a1c986155979d365657cccb313436b98af2f76692f5b0425176eef4a390d82"
+    },
+    {
+      "path": "store/871af366ae77.txt",
+      "size_bytes": 91,
+      "content_hash": "sha256:871af366ae779c081d4cefa3f20c887c94615352d8f8f5844ace48a8fc3214a6"
+    },
+    {
+      "path": "store/_manifest.json",
+      "size_bytes": 978,
+      "content_hash": "sha256:e182372bea915113cfb154f02bb6a6af258d893d85e64279c31b686da796d44c"
+    },
+    {
+      "path": "store/abfe4946dd38.txt",
+      "size_bytes": 21634,
+      "content_hash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80"
+    },
+    {
+      "path": "store/d27fe83862e5.txt",
+      "size_bytes": 91,
+      "content_hash": "sha256:d27fe83862e51131223df4f917291820d02554cd2f420382da2f04002bd9837c"
+    },
+    {
+      "path": "store/f1f2774a7672.txt",
+      "size_bytes": 225,
+      "content_hash": "sha256:f1f2774a7672f15f28149f95cf0ac38691208caa80ba17879e031c0a130bff4e"
+    },
+    {
+      "path": "store/fa3179279e53.txt",
+      "size_bytes": 229,
+      "content_hash": "sha256:fa3179279e5363dd7141a638724672e03ba1f8d25938fac72af8b0faa5e300f6"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Provenance analytics for 'example_2': 11 activities and 78 entities (89.7% typed), 9 derivations, 70 terminal entities. Wall-clock span 112.53s across 11 ordered activities. Energy streams: 33; resource streams: 42. Anomalies: 2.

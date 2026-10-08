@@ -1,0 +1,97 @@
+{
+  "prefix": {
+    "yp": "http://hpci-lab.org/yProv4Agents#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "agent": {
+    "yp:agent_example_0::ca1-mc3": {
+      "prov:type": {
+        "$": "yp:OperationalAgent",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "AuditabilityAgent"
+    }
+  },
+  "activity": {
+    "yp:ReceiveTaskActivity_example_0::ca1-mc3_00": {
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "MC3: receive agent PROV",
+      "prov:startTime": "2026-10-06T04:56:14.061950+00:00",
+      "prov:endTime": "2026-10-06T04:56:14.061955+00:00"
+    },
+    "yp:AuditActivity_example_0::ca1-mc3_01": {
+      "prov:type": {
+        "$": "yp:AuditActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "MC3: audit StorageAgent",
+      "prov:startTime": "2026-10-06T04:56:14.061969+00:00",
+      "prov:endTime": "2026-10-06T04:56:14.061971+00:00",
+      "yp:justification": "Reconstructed the lifecycle of 'StorageAgent': 6 activities (1 justified) in order ReceiveTaskActivity -> PlanningActivity -> PersistActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity.",
+      "yp:audited_agent": "StorageAgent",
+      "yp:step_count": 6
+    }
+  },
+  "_yprov4agents_meta": {
+    "granularity": "DATA",
+    "persistence": "PERSISTENT"
+  },
+  "entity": {
+    "yp:TaskEntity_example_0::ca1-mc3": {
+      "prov:type": {
+        "$": "yp:TaskEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:value": "StorageAgent PROV under audit (example_0::ca1)"
+    },
+    "yp:QualityEntity_example_0::ca1-mc3": {
+      "prov:type": {
+        "$": "yp:QualityEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:value": "agent=StorageAgent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> PersistActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d1": {
+      "prov:generatedEntity": "yp:QualityEntity_example_0::ca1-mc3",
+      "prov:usedEntity": "yp:TaskEntity_example_0::ca1-mc3"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "yp:ReceiveTaskActivity_example_0::ca1-mc3_00",
+      "prov:agent": "yp:agent_example_0::ca1-mc3"
+    },
+    "_:a1": {
+      "prov:activity": "yp:AuditActivity_example_0::ca1-mc3_01",
+      "prov:agent": "yp:agent_example_0::ca1-mc3"
+    }
+  },
+  "wasInformedBy": {
+    "_:i1": {
+      "prov:informed": "yp:AuditActivity_example_0::ca1-mc3_01",
+      "prov:informant": "yp:ReceiveTaskActivity_example_0::ca1-mc3_00"
+    }
+  },
+  "used": {
+    "_:u1": {
+      "prov:activity": "yp:AuditActivity_example_0::ca1-mc3_01",
+      "prov:entity": "yp:TaskEntity_example_0::ca1-mc3"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "yp:TaskEntity_example_0::ca1-mc3",
+      "prov:activity": "yp:ReceiveTaskActivity_example_0::ca1-mc3_00"
+    },
+    "_:g1": {
+      "prov:entity": "yp:QualityEntity_example_0::ca1-mc3",
+      "prov:activity": "yp:AuditActivity_example_0::ca1-mc3_01"
+    }
+  }
+}
