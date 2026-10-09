@@ -171,3 +171,50 @@ def test_a_local_run_clears_only_what_it_writes(tmp_path: Path) -> None:
     assert clear_previous_run(tmp_path) == 5
     assert sorted(p.name for p in tmp_path.iterdir()) == ["bench", "faults"]
     assert (tmp_path / "bench" / "result.json").is_file()
+
+
+def test_finding_a_free_name_costs_one_attempt_however_many_records_exist(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The first never-overwrite version probed __2, __3, ... on every write, so writing
+    grew slower with every record already written — 1.5 ms to 4.5 ms over sixty writes of
+    one session, caught by the overhead study. Counted in attempts, not timed, so the test
+    is exact on a loaded machine."""
+    import runtime.util
+
+    monkeypatch.setattr(runtime.util, "OUT_DIR", tmp_path)
+    attempts = 0
+    real_open = Path.open
+
+    def counting_open(self: Path, *args: Any, **kwargs: Any) -> Any:
+        nonlocal attempts
+        if self.parent == tmp_path:
+            attempts += 1
+        return real_open(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", counting_open)
+    for _ in range(50):
+        runtime.util.write_prov("mc1", "s", {})
+    assert attempts == 50
+    assert len(list(tmp_path.glob("*_prov.json"))) == 50
+
+
+def test_concurrent_writers_are_never_handed_the_same_name(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Agents write from executor threads. A check-then-write could hand two of them one
+    name; exclusive creation cannot."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    import runtime.util
+
+    monkeypatch.setattr(runtime.util, "OUT_DIR", tmp_path)
+
+    def write(n: int) -> Path | None:
+        return runtime.util.write_prov("ca1", "s", {"n": n})
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        paths = list(pool.map(write, range(40)))
+    assert len({p for p in paths if p is not None}) == 40
+    contents = {json.loads(p.read_text(encoding="utf-8"))["n"] for p in paths if p is not None}
+    assert contents == set(range(40))
