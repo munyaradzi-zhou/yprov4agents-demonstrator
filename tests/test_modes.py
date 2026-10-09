@@ -217,8 +217,11 @@ def test_an_energy_figure_states_whether_it_can_be_attributed_to_the_step() -> N
 
     Measured on this demonstrator with codecarbon's 15-second default: a step of 0.000 s
     was handed 46.9 µWh while the rendering step that actually did the work was handed
-    4.6 µWh. The number is real consumption in a real window, so it is recorded rather
-    than dropped — what is not real is the attribution, and the record has to say which.
+    4.6 µWh. The figure is kept rather than dropped and the attribution denied instead.
+
+    Attributability is independent of whether the watts were observed or estimated —
+    `source` carries that, and the two can fail together. See
+    `test_a_modelled_figure_is_never_labelled_measured`.
     """
     from yprov4agenticai import EnergyDelta
 
@@ -234,6 +237,46 @@ def test_an_energy_figure_states_whether_it_can_be_attributed_to_the_step() -> N
     assert attrs["yp:energy_sampling_period_s"] == 15.0
     assert attrs["yp:energy_attributable"] is False
     assert "yp:energy_sampling_period_s" not in unsampled.to_attrs()
+
+
+def test_a_modelled_figure_is_never_labelled_measured() -> None:
+    """`source_label` must require a counter that is *delivering*, not merely selected.
+
+    This has been wrong in both directions. It first probed only the Linux RAPL sysfs
+    path, which reports "modelled" on every non-Linux host even where a real counter is
+    in use. Trusting codecarbon's selected mode instead is the opposite trap: on the
+    development host it selects `windows_emi`, and that interface returns a processor
+    energy delta of 0.0 under a saturating load because it needs OEM firmware the machine
+    does not have. A mode name alone would have labelled a fallback as an instrument
+    reading, which is the error that quietly corrupts a published figure.
+    """
+    from yprov4agenticai.energy import CodeCarbonBackend
+
+    backend = CodeCarbonBackend(country_iso_code="GBR")
+
+    class _Hardware:
+        def __init__(self, mode: str | None) -> None:
+            self._mode = mode
+
+    class _Tracker:
+        def __init__(self, mode: str | None, energy: float) -> None:
+            self._hardware = [_Hardware(mode)]
+            self._total_energy = energy
+
+    cases = [
+        ("cpu_load", 1e-6, "modelled", "a load model is not an observation"),
+        ("constant", 1e-6, "modelled", "a TDP constant is not an observation"),
+        ("windows_emi", 0.0, "modelled", "an interface returning zero is not delivering"),
+        ("intel_rapl", 0.0, "modelled", "RAPL present but unreadable falls back silently"),
+        ("intel_rapl", 1e-6, "measured", "a readable counter with a reading is measured"),
+        ("windows_emi", 1e-6, "measured", "EMI backed by real firmware is measured"),
+    ]
+    for mode, energy, expected, why in cases:
+        backend._tracker = _Tracker(mode, energy)
+        assert backend.source_label == expected, f"{mode}/{energy}: {why}"
+
+    backend._tracker = None
+    assert backend.source_label == "modelled", "no tracker means nothing was measured"
 
 
 def test_the_first_step_is_not_charged_for_the_agent_idling(
