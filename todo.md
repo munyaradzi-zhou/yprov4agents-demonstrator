@@ -1,6 +1,6 @@
 # Review findings & fix plan — yProv4Agents demonstrator
 
-> **Phase 4 complete (2026-10-08).** The items below are the original review. Statuses:
+> **Phase 5 complete (2026-10-09).** The items below are the original review. Statuses:
 >
 > | | finding | status |
 > |---|---|---|
@@ -22,6 +22,8 @@
 > | H4 | persist-after-consume was a race | **fixed** — guard cancelled at quorum |
 > | A1 | the documented API did not exist | **fixed (Phase 2)** — `step`/`activity`/`decide`/`emit`; all six agents ported, zero structural change |
 > | J1 | every activity recorded a zero duration (96/96) | **fixed (Phase 2)** — found while porting; the wall clock's 15.6 ms granularity exceeded the steps it was timing. Now 0/96 |
+> | J2 | `to_prov_json()` read distribution metadata from disk on every call | **fixed (Phase 5)** — found by the microbenchmark; 6.78 ms → 23 µs, **306×** |
+> | J3 | declared derivations were de-duplicated by scanning a list | **fixed (Phase 5)** — found by the scaling sweep; a 10,000-activity record 1.72 s → 88 ms, **19.6×**, and the complexity class was wrong (1.468 → 1.045) |
 > | A4 | nothing consumes `governance.*` | **open** — Phase 6 decides: implement or narrow the claim |
 > | B1 | E2 coverage metric is tautological | **open** — Phase 6 |
 > | B2 | Strategy A column is unmeasured | **fixed (Phase 3)** — one shared callback baseline; A recovers 96/96 activities, 324/324 relations, 24/24 verdicts and 0/24 justifications |
@@ -548,6 +550,56 @@ with the end instant derived as start + duration. See `yprov4agenticai.api.Span`
 
 Enforced by `test_every_activity_has_a_measurable_extent`, which runs against freshly
 emitted provenance in CI.
+
+---
+
+<a id="j2"></a>
+### J2. `to_prov_json()` paid a filesystem lookup on every call ✅ *fixed in Phase 5*
+
+Found by E6a, the first thing the microbenchmark measured. `to_prov_json()` came out at
+**6.19 ms** on a six-activity document, against a prediction of 10–100 µs. The cause was
+`_library_version()`, called from the bundle descriptor on every serialisation, reading
+installed distribution metadata off the disk:
+
+| | median |
+|---|--:|
+| `_library_version()` | 6.78 ms |
+| `to_prov_json()` | 7.14 ms |
+
+So **95% of the cost of serialising a provenance document was a metadata lookup**, paid
+once per emitted record, per agent, per message. A `functools.cache` fixes it: 23 µs, a
+306× improvement. The installed version of a package cannot change under a running
+interpreter, so there was never a reason to read it twice.
+
+Worth noting how it hid: the value is correct, the output is byte-identical, and every test
+passes. Only a measurement finds a defect whose only symptom is time.
+
+<a id="j3"></a>
+### J3. Recording a derivation was quadratic in the size of the record ✅ *fixed in Phase 5*
+
+Found by the §7 scaling sweep, which exists for exactly this. The fitted exponent for
+building a record was **1.468** — superlinear — and a 10,000-activity record took 1.72 s.
+
+The cause was one line in `register_entity`:
+
+```python
+if source and (source, eid) not in self.derivations:   # O(n) scan, O(n²) over a run
+```
+
+With an O(1) membership set alongside the list: **88 ms, exponent 1.045**. The same pattern
+was already in use three fields away in the same class, for memory ids, and simply had not
+been applied here.
+
+| | before | after |
+|---|--:|--:|
+| 10,000-activity record | 1.72 s | **88 ms** |
+| fitted exponent | 1.468 | **1.045** |
+
+This one is worth a sentence in the paper rather than just a fix. It was invisible at every
+scale the tests and the demonstrator use — six activities — and it would have shipped as an
+unqualified O(A+E) claim. `docs/E6_OVERHEAD.md` §7 said: *state the complexity explicitly;
+if it is not O(A+E) that is a bug worth finding before the paper, not after.* It was, and
+it was.
 
 ---
 

@@ -35,6 +35,7 @@ from yprov4agenticai import (  # noqa: E402
     CodeCarbonBackend,
     EnergyTracker,
     NullBackend,
+    NullTracker,
     ProvTracker,
 )
 from yprov4agenticai import now_iso as now_iso  # noqa: E402
@@ -52,6 +53,11 @@ ENERGY_ENV = "PROV_ENERGY"
 #: a run that resolves it over the network cannot be repeated, and on Windows the lookup is
 #: a documented crash site. State the country instead (3-letter ISO code).
 ENERGY_COUNTRY_ENV = "PROV_ENERGY_COUNTRY"
+#: Whether provenance is recorded at all. ``off`` installs a NullTracker, which honours the
+#: whole interface and builds nothing — a deployment decision for a user who wants no
+#: provenance, and condition OFF of the overhead study, which are the same thing.
+INSTRUMENTATION_ENV = "PROV_INSTRUMENTATION"
+INSTRUMENTATION_OFF = {"off", "0", "false", "no", "none"}
 
 
 def write_prov(role: str, session_id: str, doc: dict[str, Any]) -> Path | None:
@@ -74,6 +80,7 @@ class ProvMode(NamedTuple):
 
     granularity: str
     persistence: str
+    enabled: bool
 
 
 def prov_mode() -> ProvMode:
@@ -86,6 +93,9 @@ def prov_mode() -> ProvMode:
     """
     granularity = os.environ.get(GRANULARITY_ENV, "DATA").strip().upper()
     persistence = os.environ.get(PERSISTENCE_ENV, "PERSISTENT").strip().upper()
+    enabled = os.environ.get(INSTRUMENTATION_ENV, "on").strip().lower() not in (
+        INSTRUMENTATION_OFF
+    )
     if granularity not in GRANULARITIES:
         raise SystemExit(
             f"{GRANULARITY_ENV} must be one of {GRANULARITIES}, got {granularity!r}"
@@ -94,7 +104,7 @@ def prov_mode() -> ProvMode:
         raise SystemExit(
             f"{PERSISTENCE_ENV} must be one of {PERSISTENCES}, got {persistence!r}"
         )
-    return ProvMode(granularity=granularity, persistence=persistence)
+    return ProvMode(granularity=granularity, persistence=persistence, enabled=enabled)
 
 
 def energy_tracker() -> EnergyTracker | None:
@@ -135,7 +145,7 @@ def agent_tracker(
     agent_label: str,
     sid: str | None = None,
     energy: EnergyTracker | None = None,
-) -> ProvTracker:
+) -> ProvTracker | NullTracker:
     """The tracker an agent emits its own lifecycle into.
 
     One construction site for all six agents. Before this, each built its own with the
@@ -144,10 +154,14 @@ def agent_tracker(
 
     The sink writes the finished document to the shared output volume, and the mode comes
     from the environment — so ``PROV_PERSISTENCE=TRANSIENT`` means no agent writes, without
-    any agent knowing about the flag.
+    any agent knowing about the flag, and ``PROV_INSTRUMENTATION=off`` means no agent
+    records, without any agent knowing that either.
     """
     mode = prov_mode()
-    return ProvTracker(
+    tracker_class: type[NullTracker] | type[ProvTracker] = (
+        ProvTracker if mode.enabled else NullTracker
+    )
+    return tracker_class(
         sid=sid or session_id,
         granularity=mode.granularity,
         persistence=mode.persistence,

@@ -250,21 +250,32 @@ rejectable table in the paper and the baseline for the overhead study at the sam
       attribution is unsound when the backend samples less often than a step lasts, and
       the record now discloses that rather than presenting the figure as an attribution
 
-### Phase 5 — E6 proper · ~4–5 days, spread over two sittings
+### Phase 5 — E6 proper · ~4–5 days, spread over two sittings ✅ *complete 2026-10-09*
 
-Per `docs/E6_OVERHEAD.md` §13, amended by R1–R9. **`bench_support.py` is independent of
-every phase above — build it whenever there's a gap.**
+Per `docs/E6_OVERHEAD.md` §13, amended by R1–R9. Results: `docs/E6_RESULTS.md`.
 
-- [ ] `bench_support.py` — `timeit`, percentiles, environment capture *(parallelizable now)*
-- [ ] `NullTracker` (condition OFF)
-- [ ] Level 1: M1–M10, **plus M11 `store.resolve()`** ([R6](#r6)), **plus wrapper-vs-raw**
-      ([R4](#r4))
-- [ ] Level 2: per-agent OFF/A/B, interleaved, ≥30 reps, + output bytes
-- [ ] Scaling sweep + complexity fit ([R3](#r3) — now over the corrected tracker)
-- [ ] Level 3 pipeline, **labelled sequential/single-process** ([R8](#r8))
-- [ ] E6c modes: DATA / METADATA / TRANSIENT / justification on-off
-- [ ] `E6_RESULTS.md` renderer, tables E6a–E6d
-- [ ] Re-run on a second occasion; confirm stability
+- [x] `bench_support.py` — `timeit`, percentiles, environment capture, **plus** a measured
+      timer floor, robust dispersion, and paired differences. The additions were not
+      gold-plating: the first attempt at the headline figure reported +52, −30 and +201 ns
+      on three consecutive runs, because it subtracted two separately-taken measurements
+- [x] `NullTracker` (condition OFF) — in the library, not the harness, because "run with no
+      provenance" is a product feature and a shim that exists only in a benchmark measures
+      the shim
+- [x] Level 1: M1–M12, including M11 `store.resolve()` ([R6](#r6)), wrapper-vs-raw
+      ([R4](#r4)), and the clock decomposed into reading and formatting
+- [x] Level 2: per-agent OFF/A/**B-TRANS**/B, interleaved, 30 reps, + output bytes
+- [x] Scaling sweep + complexity fit ([R3](#r3)) — **found a quadratic defect** ([J3](todo.md#j3))
+- [x] Level 3 pipeline, labelled sequential/single-process ([R8](#r8)) — and *in noise*,
+      which R8 predicted
+- [x] E6c modes: DATA / METADATA / TRANSIENT / justification on-off
+- [x] `E6_RESULTS.md` renderer, tables E6a–**E6f**
+- [x] Re-run on a second occasion; stability reported as E6f — absolute timings moved up to
+      44%, byte counts identical, exponents within 2%
+
+**R1 vindicated.** The prediction E6 built a sub-mode around — that justification is a
+storage cost rather than a compute cost — held *after* Phase 1 made the justifications
+compute something. Measuring it before that fix would have published the right answer for
+the wrong reason.
 
 ### Phase 6 — Vocabulary, tables, truth pass · ~3 days
 

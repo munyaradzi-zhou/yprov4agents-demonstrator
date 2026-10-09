@@ -68,10 +68,21 @@ def now_iso() -> str:
     return datetime.datetime.now(datetime.UTC).isoformat()
 
 
+@functools.cache
 def _library_version() -> str:
     """Version of the library that wrote a record, stamped into its bundle descriptor.
 
-    Read from installed distribution metadata so it cannot drift from pyproject.toml.
+    Read from installed distribution metadata so it cannot drift from pyproject.toml, and
+    cached because that read goes to the filesystem.
+
+    The cache is not a micro-optimisation. Uncached, this call is **6.78 ms** on the
+    development machine and ``to_prov_json`` is 7.14 ms — so 95% of the cost of
+    serialising a provenance document was a metadata lookup, paid once per emitted record,
+    per agent, per message. The overhead study found it at Level 1 (see
+    ``docs/E6_RESULTS.md``), which is what Level 1 is for.
+
+    Safe to cache for the lifetime of the process: the installed version of a package
+    cannot change under a running interpreter.
     """
     from importlib.metadata import PackageNotFoundError, version
 
@@ -169,6 +180,16 @@ class ProvTracker:
         self._ent_order: list = []
         #: Declared (source, generated) entity pairs. Only what a caller stated.
         self.derivations: list[tuple[str, str]] = []
+        #: O(1) membership mirror of `derivations`, for the duplicate check.
+        #:
+        #: The check used to scan the list — `(source, eid) not in self.derivations` — which
+        #: is O(n) per declaration and therefore O(n²) over a run. The scaling study
+        #: measured the consequence: building a 10,000-activity record took 1.72 s and the
+        #: fitted exponent was 1.47, not 1.0. The same pattern was already solved three
+        #: fields below for memory ids and simply not applied here, which is how this kind
+        #: of defect survives review: it is invisible at the six-activity scale every test
+        #: and every demo uses, and it only bites a long-lived agent.
+        self._derivation_pairs: set[tuple[str, str]] = set()
         # ── Optional, additive features (memory model + lightweight PID) ──────
         # These stay EMPTY on a default lifecycle run, so to_prov_json emits the
         # exact same document (the default 6/6/27 graph is byte-identical).
@@ -222,7 +243,8 @@ class ProvTracker:
         if derived_from:
             sources = [derived_from] if isinstance(derived_from, str) else list(derived_from)
             for source in sources:
-                if source and (source, eid) not in self.derivations:
+                if source and (source, eid) not in self._derivation_pairs:
+                    self._derivation_pairs.add((source, eid))
                     self.derivations.append((source, eid))
         return eid
 
@@ -560,6 +582,7 @@ class ProvTracker:
         t.ents = dict(d["ents"])
         t._ent_order = list(d["eo"])
         t.derivations = [tuple(pair) for pair in d.get("derivations", [])]
+        t._derivation_pairs = set(t.derivations)  # rebuild the O(1) dedup mirror
         t.mem_chain = list(d.get("mem_chain", []))  # backward-compatible
         t._mem_ids = set(t.mem_chain)  # rebuild O(1) dedup mirror
         t.used_mem = [tuple(x) for x in d.get("used_mem", [])]

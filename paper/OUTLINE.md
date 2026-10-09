@@ -298,17 +298,70 @@ number is real consumption in a real window but **not** an attribution. **Energy
 session granularity**; any per-step energy claim in this literature needs a backend sampling
 faster than the steps, and should say what its period was.
 
-### E6 — Instrumentation overhead *(to measure)*
+### E6 — Instrumentation overhead *(measured, Phase 5)*
 
-Specified in [`docs/E6_OVERHEAD.md`](../docs/E6_OVERHEAD.md). Not "the one evaluation gap":
-it is **order-dependent**, because it measures the cost of a mechanism whose output Phase 1
-has just changed. Its central predicted finding — that `yp:justification` is a storage cost
-rather than a compute cost — was an artifact of the justifications containing no
-computation. Now that they perform real checks, the honest claim becomes *the cost of a
-justification is the cost of gathering its evidence*, which is stronger and only
-discoverable in this order. See [`PLAN.md`](../PLAN.md) Part 1.
+Full tables in [`docs/E6_RESULTS.md`](../docs/E6_RESULTS.md), rendered from the results
+files rather than transcribed. Specification and scored predictions in
+[`docs/E6_OVERHEAD.md`](../docs/E6_OVERHEAD.md).
 
----
+**The central result, and it is the one that was predicted.** Recording a
+`yp:justification` costs **nothing this machine can resolve** — over 40 interleaved
+rounds of 1,000 calls, the paired difference is 26 ns against a round-to-round
+spread of ±352 ns — and **278 bytes, 21.7% of a record**. The trade is *storage for explainability, not speed
+for explainability*. That is a far more defensible claim than "it is free", and it is what
+the data shows. It also survived being made harder: Phase 1 rewrote the justifications so
+they state the result of real checks rather than restating their own instruction
+([`PLAN.md`](../PLAN.md) R1), so this is no longer a measurement of f-string concatenation.
+
+**Almost all of the measurable overhead is one file write.** This is the finding the
+original specification did not anticipate, and it reframes the whole study:
+
+| | MC1 Compliance, the worst case in the system |
+|---|--:|
+| the agent's own work | 96 µs |
+| …plus building a complete typed PROV record | **+42 µs** |
+| …plus writing it to disk | **+1,532 µs** |
+| total overhead | **+1,645%** |
+
+Report the ratio — a paper that leads with its own worst case is worth more than one that
+leads with its best — but report it with the decomposition, or it is unactionable.
+Explicit instrumentation is not expensive to *compute*; persisting its output is, and that
+is a deployment decision. `TRANSIENT` mode makes it: **−91% of the time cost** for an
+identical record. `METADATA` makes the other one: **−37.6% of the bytes**, with every
+justification retained.
+
+**The cost is linear, and was not when first measured.** The scaling sweep fitted an
+exponent of **1.468** on building a record, and a 10,000-activity record took 1.72 s. The
+cause was a duplicate check on declared derivations that scanned a list. With an O(1)
+membership set: **131 ms, exponent 1.066**. Memory is linear too, ~1.3 KiB per
+activity, and
+held until emission — a real constraint for a long-lived agent, and one for §8.
+
+**The surprising per-call result is that the timestamp dominates.** A tracked step is
+~4.5 µs, 64% of it `now_iso()`, and 3× more of that is `.isoformat()` than
+reading the clock. The dominant per-step cost of this library is rendering an instant as text — a
+property of what PROV stores, not of how it is built. For anyone else implementing a
+provenance library this is the most transferable number in the study.
+
+**Which figures transfer.** Run twice on separate occasions: absolute timings moved by up
+to 26%, byte counts were **identical**, fitted exponents agreed to within 3%, and the
+agent ranking was unchanged. Quote the bytes and the complexity class; quote the timings as
+orders of magnitude.
+
+**Two library defects were found by this study and fixed before the paper.** An uncached
+metadata lookup making `to_prov_json()` 306× slower than it needed to be, and the quadratic
+derivation check above. Neither is a result about provenance; both are the argument for
+measuring before publishing a performance claim. State them — a reviewer who finds a
+performance bug in a paper's artifact trusts nothing else in it, and a paper that found its
+own is in a different position.
+
+**Confounds, stated plainly.** The pipeline-level figure (E6e) is **inside the noise**,
+dominated by a fixed persist window and process start-up; it is also sequential and
+single-process, so it is not a throughput measurement ([`PLAN.md`](../PLAN.md) R8). CA2's
+own work is matplotlib rendering, three orders of magnitude larger than its instrumentation,
+so its overhead is unresolvable — reported as such rather than as the 5% *speed-up* an
+earlier version of the harness produced. Condition A is indistinguishable from OFF at
+agent level: the callback layer is cheap, and what it cannot do is not a matter of cost.
 
 ## Qualitative results worth a paragraph each
 
@@ -406,6 +459,7 @@ used for isolation in measurement, not as evidence of throughput.
 | F6 | Reflexivity chain and its depth limit | E4 |
 | **F7** | **Declared-or-derived lineage vs the index-order chain it replaced** | `docs/phases/PHASE_1.md` §2.4 |
 | **F8** | **One LLM step, fully accounted: prompt → model → response, with the attributes that make it repeatable** | E5b |
+| **F9** | **Where the overhead actually is: the agent's work, the record, and the write, stacked** | E6b |
 
 F7 is new and earns its place: it shows the correction changed the graph's *topology*, not
 only its size — the old chain asserted a single dependency spine where the real dataflow is
@@ -425,7 +479,8 @@ more honest and more persuasive than drawing it as uniformly poor.
    artifact serves E6's `A` condition.
 2. ~~**Phase 4** — model and prompt provenance~~ — **done**; see E5b, plus a negative
    result on energy attribution (E5c) and both instrumentation modes made selectable.
-3. **Phase 5** — measure E6.
+3. ~~**Phase 5** — measure E6~~ — **done**; see E6 above, plus two library defects the
+   study found and fixed.
 4. **Phase 6** — reframe E2 with a real denominator; decide the reflexivity claim.
 5. **Phase 7** — the `yp:` vocabulary artifact, without which C3 has no artifact.
 6. Write §8 from the material above; render F1–F7.
