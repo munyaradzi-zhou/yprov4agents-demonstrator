@@ -17,7 +17,7 @@ import argparse
 from pathlib import Path
 from typing import Any
 
-from eval.bench_support import read_results
+from eval.bench_support import RESOLVE_MULTIPLE, read_results
 
 #: Operations whose median is reported in E6a, in the order the paper reads them.
 E6A_ROWS = (
@@ -53,6 +53,24 @@ def _ns(value: float) -> str:
     if magnitude >= 1_000:
         return f"{sign}{magnitude / 1_000:.2f} µs"
     return f"{sign}{magnitude:.0f} ns"
+
+
+def _resolves(row: dict[str, Any], baseline: str = "OFF") -> tuple[bool, float]:
+    """Re-judge a stored agent measurement under the criterion in force now.
+
+    Returns ``(resolvable, margin)``. The medians and the dispersion are measurements and
+    are read as recorded; whether their difference counts as a finding is a judgement, and
+    judgements belong to the code doing the reporting rather than to a file written weeks
+    earlier. When the criterion tightened from 1x the noise to 3x, two rows in this table
+    stopped earning the overhead figure they had been printing.
+    """
+    medians = row["median_ns"]
+    noise = row["vs_off"]["noise_ns"] if baseline == "OFF" else row["vs_a"]["noise_ns"]
+    delta = abs(medians["B"] - medians[baseline])
+    if not noise:
+        return True, float("inf")
+    margin = delta / noise
+    return margin > RESOLVE_MULTIPLE, margin
 
 
 def _environment_block(environment: dict[str, Any]) -> list[str]:
@@ -192,15 +210,19 @@ def render_agent(data: dict[str, Any]) -> list[str]:
         "| Agent | OFF | A | B-TRANS | B | B vs OFF | of which the write | Output |",
         "|---|--:|--:|--:|--:|--:|--:|--:|",
     ]
+    resolved: dict[str, tuple[bool, float]] = {
+        label: _resolves(row) for label, row in data["agents"].items()
+    }
     for label, row in data["agents"].items():
         medians = row["median_ns"]
         overhead = row["vs_off"]
+        is_resolved, margin = resolved[label]
         ratio = (
             f"**{overhead['pct']:+.0f}%**"
-            if overhead["resolvable"] and overhead["pct"] is not None
-            else "*in noise*"
+            if is_resolved and overhead["pct"] is not None
+            else f"*in noise* ({margin:.1f}×)"
         )
-        write = _ns(row["write_cost_ns"]) if overhead["resolvable"] else "*in noise*"
+        write = _ns(row["write_cost_ns"]) if is_resolved else "—"
         lines.append(
             f"| {label} | {_ns(medians['OFF'])} | {_ns(medians['A'])} | "
             f"{_ns(medians['B-TRANS'])} | {_ns(medians['B'])} | {ratio} | {write} | "
@@ -211,7 +233,7 @@ def render_agent(data: dict[str, Any]) -> list[str]:
         (
             (label, row)
             for label, row in data["agents"].items()
-            if row["vs_off"]["resolvable"] and row["vs_off"]["pct"] is not None
+            if resolved[label][0] and row["vs_off"]["pct"] is not None
         ),
         key=lambda item: item[1]["vs_off"]["pct"],
         default=None,
@@ -237,16 +259,27 @@ def render_agent(data: dict[str, Any]) -> list[str]:
             f"decision a deployment can make differently (E6c).",
             "",
         ]
+    unresolved = [label for label, (ok, _) in resolved.items() if not ok]
     lines += [
-        "**Where a figure is inside the run-to-run noise it says so.** CA2's own work is "
-        "matplotlib rendering, three orders of magnitude larger than its instrumentation, "
-        "so thirty samples cannot resolve the difference — an earlier version of this "
-        "table reported instrumentation as a 5% *speed-up* there. A ratio is printed only "
-        "when the difference exceeds the dispersion of the samples it came from.",
+        f"**Instrumentation is cheaper than the noise floor of the work it instruments.** "
+        f"{len(unresolved)} of the {len(resolved)} agents show no resolvable overhead at "
+        f"{data['repetitions']} repetitions — the difference between running them with and "
+        f"without provenance is smaller than their own run-to-run variance. Those rows "
+        f"carry the margin in parentheses: the multiple of the sample dispersion the "
+        f"difference reaches, where **{RESOLVE_MULTIPLE:g}× is required** before a figure "
+        f"is printed as a result.",
         "",
-        "**Condition A is indistinguishable from OFF at this level.** Appending one event "
-        "per node costs nothing a 5 ms agent step can resolve, which is the honest reading: "
-        "the callback layer is cheap, and what it cannot do (E3) is not a matter of cost.",
+        "That criterion is stricter than it was, and the correction matters. It used to be "
+        "*larger than the noise*, which treats any consistent bias as a finding — and a "
+        "loaded machine supplies plenty. Under the old rule two of these rows reported "
+        "resolved overheads at margins of 2.9×. They are now reported as what they are. "
+        "The project's own guard test caught it: on a shared CI runner, timing the **same "
+        "function twice** produced a 147.5 ns difference against 61.0 ns of noise and "
+        "called it real.",
+        "",
+        "**Condition A is indistinguishable from OFF everywhere.** Appending one event per "
+        "node costs nothing any agent step can resolve, which is the honest reading: the "
+        "callback layer is cheap, and what it cannot do (E3) is not a matter of cost.",
         "",
     ]
     return lines
@@ -474,8 +507,11 @@ def render_stability(first: Path, second: Path) -> list[str]:
     ]
 
     def verdict(row: dict[str, Any] | None) -> str:
-        overhead = (row or {}).get("vs_off", {})
-        if not overhead.get("resolvable") or overhead.get("pct") is None:
+        if row is None:
+            return "*not measured*"
+        overhead = row.get("vs_off", {})
+        is_resolved, _ = _resolves(row)
+        if not is_resolved or overhead.get("pct") is None:
             return "*in noise*"
         return f"{overhead['pct']:+.0f}%"
 
@@ -484,6 +520,12 @@ def render_stability(first: Path, second: Path) -> list[str]:
             f"| {label} | {verdict(agents_first[label])} | "
             f"{verdict(agents_second.get(label))} |"
         )
+    lines.append("")
+    lines.append(
+        f"Judged under the criterion in force now — a difference must reach "
+        f"{RESOLVE_MULTIPLE:g}× the dispersion of its samples — applied to the stored "
+        f"measurements rather than to the verdicts those files were written with."
+    )
 
     timings = [row for row in rows if abs(row[3]) > 10.0]
     exact = [row for row in rows if abs(row[3]) < 0.01]

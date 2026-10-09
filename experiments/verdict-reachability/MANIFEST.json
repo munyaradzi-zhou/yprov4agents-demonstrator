@@ -1,13 +1,13 @@
 {
   "schema": "yprov4agents/experiment-manifest/1",
   "name": "verdict-reachability",
-  "note": "the reference run plus out/faults: seven injected faults covering every verdict of every agent the happy path leaves unobserved. The verdict matrix closes at 12 of 12. Each fault is in the input or the environment, never in the check being tested",
-  "created_at": "2026-10-09T06:52:37.536700+00:00",
+  "note": "the reference run, seven injected faults covering 12/12 verdicts, and the Phase 5 benchmark results carried forward. The bench results are from a quiet machine; the resolvability verdicts in docs/E6_RESULTS.md are re-judged at render time under the corrected 3x criterion",
+  "created_at": "2026-10-09T10:51:28.540878+00:00",
   "source": "out",
   "git": {
-    "commit": "f036277fc16d62b797fab3ac1597e8ad0295fe20",
+    "commit": "f01183676c10bf3caad51bce7c1241258e519dea",
     "branch": "fault-injection",
-    "describe": "v1.0.0-phase6-dirty",
+    "describe": "v1.0.0-phase6-2-gf011836-dirty",
     "dirty": true
   },
   "environment": {
@@ -20,8 +20,8 @@
     "cpu_physical": 4,
     "memory_bytes": 17015459840
   },
-  "file_count": 119,
-  "total_bytes": 563073,
+  "file_count": 109,
+  "total_bytes": 522534,
   "files": [
     {
       "path": "baseline/_events.json",
@@ -154,31 +154,6 @@
       "content_hash": "sha256:bd1fabe6b4416365bd2475d9db07994431b9d55d916269b3e9bee9ef6ee12f3e"
     },
     {
-      "path": "bench/bench/agent.json",
-      "size_bytes": 5774,
-      "content_hash": "sha256:bd1fabe6b4416365bd2475d9db07994431b9d55d916269b3e9bee9ef6ee12f3e"
-    },
-    {
-      "path": "bench/bench/micro.json",
-      "size_bytes": 9083,
-      "content_hash": "sha256:346ace204cd59fb214a96aeb6526b51dbee9f62357a5ea2e0196cfe5a04f7ef5"
-    },
-    {
-      "path": "bench/bench/modes.json",
-      "size_bytes": 2027,
-      "content_hash": "sha256:fc02f2b39b26a5d70cef474b1c8e1c503a4f0fc9a8981629ba213799c3ec07e8"
-    },
-    {
-      "path": "bench/bench/pipeline.json",
-      "size_bytes": 1709,
-      "content_hash": "sha256:cee0c891c224c610a529affa6328780e998f87b34728caab1500b2d87a4cad5d"
-    },
-    {
-      "path": "bench/bench/scaling.json",
-      "size_bytes": 1662,
-      "content_hash": "sha256:0804083602f88b3e63af790a0ada3135d24738f1024ad4ba843a049fd6b00571"
-    },
-    {
       "path": "bench/micro.json",
       "size_bytes": 9083,
       "content_hash": "sha256:346ace204cd59fb214a96aeb6526b51dbee9f62357a5ea2e0196cfe5a04f7ef5"
@@ -202,31 +177,6 @@
       "path": "bench-occasion1/agent.json",
       "size_bytes": 5751,
       "content_hash": "sha256:ba48e5b1466799cf1d6c98d4796a70537f2781f5e4d48521f34f7d1d29bc6ecc"
-    },
-    {
-      "path": "bench-occasion1/bench-occasion1/agent.json",
-      "size_bytes": 5751,
-      "content_hash": "sha256:ba48e5b1466799cf1d6c98d4796a70537f2781f5e4d48521f34f7d1d29bc6ecc"
-    },
-    {
-      "path": "bench-occasion1/bench-occasion1/micro.json",
-      "size_bytes": 9137,
-      "content_hash": "sha256:ad8c379c82d82cb5838d24516ac53635dfb0d25e1ce81493509ed0ba0014a3cf"
-    },
-    {
-      "path": "bench-occasion1/bench-occasion1/modes.json",
-      "size_bytes": 2025,
-      "content_hash": "sha256:4e3dc124d712935fdec2a51c5aa7ad9c8645f750a12c623fc0feb051004ba17c"
-    },
-    {
-      "path": "bench-occasion1/bench-occasion1/pipeline.json",
-      "size_bytes": 1708,
-      "content_hash": "sha256:bcd33d0302af2ca75aaf2d085ea7df17ca17ee33963d7808323e322c53e1e4bf"
-    },
-    {
-      "path": "bench-occasion1/bench-occasion1/scaling.json",
-      "size_bytes": 1663,
-      "content_hash": "sha256:8ef47bdefc07022e410a16503f4c016036ff044eb9fa12cf4e149974e72be2f4"
     },
     {
       "path": "bench-occasion1/micro.json",
