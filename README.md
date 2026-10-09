@@ -91,22 +91,27 @@ S1 Receive · S2 Plan · S3 Act · S4 Observe · **S5 Decide ★** · S6 Respond
 three phases: *Ingestion & Scoping* {S1,S2} · *Execution* {S3} · *Governance &
 Reflexion* {S4,S5,S6}. ★ is the step that carries `yp:justification`.
 
-| | Agent | LLM | S5 verdicts (observed **bold**) | What it does |
+| | Agent | LLM | S5 verdicts | What it does |
 |---|---|:--:|---|---|
-| **CA1** | `StorageAgent` | — | **ACCEPT** / **ESCALATE** | persists after consumption; sha-256 + `yp:pid`; round-trip integrity check |
-| **CAx** | `NL_Summarizer` | ✅ | **ACCEPT** / REVISE | natural-language summary of a provenance document |
-| **CA2** | `Metrics_Visualizer` | — | ACCEPT / **REVISE** | renders charts from the graph |
-| **CA3** | `Analytics_Agent` | optional | OK / **ANOMALY** | **5 mining algorithms** over any PROV graph |
-| **MC1** | `ComplianceChecker` | — | **PASS** / FAIL | checks a record against `vocab/shapes.ttl` |
-| **MC3** | `AuditabilityAgent` | — | **COMPLETE** / PARTIAL | reconstructs the who-did-what-when trail |
+| **CA1** | `StorageAgent` | — | ACCEPT / ESCALATE ×2 | persists after consumption; sha-256 + `yp:pid`; round-trip integrity check |
+| **CAx** | `NL_Summarizer` | ✅ | ACCEPT / REVISE | natural-language summary of a provenance document |
+| **CA2** | `Metrics_Visualizer` | — | ACCEPT / REVISE | renders charts from the graph |
+| **CA3** | `Analytics_Agent` | optional | OK / ANOMALY | **5 mining algorithms** over any PROV graph |
+| **MC1** | `ComplianceChecker` | — | PASS / FAIL | checks a record against `vocab/shapes.ttl` |
+| **MC3** | `AuditabilityAgent` | — | COMPLETE / PARTIAL | reconstructs the who-did-what-when trail |
 
-Bold marks a verdict that appears in an archived run under `experiments/`; the rest are
-reachable in code and have not been triggered by the sample data. The distinction matters
-because a verdict that has never fired is a claim, not a result — and this table used to
-be wrong in both directions: it credited CAx with an ESCALATE it cannot emit, and credited
-MC3 with no verdict at all when it emits two (review finding A3). `experiments/fault-escalate`
-is the run that earned CA1's ESCALATE, and `paper/OUTLINE.md` E5 tracks which of the
-remaining four still need a fault-injection case.
+**Every verdict in that table has been observed in an archived run** — twelve of twelve,
+six from the ordinary pipeline and six from seven injected faults under
+`experiments/verdict-reachability`. A verdict that has never fired is a claim rather than a
+result, which is why the distinction is tracked: this table used to credit CAx with an
+`ESCALATE` it cannot emit and MC3 with no verdict at all when it emits two (review finding
+A3).
+
+CA1's `ESCALATE` arrives down two independent paths, and `yp:escalation_reason` separates
+them: `integrity` means the stored bytes are wrong, `consumption-unconfirmed` means the
+data is fine and a consumer is down. They demand opposite responses, which is why the
+record has to say which. Reproduce any of it with
+`python -m eval.fault_injection --all`.
 
 **CA3 is an analytics agent, not an anomaly detector.** It applies a *set* of algorithms
 to any W3C PROV document — structure, timing, sustainability, resource, anomaly — with

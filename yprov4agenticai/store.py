@@ -70,7 +70,12 @@ class LightweightStore:
     """
 
     def __init__(self, root: str | Path | None = None) -> None:
-        self.root = Path(root) if root else None
+        # Resolved, not stored as given. A payload's record carries a `file:` URI, and
+        # `Path.as_uri()` raises on a relative path — so a store opened on "out/store"
+        # used to work until the first `put`, then crash with "relative path can't be
+        # expressed as a file URI". Resolving here also makes the recorded URI independent
+        # of the working directory a later reader happens to have.
+        self.root = Path(root).resolve() if root else None
         #: pid -> record {uri, yp:contentHash, size_bytes, kind, preview, created_at}
         self.manifest: dict[str, dict] = {}
         #: pid -> payload. Only used when there is no root; a rooted store reads through

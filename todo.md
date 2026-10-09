@@ -1,6 +1,7 @@
 # Review findings & fix plan — yProv4Agents demonstrator
 
-> **Phase 6 complete (2026-10-09) — every review finding is now resolved.** Statuses:
+> **All six phases complete (2026-10-09); every review finding resolved, and every
+> advertised verdict observed in an archived run.** Statuses:
 >
 > | | finding | status |
 > |---|---|---|
@@ -15,7 +16,7 @@
 > | D3 | PID semantics undocumented | **fixed** — documented as mock handles |
 > | D4 | `put()` hashed bytes it did not store | **fixed** — binary end to end, tested on Windows CI |
 > | A5 | MC1 failed its own check | **fixed** — MC1 and MC3 both emit a decision step |
-> | A3 | most advertised verdicts never occurred | **fixed** — 6 verdict kinds; the README table now marks which are *observed* in an archive versus merely reachable, and two entries in it were wrong (CAx had an ESCALATE it cannot emit; MC3 was credited with none) |
+> | A3 | most advertised verdicts never occurred | **fixed, and now closed** — 12 of 12 verdicts observed in archived runs (`experiments/verdict-reachability`), six from the ordinary pipeline and six from seven injected faults. Two entries in the README table were also wrong: CAx had an ESCALATE it cannot emit, MC3 was credited with none |
 > | A2 | 6-step lifecycle not uniform | **fixed** — all four operational agents emit 6; meta agents emit a 3-step subset |
 > | B4 | lineage fabricated from registration order | **fixed** — derivation declared, informed-by derived from dataflow |
 > | G1–G5 | five CA3 defects | **fixed** — including a check that could never fire |

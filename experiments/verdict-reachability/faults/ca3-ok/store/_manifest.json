@@ -1,0 +1,10 @@
+{
+  "21.T11999/yprovstore-8872c206e705": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/faults/ca3-ok/store/8872c206e705.txt",
+    "yp:contentHash": "sha256:8872c206e705200bb733950e08338b3c577732f17d110c25d034e7829c26ebe7",
+    "size_bytes": 244,
+    "kind": "analytics-report",
+    "preview": "Provenance analytics for 'fault': 8 activities and 6 entities (100.0% typed), 0 derivations, 0 terminal entities. Wall-clock span 70.0s acro…",
+    "created_at": "2026-10-09T06:51:57.567058+00:00"
+  }
+}

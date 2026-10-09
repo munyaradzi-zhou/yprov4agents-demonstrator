@@ -319,8 +319,8 @@ makes them worth scoring. Results in [`E6_RESULTS.md`](E6_RESULTS.md).
 | Justification cost (M5 − M4) | near zero in time; tens-to-hundreds of bytes | **below what the machine can resolve**; 278 bytes, 21.7% of a record | ✅ emphatically |
 | `to_prov_json` (6 activities) | 10–100 µs | ~25 µs — *after* fixing a 6.78 ms defect it exposed | ✅, eventually |
 | Per-session L1+L2 total | well under 1 ms | 50–85 µs | ✅ |
-| Deterministic agent overhead | low single-digit % | **20–57%**, almost all of it the file write | ❌ the prediction was wrong |
-| Meta-agent overhead | highest ratio, possibly 10%+ | **+1450% to +1700%** | ✅ direction, badly wrong magnitude |
+| Deterministic agent overhead | low single-digit % | **not resolvable** — inside each agent's own run-to-run variance | ⚠️ the prediction was unmeasurable, which is a better answer than either of us expected |
+| Meta-agent overhead | highest ratio, possibly 10%+ | **+1519% and +1645%**, the only resolvable rows | ✅ direction, badly wrong magnitude |
 | LLM agent overhead | <0.1% | inside the noise, as predicted | ✅ |
 | Pipeline throughput | bounded by the LLM, not the tracker | inside the noise; bounded by a fixed persist window | ✅ for the wrong reason |
 | Scaling | O(A + E) | **1.47 before a fix, 1.04 after** | ❌ then ✅ |
@@ -331,12 +331,20 @@ explainability**. §9 called this "almost certainly what the data will show" and
 it is worth more now, because the justifications have since been made to *compute* something
 (`PLAN.md` R1) and the result survived that change.
 
-**Two predictions were wrong, and both were wrong in the same way.** Agent-level overhead
-came in at twenty to seventeen hundred percent rather than single digits, and the scaling
-exponent was 1.47 rather than 1.0. Both were wrong because they reasoned about building a
-provenance record and the costs were somewhere else: in one `write_text` call, and in a
-list scan nobody had looked at. A prediction about a system's cost that is not checked
-against the system is a guess about where the author thinks the cost is.
+**Two predictions were wrong, and both were wrong in the same way.** The scaling exponent
+was 1.47 rather than 1.0, and agent-level overhead was either unmeasurable or seventeen
+hundred percent depending on the agent — never the predicted single digits. Both were wrong
+because they reasoned about building a provenance record and the costs were somewhere else:
+in one `write_text` call, and in a list scan nobody had looked at. A prediction about a
+system's cost that is not checked against the system is a guess about where the author
+thinks the cost is.
+
+**And the harness itself was wrong once, in the direction that matters.** Its resolvability
+criterion accepted any difference larger than its own noise, which reported two agents'
+overhead as resolved at margins of 2.9×. The guard test caught it by timing the same
+function twice. The criterion is now 3× the dispersion, with the pair order counterbalanced
+so a fixed-order bias cancels — and under it, no agent that does substantial work has a
+resolvable instrumentation cost.
 
 **And the warning in the `now_iso` row fired.** It said: *if it rivals `record_activity`,
 cache the clock or pass timestamps in.* It does rival it — it exceeds it — and the

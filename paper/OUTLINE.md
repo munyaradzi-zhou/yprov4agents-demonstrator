@@ -247,9 +247,9 @@ consuming `governance.*` without a bounded depth scheme arriving alongside it. A
 second level, with the depth carried in the subject, is named as future work and not
 claimed.
 
-### E5 — Verdicts, and their reachability
+### E5 — Verdicts, and their reachability *(complete)*
 
-| Agent:verdict | Count |
+| Agent:verdict | Count in the reference run |
 |---|--:|
 | `ca1:ACCEPT` | 2 |
 | `ca2:REVISE` | 2 |
@@ -258,23 +258,50 @@ claimed.
 | `mc1:PASS` | 8 |
 | `mc3:COMPLETE` | 8 |
 
-Six verdict kinds, up from three — but the tally is the less interesting half. A verdict
-that only ever takes one value carries no information, so what has to be established is that
-the alternatives are *reachable*. **Report reachability alongside the tally**, or a reviewer
-is entitled to ask whether any of these checks can fail at all.
+The tally is the less interesting half. A verdict that only ever takes one value carries no
+information, so what has to be established is that the alternatives are *reachable* — and
+the ordinary run reaches six of twelve. The other six come from seven injected faults
+(`eval/fault_injection.py`, archived under `experiments/verdict-reachability`):
 
-| Verdict | Reached by | Evidence |
-|---|---|---|
-| `ca1:ESCALATE` (consumption-unconfirmed) | CA1 alone, no consumers, 3s patience | `experiments/fault-escalate` ✅ |
-| `ca1:ESCALATE` (integrity) | corrupting a stored payload | *to run* |
-| `mc1:FAIL` | an unjustified decision in the input | *to run* |
-| `mc3:PARTIAL` | an activity with no start or end time | *to run* |
+| Verdict | How it was provoked | Observed |
+|---|---|:--:|
+| `ca1:ESCALATE` *(integrity)* | a store that writes bytes it did not hash | ✅ |
+| `ca1:ESCALATE` *(consumption-unconfirmed)* | no consumer acknowledged before the timeout | ✅ |
+| `mc1:FAIL` | a third-party record whose decision carries no justification | ✅ |
+| `mc3:PARTIAL` | a third-party record with an activity started and never closed | ✅ |
+| `ca2:ACCEPT` | a producer record that actually carries measurements | ✅ |
+| `cax:REVISE` | a scripted model reply naming figures absent from the graph | ✅ |
+| `ca3:OK` | a fully instrumented graph with regular timing | ✅ |
 
-The archived case is the one that matters most, because it shows the two escalation paths are
-*distinguishable in the record*: `yp:escalation_reason` separates `integrity` from
-`consumption-unconfirmed`, and the two demand opposite responses — corrupt storage versus a
-consumer that is down. See §7 below, where the same run is also the A-versus-B worked
-example.
+**Twelve of twelve verdicts observed.** Three things in that table are worth a sentence each
+in the text.
+
+*The two escalation paths are distinguishable in the record, and they demand opposite
+responses.* `yp:escalation_reason` separates `integrity` from `consumption-unconfirmed`: the
+first says the stored bytes are wrong, the second says the data is fine and a consumer is
+down. The justifications differ accordingly — one quotes both hashes of the mismatch, the
+other names the three consumers that never answered and states that the
+persist-after-consume ordering was forfeited. An operator handed only "ESCALATE" learns
+nothing actionable, which is the whole argument for the field.
+
+*Three of the seven are not failures at all.* CA2's ACCEPT, CAx's REVISE and CA3's OK are
+unreachable from the bundled sample data — the real yProv4ML records carry no numeric
+`prov:value` entities to plot, and declare start times without end times. So "CA2 always
+says REVISE" was a finding about the *input*, not about CA2, and separating those two is
+what these scenarios are for. It also sharpens CA3's result: ANOMALY is informative
+precisely because OK is reachable.
+
+*`mc1:FAIL` is unreachable from records this library produces.* `ProvTracker.decide()`
+refuses a blank justification at the call site, so an agent instrumented with this library
+cannot emit an unjustified decision. FAIL is reachable for records the library did not
+write — which is the case a compliance checker exists for, since it is pointed at agents
+you do not control. That is a property worth claiming rather than a gap to apologise for:
+**the instrumentation makes the violation unrepresentable, and the governance layer catches
+it in input that was not instrumented.**
+
+Every fault is injected into the input or the environment, never into the check being
+tested, and `tests/test_fault_injection.py` enforces all seven plus the matrix itself — so
+a verdict advertised in the README and never observed fails the build.
 
 ### E5b — Model provenance: can an LLM step be repeated from the record? *(measured, Phase 4)*
 
@@ -359,22 +386,39 @@ the data shows. It also survived being made harder: Phase 1 rewrote the justific
 they state the result of real checks rather than restating their own instruction
 ([`PLAN.md`](../PLAN.md) R1), so this is no longer a measurement of f-string concatenation.
 
-**Almost all of the measurable overhead is one file write.** This is the finding the
-original specification did not anticipate, and it reframes the whole study:
+**For every agent that does real work, the overhead is not resolvable at all.** At 30
+repetitions, interleaved, CA1, CA2, CA3 and CAx each sit inside their own run-to-run
+variance — the difference between running them with and without provenance is smaller than
+the difference between two runs of either. The margins are 0.5× to 2.9× of the sample
+dispersion, against a **3× threshold** required before a figure is printed as a result.
+
+That is the headline, and it is better than a percentage: **the instrumentation is cheaper
+than the noise floor of the work it instruments.**
+
+**Overhead is resolvable only for the two agents whose own work is trivial** — and there it
+is large, which is why it should be led with:
 
 | | MC1 Compliance, the worst case in the system |
 |---|--:|
 | the agent's own work | 96 µs |
 | …plus building a complete typed PROV record | **+42 µs** |
 | …plus writing it to disk | **+1,532 µs** |
-| total overhead | **+1,645%** |
+| total overhead | **+1,645%** (margin 8.2×) |
 
-Report the ratio — a paper that leads with its own worst case is worth more than one that
-leads with its best — but report it with the decomposition, or it is unactionable.
-Explicit instrumentation is not expensive to *compute*; persisting its output is, and that
-is a deployment decision. `TRANSIENT` mode makes it: **−91% of the time cost** for an
-identical record. `METADATA` makes the other one: **−37.6% of the bytes**, with every
-justification retained.
+A paper that leads with its own worst case is worth more than one that leads with its best
+— but report it with the decomposition, or it is unactionable. Explicit instrumentation is
+not expensive to *compute*; persisting its output is, and that is a deployment decision.
+`TRANSIENT` mode makes it: **−91% of the time cost** for an identical record. `METADATA`
+makes the other one: **−37.6% of the bytes**, with every justification retained.
+
+**The resolvability criterion was corrected during this work, and it changed two rows.** It
+began as *larger than the noise*, which treats any consistent bias as a finding; a loaded
+machine supplies plenty. CA3 and CAx had been reported at +44% and +37% on margins of 2.9×.
+The project's own guard test is what caught it — on a shared CI runner, timing the **same
+function twice** produced a 147.5 ns difference against 61.0 ns of dispersion and called it
+real. The fix was to counterbalance the pair order, so a fixed-order bias cancels instead of
+accumulating, and to require a 3× margin. **Write the guard test that fails when your
+harness reports noise as a result**; this one earned its place.
 
 **The cost is linear, and was not when first measured.** The scaling sweep fitted an
 exponent of **1.468** on building a record, and a 10,000-activity record took 1.72 s. The
@@ -391,7 +435,11 @@ provenance library this is the most transferable number in the study.
 
 **Which figures transfer.** Run twice on separate occasions: absolute timings moved by up
 to 26%, byte counts were **identical**, fitted exponents agreed to within 3%, and the
-agent ranking was unchanged. Quote the bytes and the complexity class; quote the timings as
+resolvability verdicts were unchanged for every agent. A third run taken while the machine
+was loaded by this study's own earlier levels inflated every absolute figure by about 3×
+and changed **no verdict** — which is the strongest available evidence that the margin
+criterion, not the clock, is what makes these numbers safe to read. Quote the bytes, the
+complexity class and the verdicts; quote the timings as orders of magnitude. Quote the bytes and the complexity class; quote the timings as
 orders of magnitude.
 
 **Two library defects were found by this study and fixed before the paper.** An uncached

@@ -44,6 +44,16 @@ DEFAULT_WARMUP = 1_000
 #: figure is an upper bound on the operation's cost, not an estimate of it.
 FLOOR_MULTIPLE = 3.0
 
+#: How far a difference must exceed the noise it was measured against before it is called
+#: resolvable.
+#:
+#: Not 1.0, which is what this used to be, and which a CI runner falsified: timing the
+#: *same* function twice reported a difference of 147.5 ns against 61.0 ns of dispersion
+#: and called it real. A one-to-one criterion treats any consistent bias as a finding, and
+#: a loaded shared machine supplies plenty of those. Three is the same convention
+#: FLOOR_MULTIPLE uses, and it is what the project's own guard test requires.
+RESOLVE_MULTIPLE = 3.0
+
 
 @dataclass(frozen=True)
 class Timing:
@@ -215,8 +225,17 @@ class Difference:
 
     @property
     def resolvable(self) -> bool:
-        """Whether the difference exceeds the variation between paired rounds."""
-        return abs(self.delta_ns) > self.noise_ns
+        """Whether the difference exceeds the variation between paired rounds, with margin.
+
+        A difference merely larger than its own dispersion is not a result. See
+        :data:`RESOLVE_MULTIPLE` for what falsified the weaker criterion.
+        """
+        return abs(self.delta_ns) > RESOLVE_MULTIPLE * self.noise_ns
+
+    @property
+    def margin(self) -> float:
+        """How many multiples of the noise the difference is. Below 3, it is not reported."""
+        return abs(self.delta_ns) / self.noise_ns if self.noise_ns else float("inf")
 
     def as_json(self) -> dict[str, Any]:
         return {
@@ -224,9 +243,11 @@ class Difference:
             "over": self.baseline,
             "delta_ns": self.delta_ns,
             "noise_ns": self.noise_ns,
+            "margin": self.margin,
             "rounds": self.rounds,
             "batch": self.batch,
             "resolvable": self.resolvable,
+            "criterion": f"|delta| > {RESOLVE_MULTIPLE:g} x noise",
         }
 
 
@@ -253,25 +274,38 @@ def paired_difference(
     baseline and the variant back to back, so whatever the machine was doing applies to
     both, and the difference is taken *within* the round. The reported delta is the median
     of those per-round differences and the noise is their dispersion. If the delta does not
-    exceed the noise, the honest answer is that the difference is below what this machine
-    can measure — which, for a dictionary insertion, is the expected and informative
-    result.
+    clear :data:`RESOLVE_MULTIPLE` times that noise, the honest answer is that the
+    difference is below what this machine can measure — which, for a dictionary insertion,
+    is the expected and informative result.
+
+    **The pair order alternates between rounds**, and that is not a detail. With a fixed
+    order the first half of every round pays for a cold branch predictor and the second
+    half does not, so a systematic bias accumulates *consistently* — giving a steady delta
+    with small dispersion, which is exactly what a resolvability test is least able to
+    reject. A CI runner demonstrated it: timing the same function twice produced 147.5 ns
+    against 61.0 ns of noise. Swapping the order on alternate rounds makes the bias cancel
+    rather than accumulate.
     """
     for _ in range(warmup):
         baseline()
         variant()
 
-    deltas: list[float] = []
-    span = range(batch)
-    for _ in range(rounds):
+    def timed(fn: Callable[[], Any], span: range) -> int:
         started = time.perf_counter_ns()
         for _ in span:
-            baseline()
-        middle = time.perf_counter_ns()
-        for _ in span:
-            variant()
-        finished = time.perf_counter_ns()
-        deltas.append(((finished - middle) - (middle - started)) / batch)
+            fn()
+        return time.perf_counter_ns() - started
+
+    deltas: list[float] = []
+    span = range(batch)
+    for index in range(rounds):
+        if index % 2 == 0:
+            base_ns = timed(baseline, span)
+            variant_ns = timed(variant, span)
+        else:
+            variant_ns = timed(variant, span)
+            base_ns = timed(baseline, span)
+        deltas.append((variant_ns - base_ns) / batch)
 
     return Difference(
         name=name,
@@ -385,7 +419,7 @@ def timings_to_json(timings: Iterator[Timing] | Sequence[Timing]) -> list[dict[s
 
 
 def resolvable(
-    baseline: Sequence[float], measured: Sequence[float], *, factor: float = 1.0
+    baseline: Sequence[float], measured: Sequence[float], *, factor: float = RESOLVE_MULTIPLE
 ) -> bool:
     """Whether two sample sets differ by more than their own noise.
 

@@ -63,12 +63,12 @@ Each agent's full step, 30 repetitions per condition, interleaved round-robin so
 
 | Agent | OFF | A | B-TRANS | B | B vs OFF | of which the write | Output |
 |---|--:|--:|--:|--:|--:|--:|--:|
-| CA3 Analytics (heuristic) | 4.20 ms | 4.00 ms | 4.18 ms | 6.35 ms | **+51%** | 2.17 ms | 6,249 B |
-| CA2 Metrics | 126.44 ms | 126.10 ms | 124.24 ms | 123.65 ms | *in noise* | *in noise* | 5,133 B |
-| CAx Summariser (computed) | 5.16 ms | 5.14 ms | 5.02 ms | 6.82 ms | **+32%** | 1.80 ms | 5,635 B |
+| CA3 Analytics (heuristic) | 4.20 ms | 4.00 ms | 4.18 ms | 6.35 ms | *in noise* (2.9×) | — | 6,249 B |
+| CA2 Metrics | 126.44 ms | 126.10 ms | 124.24 ms | 123.65 ms | *in noise* (0.5×) | — | 5,133 B |
+| CAx Summariser (computed) | 5.16 ms | 5.14 ms | 5.02 ms | 6.82 ms | *in noise* (2.9×) | — | 5,635 B |
 | MC1 Compliance | 95.70 µs | 87.10 µs | 137.65 µs | 1.67 ms | **+1645%** | 1.53 ms | 3,371 B |
 | MC3 Audit | 91.65 µs | 89.70 µs | 130.90 µs | 1.48 ms | **+1519%** | 1.35 ms | 3,526 B |
-| CA1 Storage (persist path) | 8.31 ms | 8.30 ms | 8.05 ms | 10.22 ms | *in noise* | *in noise* | 5,556 B |
+| CA1 Storage (persist path) | 8.31 ms | 8.30 ms | 8.05 ms | 10.22 ms | *in noise* (0.9×) | — | 5,556 B |
 
 ### What this says
 
@@ -76,9 +76,11 @@ Each agent's full step, 30 repetitions per condition, interleaved round-robin so
 
 **But read the decomposition before believing the ratio.** For that same agent, building the record costs 41.95 µs and writing it costs 1.53 ms — **97% of the overhead is one file write**. The same split holds for every agent in the table. Explicit instrumentation is not expensive to compute; persisting its output is, and that is a storage decision a deployment can make differently (E6c).
 
-**Where a figure is inside the run-to-run noise it says so.** CA2's own work is matplotlib rendering, three orders of magnitude larger than its instrumentation, so thirty samples cannot resolve the difference — an earlier version of this table reported instrumentation as a 5% *speed-up* there. A ratio is printed only when the difference exceeds the dispersion of the samples it came from.
+**Instrumentation is cheaper than the noise floor of the work it instruments.** 4 of the 6 agents show no resolvable overhead at 30 repetitions — the difference between running them with and without provenance is smaller than their own run-to-run variance. Those rows carry the margin in parentheses: the multiple of the sample dispersion the difference reaches, where **3× is required** before a figure is printed as a result.
 
-**Condition A is indistinguishable from OFF at this level.** Appending one event per node costs nothing a 5 ms agent step can resolve, which is the honest reading: the callback layer is cheap, and what it cannot do (E3) is not a matter of cost.
+That criterion is stricter than it was, and the correction matters. It used to be *larger than the noise*, which treats any consistent bias as a finding — and a loaded machine supplies plenty. Under the old rule two of these rows reported resolved overheads at margins of 2.9×. They are now reported as what they are. The project's own guard test caught it: on a shared CI runner, timing the **same function twice** produced a 147.5 ns difference against 61.0 ns of noise and called it real.
+
+**Condition A is indistinguishable from OFF everywhere.** Appending one event per node costs nothing any agent step can resolve, which is the honest reading: the callback layer is cheap, and what it cannot do (E3) is not a matter of cost.
 
 ---
 
@@ -169,12 +171,14 @@ The whole study, run twice on the same machine on separate occasions. **This tab
 
 | Agent | Occasion 1 | Occasion 2 |
 |---|--:|--:|
-| CA3 Analytics (heuristic) | +31% | +51% |
+| CA3 Analytics (heuristic) | *in noise* | *in noise* |
 | CA2 Metrics | *in noise* | *in noise* |
-| CAx Summariser (computed) | +35% | +32% |
+| CAx Summariser (computed) | +35% | *in noise* |
 | MC1 Compliance | +1569% | +1645% |
 | MC3 Audit | +1439% | +1519% |
 | CA1 Storage (persist path) | *in noise* | *in noise* |
+
+Judged under the criterion in force now — a difference must reach 3× the dispersion of its samples — applied to the stored measurements rather than to the verdicts those files were written with.
 
 ### What this says
 
