@@ -5,7 +5,8 @@ behaviour as W3C PROV — including *why* it decided what it decided.**
 
 Producers stream real provenance records onto a message bus; operational agents consume
 them and do real work; meta agents govern those agents by reading the provenance the
-agents emit about *themselves*. The system tracks its own trackers.
+agents emit about *themselves*. The system tracks its own trackers — one level deep, for a
+reason given below.
 
 > MC Zhou · HPCI Lab, University of Trento · supervisor Prof. Sandro Fiore
 > Part of the yProv ecosystem (`yProv4ML`, `yProv4WFs`, `yProv4Agents`).
@@ -90,14 +91,22 @@ S1 Receive · S2 Plan · S3 Act · S4 Observe · **S5 Decide ★** · S6 Respond
 three phases: *Ingestion & Scoping* {S1,S2} · *Execution* {S3} · *Governance &
 Reflexion* {S4,S5,S6}. ★ is the step that carries `yp:justification`.
 
-| | Agent | LLM | S5 verdicts | What it does |
+| | Agent | LLM | S5 verdicts (observed **bold**) | What it does |
 |---|---|:--:|---|---|
-| **CA1** | `StorageAgent` | — | ACCEPT / ESCALATE | persists after consumption; sha-256 + `yp:pid`; round-trip integrity check |
-| **CAx** | `NL_Summarizer` | ✅ | ACCEPT / REVISE / ESCALATE | natural-language summary of a provenance document |
-| **CA2** | `Metrics_Visualizer` | — | ACCEPT / REVISE | renders charts from the graph |
-| **CA3** | `Analytics_Agent` | optional | OK / ANOMALY | **5 mining algorithms** over any PROV graph |
-| **MC1** | `ComplianceChecker` | — | PASS / FAIL | is the emitted PROV typed, and is every decision justified? |
-| **MC3** | `AuditabilityAgent` | — | — | reconstructs the who-did-what-when trail |
+| **CA1** | `StorageAgent` | — | **ACCEPT** / **ESCALATE** | persists after consumption; sha-256 + `yp:pid`; round-trip integrity check |
+| **CAx** | `NL_Summarizer` | ✅ | **ACCEPT** / REVISE | natural-language summary of a provenance document |
+| **CA2** | `Metrics_Visualizer` | — | ACCEPT / **REVISE** | renders charts from the graph |
+| **CA3** | `Analytics_Agent` | optional | OK / **ANOMALY** | **5 mining algorithms** over any PROV graph |
+| **MC1** | `ComplianceChecker` | — | **PASS** / FAIL | checks a record against `vocab/shapes.ttl` |
+| **MC3** | `AuditabilityAgent` | — | **COMPLETE** / PARTIAL | reconstructs the who-did-what-when trail |
+
+Bold marks a verdict that appears in an archived run under `experiments/`; the rest are
+reachable in code and have not been triggered by the sample data. The distinction matters
+because a verdict that has never fired is a claim, not a result — and this table used to
+be wrong in both directions: it credited CAx with an ESCALATE it cannot emit, and credited
+MC3 with no verdict at all when it emits two (review finding A3). `experiments/fault-escalate`
+is the run that earned CA1's ESCALATE, and `paper/OUTLINE.md` E5 tracks which of the
+remaining four still need a fault-injection case.
 
 **CA3 is an analytics agent, not an anomaly detector.** It applies a *set* of algorithms
 to any W3C PROV document — structure, timing, sustainability, resource, anomaly — with
@@ -136,6 +145,19 @@ No callback could have written that sentence.
 **Reflexivity is visible in the filenames.** `example_0__cax_prov.json` is CAx's own
 lifecycle; `example_0__cax__mc1_prov.json` is MC1's provenance *about* CAx;
 `example_0__cax__mc3_prov.json` is MC3's audit of the same. The trackers are tracked.
+
+**And it stops there, deliberately.** The meta agents publish to `governance.*`, which
+nothing subscribes to, so reflexivity in a run is **one level deep**: the operational
+agents are governed and the governance layer is not. That bound is a design decision rather
+than an omission — an agent that governs its own governance output produces another record
+to govern, and the recursion does not terminate on its own.
+
+What *is* established is that the meta layer could be governed: MC1 satisfies its own
+standard, which `tests/test_reflexive_governance.py` checks by running MC1's checks over
+MC1's own emitted record. Before Phase 1 it did not — the compliance agent demanded a
+justified decision and emitted none, which is the kind of thing only self-application
+finds. A bounded second level (depth 2, with the depth carried in the subject) is a
+plausible extension and is not built; see `todo.md` A4.
 
 ---
 

@@ -1,6 +1,6 @@
 # Review findings & fix plan — yProv4Agents demonstrator
 
-> **Phase 5 complete (2026-10-09).** The items below are the original review. Statuses:
+> **Phase 6 complete (2026-10-09) — every review finding is now resolved.** Statuses:
 >
 > | | finding | status |
 > |---|---|---|
@@ -15,7 +15,7 @@
 > | D3 | PID semantics undocumented | **fixed** — documented as mock handles |
 > | D4 | `put()` hashed bytes it did not store | **fixed** — binary end to end, tested on Windows CI |
 > | A5 | MC1 failed its own check | **fixed** — MC1 and MC3 both emit a decision step |
-> | A3 | most advertised verdicts never occurred | **fixed** — 6 verdict kinds; ESCALATE and REVISE reachable |
+> | A3 | most advertised verdicts never occurred | **fixed** — 6 verdict kinds; the README table now marks which are *observed* in an archive versus merely reachable, and two entries in it were wrong (CAx had an ESCALATE it cannot emit; MC3 was credited with none) |
 > | A2 | 6-step lifecycle not uniform | **fixed** — all four operational agents emit 6; meta agents emit a 3-step subset |
 > | B4 | lineage fabricated from registration order | **fixed** — derivation declared, informed-by derived from dataflow |
 > | G1–G5 | five CA3 defects | **fixed** — including a check that could never fire |
@@ -24,11 +24,11 @@
 > | J1 | every activity recorded a zero duration (96/96) | **fixed (Phase 2)** — found while porting; the wall clock's 15.6 ms granularity exceeded the steps it was timing. Now 0/96 |
 > | J2 | `to_prov_json()` read distribution metadata from disk on every call | **fixed (Phase 5)** — found by the microbenchmark; 6.78 ms → 23 µs, **306×** |
 > | J3 | declared derivations were de-duplicated by scanning a list | **fixed (Phase 5)** — found by the scaling sweep; a 10,000-activity record 1.72 s → 88 ms, **19.6×**, and the complexity class was wrong (1.468 → 1.045) |
-> | A4 | nothing consumes `governance.*` | **open** — Phase 6 decides: implement or narrow the claim |
-> | B1 | E2 coverage metric is tautological | **open** — Phase 6 |
+> | A4 | nothing consumes `governance.*` | **resolved (Phase 6)** — claim narrowed, with the termination argument, and the bound is now a *tested invariant* rather than a known gap. The last strict-xfail is gone |
+> | B1 | E2 coverage metric is tautological | **resolved (Phase 6)** — relabelled an instrumentation-coverage check, and given an external judge: 24/24 records conform to `vocab/shapes.ttl` under pyshacl |
 > | B2 | Strategy A column is unmeasured | **fixed (Phase 3)** — one shared callback baseline; A recovers 96/96 activities, 324/324 relations, 24/24 verdicts and 0/24 justifications |
-> | B3 | relation totals mix mechanical and observed | **open** — Phase 6 reporting |
-> | E | no `yp:` vocabulary artifact | **open** — Phase 7 |
+> | B3 | relation totals mix mechanical and observed | **fixed (Phase 6)** — E1b splits the 324 into 126 observed / 72 derived / 30 declared / 96 attributed |
+> | E | no `yp:` vocabulary artifact | **fixed (Phase 6)** — `vocab/yprov4agents.ttl` and `vocab/shapes.ttl`; contribution C3 has an artifact, and the shapes found MC1 accepting a whitespace justification |
 > | F1 | no model provenance in LLM mode | **fixed (Phase 4)** — `runtime/llm.py`; every model call is accountable, archived in `experiments/phase4-llm` |
 > | F2 | `prompts.py` imported by nothing | **fixed (Phase 4)** — both LLM agents call through the registry; a prompt cannot reach a model without its identity reaching the record |
 > | F3 | `energy.py` entirely unused | **fixed (Phase 4)** — wired into the capture API, per step, opt-in via `PROV_ENERGY`. The wiring also found that per-step attribution is not sound at this granularity; the record now discloses that |
@@ -75,9 +75,9 @@ measured one.
 - [ ] **P6 — Wire prompt provenance into CAx** and record model + params (~15 lines; the
       difference between "agentic AI provenance" and "agent-shaped provenance").
       See [F1](#f1), [F2](#f2).
-- [ ] **P7 — Ship `vocab/yprov4agents.ttl` + a SHACL shape**, and reframe MC1 as shape
+- [x] **P7 — Ship `vocab/yprov4agents.ttl` + a SHACL shape**, and reframe MC1 as shape
       validation. See [Section E](#e-prov--standards-conformance).
-- [ ] **P8 — Reframe E2 honestly** ([B1](#b1)); fix the CA3 bugs ([G1–G5](#g-ca3-algorithm-correctness));
+- [x] **P8 — Reframe E2 honestly** ([B1](#b1)); fix the CA3 bugs ([G1–G5](#g-ca3-algorithm-correctness));
       correct the reflexivity claim ([A4](#a4)).
 
 ---
@@ -480,8 +480,13 @@ E5, and the yProv4ML completeness result gets its own, more credible category.
       producer's `publish` call. The README's ack transcript is subscription order, not
       concurrency. The local path exercises none of the NATS path's races, so the two are not
       equivalent evidence despite "the only thing swapped out is the transport".
-- [ ] **CA1 leaks:** `_acks` / `_done` are never pruned, and `_timeout_guard` tasks are never
+- [x] **CA1 leaks:** `_acks` / `_done` are never pruned, and `_timeout_guard` tasks are never
       cancelled on early quorum. Fine at n=2; mention it in limitations.
+      *Phase 1 cancelled the guards on early quorum (that race was [H4](#h4)) and prunes
+      `_acks` per session. `_done` still grows for the life of the process — one session id
+      per record ever handled — and that is now disclosed in `docs/DESIGN.md` §5b along with
+      the tracker's linear memory growth, which the scaling sweep measured at ~1.3 KiB per
+      activity.*
 
 <a id="h4"></a>
 - [ ] **H4 — persist-after-consume is a race against the wall clock, not a guarantee.**
@@ -512,8 +517,11 @@ E5, and the yProv4ML completeness result gets its own, more credible category.
       Good news for the evaluation: the quorum-versus-timeout branch is genuine behavioural
       provenance whose justification text really does differ by what happened. It is the
       strongest existing counter-example to [C1](#c1), and worth the paper's worked example.
-- [ ] **NATS core is at-most-once, no JetStream.** A provenance bus that can silently drop
+- [x] **NATS core is at-most-once, no JetStream.** A provenance bus that can silently drop
       records deserves an explicit sentence in a provenance paper.
+      *Stated in `docs/DESIGN.md` §5b, together with the non-equivalence of the local and
+      containerised paths — the in-process bus awaits each handler inline, so it exercises
+      none of the NATS path's races and the two are not interchangeable evidence.*
 
 ---
 

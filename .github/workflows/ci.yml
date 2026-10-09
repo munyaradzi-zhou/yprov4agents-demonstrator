@@ -127,16 +127,23 @@ jobs:
       # and yp:report_mode, now recorded on the step that produced the text rather than only
       # on the decision about it. Phase 5 changed no provenance at all: the two defects
       # the overhead study found were performance defects, and the records they produce are
-      # byte-identical before and after — which the gate is what establishes.
+      # byte-identical before and after — which the gate is what establishes. Phase 6
+      # adds exactly one declared attribute: MC1 cites the standard it checked against.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/phase5-overhead \
+            --before experiments/phase6-vocabulary \
             --after out \
             --strict
 
       - name: Run the conformance suite against freshly emitted provenance
         run: uv run pytest -v -m conformance --prov-dir out
+
+      # The vocabulary's SHACL shapes, applied by an independent engine. This is what
+      # makes "every decision is justified" a conformance statement against a declared
+      # standard rather than a self-report by the agent that enforces it.
+      - name: Validate the emitted records against vocab/shapes.ttl
+        run: uv run python -m eval.validate_shapes --prov-dir out
 
       - uses: actions/upload-artifact@v4
         if: always()

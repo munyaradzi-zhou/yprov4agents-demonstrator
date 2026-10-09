@@ -1,0 +1,594 @@
+@prefix yp:      <http://hpci-lab.org/yProv4Agents#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  yProv4Agents — a vocabulary for behavioural provenance in agentic AI
+# ═════════════════════════════════════════════════════════════════════════════════
+#
+#  This file is contribution C3, and until now it did not exist. Every term below was
+#  already being emitted by the demonstrator as a string inside an f-string — which is
+#  not a vocabulary, it is a naming convention with no definitions, no domains, no
+#  ranges, and nothing a consumer could validate against.
+#
+#  Two rules governed what went in:
+#
+#  *Only terms the system actually emits.* The inventory was taken from the frozen
+#  archives under experiments/, not from the documentation. A vocabulary that defines
+#  terms nothing produces is the same defect as an API that nothing implements, which
+#  this project has already had once (review finding A1).
+#
+#  *Standard terms wherever a standard term exists.* Lineage is prov:used,
+#  prov:wasGeneratedBy, prov:wasDerivedFrom, prov:wasInformedBy, prov:wasAssociatedWith
+#  and prov:actedOnBehalfOf — all PROV, none re-invented. The yp: namespace adds exactly
+#  two things PROV has no term for: the typed steps of an agent's decision lifecycle, and
+#  the reasoning behind a decision.
+#
+#  The accompanying SHACL shapes (shapes.ttl) make the structural rules machine-checkable,
+#  which is what turns the compliance agent's hand-written checks into a standard.
+
+<http://hpci-lab.org/yProv4Agents>
+    a                owl:Ontology ;
+    dcterms:title    "yProv4Agents: behavioural provenance for agentic AI"@en ;
+    dcterms:description """An extension of W3C PROV for recording what an autonomous
+        agent did and, critically, why it decided to do it. PROV describes data
+        lineage completely and says nothing about rationale, because rationale is not
+        observable from outside the function that formed it."""@en ;
+    owl:imports      <http://www.w3.org/ns/prov-o#> ;
+    dcterms:created  "2026-10-09"^^xsd:date ;
+    owl:versionInfo  "0.6.0" .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  1. Agents
+# ═════════════════════════════════════════════════════════════════════════════════
+
+yp:OperationalAgent
+    a               owl:Class ;
+    rdfs:subClassOf prov:SoftwareAgent ;
+    rdfs:label      "operational agent"@en ;
+    rdfs:comment    """An agent that performs the system's work: summarising, rendering,
+        analysing, storing. Distinguished from a meta agent because the two are related
+        asymmetrically — a meta agent consumes an operational agent's provenance, and a
+        claim of reflexivity is a claim about that relation."""@en .
+
+yp:MetaAgent
+    a               owl:Class ;
+    rdfs:subClassOf prov:SoftwareAgent ;
+    rdfs:label      "meta agent"@en ;
+    rdfs:comment    """An agent whose input is another agent's provenance record. It
+        governs rather than produces: checking compliance, reconstructing an audit
+        trail. A meta agent is itself provenance-tracked, which is what makes the
+        system's self-application more than a slogan."""@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  2. The agent lifecycle — typed activities
+# ═════════════════════════════════════════════════════════════════════════════════
+#
+#  PROV has prov:Activity and nothing more specific, because PROV is domain-neutral.
+#  These subclasses are the domain: the recurring steps of an agent's turn. Typing them
+#  is what lets a consumer ask "show me every decision" or "which step consumed this?"
+#  without knowing how any particular agent was written.
+
+yp:AgentLifecycleActivity
+    a               owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label      "agent lifecycle activity"@en ;
+    rdfs:comment    "One step of an agent's turn. The superclass of every step type."@en .
+
+yp:ReceiveTaskActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "receive task"@en ;
+    rdfs:comment    "Accepting work: the arrival of the input this turn will act on."@en .
+
+yp:PlanningActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "planning"@en ;
+    rdfs:comment    """Choosing an approach before acting. Often costs nothing
+        measurable, and is recorded anyway: a plan that was not formed is a different
+        record from a plan that was formed and was trivial."""@en .
+
+yp:ToolCallActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "tool call"@en ;
+    rdfs:comment    """Invoking something outside the agent: a model, a renderer, a
+        library. Where a model is involved this step carries the model provenance
+        properties, without which the call cannot be repeated."""@en .
+
+yp:AnalysisActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "analysis"@en ;
+    rdfs:comment    "Computing over data already held, rather than fetching more."@en .
+
+yp:PersistActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "persist"@en ;
+    rdfs:comment    """Writing a payload to a store. Separated from the tool call because
+        the cost and the failure modes are different — and because the overhead study
+        found that persisting a record costs an order of magnitude more than building
+        it."""@en .
+
+yp:ObservationActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "observation"@en ;
+    rdfs:comment    """Checking the result of an earlier step: did the file arrive, does
+        the hash match, are the summary's figures supported. The evidence an observation
+        gathers is what a subsequent decision's justification cites."""@en .
+
+yp:DecisionActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "decision"@en ;
+    rdfs:comment    """Concluding something and acting on it. The only activity type that
+        must carry yp:justification, because it is the only one whose content cannot be
+        reconstructed by an observer: a verdict is a value, and the reasoning that
+        produced it was a local variable at the moment of decision."""@en .
+
+yp:ResponseActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "response"@en ;
+    rdfs:comment    "Handing the result onward — onto a bus, to a caller, to a store."@en .
+
+yp:GovernanceActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:AgentLifecycleActivity ;
+    rdfs:label      "governance activity"@en ;
+    rdfs:comment    """A step whose subject is another agent's provenance record. The
+        superclass of the meta agents' work."""@en .
+
+yp:ComplianceCheckActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:GovernanceActivity ;
+    rdfs:label      "compliance check"@en ;
+    rdfs:comment    """Testing another agent's record against a structural standard. The
+        standard is in shapes.ttl, so what is checked is declared rather than implied by
+        the checking code."""@en .
+
+yp:AuditActivity
+    a               owl:Class ;
+    rdfs:subClassOf yp:GovernanceActivity ;
+    rdfs:label      "audit"@en ;
+    rdfs:comment    """Reconstructing who did what, in what order, from a record alone.
+        An audit can fail for a reason the audited agent never sees: an activity with no
+        start time cannot be placed in a sequence."""@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  3. Typed entities
+# ═════════════════════════════════════════════════════════════════════════════════
+
+yp:TaskEntity
+    a               owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label      "task"@en ;
+    rdfs:comment    "The work an agent was given, as it arrived."@en .
+
+yp:ResponseEntity
+    a               owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label      "response"@en ;
+    rdfs:comment    "What the agent produced for its caller."@en .
+
+yp:ToolResultEntity
+    a               owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label      "tool result"@en ;
+    rdfs:comment    "What something outside the agent returned."@en .
+
+yp:QualityEntity
+    a               owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label      "quality finding"@en ;
+    rdfs:comment    """The outcome of a check, as a first-class entity rather than a flag
+        on an activity. Making it an entity is what lets a decision declare that it was
+        derived from the finding it rests on."""@en .
+
+yp:MemoryStateEntity
+    a               owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label      "memory state"@en ;
+    rdfs:comment    """An agent's working memory at one turn, as a revision of the
+        previous turn's. Defined here and not exercised by the demonstrator — see
+        docs/DESIGN.md on the distinction between what the library offers and what the
+        demonstrator shows."""@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  4. The decision properties — the part PROV has no term for
+# ═════════════════════════════════════════════════════════════════════════════════
+
+yp:justification
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "justification"@en ;
+    rdfs:comment        """Why this decision was reached, in terms of the evidence that
+        produced it. The contribution of this vocabulary, and the one property here that
+        no external observer can supply: a callback fires after a function returns and
+        cannot read what that function concluded or why. Measured rather than asserted —
+        searching every payload a callback handler could observe for the justifications
+        in the explicit record finds none of them."""@en .
+
+yp:verdict
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "verdict"@en ;
+    rdfs:comment        """The conclusion: ACCEPT, REVISE, ESCALATE, PASS, FAIL, ANOMALY,
+        OK, COMPLETE, PARTIAL. Unlike the justification, a verdict is sometimes
+        recoverable by an observer — it is a short token, and a developer who puts it in
+        a step's label has published it. That is a property of the label, not of the
+        observation channel."""@en .
+
+yp:confidence_score
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:decimal ;
+    rdfs:label          "confidence score"@en ;
+    rdfs:comment        "The agent's own confidence in the verdict, where it has one."@en .
+
+yp:escalation_reason
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "escalation reason"@en ;
+    rdfs:comment        """Which of several independent conditions caused an escalation.
+        Recorded separately from the justification because the conditions demand
+        different responses: a failed integrity check means the data is suspect, an
+        unconfirmed consumption means a consumer is down."""@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  5. Pointers, not payloads
+# ═════════════════════════════════════════════════════════════════════════════════
+
+yp:pid
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         prov:Entity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "persistent identifier"@en ;
+    rdfs:comment        """Where the payload is, so the graph grows with the number of
+        steps rather than the size of the data. A pointer that does not resolve is worse
+        than an inline value: it reads as evidence while supplying none, so a conforming
+        producer must be able to dereference every PID it publishes."""@en .
+
+yp:contentHash
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         prov:Entity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "content hash"@en ;
+    rdfs:comment        """What the payload was, as `sha256:<hex>`. Makes the pointer
+        falsifiable: a reader can fetch and verify rather than trust."""@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  6. Model provenance — for a step whose output is not deterministic
+# ═════════════════════════════════════════════════════════════════════════════════
+#
+#  Without these, the one step in an agent's turn that cannot be reproduced is the one
+#  step the record cannot account for.
+
+yp:model
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "model identifier"@en ;
+    rdfs:comment "Which model produced this output."@en .
+
+yp:temperature
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "sampling temperature"@en .
+
+yp:max_tokens
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "token budget"@en .
+
+yp:prompt_id
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "prompt identifier"@en ;
+    rdfs:comment """Which registered prompt drove the call. A prompt is part of the
+        experimental apparatus: change its wording and the output distribution
+        changes."""@en .
+
+yp:prompt_version
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "prompt version"@en .
+
+yp:prompt_sha
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "prompt content hash"@en ;
+    rdfs:comment """The hash of the prompt text. Recorded alongside the version because a
+        forgotten version bump is otherwise undetectable."""@en .
+
+yp:prompt_tokens
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "prompt tokens"@en .
+
+yp:completion_tokens
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "completion tokens"@en .
+
+yp:finish_reason
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "finish reason"@en ;
+    rdfs:comment """Why generation stopped. A response truncated on its token budget is a
+        different artifact from one that finished, and the two are indistinguishable from
+        the text alone."""@en .
+
+yp:response_sha
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "response content hash"@en .
+
+yp:llm_latency_s
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "model latency in seconds"@en ;
+    rdfs:comment """How long the model took, separately from how long the step took, so a
+        reader can tell model time from instrumentation time."""@en .
+
+yp:summary_mode
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:AgentLifecycleActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "summary mode"@en ;
+    rdfs:comment """Which path produced the text: a model, or a deterministic fallback.
+        An outcome rather than a configuration — an agent given a model whose call failed
+        produced computed output and must say so."""@en .
+
+yp:report_mode
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:AgentLifecycleActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "report mode"@en ;
+    rdfs:comment "As yp:summary_mode, for a narrated analytics report."@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  7. Energy and emissions
+# ═════════════════════════════════════════════════════════════════════════════════
+
+yp:energy_kwh
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Activity ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "energy in kWh"@en .
+
+yp:emissions_kg
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Activity ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "CO2-equivalent emissions in kg"@en .
+
+yp:energy_source
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Activity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "energy measurement source"@en ;
+    rdfs:comment """`measured` when a hardware counter was readable, `modelled` when a
+        thermal-design-power estimate was used, `null` when accounting was enabled with
+        no backend. A labelled zero is a different claim from an absent measurement."""@en .
+
+yp:energy_sampling_period_s
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Activity ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "energy sampling period in seconds"@en .
+
+yp:energy_attributable
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Activity ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "energy is attributable to this activity"@en ;
+    rdfs:comment """False when the backend samples less often than the activity lasted.
+        The figure is then real consumption over a real window but not an attribution,
+        and a consumer must not aggregate it per step. Measured here: a 15-second
+        sampling period against millisecond steps charged a step that did nothing ten
+        times what the step that did the work was charged."""@en .
+
+yp:duration_s
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Activity ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "window covered by an energy delta, in seconds"@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  8. Record configuration — the bundle describes itself
+# ═════════════════════════════════════════════════════════════════════════════════
+#
+#  A reader cannot interpret a record without knowing how it was configured. These sit on
+#  the prov:Bundle entity every document carries, because PROV already defines a bundle
+#  as a named set of provenance descriptions that is itself an entity.
+
+yp:granularity
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Bundle ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "granularity"@en ;
+    rdfs:comment """`DATA` for the full graph, `METADATA` for typed activities without
+        the entity section. A METADATA record is smaller and keeps every justification:
+        the lean mode buys less data, never less reasoning."""@en .
+
+yp:persistence
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Bundle ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "persistence"@en ;
+    rdfs:comment """`PERSISTENT` or `TRANSIENT`. A transient record is built, returned
+        and published, and not written to a store."""@en .
+
+yp:emitted_by
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Bundle ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "emitting library"@en .
+
+yp:library_version
+    a           owl:DatatypeProperty ;
+    rdfs:domain prov:Bundle ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "emitting library version"@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  9. Evidence properties
+# ═════════════════════════════════════════════════════════════════════════════════
+#
+#  What a step examined, counted or produced. Deliberately distinct from the
+#  justification: these are the evidence, the justification is the claim that rests on
+#  it. A reader who wants to check an agent's reasoning needs both, and a reader who
+#  wants to aggregate across runs needs these to be structured rather than prose.
+
+yp:evidence
+    a               owl:DatatypeProperty ;
+    rdfs:domain     prov:Activity ;
+    rdfs:label      "evidence property"@en ;
+    rdfs:comment    """Abstract superproperty of the measurement properties below. Not
+        emitted directly; it exists so a consumer can ask for "everything this step
+        measured" without enumerating the vocabulary."""@en .
+
+yp:checks_applied        a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "checks applied"@en ;
+    rdfs:comment "Which named checks a compliance step ran, so a verdict names its standard."@en .
+yp:activities_examined   a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "activities examined"@en .
+yp:decisions_examined    a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "decisions examined"@en .
+yp:target_agent          a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "agent under review"@en .
+yp:audited_agent         a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "agent under audit"@en .
+yp:step_count            a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "steps in the audited trail"@en .
+yp:justified_step_count  a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "audited steps carrying a justification"@en .
+yp:orderable_step_count  a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "audited steps that could be placed in order"@en ;
+    rdfs:comment """Fewer than the step count when activities lack start times. An audit
+        trail is only a trail if its steps can be ordered from the record."""@en .
+yp:algorithms            a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "analytics algorithms applied"@en .
+yp:activities_analysed   a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "activities analysed"@en .
+yp:entities_analysed     a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "entities analysed"@en .
+yp:wall_clock_s          a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:decimal ; rdfs:label "wall clock span of the analysed run"@en .
+yp:anomaly_count         a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "invariants breached"@en .
+yp:completeness_gap_count a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "completeness gaps found"@en ;
+    rdfs:comment """Reported separately from anomalies. An anomaly is a claim about how a
+        run behaved; a completeness gap is a claim about what its producer recorded, and
+        conflating them made the anomaly verdict carry no information."""@en .
+yp:energy_streams        a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "energy metric streams found"@en .
+yp:resource_streams      a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "resource metric streams found"@en .
+yp:grounding_check       a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "grounding check performed"@en .
+yp:ungrounded_figure_count a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "figures unsupported by the source graph"@en .
+yp:chart_subject         a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "what a rendered chart depicts"@en ;
+    rdfs:comment """`numeric-metrics` or `graph-composition`. Materially different
+        deliverables: one shows a run's measurements, the other only how many nodes its
+        provenance graph has."""@en .
+yp:series_plotted        a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "data series plotted"@en .
+yp:rendered_bytes        a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "size of a rendered artifact in bytes"@en ;
+    rdfs:comment """Evidence, not a claim: a rendered image's size depends on the host's
+        libraries and fonts, so it belongs in a property and not in a justification."""@en .
+yp:size_bytes            a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "size of a stored payload in bytes"@en .
+yp:store                 a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "store implementation written to"@en .
+yp:standard              a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "declared standard a check was made against"@en ;
+    rdfs:comment """Where the rules a compliance verdict was reached against are declared.
+        A verdict that cites its standard can be disputed; one that does not can only be
+        believed."""@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  10. Persist-after-consume
+# ═════════════════════════════════════════════════════════════════════════════════
+#
+#  The ordering guarantee a record is archived under. A record persisted because its
+#  consumers used it carries a different warranty from one persisted because a timer
+#  fired, and reporting both as a plain success made them indistinguishable without
+#  reading the prose.
+
+yp:persist_policy
+    a owl:DatatypeProperty ; rdfs:domain yp:AgentLifecycleActivity ;
+    rdfs:range xsd:string ; rdfs:label "persistence policy"@en .
+
+yp:persist_trigger
+    a owl:DatatypeProperty ; rdfs:domain yp:DecisionActivity ;
+    rdfs:range xsd:string ; rdfs:label "what triggered the write"@en ;
+    rdfs:comment "`quorum` when every required consumer acknowledged, `timeout` otherwise."@en .
+
+yp:required_consumers
+    a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "consumers whose use was required"@en .
+
+yp:acknowledged_by
+    a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:string ; rdfs:label "consumers that acknowledged"@en .
+
+yp:consumers_required
+    a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "number of consumers required"@en .
+
+yp:consumers_acknowledged
+    a owl:DatatypeProperty ; rdfs:subPropertyOf yp:evidence ;
+    rdfs:range xsd:integer ; rdfs:label "number of consumers that acknowledged"@en .
+
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  11. Failure
+# ═════════════════════════════════════════════════════════════════════════════════
+
+yp:outcome
+    a owl:DatatypeProperty ; rdfs:domain prov:Activity ;
+    rdfs:range xsd:string ; rdfs:label "outcome"@en ;
+    rdfs:comment """`error` when the step raised. Present only on a failed step, so a
+        successful record carries nothing extra. A step that fails and leaves no trace
+        shows a hole where it should show a failure, and a hole cannot be told apart from
+        a step that never ran."""@en .
+
+yp:error_type
+    a owl:DatatypeProperty ; rdfs:domain prov:Activity ;
+    rdfs:range xsd:string ; rdfs:label "exception type"@en .

@@ -102,21 +102,57 @@ The last row is structurally determined by activity count, so quoting a single t
 invites the objection that the figure measures how many steps ran. The 228 dataflow and
 lineage edges are the number that carries information.
 
-### E2 — Instrumentation coverage *(reframed: not the headline)*
+### E1b — Relations, by what established them *(new, Phase 6)*
 
-**24 of 24 decision activities carry a non-empty `yp:justification` (100%).**
+| How the edge was established | Count | Share | Which |
+|---|--:|--:|---|
+| **Observed** — a step said it read or wrote this | 126 | 39% | `used` 72, `wasGeneratedBy` 54 |
+| **Derived** — follows by PROV's definition of `wasInformedBy` | 72 | 22% | `wasInformedBy` 72 |
+| **Declared** — a step asserted this derivation | 30 | 9% | `wasDerivedFrom` 30 |
+| **Attributed** — one per activity, to the agent that ran it | 96 | 30% | `wasAssociatedWith` 96 |
+| **Total** | **324** | 100% | |
 
-State plainly what this is: a **conformance check that every decision site is
-instrumented**. It cannot be a result, because the denominator and the numerator come from
-the same call sites — the code that counts decisions is the code that justifies them, so no
-run could produce another number. Presenting it as the headline is the single easiest thing
-for a reviewer to dismantle.
+**The structural claim is 228, not 324.** The remaining 96 are agent attributions: exactly
+one per activity, so they count how many steps ran rather than how they were connected.
+Quoting the total invites precisely that objection (review finding B3), and the split
+forecloses it. It also makes the comparison with E3 legible: Strategy A reconstructs all
+four categories, which is why the structural rows there tie.
 
-The claim it *does* support is worth keeping: no decision point in six heterogeneous agents
-was left unrecorded, across both the operational and governance layers.
+### E2 — Instrumentation coverage, and conformance to a declared standard
 
-*Pending:* a real denominator — branch points counted from source — would make this a
-measurement. Scheduled Phase 6.
+Two tables that are easy to confuse, and the second is the one worth printing.
+
+**Coverage: 24 of 24 decisions carry a justification.** This is a conformance check on the
+instrumentation, not a result. The code that counts decision activities is the code that
+justifies them, so no run of this system could report another number, and the figure says
+nothing about whether a justification is *informative*. Report it as evidence that no
+decision point was left uninstrumented, and nothing more.
+
+**Conformance: 24 of 24 records satisfy `vocab/shapes.ttl`.** This one has an external
+judge. The rule — every `yp:DecisionActivity` carries a non-empty `yp:justification`, on an
+activity that is dated, ended and attributed — is declared in SHACL in the vocabulary, not
+written into the agent that enforces it. It is applied by `pyshacl` over RDF converted by
+the reference `prov` library. Neither the rule nor the engine is ours, which is the whole
+difference between a conformance statement and a self-report.
+
+| Shape | What it requires | Records checked |
+|---|---|--:|
+| `decision-justified` | a non-empty justification on every decision | 24 |
+| `decision-concluded` | a verdict on every decision | 24 |
+| `activity-started` · `activity-ended` · `activity-attributed` | every step dated, ended, attributed to an agent | 24 |
+| `pointer-verifiable` | every `yp:pid` accompanied by a `sha256:` hash | 8 |
+| `granularity-declared` · `persistence-declared` · `emitter-identified` | the record describes its own configuration | 24 |
+
+**Declaring the standard immediately found a defect in the agent that had been enforcing
+it.** MC1 tested `if not activity.get("yp:justification")`, so a justification of pure
+whitespace passed; the shape's `sh:pattern "\S"` rejects it, and the evaluation harness
+strips before counting. Three implementations of one rule, and the agent was the one that
+disagreed. That is the argument for declaring a standard rather than implementing it:
+*a rule written once in one place cannot disagree with itself.*
+
+The shapes are also tested for teeth. Each is checked by mutating a conforming record in
+the specific way that shape exists to catch — a suite that passes everything is decoration,
+and this is how the whitespace gap surfaced.
 
 ### E3 — Strategy A vs Strategy B *(measured, Phase 3)*
 
@@ -198,8 +234,18 @@ it previously failed — the checker could not satisfy its own rule. It now pass
 MC1 applied to MC3. That is a sharper statement of reflexivity than a governance table, and
 it is a test in the suite rather than a claim in prose.
 
-**State the depth honestly:** `governance.*` is terminal. Nothing consumes it, so
-reflexivity is one level deep. Either close the loop or say so — see Limitations.
+**The depth, and why it is a property rather than a gap.** `governance.*` is terminal:
+nothing consumes it, so reflexivity in a run is one level deep. That bound is deliberate.
+An agent that governs governance output emits a record that is itself governance output,
+and nothing in the subject structure stops the next pass — publishing to a prefix nobody
+subscribes to makes the recursion impossible by construction, which is worth more than a
+depth counter someone can forget to check.
+
+So contribution C2 carries the qualifier, and the bound is a tested invariant rather than a
+documented defect: `test_governance_output_is_terminal_by_design` fails if any agent starts
+consuming `governance.*` without a bounded depth scheme arriving alongside it. A bounded
+second level, with the depth carried in the subject, is named as future work and not
+claimed.
 
 ### E5 — Verdicts, and their reachability
 
@@ -460,6 +506,7 @@ used for isolation in measurement, not as evidence of throughput.
 | **F7** | **Declared-or-derived lineage vs the index-order chain it replaced** | `docs/phases/PHASE_1.md` §2.4 |
 | **F8** | **One LLM step, fully accounted: prompt → model → response, with the attributes that make it repeatable** | E5b |
 | **F9** | **Where the overhead actually is: the agent's work, the record, and the write, stacked** | E6b |
+| **F10** | **The vocabulary: `yp:` classes hung off PROV-O, with the one property PROV has no term for highlighted** | `vocab/yprov4agents.ttl` |
 
 F7 is new and earns its place: it shows the correction changed the graph's *topology*, not
 only its size — the old chain asserted a single dependency spine where the real dataflow is
@@ -481,11 +528,21 @@ more honest and more persuasive than drawing it as uniformly poor.
    result on energy attribution (E5c) and both instrumentation modes made selectable.
 3. ~~**Phase 5** — measure E6~~ — **done**; see E6 above, plus two library defects the
    study found and fixed.
-4. **Phase 6** — reframe E2 with a real denominator; decide the reflexivity claim.
-5. **Phase 7** — the `yp:` vocabulary artifact, without which C3 has no artifact.
+4. ~~**Phase 6** — reframe E2; decide the reflexivity claim~~ — **done**; see E2 and the
+   A4 note below.
+5. ~~**Phase 7** — the `yp:` vocabulary artifact~~ — **done in Phase 6**: `vocab/` carries
+   the ontology and the SHACL shapes, so contribution C3 has an artifact a reader can
+   download, validate against, and disagree with.
 6. Write §8 from the material above; render F1–F7.
 7. Decide authorship and venue date with Sandro.
 
-One claim-scope decision is the author's, not the implementer's: **A4**, that nothing
-consumes `governance.*`, so the reflexivity in contribution C2 is one level deep. It can be
-implemented as a real loop or narrowed in the text, and E4 reads differently depending which.
+**A4 is resolved, by deciding the claim rather than the code.** Reflexivity in a run is
+one level deep: the operational agents are governed and the governance layer is not.
+Contribution C2 carries that qualifier, and the reason is termination — an agent that
+governs governance output emits another record to govern, and nothing in the subject
+structure stops the next pass. Publishing meta output to a prefix nobody subscribes to
+makes the recursion impossible by construction, which is stronger than a depth counter
+someone can forget to check. The bound is now a *tested invariant* rather than a known gap,
+and the capability half still holds: MC1 satisfies its own standard, which it did not
+before Phase 1. A bounded second level with the depth carried in the subject is a plausible
+extension and is named as future work, not claimed.

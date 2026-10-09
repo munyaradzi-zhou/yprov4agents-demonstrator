@@ -1,0 +1,193 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix yp:   <http://hpci-lab.org/yProv4Agents#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# ═════════════════════════════════════════════════════════════════════════════════
+#  Conformance shapes for yProv4Agents records
+# ═════════════════════════════════════════════════════════════════════════════════
+#
+#  MC1, the compliance agent, has always enforced a structural standard. Until now that
+#  standard lived inside MC1 as four hand-written predicates, which means it was a
+#  property of one implementation rather than something anyone else could check against,
+#  disagree with, or extend.
+#
+#  These shapes are that standard, declared. Three consequences, and the third is the
+#  point:
+#
+#  * A consumer can validate a record with any SHACL engine, without running MC1.
+#  * The checks have names a reader can cite, rather than line numbers.
+#  * MC1 can be *tested against the shapes* — if the agent and the shapes disagree,
+#    one of them is wrong, and that is a question with an answer.
+#
+#  Scope. These shapes say what a record must *structurally* contain. They cannot say
+#  whether a justification is any good; no shape can, because that is a judgement about
+#  prose. The project's own evaluation is explicit that justification coverage is an
+#  instrumentation-coverage figure and not a quality result (review finding B1), and the
+#  same limit applies here. What a shape can establish is that the field is present,
+#  non-empty, and attached to the activity type that is supposed to carry it — which is
+#  precisely the claim worth making mechanically.
+
+yp:RecordShape
+    a               sh:NodeShape ;
+    rdfs:label      "an emitted provenance record"@en ;
+    sh:targetClass  prov:Bundle ;
+    sh:property [
+        sh:path     yp:granularity ;
+        sh:in       ( "DATA"^^xsd:string "METADATA"^^xsd:string ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:name     "granularity-declared" ;
+        sh:message  """A record must state the granularity it was built at. A reader
+            cannot otherwise tell an absent entity section from a record that had no
+            entities.""" ;
+    ] ;
+    sh:property [
+        sh:path     yp:persistence ;
+        sh:in       ( "PERSISTENT"^^xsd:string "TRANSIENT"^^xsd:string ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:name     "persistence-declared" ;
+        sh:message  "A record must state whether it was written out." ;
+    ] ;
+    sh:property [
+        sh:path     yp:library_version ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:name     "emitter-identified" ;
+        sh:message  """A record must name the version of the library that wrote it, or a
+            defect found later cannot be scoped to the records it affected.""" ;
+    ] .
+
+
+yp:DecisionShape
+    a               sh:NodeShape ;
+    rdfs:label      "a decision activity"@en ;
+    sh:targetClass  yp:DecisionActivity ;
+    sh:property [
+        sh:path      yp:justification ;
+        sh:datatype  xsd:string ;
+        sh:minCount  1 ;
+        sh:maxCount  1 ;
+        sh:minLength 1 ;
+        # Whitespace is not a justification. sh:minLength alone accepts "  ", while MC1's
+        # own check strips before testing — so the shape and the agent disagreed, and the
+        # shape was the weaker of the two. Found by mutating a conforming record and
+        # asking which shape objected; tests/test_shapes.py keeps it found.
+        sh:pattern   "\\S" ;
+        sh:name      "decision-justified" ;
+        sh:severity  sh:Violation ;
+        sh:message   """Every decision must carry a non-empty yp:justification. This is
+            the project's central structural claim and the one check that cannot be
+            satisfied by an external observer: the reasoning behind a verdict was a local
+            variable at the moment of decision, and a record that omits it has lost it
+            permanently.""" ;
+    ] ;
+    sh:property [
+        sh:path      yp:verdict ;
+        sh:datatype  xsd:string ;
+        sh:minCount  1 ;
+        sh:maxCount  1 ;
+        sh:minLength 1 ;
+        sh:pattern   "\\S" ;
+        sh:name      "decision-concluded" ;
+        sh:message   "A decision must state what it concluded." ;
+    ] ;
+    sh:property [
+        sh:path     prov:startedAtTime ;
+        sh:minCount 1 ;
+        sh:name     "decision-dated" ;
+        sh:message  "A decision must say when it was taken." ;
+    ] .
+
+
+yp:ActivityShape
+    a               sh:NodeShape ;
+    rdfs:label      "any lifecycle activity"@en ;
+    sh:targetClass  yp:AgentLifecycleActivity ;
+    sh:property [
+        sh:path     prov:startedAtTime ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:name     "activity-started" ;
+        sh:message  """An activity must record when it started. Without it the step
+            cannot be placed in a sequence, and an audit trail that cannot be ordered is
+            not a trail — which is a failure the audited agent never sees.""" ;
+    ] ;
+    sh:property [
+        sh:path     prov:endedAtTime ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:name     "activity-ended" ;
+        sh:message  "An activity must record when it ended, or it has no duration." ;
+    ] ;
+    sh:property [
+        sh:path     prov:wasAssociatedWith ;
+        sh:minCount 1 ;
+        sh:name     "activity-attributed" ;
+        sh:message  """An activity must be attributed to an agent. An unattributed step
+            in a multi-agent record cannot be assigned responsibility, which is what the
+            record exists to support.""" ;
+    ] .
+
+
+yp:PointerShape
+    a               sh:NodeShape ;
+    rdfs:label      "an entity that points at a stored payload"@en ;
+    sh:targetSubjectsOf yp:pid ;
+    sh:property [
+        sh:path      yp:contentHash ;
+        sh:datatype  xsd:string ;
+        sh:minCount  1 ;
+        sh:pattern   "^sha256:[0-9a-f]{64}$" ;
+        sh:name      "pointer-verifiable" ;
+        sh:message   """An entity carrying a yp:pid must also carry a yp:contentHash, as
+            sha256:<64 hex>. A pointer without a hash cannot be verified, and a pointer
+            that cannot be verified reads as evidence while supplying none. Whether the
+            PID actually dereferences is not a question a shape can answer — see
+            tests/test_store_integrity.py, which fetches every one of them.""" ;
+    ] .
+
+
+yp:EnergyShape
+    a               sh:NodeShape ;
+    rdfs:label      "an activity carrying an energy measurement"@en ;
+    sh:targetSubjectsOf yp:energy_kwh ;
+    sh:property [
+        sh:path     yp:energy_source ;
+        sh:in       ( "measured"^^xsd:string "modelled"^^xsd:string "null"^^xsd:string ) ;
+        sh:minCount 1 ;
+        sh:name     "energy-sourced" ;
+        sh:message  """An energy figure must say where it came from. A modelled estimate
+            and a hardware counter reading are different claims, and a labelled zero is
+            different again from no measurement at all.""" ;
+    ] ;
+    sh:property [
+        sh:path     yp:energy_kwh ;
+        sh:minInclusive 0 ;
+        sh:name     "energy-non-negative" ;
+        sh:message  "Energy consumption cannot be negative." ;
+    ] .
+
+
+yp:ModelCallShape
+    a               sh:NodeShape ;
+    rdfs:label      "an activity that invoked a model"@en ;
+    sh:targetSubjectsOf yp:model ;
+    sh:property [
+        sh:path     yp:temperature ;
+        sh:minCount 1 ;
+        sh:name     "sampling-declared" ;
+        sh:message  """A step that names a model must also name its sampling parameters.
+            Without them the call cannot be repeated, which is the whole reason to record
+            the model.""" ;
+    ] ;
+    sh:property [
+        sh:path     yp:prompt_sha ;
+        sh:minCount 1 ;
+        sh:name     "prompt-identified" ;
+        sh:message  """A model call must cite the prompt that drove it, by content hash.
+            A prompt is part of the apparatus: change its wording and the output
+            distribution changes.""" ;
+    ] .
