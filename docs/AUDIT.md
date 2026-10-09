@@ -261,6 +261,57 @@ audit that reports only what it anticipated understates how much was wrong.
   timestamp, so every re-render showed as a change; they are now byte-identical when the
   data is. *(fixed with AU8)*
 
+## What the paper says now, and why *(AU9, AU10)*
+
+Three of the paper's sentences were stronger than the evidence under them. None of the three
+was dropped; each was narrowed to the version the evidence supports, and the number behind
+it is now computed by code from the frozen archive instead of written into the text.
+
+**1. "The baseline recovers 0 of 24 justifications."** True, but nearly guaranteed: it asked
+whether a whole sentence appeared word for word somewhere, and a sentence put together at run
+time almost never does. The new measure breaks each justification into the facts it mentions
+(numbers, names, files, agent roles) and checks each one separately:
+
+```
+   what the decision used            what the callback layer saw
+   ──────────────────────            ───────────────────────────
+   counts handed in   39, 55   ───►  seen      (they crossed a step boundary)
+   roles that acked   ca2 ca3  ───►  seen
+   values it computed 21634 B  ──X   not seen  (computed inside the decision)
+                      64.7%    ──X   not seen
+   the threshold      10       ──X   not seen
+   the RULE joining them all   ──X   never a value anything passed
+```
+
+Over the eight decisions the four working agents make, the callback layer saw 30 of the 49
+facts (61%), and none of the 19 values the agents worked out in order to decide. For two
+decisions it saw *every* fact, and still could not say why the verdict followed. The sixteen
+justifications from the two checking agents only restate structure the baseline rebuilds
+anyway, so they are now reported separately and do not count toward the claim. The claim
+the paper makes is the **decision rule**, not the sentence.
+
+**2. "The instrumentation is cheaper than the noise of the work it measures."** Only half
+true. Each agent was timed three ways: provenance off, record built but not saved, record
+built and saved. On both occasions, *building* the record made no measurable difference to
+any of the four working agents. *Saving* it sometimes did — and for two agents (CA3, CAx)
+the answer changed between occasions, so neither answer is a result. The paper now says
+exactly that, and the report computes which verdicts held instead of asserting that all did.
+
+```
+   building the record   ▏ inside the noise, every working agent, both occasions
+   saving the record     ▇▇▇▇▇▇▇▇▇▇  ≥ 90% of the overhead, wherever overhead shows at all
+```
+
+**3. "A justification is 278 bytes, 21.7% of a record."** The 21.7% came from a test record
+in which all six steps carry a justification. The agents justify only their decision, so in
+the 24 records they actually emit, justifications are **6.5%** of the bytes.
+
+**Also brought up to date:** 86 vocabulary terms and 16 shapes (was 81 and 14); thirteen
+verdicts observed, not twelve (INCOMPLETE, and CA1's three escalation reasons); the model
+recorded as the version that answered, with the three fingerprints one run produced; and
+§3 no longer says the compliance rule is "written once in one place" — it is declared once
+and its two implementations are tested against the declaration.
+
 ## Checked and found sound
 
 - **No secret has ever been committed.** Searched the full history for key-shaped strings;

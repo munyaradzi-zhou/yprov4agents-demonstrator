@@ -101,8 +101,9 @@ Reflexion* {S4,S5,S6}. ★ is the step that carries `yp:justification`.
 | **MC3** | `AuditabilityAgent` | — | COMPLETE / PARTIAL | reconstructs the who-did-what-when trail |
 
 **Every verdict in that table has been observed in an archived run** — twelve of twelve,
-six from the ordinary pipeline and six from seven injected faults under
-`experiments/audit-reference`. A verdict that has never fired is a claim rather than a
+six from the ordinary pipeline and six from nine injected scenarios under
+`experiments/audit-reference/faults`, which also observe CA1's ESCALATE by each of its three
+reasons and `INCOMPLETE`. A verdict that has never fired is a claim rather than a
 result, which is why the distinction is tracked: this table used to credit CAx with an
 `ESCALATE` it cannot emit and MC3 with no verdict at all when it emits two (review finding
 A3).

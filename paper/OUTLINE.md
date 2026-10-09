@@ -208,16 +208,17 @@ identity from content, types none of the 54, and carries no `yp:pid` at all. The
 pointers-not-payloads design has no analogue in a reconstruction that never saw where a
 payload was stored.
 
-*The verdict is often recoverable; the reasoning never is.* A recovers 24 of 24 verdicts —
-honestly reported, and reported as fragile: it recovers them by scraping a developer-chosen
-label, and a graph whose decision node is named `decide` yields none. The justifications are
-recoverable under no labelling convention at all. Searching everything the handler could
-read — 222 strings, 12,425 characters — finds 0 of 24. Each justification is prose composed
-at the moment of decision out of evidence the step never returned: a local variable, and the
-callback layer is outside the function.
+*The verdict is often recoverable; the decision rule never is.* A recovers 24 of 24
+verdicts — honestly reported, and reported as fragile: it recovers them by scraping a
+developer-chosen label, and a graph whose decision node is named `decide` yields none.
+Searching everything the handler could read — 222 strings, 12,425 characters — finds 0 of 24
+justifications *verbatim*, which is close to true by construction and is not the claim
+(`docs/AUDIT.md` [2]). Fact by fact (DRAFT Table 3), A saw 30 of the 49 facts the eight
+operational justifications cite and none of the 19 the agents computed in order to decide;
+the sixteen meta-agent justifications are restatements and are reported apart.
 
-**This is the single earned zero.** It isolates exactly what explicit instrumentation buys,
-and it is worth more than the four unearned ones it replaces. §7's worked example (CA1's
+**The narrowed claim is the decision rule.** It isolates exactly what explicit
+instrumentation buys. §7's worked example (CA1's
 ESCALATE) is the qualitative companion: no callback could produce that sentence, because the
 sentence is assembled from a quorum set and an integrity result that the step reported
 nowhere but into the record.
@@ -379,8 +380,9 @@ files rather than transcribed. Specification and scored predictions in
 
 **The central result, and it is the one that was predicted.** Recording a
 `yp:justification` costs **nothing this machine can resolve** — over 40 interleaved
-rounds of 1,000 calls, the paired difference is 26 ns against a round-to-round
-spread of ±352 ns — and **278 bytes, 21.7% of a record**. The trade is *storage for explainability, not speed
+rounds of 1,000 calls, the paired difference is 54 ns against a round-to-round
+spread of ±726 ns — and 240–738 bytes per justification, **6.5% of the records the agents
+emit** (21.7% is a synthetic benchmark record that justifies every step). The trade is *storage for explainability, not speed
 for explainability*. That is a far more defensible claim than "it is free", and it is what
 the data shows. It also survived being made harder: Phase 1 rewrote the justifications so
 they state the result of real checks rather than restating their own instruction
@@ -614,7 +616,9 @@ renumbered in `DRAFT.md`, and **energy is non-negotiable**. The live plan is bel
 first-class subsection with its own table, not a limitation clause, so it is removed from
 the cut menu below and every other item absorbs the difference.
 
-The draft now stands at **5,613 words, 3 figures, 4 tables**, after four passes. Whether
+The draft now stands at **6,275 words, 3 figures, 5 tables**: 5,613 after four passes, then
+~610 more when the audit (`docs/AUDIT.md`) narrowed the rationale and overhead claims and the
+fact-level table (Table 3) was added to carry the narrowed one. Whether
 that is 6 pages or 7 cannot be answered by arithmetic: estimates of a two-column IEEE page
 range from ~900 to ~1,200 words, and that band spans "fits" and "a page over". Earlier
 versions of this file asserted a 4,000-word budget and then a 3,300-word one; both were
@@ -659,8 +663,8 @@ absent from this list by decision and is not a candidate at any page count.
 1. **§6.1 conformance to one sentence** (~90 w). "A single non-standard key made a conforming
    parser reject all 24 documents; after the fix, 24 of 24 are accepted and all 8 pointers
    dereference, judged by the reference `prov` library." Nothing is lost but breathing room.
-2. **§6.6 reachability to its two load-bearing claims** (~120 w): twelve of twelve observed,
-   and `mc1:FAIL` unreachable from this library's own records. The finding-about-the-input
+2. **§6.6 reachability to its two load-bearing claims** (~120 w): all thirteen verdicts
+   observed, and `mc1:FAIL` unreachable from this library's own records. The finding-about-the-input
    paragraph is excellent and expendable.
 3. **§6.4 model provenance to its attribute list plus the prompt-registry lesson** (~90 w).
 4. **§6.5's "which figures transfer" to the one-sentence rule plus the criterion correction**
@@ -676,10 +680,12 @@ absent from this list by decision and is not a candidate at any page count.
 Items 1–6 total roughly 810 words and land near 4,750 without touching a result's substance.
 Item 7 reaches ~4,600 with three figures becoming two.
 
-**Do not cut, under any pressure:** the four zeros that were wrong and are now one earned
-zero; the resolvability-criterion correction; the fabricated-lineage disclosure; the
-justification-quality limitation; the energy negative result. The first four are places where
-the paper concedes something a reviewer would otherwise find. The fifth is a result the
+**Do not cut, under any pressure:** Table 3 and the decision-rule claim it supports — the
+narrowed form of the old "0 of 24", which on its own was a verbatim test close to true by
+construction (`docs/AUDIT.md` [2]); the verdicts that did *not* hold across occasions; the
+resolvability-criterion correction; the fabricated-lineage disclosure; the
+justification-quality limitation; the energy negative result. All but the last are places where
+the paper concedes something a reviewer would otherwise find. The last is a result the
 community needs in order to stop publishing per-step energy figures that are artifacts of a
 sampling period.
 

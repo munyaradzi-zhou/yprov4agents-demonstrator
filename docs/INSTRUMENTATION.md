@@ -208,8 +208,8 @@ per activity); the first three are the structural claim, and quoting the total i
 "that counts steps, not structure". The 24/24 justification figure is instrumentation
 coverage, not a quality result — the code that counts decisions is the code that justifies
 them, so no run of this system could report another number. What a callback-level approach
-structurally cannot reach is the rationale row alone, and that single earned zero is the
-stronger claim (see `paper/OUTLINE.md` E0–E3).
+structurally cannot reach is the decision rule: it may see the facts a decision used, but not
+how they were combined into the verdict (`eval.baseline`, E3b).
 
 Layer 1 (the OTel bridge) is **not built**; it is the scouting target and the natural next
 increment. Nothing in the architecture has to change to accept it: the bridge feeds the

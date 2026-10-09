@@ -277,9 +277,9 @@ sees run trees with inputs, outputs and parents; activities, entities, `used`,
 do typed activities. Measured over the same run, A recovers 96 of 96 activities, all 324
 relations, and — by scraping the verdict out of a node label — 24 of 24 verdicts.
 
-What it recovers is **0 of 24 justifications**, and that is now a measurement rather than a
+It recovers **no justification verbatim**, and that is a measurement rather than a
 stipulation: every justification in the explicit record is searched for across every string
-the handler was handed. See `eval/baseline.py` and the E3 table in `paper/OUTLINE.md`.
+the handler was handed. The verbatim search is close to true by construction — a sentence assembled at run time rarely survives intact anywhere — so the claim rests on a fact-level measure instead (`eval.baseline`, E3b; `docs/AUDIT.md` [2]). See `eval/baseline.py`.
 
 Two consequences for this study, both good:
 
@@ -316,7 +316,7 @@ makes them worth scoring. Results in [`E6_RESULTS.md`](E6_RESULTS.md).
 |---|---|---|---|
 | `record_activity` | 1–5 µs | ~1.7 µs | ✅ |
 | `now_iso` | 0.5–2 µs | ~2 µs, **and more than `record_activity` itself** | ⚠️ at the top of the range, and the warning fired |
-| Justification cost (M5 − M4) | near zero in time; tens-to-hundreds of bytes | **below what the machine can resolve**; 278 bytes, 21.7% of a record | ✅ emphatically |
+| Justification cost (M5 − M4) | near zero in time; tens-to-hundreds of bytes | **below what the machine can resolve**; 278 bytes each, 6.5% of the records the agents emit | ✅ emphatically |
 | `to_prov_json` (6 activities) | 10–100 µs | ~25 µs — *after* fixing a 6.78 ms defect it exposed | ✅, eventually |
 | Per-session L1+L2 total | well under 1 ms | 50–85 µs | ✅ |
 | Deterministic agent overhead | low single-digit % | **not resolvable** — inside each agent's own run-to-run variance | ⚠️ the prediction was unmeasurable, which is a better answer than either of us expected |
