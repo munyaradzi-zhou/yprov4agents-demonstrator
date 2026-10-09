@@ -556,6 +556,18 @@ used for isolation in measurement, not as evidence of throughput.
 | **F9** | **Where the overhead actually is: the agent's work, the record, and the write, stacked** | E6b |
 | **F10** | **The vocabulary: `yp:` classes hung off PROV-O, with the one property PROV has no term for highlighted** | `vocab/yprov4agents.ttl` |
 
+**Cut to four, and rendered: F1, F4, F5, F9** (`python -m paper.figures` →
+`paper/figures/`). Ten figures in six pages is a poster. The four that survive each carry
+an argument the text cannot: the structural split, the two escalations, A's success and its
+one cliff, and the composition of the overhead. F2, F3, F6–F8 and F10 become prose or an
+appendix.
+
+Every number in them is read from `experiments/` at render time. Three figure defects were
+caught by looking at the output rather than at the code: colliding text from eyeballed
+coordinates, a line spacing computed in points against axes in data units, and — the one
+that mattered — **stacked segments on a log axis**, where a segment's length bears no
+relation to its value, so the composition the figure existed to show was simply false.
+
 F7 is new and earns its place: it shows the correction changed the graph's *topology*, not
 only its size — the old chain asserted a single dependency spine where the real dataflow is
 a tree.
@@ -581,7 +593,8 @@ more honest and more persuasive than drawing it as uniformly poor.
 5. ~~**Phase 7** — the `yp:` vocabulary artifact~~ — **done in Phase 6**: `vocab/` carries
    the ontology and the SHACL shapes, so contribution C3 has an artifact a reader can
    download, validate against, and disagree with.
-6. Write §8 from the material above; render F1–F7.
+6. ~~Render the figures~~ — **done**: four, from `python -m paper.figures`.
+   §1–§5 drafted in `paper/DRAFT.md` (~2,500 words); §6–§9 remain.
 7. Decide authorship and venue date with Sandro.
 
 **A4 is resolved, by deciding the claim rather than the code.** Reflexivity in a run is
