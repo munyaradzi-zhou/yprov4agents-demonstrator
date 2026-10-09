@@ -59,7 +59,7 @@ against those archives. Energy (PR #11) is parked by decision.
 - [x] **AU4** — SHACL shapes accept a record with no decision; add an existence constraint *(audit [6])*
 - [x] **AU5** — LLM records the alias `gpt-4o`, not the resolved snapshot or `system_fingerprint` *(audit [7])*
 - [x] **AU6** — CA1 silently drops a repeated session; session id is per folder, so per-rank files would collide *(audit [8])*
-- [ ] **AU7** — `freeze` reads git status after copying, so every manifest says `dirty: true`; no record of what changed *(audit [4])*
+- [x] **AU7** — `freeze` reads git status after copying, so every manifest says `dirty: true`; no record of what changed *(audit [4])*
 
 **Evidence**
 - [ ] **AU8** — re-run the pipeline and re-freeze the reference archives once, from a clean committed tree *(audit [4])*
