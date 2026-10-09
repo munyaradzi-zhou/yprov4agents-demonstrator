@@ -488,6 +488,100 @@ def unreachable_rationale(
     return found, verdicts_found, wanted
 
 
+#: The agents' role names, as they appear inside justifications ("acknowledged by [ca2,
+#: ca3, cax]"). A role name is a fact a justification cites, and one a handler sees in
+#: every topic and label.
+AGENT_ROLES = ("ca1", "ca2", "ca3", "cax", "mc1", "mc3")
+#: Roles whose decisions judge an input; the rest judge another agent's record.
+OPERATIONAL_ROLES = ("ca1", "ca2", "ca3", "cax")
+
+#: What counts as a checkable fact inside a justification, tried in order. A single-digit
+#: integer is deliberately not one: "9" occurs somewhere in almost any haystack, so finding
+#: it says nothing about whether the handler saw *that* 9.
+_FACT = re.compile(
+    r"(?<!\w)'(?P<quoted>[\w/.-]{2,})'"
+    r"|\b(?P<hash>[0-9a-f]{8,})\b"
+    r"|\b(?P<file>[\w-]+\.(?:png|svg|json|csv|txt))\b"
+    rf"|\b(?P<role>{'|'.join(AGENT_ROLES)})\b"
+    # Not part of a name ("sha-256", "example_0"); a unit may follow ("5.049s", "64.7%").
+    r"|(?<![\w.-])(?P<number>\d+\.\d+|\d{2,})(?!\.?\d)"
+)
+
+
+def justification_facts(text: str) -> list[str]:
+    """The checkable facts a justification cites: figures, hashes, names, files, roles."""
+    facts: list[str] = []
+    for match in _FACT.finditer(text):
+        fact = next(value for value in match.groupdict().values() if value)
+        if fact not in facts:
+            facts.append(fact)
+    return facts
+
+
+def _visible(fact: str, haystack: str) -> bool:
+    """Whether a fact occurs in the haystack as a whole token, not inside a longer one.
+
+    A figure may carry a unit in the haystack as in the justification ("5.049s"), so a
+    number is bounded only against further digits.
+    """
+    tail = r"(?!\.?\d)" if fact[0].isdigit() else r"(?!\w)"
+    return re.search(rf"(?<![\w.]){re.escape(fact)}{tail}", haystack) is not None
+
+
+@dataclass
+class FactRecovery:
+    """How much of one agent's justifications a callback handler could have seen."""
+
+    decisions: int = 0
+    verbatim: int = 0
+    facts: int = 0
+    facts_visible: int = 0
+    #: Justifications citing at least one fact, every one of which the handler saw. For
+    #: these, the only thing Strategy A is missing is the rule that combined them.
+    all_facts_visible: int = 0
+
+
+def role_of(path: Path) -> str:
+    """The emitting agent's role, from a record's file name (``…__<role>_prov.json``)."""
+    return path.name.removesuffix("_prov.json").split("__")[-1]
+
+
+def fact_recovery(
+    explicit: Iterable[tuple[Path, dict[str, Any]]], payloads: list[str]
+) -> dict[str, FactRecovery]:
+    """Recoverability of the rationale at the level of facts, per emitting agent.
+
+    :func:`unreachable_rationale` asks whether a justification appears *verbatim* anywhere
+    the handler looked. That is the right question about prose, and the wrong one to rest a
+    claim on alone: a sentence assembled at run time will almost never survive intact, so a
+    verbatim zero is close to guaranteed (docs/AUDIT.md [2]). This asks the harder question
+    — of the facts each justification cites, how many did the handler see somewhere?
+
+    It over-counts visibility, and is reported as an over-count. A role name in the stream
+    is not knowledge that the role acknowledged; a number seen in a payload is not knowledge
+    that it was compared with a threshold. What a high figure here establishes is narrower
+    and still the point: the inputs to a decision can be observable while the rule that
+    combined them is not.
+    """
+    haystack = "\n".join(payloads)
+    recovery: dict[str, FactRecovery] = defaultdict(FactRecovery)
+    for path, doc in explicit:
+        for activity in (doc.get("activity") or {}).values():
+            text = str(activity.get("yp:justification", "")).strip()
+            if not text:
+                continue
+            tally = recovery[role_of(path)]
+            tally.decisions += 1
+            tally.verbatim += text in haystack
+            facts = justification_facts(text)
+            seen = sum(_visible(fact, haystack) for fact in facts)
+            tally.facts += len(facts)
+            tally.facts_visible += seen
+            tally.all_facts_visible += bool(facts) and seen == len(facts)
+    order = {role: index for index, role in enumerate(AGENT_ROLES)}
+    return dict(sorted(recovery.items(), key=lambda item: (order.get(item[0], 99), item[0])))
+
+
 def entity_identity_collisions(
     explicit: list[dict[str, Any]], callback: list[dict[str, Any]]
 ) -> int:
@@ -539,7 +633,11 @@ def compare(prov_dir: Path, baseline_dir: Path) -> dict[str, Any]:
     hand-written label-to-type map. The gap between them is what the types cost — a cost
     that belongs to condition A rather than being free.
     """
-    explicit = _load(prov_dir, "*_prov.json")
+    named = [
+        (path, json.loads(path.read_text(encoding="utf-8")))
+        for path in sorted(prov_dir.glob("*_prov.json"))
+    ]
+    explicit = [doc for _, doc in named]
     events_path = baseline_dir / EVENTS_FILE
     if not events_path.is_file():
         raise SystemExit(
@@ -571,6 +669,9 @@ def compare(prov_dir: Path, baseline_dir: Path) -> dict[str, Any]:
         "verdicts_found": verdicts,
         "payloads_searched": len(payloads),
         "payload_chars": sum(len(payload) for payload in payloads),
+        "facts": {
+            role: asdict(tally) for role, tally in fact_recovery(named, payloads).items()
+        },
         "entity_collisions": entity_identity_collisions(explicit, mapped_docs),
         "type_rules": len(DEFAULT_TYPE_MAP),
     }
@@ -658,20 +759,71 @@ def render(result: dict[str, Any]) -> list[str]:
         f"never saw where a payload was stored, so the pointers-not-payloads design is not "
         f"available to A at all.",
         "",
-        f"**The verdict is often recoverable; the reasoning never is.** Searching "
+        f"**Verdicts are often recoverable; justifications verbatim, never.** Searching "
         f"everything the handler could read — {result['payloads_searched']} strings, "
         f"{result['payload_chars']:,} characters — recovers {result['verdicts_found']} of "
-        f"{result['rationale_searched']} verdicts and **{result['rationale_found']} of "
-        f"{result['rationale_searched']} justifications**. The verdicts come back only "
-        f"because these agents interpolate them into node labels, which is a property of "
-        f"the labels and not of the observation channel: a graph whose decision node is "
-        f"named `decide` would yield none. The justifications come back under no labelling "
-        f"convention at all. Each is prose composed at the moment of decision out of "
-        f"evidence the step never returned — a local variable, and the callback layer is "
-        f"outside the function.",
+        f"{result['rationale_searched']} verdicts and {result['rationale_found']} of "
+        f"{result['rationale_searched']} justifications *verbatim*. The verdicts come back "
+        f"only because these agents interpolate them into node labels: a graph whose "
+        f"decision node is named `decide` would yield none. The verbatim zero is close to "
+        f"guaranteed for any sentence assembled at run time, so it is reported as what it "
+        f"is and not rested on. The table below asks the harder question.",
         "",
-        "*This is the single earned zero, and it is worth more than the four unearned ones "
-        "it replaces: it isolates exactly what explicit instrumentation buys.*",
+        *render_facts(result["facts"]),
+    ]
+
+
+def render_facts(facts: dict[str, dict[str, int]]) -> list[str]:
+    """The fact-level table (E3b), with operational and meta agents kept apart."""
+
+    def pct(part: int, whole: int) -> str:
+        return f"{100 * part / whole:.0f}%" if whole else "—"
+
+    def row(label: str, tally: dict[str, int]) -> str:
+        return (
+            f"| {label} | {tally['decisions']} | {tally['verbatim']} | {tally['facts']} | "
+            f"{tally['facts_visible']} ({pct(tally['facts_visible'], tally['facts'])}) | "
+            f"{tally['all_facts_visible']} |"
+        )
+
+    def total(roles: Iterable[str]) -> dict[str, int]:
+        summed: dict[str, int] = defaultdict(int)
+        for role in roles:
+            for key, value in facts.get(role, {}).items():
+                summed[key] += value
+        return dict(summed) or asdict(FactRecovery())
+
+    operational = [role for role in facts if role in OPERATIONAL_ROLES]
+    meta = [role for role in facts if role not in OPERATIONAL_ROLES]
+    ops, rest = total(operational), total(meta)
+    return [
+        "### E3b — The rationale, fact by fact",
+        "",
+        "Each justification is split into the checkable facts it cites — multi-digit "
+        "figures, hashes, quoted names, files and agent roles — and each fact is searched "
+        "for, as a whole token, in everything the handler could read. This over-counts: a "
+        "role name in the stream is not knowledge that the role acknowledged.",
+        "",
+        "| Agent | Decisions | Verbatim | Facts cited | Facts visible to A | "
+        "All facts visible |",
+        "|---|--:|--:|--:|--:|--:|",
+        *(row(role, facts[role]) for role in operational),
+        row("**operational**", ops),
+        *(row(role, facts[role]) for role in meta),
+        row("**meta**", rest),
+        "",
+        f"**The inputs to a decision can be observable; the rule that combined them is "
+        f"not.** Across the {ops['decisions']} operational decisions, "
+        f"{pct(ops['facts_visible'], ops['facts'])} of the facts the justifications cite "
+        f"were somewhere in the callback stream, and for {ops['all_facts_visible']} of "
+        f"{ops['decisions']} every cited fact was. What A lacks for those is which facts "
+        f"were combined, against what threshold, to reach the verdict — the decision rule, "
+        f"which was never a value the step passed anywhere.",
+        "",
+        f"**The {rest['decisions']} meta-agent justifications are restatements**, and are "
+        f"reported apart for that reason: they describe structure A already reconstructs "
+        f"in full ({pct(rest['facts_visible'], rest['facts'])} of their facts visible). "
+        f"Counting them would inflate any headline built on the operational agents.",
         "",
     ]
 

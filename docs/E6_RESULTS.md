@@ -61,24 +61,26 @@ Timer floor on this machine: **200 ns** for two clock reads around an empty call
 
 Each agent's full step, 30 repetitions per condition, interleaved round-robin so drift and background load hit every condition equally. **B-TRANS is condition B with persistence off**: it builds and returns the record and writes nothing, which separates what the provenance costs to *construct* from what it costs to *store*.
 
-| Agent | OFF | A | B-TRANS | B | B vs OFF | of which the write | Output |
-|---|--:|--:|--:|--:|--:|--:|--:|
-| CA3 Analytics (heuristic) | 2.45 ms | 2.41 ms | 2.60 ms | 3.92 ms | **+60%** | 1.32 ms | 6,250 B |
-| CA2 Metrics | 109.70 ms | 107.54 ms | 105.83 ms | 108.62 ms | *in noise* (0.1×) | — | 5,133 B |
-| CAx Summariser (computed) | 4.73 ms | 4.72 ms | 4.68 ms | 7.94 ms | **+68%** | 3.26 ms | 5,635 B |
-| MC1 Compliance | 109.30 µs | 96.55 µs | 146.90 µs | 1.63 ms | **+1394%** | 1.49 ms | 3,445 B |
-| MC3 Audit | 166.35 µs | 176.65 µs | 239.00 µs | 2.16 ms | **+1199%** | 1.92 ms | 3,526 B |
-| CA1 Storage (persist path) | 5.37 ms | 5.27 ms | 5.41 ms | 7.36 ms | *in noise* (1.5×) | — | 5,556 B |
+| Agent | OFF | A | B-TRANS | B | Building it | Building and writing it | of which the write | Output |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| CA3 Analytics (heuristic) | 2.45 ms | 2.41 ms | 2.60 ms | 3.92 ms | *in noise* (0.5×) | **+60%** (5.0×) | 1.32 ms | 6,250 B |
+| CA2 Metrics | 109.70 ms | 107.54 ms | 105.83 ms | 108.62 ms | *in noise* (0.4×) | *in noise* (0.1×) | — | 5,133 B |
+| CAx Summariser (computed) | 4.73 ms | 4.72 ms | 4.68 ms | 7.94 ms | *in noise* (0.1×) | **+68%** (4.6×) | 3.26 ms | 5,635 B |
+| MC1 Compliance | 109.30 µs | 96.55 µs | 146.90 µs | 1.63 ms | **+34%** (5.0×) | **+1394%** (11.5×) | 1.49 ms | 3,445 B |
+| MC3 Audit | 166.35 µs | 176.65 µs | 239.00 µs | 2.16 ms | *in noise* (1.9×) | **+1199%** (11.9×) | 1.92 ms | 3,526 B |
+| CA1 Storage (persist path) | 5.37 ms | 5.27 ms | 5.41 ms | 7.36 ms | *in noise* (0.1×) | *in noise* (1.5×) | — | 5,556 B |
+
+Each verdict cell carries its margin: the multiple of the sample dispersion the difference from OFF reaches, where **3× is required** before a figure is printed as a result.
 
 ### What this says
 
 **Lead with the worst case: MC1 Compliance, at +1394%.** A meta agent's own work is trivial — 109.30 µs — while it still emits a complete typed record, so it carries the highest ratio in the system by construction. A paper that reports its own worst case is worth more than one that reports its best.
 
-**But read the decomposition before believing the ratio.** For that same agent, building the record costs 37.60 µs and writing it costs 1.49 ms — **98% of the overhead is one file write**. The same split holds for every agent in the table. Explicit instrumentation is not expensive to compute; persisting its output is, and that is a storage decision a deployment can make differently (E6c).
+**But read the decomposition before believing the ratio.** For that same agent, building the record costs 37.60 µs and writing it costs 1.49 ms — **98% of the overhead is one file write**. Across the 4 agents whose overhead resolves, the write is at least 90% of it. Explicit instrumentation is not expensive to compute; persisting its output is, and that is a storage decision a deployment can make differently (E6c).
 
-**Instrumentation is cheaper than the noise floor of the work it instruments.** 2 of the 6 agents show no resolvable overhead at 30 repetitions — the difference between running them with and without provenance is smaller than their own run-to-run variance. Those rows carry the margin in parentheses: the multiple of the sample dispersion the difference reaches, where **3× is required** before a figure is printed as a result.
+**Building the record is unresolvable for 5 of the 6 agents** at 30 repetitions: CA3, CA2, CAx, MC3, CA1. For those, constructing a complete typed record moves the agent's step by less than its own run-to-run variance. Whether *writing* it also stays inside the noise depends on the agent and, near the threshold, on the occasion — E6f says which verdicts held.
 
-That criterion is stricter than it was, and the correction matters. It used to be *larger than the noise*, which treats any consistent bias as a finding — and a loaded machine supplies plenty. Under the old rule two of these rows reported resolved overheads at margins of 2.9×. They are now reported as what they are. The project's own guard test caught it: on a shared CI runner, timing the **same function twice** produced a 147.5 ns difference against 61.0 ns of noise and called it real.
+The 3× criterion is stricter than the one this study began with, and the correction matters. It used to be *larger than the noise*, which treats any consistent bias as a finding — and a loaded machine supplies plenty. Under the old rule two rows of the first occasion's table reported resolved overheads at margins of 2.9×. The project's own guard test caught it: on a shared CI runner, timing the **same function twice** produced a 147.5 ns difference against 61.0 ns of noise and called it real.
 
 **Condition A is indistinguishable from OFF everywhere.** Appending one event per node costs nothing any agent step can resolve, which is the honest reading: the callback layer is cheap, and what it cannot do (E3) is not a matter of cost.
 
@@ -101,7 +103,7 @@ One six-step record, built and emitted 3,000 times per mode. Measured through `e
 
 **METADATA buys 38% fewer bytes for 8% less time.** The saving is in storage, not compute, and it keeps every justification: the lean mode buys less *data*, never less reasoning. A mode that shed justifications would be a different product rather than a cheaper one.
 
-**A justification is 278 bytes, 21.7% of a record.** Together with E6a's compute figure this is the central result of the overhead study: the field the project argues for costs about a fifth of a record's bytes and nothing measurable in time.
+**A justification of this benchmark's length is 278 bytes.** This record justifies all 6 of its steps, so here they are 21.7% of it — an upper bound on the share, not a typical one. The agents justify only their decision; E2 reports what the justifications are of the records the demonstrator actually emits.
 
 ---
 
@@ -127,7 +129,7 @@ Fitted exponents (`cost ≈ k · size^b`, least squares on log-log axes):
 
 ### What this says
 
-**It is linear now, and it was not when first measured.** The first run of this sweep fitted an exponent of **1.468** on building a record, and a 10,000-activity record took **1.72 s**. The cause was a duplicate check on declared derivations that scanned a list — O(n) per declaration, O(n²) over a run. With an O(1) membership set the same record takes **88 ms**, a 19.6× improvement, and the exponent is 1.036.
+**It is linear now, and it was not when first measured.** The first run of this sweep fitted an exponent of **1.468** on building a record, and a 10,000-activity record took **1.72 s**. The cause was a duplicate check on declared derivations that scanned a list — O(n) per declaration, O(n²) over a run. With an O(1) membership set the same record took **88 ms**, a 19.6× improvement. The exponents in the table above are this occasion's.
 
 That defect was invisible at every scale the tests and the demonstrator use: six activities. It would have reached the paper as an unqualified O(A+E) claim. **This is what the scaling study is for**, and §7 was right to name it as the place a complexity surprise would hide.
 
@@ -169,14 +171,14 @@ The whole study, run twice on the same machine on separate occasions. **This tab
 | Exponent: building a record | 1.066 | 1.089 | +2.1% |
 | Exponent: `to_prov_json()` | 1.124 | 1.134 | +0.9% |
 
-| Agent | Occasion 1 | Occasion 2 |
-|---|--:|--:|
-| CA3 Analytics (heuristic) | *in noise* | +60% |
-| CA2 Metrics | *in noise* | *in noise* |
-| CAx Summariser (computed) | *in noise* | +68% |
-| MC1 Compliance | +1645% | +1394% |
-| MC3 Audit | +1519% | +1199% |
-| CA1 Storage (persist path) | *in noise* | *in noise* |
+| Agent | Building it, occasion 1 | occasion 2 | Building and writing it, occasion 1 | occasion 2 |
+|---|--:|--:|--:|--:|
+| CA3 Analytics (heuristic) | *in noise* (0.0×) | *in noise* (0.5×) | *in noise* (2.9×) | **+60%** (5.0×) |
+| CA2 Metrics | *in noise* (0.4×) | *in noise* (0.4×) | *in noise* (0.5×) | *in noise* (0.1×) |
+| CAx Summariser (computed) | *in noise* (0.3×) | *in noise* (0.1×) | *in noise* (2.9×) | **+68%** (4.6×) |
+| MC1 Compliance | *in noise* (2.9×) | **+34%** (5.0×) | **+1645%** (8.1×) | **+1394%** (11.5×) |
+| MC3 Audit | **+43%** (9.8×) | *in noise* (1.9×) | **+1519%** (24.2×) | **+1199%** (11.9×) |
+| CA1 Storage (persist path) | *in noise* (0.1×) | *in noise* (0.1×) | *in noise* (0.9×) | *in noise* (1.5×) |
 
 Judged under the criterion in force now — a difference must reach 3× the dispersion of its samples — applied to the stored measurements rather than to the verdicts those files were written with.
 
@@ -184,11 +186,11 @@ Judged under the criterion in force now — a difference must reach 3× the disp
 
 **The absolute timings do not transfer, and the document should not be read as though they do.** 1 of the figures above moved by more than 10% between occasions — the largest by 11% — on the same machine, with the same code, under the same conditions. This is a four-core laptop with other processes on it; a quiet server would be tighter, and the reader's machine is neither.
 
-**The byte counts are exact.** 2 figures were identical to the byte across occasions. Output size is deterministic given the record, which is why E6c's conclusion — a justification is 278 bytes and 21.7% of a record — is the firmest number in the study and the one to quote.
+**The byte counts are exact.** 2 figures were identical to the byte across occasions. Output size is deterministic given the record, which makes the byte counts the firmest numbers in the study.
 
-**The complexity class is stable.** The fitted exponents agree to within 2%, and both occasions say the same thing: building a record and serialising it are linear in the size of the graph. A complexity class is a property of the algorithm rather than of the afternoon.
+**The complexity class is stable.** The fitted exponents agree to within 2.1%, and both occasions say the same thing: building a record and serialising it are linear in the size of the graph. A complexity class is a property of the algorithm rather than of the afternoon.
 
-**The agent ratios are stable in order of magnitude and not in digits.** The meta agents are the worst case on both occasions, by a factor of twenty or so over the operational agents; CA2 is inside the noise on both. Report the ranking and the decomposition, not the second significant figure.
+**Whether building the record resolves changed for MC1, MC3; whether building and writing it resolves changed for CA3, CAx.** A verdict that changes between two occasions is not a result in either direction, whatever margin either occasion reached. Quote the verdicts that held, and the decomposition, not the second significant figure.
 
 ---
 

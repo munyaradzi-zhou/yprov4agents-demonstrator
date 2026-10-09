@@ -21,8 +21,11 @@ import pytest
 from eval.baseline import (
     DEFAULT_TYPE_MAP,
     CallbackLogger,
+    _visible,
     compare,
     entity_identity_collisions,
+    fact_recovery,
+    justification_facts,
     read_events,
     unreachable_rationale,
     write_events,
@@ -175,6 +178,54 @@ def test_the_rationale_search_would_catch_a_leak() -> None:
     assert found == 1
 
 
+def test_the_facts_of_a_justification_are_its_figures_names_and_roles() -> None:
+    """What the fact-level measure extracts, pinned on the shapes the agents write."""
+    assert justification_facts(
+        "acknowledged by [ca2, ca3, cax]; 9 activities / 39 entities, 21634 bytes; "
+        "sha-256 matched; gap before 'Training' is 5.049s — 64.7% of the run's wall "
+        "clock; wrote example_0_metrics.png"
+    ) == ["ca2", "ca3", "cax", "39", "21634", "Training", "5.049", "64.7",
+          "example_0_metrics.png"]  # fmt: skip
+
+
+def test_a_fact_is_visible_only_as_a_whole_token() -> None:
+    """A figure inside a longer number, or a name inside a longer name, was not seen."""
+    haystack = "gap 5.049s; count 2163; agent ca22; file example_0_metrics.png.bak"
+    assert _visible("5.049", haystack)
+    assert not _visible("216", haystack)
+    assert not _visible("ca2", haystack)
+    assert _visible("example_0_metrics.png", haystack)
+
+
+def test_fact_recovery_separates_what_was_seen_from_what_was_computed(
+    tmp_path: Path,
+) -> None:
+    """The figure a decision computed is invisible; the counts it was handed are not."""
+    record = {
+        "activity": {
+            "d": {
+                "yp:verdict": "ACCEPT",
+                "yp:justification": "Graph of 39 entities; record is 21634 bytes.",
+            }
+        }
+    }
+    recovery = fact_recovery(
+        [(tmp_path / "s0__ca1_prov.json", record)], ["a graph with 39 entities"]
+    )
+    tally = recovery["ca1"]
+    assert (tally.decisions, tally.verbatim, tally.facts, tally.facts_visible) == (1, 0, 2, 1)
+    assert tally.all_facts_visible == 0
+
+
+def test_fact_recovery_reports_the_verbatim_case_too(tmp_path: Path) -> None:
+    """Guards the guard, as for the verbatim search: a leak must show up in both columns."""
+    record = {"activity": {"d": {"yp:justification": JUSTIFICATION}}}
+    tally = fact_recovery([(tmp_path / "s0__mc1_prov.json", record)], [JUSTIFICATION])["mc1"]
+    assert tally.verbatim == 1
+    assert tally.facts_visible == tally.facts == 2  # 0.41 and 0.70
+    assert tally.all_facts_visible == 1
+
+
 def test_reconstruction_carries_no_pointer_or_typed_entity() -> None:
     logger, _ = _observed()
     entities = logger.to_prov_json("s0", "Test_Agent")["entity"].values()
@@ -224,6 +275,7 @@ def test_compare_reads_both_conditions_from_disk(tmp_path: Path) -> None:
     assert result["A0"]["typed_activities"] == 0
     assert result["A"]["typed_activities"] == 3
     assert result["rationale_found"] == 0
+    assert result["facts"]["test"]["decisions"] == 1
 
 
 def test_the_reconstruction_is_itself_valid_prov_json() -> None:
