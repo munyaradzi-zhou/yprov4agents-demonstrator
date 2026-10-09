@@ -46,6 +46,35 @@
 
 ---
 
+## Audit, 9 October 2026 — open
+
+Full findings, evidence and re-check commands in [`docs/AUDIT.md`](docs/AUDIT.md). Ordered so
+the code is fixed first, the archives are re-frozen **once**, and the paper is rewritten last
+against those archives. Energy (PR #11) is parked by decision.
+
+**Code**
+- [x] **AU1** — `eval.compare` gate compares relation counts, not endpoints; rewired lineage passes `--strict` *(audit [1])*
+- [ ] **AU2** — `sequence_no` never checked; a lost chunk becomes a well-formed record of a truncated input *(audit [3])*
+- [ ] **AU3** — MC1: typed-literal whitespace justification passes; `typed-activities` never checks a type; namespace URIs unchecked *(audit [5])*
+- [ ] **AU4** — SHACL shapes accept a record with no decision; add an existence constraint *(audit [6])*
+- [ ] **AU5** — LLM records the alias `gpt-4o`, not the resolved snapshot or `system_fingerprint` *(audit [7])*
+- [ ] **AU6** — CA1 silently drops a repeated session; session id is per folder, so per-rank files would collide *(audit [8])*
+- [ ] **AU7** — `freeze` reads git status after copying, so every manifest says `dirty: true`; no record of what changed *(audit [4])*
+
+**Evidence**
+- [ ] **AU8** — re-run the pipeline and re-freeze the reference archives once, from a clean committed tree *(audit [4])*
+
+**Paper**
+- [ ] **AU9** — the headline "0 of 24" is a verbatim test; 16 of 24 are meta-agent restatements. Narrow to the decision rule over the 8 operational decisions *(audit [2])*
+- [ ] **AU10** — "a rule written once in one place" is not true; reword §3 *(audit [9])*
+
+**Coverage**
+- [ ] **AU11** — the NATS/container path never runs in CI; add a compose-backed job *(audit [10])*
+- [ ] **AU12** — `bench_overhead`, `bench_report`, `archive` at 0% coverage; they produce the paper's numbers *(audit [11])*
+
+**Hygiene**
+- [ ] **AU13** — delete `.env.corrupted.bak`; bind NATS to localhost; fix `Homepage`; `get_running_loop()`; pin image digests
+
 ## Priority queue for 8 November
 
 > **Superseded by [`PLAN.md`](PLAN.md)** (2026-10-08), which sequences these into six phases

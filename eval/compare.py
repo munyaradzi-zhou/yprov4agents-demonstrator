@@ -32,6 +32,17 @@ REL_KEYS = (
     "actedOnBehalfOf",
 )
 
+#: The two endpoints of each relation, in PROV-JSON's own field names, ordered
+#: (from, to) the way the relation reads: ``used`` reads "activity used entity".
+REL_ENDPOINTS = {
+    "used": ("prov:activity", "prov:entity"),
+    "wasGeneratedBy": ("prov:entity", "prov:activity"),
+    "wasInformedBy": ("prov:informed", "prov:informant"),
+    "wasDerivedFrom": ("prov:generatedEntity", "prov:usedEntity"),
+    "wasAssociatedWith": ("prov:activity", "prov:agent"),
+    "actedOnBehalfOf": ("prov:delegate", "prov:responsible"),
+}
+
 #: Attributes that legitimately differ between two runs of identical code.
 VOLATILE_ATTRS = frozenset(
     {"prov:startTime", "prov:endTime", "prov:startedAtTime", "prov:endedAtTime"}
@@ -48,6 +59,7 @@ class Document(NamedTuple):
     activity_types: Counter[str]
     entity_types: Counter[str]
     relation_counts: dict[str, int]
+    edges: Counter[tuple[str, str, str]]
     verdicts: Counter[str]
     justifications: dict[str, str]
     activity_attributes: Counter[str]
@@ -62,21 +74,58 @@ def _type_of(node: dict[str, Any]) -> str:
     return str(prov_type or "")
 
 
-def _activity_key(activity_id: str, node: dict[str, Any]) -> str:
-    """A label for an activity that survives re-running: its type, minus the ordinal."""
-    return _type_of(node) or _ORDINAL.sub("", activity_id)
+def _node_keys(doc: dict[str, Any]) -> dict[str, str]:
+    """Give every node a name that survives re-running the same code.
+
+    Identifiers embed a session and an ordinal, so they differ between runs that are
+    otherwise identical. A node is named instead by its kind, its type, and its position
+    among the nodes of that type in the order the record lists them — which is the order
+    the agent registered them. Two activities of the same type stay distinct
+    (``activity:yp:ToolCallActivity#0`` and ``#1``), which a bare type would merge.
+    """
+    keys: dict[str, str] = {}
+    for kind in ("activity", "entity", "agent"):
+        seen: Counter[str] = Counter()
+        for node_id, node in (doc.get(kind) or {}).items():
+            node_type = _type_of(node) or _ORDINAL.sub("", node_id)
+            keys[node_id] = f"{kind}:{node_type}#{seen[node_type]}"
+            seen[node_type] += 1
+    return keys
+
+
+def _edges(doc: dict[str, Any], keys: dict[str, str]) -> Counter[tuple[str, str, str]]:
+    """Every relation as (relation, from, to) over stable node names.
+
+    This is what makes the comparison see lineage rather than only its volume: a ``used``
+    edge repointed at a different entity, or a derivation reversed, leaves every count
+    unchanged and changes this set. An endpoint that names no node in the record is kept
+    as ``dangling:<id>`` rather than dropped, because a dangling reference is a change.
+    """
+    edges: Counter[tuple[str, str, str]] = Counter()
+    for relation, (source_field, target_field) in REL_ENDPOINTS.items():
+        for record in (doc.get(relation) or {}).values():
+            source, target = record.get(source_field), record.get(target_field)
+            edges[
+                (
+                    relation,
+                    keys.get(str(source), f"dangling:{source}"),
+                    keys.get(str(target), f"dangling:{target}"),
+                )
+            ] += 1
+    return edges
 
 
 def reduce_document(name: str, doc: dict[str, Any]) -> Document:
     activities = doc.get("activity") or {}
     entities = doc.get("entity") or {}
+    keys = _node_keys(doc)
 
     activity_attributes: Counter[str] = Counter()
     verdicts: Counter[str] = Counter()
     justifications: dict[str, str] = {}
 
     for activity_id, node in activities.items():
-        key = _activity_key(activity_id, node)
+        key = keys[activity_id]
         for attribute in node:
             if attribute not in VOLATILE_ATTRS:
                 activity_attributes[attribute] += 1
@@ -98,6 +147,7 @@ def reduce_document(name: str, doc: dict[str, Any]) -> Document:
         activity_types=Counter(_type_of(node) for node in activities.values()),
         entity_types=Counter(_type_of(node) for node in entities.values()),
         relation_counts={key: len(doc.get(key) or {}) for key in REL_KEYS},
+        edges=_edges(doc, keys),
         verdicts=verdicts,
         justifications=justifications,
         activity_attributes=activity_attributes,
@@ -148,6 +198,15 @@ def compare_document(before: Document, after: Document) -> list[str]:
         after_count = after.relation_counts[key]
         if before_count != after_count:
             differences.append(f"relation {key}: {before_count} -> {after_count}")
+
+    # Counts above say how much lineage changed; this says which. A rewired edge keeps
+    # every count and shows up only here.
+    for edge in sorted(set(before.edges) | set(after.edges)):
+        before_n, after_n = before.edges.get(edge, 0), after.edges.get(edge, 0)
+        if before_n != after_n:
+            relation, source, target = edge
+            verb = "removed" if after_n < before_n else "added"
+            differences.append(f"edge {verb}: {relation} {source} -> {target}")
 
     for key in sorted(set(before.justifications) | set(after.justifications)):
         before_text = before.justifications.get(key)
@@ -236,7 +295,7 @@ def main(argv: list[str] | None = None) -> int:
     if not differences:
         print(
             "\nNo structural differences: every document carries the same typed "
-            "activities, entities, relations, verdicts and justifications."
+            "activities, entities, lineage edges, verdicts and justifications."
         )
     else:
         print(f"\nStructural differences in {len(differences)} document(s):")
