@@ -90,6 +90,10 @@ class CA1Storage(StreamingAgent):
         # STREAM_END sequence number once it has (which is the stream's length).
         self._seen: dict[str, set[int]] = {}
         self._ended: dict[str, int] = {}
+        # session_id -> how many times it has been persisted. A session that arrives again
+        # is held and persisted again rather than ignored: it may be a replay, or a
+        # different document that happens to share the id, and dropping either loses data.
+        self._persisted: dict[str, int] = {}
 
     # ── startup: two subscriptions, not one ────────────────────────────────────
     async def start(self) -> None:
@@ -113,7 +117,13 @@ class CA1Storage(StreamingAgent):
     async def _on_producer(self, subject: str, env: ProvRecordEnvelope) -> None:
         sid = env.session_id
         if sid in self._done:
-            return
+            if env.event_type != ProvEventType.STREAM_START.value:
+                return  # a straggler of a stream already persisted
+            # The same session again. It used to be ignored without a word, so a replay —
+            # or a producer restarted by its supervisor — was never stored and nothing said
+            # so. It is held and persisted like any other, and the record says it repeated.
+            self._done.discard(sid)
+            print(f"[{self.role}] '{sid}' arrived again; holding it anew", flush=True)
         if env.event_type == ProvEventType.STREAM_START.value:
             self._pending[sid] = {}
             _merge_payload(self._pending[sid], env.payload)
@@ -210,6 +220,7 @@ class CA1Storage(StreamingAgent):
         if sid in self._done:
             return
         self._done.add(sid)
+        self._persisted[sid] = self._persisted.get(sid, 0) + 1
         doc = self._pending.pop(sid, {})
         acked = sorted(self._acks.get(sid, set()))
         ended = sid in self._ended
@@ -342,6 +353,15 @@ class CA1Storage(StreamingAgent):
             integrity_ok, integrity = self._verify(pointer["yp:pid"])
             self.store.save()  # refresh the derived manifest index
 
+        times = self._persisted.get(sid, 1)
+        repeat = (
+            f"This session has now been persisted {times} times; the store is content-"
+            f"addressed, so an identical replay maps to the same pointer and a different "
+            f"document under the same session is kept alongside it. "
+            if times > 1
+            else ""
+        )
+
         # S5 Decide — three independent conditions, so the verdict names which one failed.
         # Partial input is stored rather than dropped (losing it is worse), and said to be
         # partial, so nothing downstream mistakes it for the record that was sent.
@@ -376,7 +396,7 @@ class CA1Storage(StreamingAgent):
                 counts,
                 len(payload),
                 integrity,
-                completeness,
+                repeat + completeness,
             ),
             label=f"CA1: {verdict.lower()} the stored record",
             consumed=stored,
@@ -386,6 +406,7 @@ class CA1Storage(StreamingAgent):
                 "yp:consumers_acknowledged": len(acked),
                 **({"yp:escalation_reason": escalation} if escalation else {}),
                 **({"yp:envelopes_missing": ",".join(map(str, lost))} if lost else {}),
+                **({"yp:persist_count": times} if times > 1 else {}),
             },
         )
 

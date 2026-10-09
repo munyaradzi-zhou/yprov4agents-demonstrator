@@ -15,6 +15,8 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
+from collections.abc import Iterable
 from pathlib import Path
 
 from .base_agent import stream_document
@@ -34,10 +36,55 @@ def _find_docs() -> list[Path]:
     return sorted(Path(DATA_DIR).rglob("*.json"))
 
 
-def _session_for(path: Path) -> str:
-    # prefer the parent folder name (example_0), else the file stem
-    parent = path.parent.name
-    return parent if parent and parent not in (".", "data") else path.stem
+#: Characters a session may contain. A session becomes a token of a NATS subject
+#: (``producer.yprov4ml.<session>``), where ``.`` separates tokens and ``*``/``>`` are
+#: wildcards, so anything else is replaced rather than allowed to split or widen a subject.
+_SESSION_UNSAFE = re.compile(r"[^A-Za-z0-9_-]")
+
+
+def sessions_for(paths: Iterable[Path], root: Path) -> list[tuple[Path, str]]:
+    """Name each input document's session, uniquely. Used by every replay path.
+
+    A document's session is its folder's name, because yProv4ML writes one run into one
+    folder — unless that folder holds more than one document. yProv4ML writes one file per
+    rank in a multi-GPU run (``…_GR0``, ``…_GR1``), and under the folder rule those shared a
+    session: downstream agents overwrote one another's records, and the storage agent
+    persisted the first and silently ignored the rest. Such documents are named
+    ``<folder>__<file stem>``; a document directly under ``root`` is named by its stem.
+
+    The rule used to be written twice, slightly differently, in the containerised producer
+    and in ``run_local.py``. It is written once, here.
+
+    Raises
+    ------
+    ValueError
+        Two documents would still share a session after sanitising — which would be the
+        silent overwrite this function exists to prevent, so it is refused instead.
+    """
+    paths = sorted(paths)
+    per_folder: dict[Path, int] = {}
+    for path in paths:
+        per_folder[path.parent] = per_folder.get(path.parent, 0) + 1
+
+    named: list[tuple[Path, str]] = []
+    for path in paths:
+        if path.parent == root:
+            raw = path.stem
+        elif per_folder[path.parent] == 1:
+            raw = path.parent.name
+        else:
+            raw = f"{path.parent.name}__{path.stem}"
+        named.append((path, _SESSION_UNSAFE.sub("_", raw)))
+
+    seen: dict[str, Path] = {}
+    for path, session in named:
+        if session in seen:
+            raise ValueError(
+                f"two input documents would share session {session!r}: "
+                f"{seen[session]} and {path}"
+            )
+        seen[session] = path
+    return named
 
 
 async def _wait_for_agents(bus: NetworkBus, timeout: float = 30.0) -> None:
@@ -72,13 +119,12 @@ async def main() -> None:
         return
     print(f"[producer] replaying {len(docs)} yProv4ML document(s) from {DATA_DIR}", flush=True)
 
-    for path in docs:
+    for path, session in sessions_for(docs, Path(DATA_DIR)):
         try:
             doc = json.loads(path.read_text(encoding="utf-8"))
         except Exception as exc:
             print(f"[producer] skip {path.name}: {exc}", flush=True)
             continue
-        session = _session_for(path)
         subject = f"producer.yprov4ml.{session}"
         n = await stream_document(
             bus,

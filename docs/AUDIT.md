@@ -220,6 +220,28 @@ earlier was in this code. *Fix:* golden-file tests over a tiny fixed results fil
 
 ---
 
+## Found while fixing
+
+The audit did not predict these; fixing its findings exposed them. They are listed because an
+audit that reports only what it anticipated understates how much was wrong.
+
+- **CA1 could hold a record for ever.** Its timeout guard was armed by `STREAM_END`, so losing
+  that one envelope left nothing to fire: never persisted, never reported. Armed by the first
+  envelope now. *(fixed with AU2)*
+- **CA1 could persist a partial copy at quorum.** Consumers can finish before CA1's own copy
+  has fully arrived. It now waits for its own `STREAM_END`. *(fixed with AU2)*
+- **The session-naming rule was written twice**, slightly differently, in the containerised
+  producer and in `run_local.py`. One function now. *(fixed with AU6)*
+- **A record file silently replaced any earlier record of the same session and role**, and
+  `run_local.py` never cleared its previous run's records — so a run that emitted fewer of
+  them left stale files to be counted as its own. No archive was affected (every archive's
+  records fall within 14 s of each other), but the next freeze could have been. *(fixed with
+  AU6)*
+- **`run_local.py` is outside the CI type check**, and it has two type errors, one of which
+  is real: its in-process bus is passed where a `NetworkBus` is expected, with no shared
+  protocol saying the two are interchangeable. *(open, AU13)*
+- **This audit's own evidence for [6] was wrong** — see the correction under [5].
+
 ## Checked and found sound
 
 - **No secret has ever been committed.** Searched the full history for key-shaped strings;

@@ -61,13 +61,23 @@ INSTRUMENTATION_OFF = {"off", "0", "false", "no", "none"}
 
 
 def write_prov(role: str, session_id: str, doc: dict[str, Any]) -> Path | None:
-    """Write an emitted PROV-JSON doc to the shared output volume, best-effort."""
+    """Write an emitted PROV-JSON doc to the shared output volume, best-effort.
+
+    A record never replaces another. If the session has already been written by this role
+    — a repeated session, see CA1 — the new record is written beside it with a numeric
+    suffix (``…__ca1__2_prov.json``). Overwriting would silently discard a record, which is
+    the one thing a provenance store should not do.
+    """
     try:
         OUT_DIR.mkdir(parents=True, exist_ok=True)
         # sanitise: session ids can contain ':' (e.g. "example_0::cax"), which is a
         # reserved char on Windows hosts where /out is bind-mounted. Keep it portable.
         safe = re.sub(r"[^A-Za-z0-9._-]", "_", session_id)
         path = OUT_DIR / f"{safe}__{role}_prov.json"
+        n = 2
+        while path.exists():
+            path = OUT_DIR / f"{safe}__{role}__{n}_prov.json"
+            n += 1
         path.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
         return path
     except Exception as exc:

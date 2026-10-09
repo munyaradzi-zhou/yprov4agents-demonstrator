@@ -39,6 +39,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import shutil
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -529,7 +530,12 @@ SCENARIOS: tuple[Scenario, ...] = (
 def run(scenario: Scenario, out_dir: Path) -> dict[str, Any]:
     """Run one scenario and report what verdict it provoked."""
     target = out_dir / scenario.name
-    target.mkdir(parents=True, exist_ok=True)
+    # The directory belongs to this scenario alone. Cleared first because records are
+    # never overwritten (runtime.util.write_prov), so a second run into the same place
+    # would otherwise leave the first run's records beside its own.
+    if target.exists():
+        shutil.rmtree(target)
+    target.mkdir(parents=True)
     observed = scenario.run(target)
     observed |= {
         "scenario": scenario.name,

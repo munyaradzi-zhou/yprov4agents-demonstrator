@@ -81,6 +81,35 @@ class LocalBus:
         return None
 
 
+#: What this pipeline writes into its output directory, and nothing else.
+PIPELINE_OUTPUTS = ("store", "charts", "baseline", "RESULTS.md")
+
+
+def clear_previous_run(out_dir: Path) -> int:
+    """Remove the outputs a previous run of this pipeline left in ``out_dir``.
+
+    Only what the pipeline itself writes: every ``*_prov.json`` at the top level, and the
+    entries in :data:`PIPELINE_OUTPUTS`. Returns how many entries were removed.
+    """
+    import shutil
+
+    if not out_dir.is_dir():
+        return 0
+    removed = 0
+    for path in out_dir.glob("*_prov.json"):
+        path.unlink()
+        removed += 1
+    for name in PIPELINE_OUTPUTS:
+        target = out_dir / name
+        if target.is_dir():
+            shutil.rmtree(target)
+            removed += 1
+        elif target.is_file():
+            target.unlink()
+            removed += 1
+    return removed
+
+
 async def main() -> None:
     ap = argparse.ArgumentParser(description="Run the demonstrator in one process.")
     ap.add_argument("--out-dir", default="out", help="where artifacts land (default: ./out)")
@@ -107,6 +136,15 @@ async def main() -> None:
     os.environ.setdefault("PERSIST_AFTER", "cax,ca2,ca3")
     os.environ["PERSIST_TIMEOUT_S"] = str(args.persist_timeout)
     os.environ["STREAM_DELAY_MS"] = os.environ.get("STREAM_DELAY_MS", "0")
+
+    # A run starts from none of its own previous outputs. The directory is not wiped —
+    # it also holds benchmark results and fault runs that take far longer to produce —
+    # but everything this pipeline writes is removed first. Otherwise a run that emitted
+    # fewer records than the last one (an agent that crashed, say) left the previous
+    # run's files in place, and the evaluation counted them as this run's.
+    removed = clear_previous_run(Path(os.environ["OUT_DIR"]))
+    if removed:
+        print(f"[local] removed {removed} output(s) of a previous run")
 
     # load a .env sitting next to this file, so LLM mode works without exporting vars
     env_file = HERE / ".env"
@@ -158,8 +196,9 @@ async def main() -> None:
         raise SystemExit(f"no .json provenance records under {data_dir}")
     print(f"\n[local] replaying {len(docs)} yProv4ML document(s)\n")
 
-    for path in docs:
-        session = path.parent.name if path.parent != data_dir else path.stem
+    from runtime.producer import sessions_for
+
+    for path, session in sessions_for(docs, data_dir):
         doc = json.loads(path.read_text(encoding="utf-8"))
         await stream_document(
             bus,

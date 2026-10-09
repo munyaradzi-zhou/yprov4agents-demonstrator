@@ -58,7 +58,7 @@ against those archives. Energy (PR #11) is parked by decision.
 - [x] **AU3** — MC1: typed-literal whitespace justification passes; `typed-activities` never checks a type; namespace URIs unchecked *(audit [5])*
 - [x] **AU4** — SHACL shapes accept a record with no decision; add an existence constraint *(audit [6])*
 - [x] **AU5** — LLM records the alias `gpt-4o`, not the resolved snapshot or `system_fingerprint` *(audit [7])*
-- [ ] **AU6** — CA1 silently drops a repeated session; session id is per folder, so per-rank files would collide *(audit [8])*
+- [x] **AU6** — CA1 silently drops a repeated session; session id is per folder, so per-rank files would collide *(audit [8])*
 - [ ] **AU7** — `freeze` reads git status after copying, so every manifest says `dirty: true`; no record of what changed *(audit [4])*
 
 **Evidence**
@@ -73,7 +73,7 @@ against those archives. Energy (PR #11) is parked by decision.
 - [ ] **AU12** — `bench_overhead`, `bench_report`, `archive` at 0% coverage; they produce the paper's numbers *(audit [11])*
 
 **Hygiene**
-- [ ] **AU13** — delete `.env.corrupted.bak`; bind NATS to localhost; fix `Homepage`; `get_running_loop()`; pin image digests
+- [ ] **AU13** — delete `.env.corrupted.bak`; bind NATS to localhost; fix `Homepage`; `get_running_loop()` (done for the base agent and CA1); pin image digests; bring `run_local.py` under the CI type check with a bus protocol shared by `LocalBus` and `NetworkBus`
 
 ## Priority queue for 8 November
 
