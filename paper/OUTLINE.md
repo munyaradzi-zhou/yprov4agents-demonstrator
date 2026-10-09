@@ -346,6 +346,19 @@ informative, which is why both are recorded.
 
 ### E5c — A negative result: energy cannot be attributed per agent step *(Phase 4)*
 
+> **Checked 9 October 2026, and it changes how this result must be written up: these
+> figures are MODELLED, not measured.** No hardware counter is reachable on the Windows
+> development host — RAPL is Linux-only and absent, Intel Power Gadget is absent and
+> discontinued, and the Windows Energy Meter Interface is reported *available* by
+> codecarbon while returning a processor energy delta of 0.0 under a saturating load.
+> codecarbon falls back to `TDP * (0.1 + 0.9 * load**3)` for the CPU and a flat 10 W for
+> RAM, the latter being 41% of the total in a four-second calibration. Real values need a
+> Linux boot with a readable RAPL counter. The attribution result below is unaffected —
+> a 15-second sampler cannot resolve a millisecond step by either route — but the phrase
+> "real consumption in a real window" was wrong and has been removed from the draft and
+> from `energy.py`. `yp:energy_source` now distinguishes the two honestly, and
+> `tests/test_modes.py::test_a_modelled_figure_is_never_labelled_measured` pins it.
+
 `energy.py` was 311 lines that nothing called, while CA3 reported "no energy or emission
 streams" as a completeness gap in the graphs it analysed — and was right about the agents
 that emitted it (finding F3). Phase 4 wired it into the capture API: every step closed
@@ -368,7 +381,7 @@ seconds of inter-message idle time, because the energy tracker outlives any one 
 Both are now handled, and the handling is the contribution. The baseline resets when a
 record begins, so no step is charged for the gap before it. And the figure is published with
 `yp:energy_sampling_period_s` and `yp:energy_attributable`, so the record states that the
-number is real consumption in a real window but **not** an attribution. **Energy belongs at
+number is **not** an attribution. **Energy belongs at
 session granularity**; any per-step energy claim in this literature needs a backend sampling
 faster than the steps, and should say what its period was.
 

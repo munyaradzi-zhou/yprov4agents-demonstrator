@@ -40,15 +40,24 @@ activity-level slices.
 
 PLATFORM NOTES
 --------------
-- Windows + Intel: codecarbon falls back to RAPL via Intel Power Gadget; only
-  works if the gadget is installed. Otherwise the CPU energy is estimated from
-  TDP, which is a *modelled* number, not a measured one. Flag this in the
-  emitted attributes (`yp:energy_source = "measured" | "modelled"`).
-- HPC / SLURM: codecarbon reads `/sys/class/powercap/intel-rapl/...` directly.
-  Faster than the API path but requires read access to those files.
-- Apple Silicon / ARM: codecarbon currently has no RAPL equivalent — falls back
-  to TDP modelling; the polling loop (a thread sampling every N seconds) can add
-  measurable overhead on these platforms.
+Whether a figure is MEASURED or MODELLED is a platform fact, not a config option,
+and `yp:energy_source` carries the answer per record. Verified on this project's
+development host rather than assumed:
+
+- Windows: usually NO readable counter, so figures are modelled. RAPL is a Linux
+  sysfs interface and is absent; Intel Power Gadget is discontinued and absent;
+  the Windows Energy Meter Interface is reported *available* by codecarbon yet
+  returns a processor energy delta of 0.0 under a saturating load, because it
+  needs OEM firmware most laptops do not ship. codecarbon then estimates CPU
+  power as `TDP * (0.1 + 0.9 * load**3)` and RAM power as a flat function of
+  installed capacity — on this host a constant 10 W, which was 41% of the total
+  in a four-second calibration. Real values need a Linux boot with readable RAPL.
+- Linux / HPC / SLURM: codecarbon reads `/sys/class/powercap/intel-rapl/...`
+  directly, which is the measured path — but since CVE-2020-8694 the counter is
+  root-locked by default, and when it is unreadable codecarbon falls back to
+  modelling *silently*. Readability, not existence, is what distinguishes the two.
+- Apple Silicon / ARM: no RAPL equivalent, so modelled; the polling thread can
+  add measurable overhead on these platforms.
 - GPU: NVIDIA via pynvml works on most clusters; AMD via ROCm is partial.
 
 A custom collector (Gabriele's plan) would replace `CodeCarbonBackend` with a
@@ -61,7 +70,6 @@ import threading
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 # ── Result type ───────────────────────────────────────────────────────────────
@@ -95,9 +103,11 @@ class EnergyDelta:
         demonstrator: a step of 0.000 s was handed 46.9 µWh while the rendering step that
         actually did the work was handed 4.6 µWh.
 
-        The number is still real — it was consumed, by this process, in this window — so it
-        is recorded rather than dropped. What is not real is the attribution, and the
-        record says so instead of leaving a reader to assume otherwise.
+        The figure is still worth recording rather than dropping, so it is kept and the
+        attribution is denied instead. Note that this property is about attribution only
+        and says nothing about whether the underlying watts were observed or estimated —
+        `source` carries that, and on a host without a readable counter the answer is
+        "modelled". A number can fail both tests at once, and the record reports both.
         """
         if self.sampling_period_s is None:
             return True
@@ -254,20 +264,43 @@ class CodeCarbonBackend(EnergyBackend):
         """Where the carbon intensity figure came from: a declared country, or a lookup."""
         return self._country_iso_code or "network-lookup"
 
+    #: codecarbon's own name for the hardware interfaces that read a real counter.
+    #: Anything else it selects ("cpu_load", "constant") is a model of power, not an
+    #: observation of it.
+    _HARDWARE_MODES = frozenset({"intel_rapl", "intel_power_gadget", "windows_emi"})
+
     @property
     def source_label(self) -> str:
-        # codecarbon decides per-component (CPU/GPU/RAM) whether the number is
-        # measured or modelled. We tag at the level it actually verifies RAPL.
-        # Self-validating: 'measured' ONLY if the RAPL counter is actually READABLE
-        # (an integer can be read from energy_uj). Since CVE-2020-8694 the counter is
-        # root-locked by default; if it is unreadable codecarbon silently falls back to
-        # TDP, so checking existence alone would MISLABEL a modelled number as measured.
-        try:
-            uj = Path("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj")
-            int(uj.read_text().strip())
-            return "measured"
-        except (OSError, ValueError):
+        """``"measured"`` only when a hardware counter is both selected and delivering.
+
+        Two traps, and we have been caught by both. Probing only the Linux RAPL path
+        (``/sys/class/powercap/...``) reports "modelled" on every non-Linux host even
+        when a real counter is in use — the mistake this method used to make. Trusting
+        the backend's selected mode instead reports "measured" whenever the interface
+        merely *loads*: on the development host codecarbon selects ``windows_emi`` and
+        that interface returns a processor energy delta of 0.0 under a saturating load,
+        because it needs OEM firmware the machine does not provide.
+
+        So the label requires both: a hardware mode, and a non-zero cumulative energy
+        reading to show the counter is actually delivering. An idle host could in
+        principle read zero and be downgraded to "modelled"; that is the safe direction
+        to be wrong in, because overclaiming a measurement is the error that corrupts a
+        result and underclaiming one only costs a footnote.
+        """
+        mode = self._cpu_mode()
+        if mode is None or mode not in self._HARDWARE_MODES:
             return "modelled"
+        if float(getattr(self._tracker, "_total_energy", 0.0) or 0.0) <= 0.0:
+            return "modelled"
+        return "measured"
+
+    def _cpu_mode(self) -> str | None:
+        """The interface codecarbon chose for the CPU, asked rather than inferred."""
+        for hardware in getattr(self._tracker, "_hardware", ()) or ():
+            mode = getattr(hardware, "_mode", None)
+            if isinstance(mode, str):
+                return mode
+        return None
 
 
 # ── Null backend ──────────────────────────────────────────────────────────────
