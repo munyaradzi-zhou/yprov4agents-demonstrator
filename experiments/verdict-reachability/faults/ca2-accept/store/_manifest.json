@@ -1,0 +1,10 @@
+{
+  "21.T11999/yprovstore-91a06a3aaeca": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/faults/ca2-accept/store/91a06a3aaeca.txt",
+    "yp:contentHash": "sha256:91a06a3aaeca5ac44392aea9bd8c05b7bbe8c09100e03d0e69884f817460786c",
+    "size_bytes": 92,
+    "kind": "chart",
+    "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out/faults/ca2-accept/charts/fault_metrics.png",
+    "created_at": "2026-10-09T06:51:57.523710+00:00"
+  }
+}

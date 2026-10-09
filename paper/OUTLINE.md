@@ -247,9 +247,9 @@ consuming `governance.*` without a bounded depth scheme arriving alongside it. A
 second level, with the depth carried in the subject, is named as future work and not
 claimed.
 
-### E5 — Verdicts, and their reachability
+### E5 — Verdicts, and their reachability *(complete)*
 
-| Agent:verdict | Count |
+| Agent:verdict | Count in the reference run |
 |---|--:|
 | `ca1:ACCEPT` | 2 |
 | `ca2:REVISE` | 2 |
@@ -258,23 +258,50 @@ claimed.
 | `mc1:PASS` | 8 |
 | `mc3:COMPLETE` | 8 |
 
-Six verdict kinds, up from three — but the tally is the less interesting half. A verdict
-that only ever takes one value carries no information, so what has to be established is that
-the alternatives are *reachable*. **Report reachability alongside the tally**, or a reviewer
-is entitled to ask whether any of these checks can fail at all.
+The tally is the less interesting half. A verdict that only ever takes one value carries no
+information, so what has to be established is that the alternatives are *reachable* — and
+the ordinary run reaches six of twelve. The other six come from seven injected faults
+(`eval/fault_injection.py`, archived under `experiments/verdict-reachability`):
 
-| Verdict | Reached by | Evidence |
-|---|---|---|
-| `ca1:ESCALATE` (consumption-unconfirmed) | CA1 alone, no consumers, 3s patience | `experiments/fault-escalate` ✅ |
-| `ca1:ESCALATE` (integrity) | corrupting a stored payload | *to run* |
-| `mc1:FAIL` | an unjustified decision in the input | *to run* |
-| `mc3:PARTIAL` | an activity with no start or end time | *to run* |
+| Verdict | How it was provoked | Observed |
+|---|---|:--:|
+| `ca1:ESCALATE` *(integrity)* | a store that writes bytes it did not hash | ✅ |
+| `ca1:ESCALATE` *(consumption-unconfirmed)* | no consumer acknowledged before the timeout | ✅ |
+| `mc1:FAIL` | a third-party record whose decision carries no justification | ✅ |
+| `mc3:PARTIAL` | a third-party record with an activity started and never closed | ✅ |
+| `ca2:ACCEPT` | a producer record that actually carries measurements | ✅ |
+| `cax:REVISE` | a scripted model reply naming figures absent from the graph | ✅ |
+| `ca3:OK` | a fully instrumented graph with regular timing | ✅ |
 
-The archived case is the one that matters most, because it shows the two escalation paths are
-*distinguishable in the record*: `yp:escalation_reason` separates `integrity` from
-`consumption-unconfirmed`, and the two demand opposite responses — corrupt storage versus a
-consumer that is down. See §7 below, where the same run is also the A-versus-B worked
-example.
+**Twelve of twelve verdicts observed.** Three things in that table are worth a sentence each
+in the text.
+
+*The two escalation paths are distinguishable in the record, and they demand opposite
+responses.* `yp:escalation_reason` separates `integrity` from `consumption-unconfirmed`: the
+first says the stored bytes are wrong, the second says the data is fine and a consumer is
+down. The justifications differ accordingly — one quotes both hashes of the mismatch, the
+other names the three consumers that never answered and states that the
+persist-after-consume ordering was forfeited. An operator handed only "ESCALATE" learns
+nothing actionable, which is the whole argument for the field.
+
+*Three of the seven are not failures at all.* CA2's ACCEPT, CAx's REVISE and CA3's OK are
+unreachable from the bundled sample data — the real yProv4ML records carry no numeric
+`prov:value` entities to plot, and declare start times without end times. So "CA2 always
+says REVISE" was a finding about the *input*, not about CA2, and separating those two is
+what these scenarios are for. It also sharpens CA3's result: ANOMALY is informative
+precisely because OK is reachable.
+
+*`mc1:FAIL` is unreachable from records this library produces.* `ProvTracker.decide()`
+refuses a blank justification at the call site, so an agent instrumented with this library
+cannot emit an unjustified decision. FAIL is reachable for records the library did not
+write — which is the case a compliance checker exists for, since it is pointed at agents
+you do not control. That is a property worth claiming rather than a gap to apologise for:
+**the instrumentation makes the violation unrepresentable, and the governance layer catches
+it in input that was not instrumented.**
+
+Every fault is injected into the input or the environment, never into the check being
+tested, and `tests/test_fault_injection.py` enforces all seven plus the matrix itself — so
+a verdict advertised in the README and never observed fails the build.
 
 ### E5b — Model provenance: can an LLM step be repeated from the record? *(measured, Phase 4)*
 

@@ -1,0 +1,342 @@
+{
+  "level": "micro",
+  "environment": {
+    "captured_at": "2026-10-09T05:12:28.519403+00:00",
+    "python": "3.11.15",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840,
+    "git_commit": "301251ef049593c5ead6aa28c989923257fc7569",
+    "git_dirty": true,
+    "llm_involved": false,
+    "energy_backend": "off",
+    "notes": {
+      "interpreter_clean": true
+    }
+  },
+  "timer_floor_ns": 200.0,
+  "fast_batch": 1000,
+  "iterations": 10000,
+  "warmup": 1000,
+  "timings": [
+    {
+      "name": "M1  now_iso()",
+      "median_ns": 2093.25,
+      "mean_ns": 2952.02,
+      "p95_ns": 4720.6,
+      "p99_ns": 4720.6,
+      "min_ns": 2042.0,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 42.0,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 5100.0,
+        "p99_ns": 7500.0,
+        "median_ns": 2200.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M1a   datetime.now(UTC) alone",
+      "median_ns": 464.85,
+      "mean_ns": 466.63,
+      "p95_ns": 474.9,
+      "p99_ns": 474.9,
+      "min_ns": 464.5,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 0.20000000000001705,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 900.0,
+        "p99_ns": 1100.0,
+        "median_ns": 600.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M1b   .isoformat() alone",
+      "median_ns": 1598.9499999999998,
+      "mean_ns": 1601.9299999999998,
+      "p95_ns": 1649.5,
+      "p99_ns": 1649.5,
+      "min_ns": 1564.0,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 3.299999999999841,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 2500.0,
+        "p99_ns": 5400.0,
+        "median_ns": 1800.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M2  register_entity()",
+      "median_ns": 576.9,
+      "mean_ns": 675.4100000000001,
+      "p95_ns": 1172.2,
+      "p99_ns": 1172.2,
+      "min_ns": 526.4,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 45.799999999999955,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 700.0,
+        "p99_ns": 1100.0,
+        "median_ns": 700.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M3  register_entity(pid=, content_hash=)",
+      "median_ns": 1013.1500000000001,
+      "mean_ns": 1589.84,
+      "p95_ns": 2877.0,
+      "p99_ns": 2877.0,
+      "min_ns": 988.7,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 24.200000000000045,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 2100.0,
+        "p99_ns": 3200.0,
+        "median_ns": 1200.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M4  record_activity() minimal",
+      "median_ns": 1476.7,
+      "mean_ns": 1606.1799999999998,
+      "p95_ns": 2265.1,
+      "p99_ns": 2265.1,
+      "min_ns": 1361.3,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 107.10000000000002,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 3400.0,
+        "p99_ns": 6800.0,
+        "median_ns": 1200.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M5  record_activity(justification=)",
+      "median_ns": 1642.6,
+      "mean_ns": 2695.12,
+      "p95_ns": 11776.5,
+      "p99_ns": 11776.5,
+      "min_ns": 1454.2,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 155.54999999999995,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 3400.0,
+        "p99_ns": 6700.0,
+        "median_ns": 1300.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M6  record_activity(extra_attrs=)",
+      "median_ns": 1751.8000000000002,
+      "mean_ns": 1749.5700000000002,
+      "p95_ns": 1960.8,
+      "p99_ns": 1960.8,
+      "min_ns": 1444.8,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 137.29999999999995,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 3300.0,
+        "p99_ns": 5900.0,
+        "median_ns": 1300.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M12 one step via the capture API",
+      "median_ns": 12019.650000000001,
+      "mean_ns": 13175.37,
+      "p95_ns": 21848.7,
+      "p99_ns": 21848.7,
+      "min_ns": 11498.4,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 210.90000000000146,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 19500.0,
+        "p99_ns": 38200.0,
+        "median_ns": 11000.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M12 one step via the primitives",
+      "median_ns": 6527.8,
+      "mean_ns": 9246.85,
+      "p95_ns": 32455.7,
+      "p99_ns": 32455.7,
+      "min_ns": 6166.7,
+      "iterations": 10000,
+      "floor_ns": 200.0,
+      "batch": 1000,
+      "mad_ns": 241.5999999999999,
+      "near_floor": false,
+      "effective_floor_ns": 0.2,
+      "unbatched": {
+        "p95_ns": 9700.0,
+        "p99_ns": 20400.0,
+        "median_ns": 5900.0,
+        "iterations": 10000
+      }
+    },
+    {
+      "name": "M7  to_prov_json() (6 activities)",
+      "median_ns": 27250.0,
+      "mean_ns": 30247.25,
+      "p95_ns": 46100.0,
+      "p99_ns": 71300.0,
+      "min_ns": 26600.0,
+      "iterations": 2000,
+      "floor_ns": 200.0,
+      "batch": 1,
+      "mad_ns": 350.0,
+      "near_floor": false,
+      "effective_floor_ns": 200.0
+    },
+    {
+      "name": "M8  json.dumps(document)",
+      "median_ns": 89500.0,
+      "mean_ns": 95351.65,
+      "p95_ns": 150900.0,
+      "p99_ns": 180600.0,
+      "min_ns": 85200.0,
+      "iterations": 2000,
+      "floor_ns": 200.0,
+      "batch": 1,
+      "mad_ns": 1600.0,
+      "near_floor": false,
+      "effective_floor_ns": 200.0
+    },
+    {
+      "name": "M9  store.put(payload)",
+      "median_ns": 1485550.0,
+      "mean_ns": 2287306.0,
+      "p95_ns": 2651600.0,
+      "p99_ns": 35159400.0,
+      "min_ns": 1188800.0,
+      "iterations": 300,
+      "floor_ns": 200.0,
+      "batch": 1,
+      "mad_ns": 176800.0,
+      "near_floor": false,
+      "effective_floor_ns": 200.0
+    },
+    {
+      "name": "M11 store.resolve(pid, verify=True)",
+      "median_ns": 823800.0,
+      "mean_ns": 1511253.0,
+      "p95_ns": 1280500.0,
+      "p99_ns": 3440700.0,
+      "min_ns": 641700.0,
+      "iterations": 300,
+      "floor_ns": 200.0,
+      "batch": 1,
+      "mad_ns": 140650.0,
+      "near_floor": false,
+      "effective_floor_ns": 200.0
+    },
+    {
+      "name": "M10 write_prov() (file write)",
+      "median_ns": 569450.0,
+      "mean_ns": 616887.6666666666,
+      "p95_ns": 886600.0,
+      "p99_ns": 1054800.0,
+      "min_ns": 493600.0,
+      "iterations": 300,
+      "floor_ns": 200.0,
+      "batch": 1,
+      "mad_ns": 47050.0,
+      "near_floor": false,
+      "effective_floor_ns": 200.0
+    }
+  ],
+  "derived": {
+    "cost_of_justification": {
+      "of": "record_activity(justification=)",
+      "over": "record_activity() minimal",
+      "delta_ns": 160.25,
+      "noise_ns": 240.10000000000002,
+      "rounds": 40,
+      "batch": 1000,
+      "resolvable": false
+    },
+    "cost_of_extra_attributes": {
+      "of": "record_activity(extra_attrs=)",
+      "over": "record_activity() minimal",
+      "delta_ns": 250.65,
+      "noise_ns": 381.20000000000005,
+      "rounds": 40,
+      "batch": 1000,
+      "resolvable": false
+    },
+    "cost_of_the_ergonomic_wrapper": {
+      "of": "one step via the capture API",
+      "over": "one step via the primitives",
+      "delta_ns": 5557.65,
+      "noise_ns": 836.9500000000003,
+      "rounds": 40,
+      "batch": 1000,
+      "resolvable": true
+    },
+    "cost_of_formatting_an_instant": {
+      "of": "now_iso()",
+      "over": "datetime.now(UTC)",
+      "delta_ns": 1528.85,
+      "noise_ns": 34.999999999999886,
+      "rounds": 40,
+      "batch": 1000,
+      "resolvable": true
+    },
+    "cost_of_one_tracked_step_ns": 3569.95,
+    "clock_share_of_a_tracked_step_ns": 2093.25,
+    "clock_share_of_a_tracked_step_pct": 58.635275003851596,
+    "clock_read_alone_ns": 464.85,
+    "formatting_over_clock_read": 3.2889104012046895,
+    "cost_of_a_six_step_session_ns": 52131.1,
+    "bytes_per_justification": 254
+  }
+}

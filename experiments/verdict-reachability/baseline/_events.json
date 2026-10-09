@@ -1,0 +1,1310 @@
+[
+  {
+    "session": "example_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-09T06:51:59.578821+00:00",
+    "ended_at": "2026-10-09T06:51:59.578849+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.example_0"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-09T06:51:59.578821+00:00",
+    "ended_at": "2026-10-09T06:51:59.578827+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.example_0"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-09T06:51:59.578821+00:00",
+    "ended_at": "2026-10-09T06:51:59.585795+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.example_0"
+    ],
+    "outputs": [
+      "This ML provenance record captures 9 activities and 39 entities linked by 55 lineage relations. Tracked steps include example_GR0_0, Training, Validation, TrainingButDifferent, TrainingButDifferent2, MSELoss/Training. The graph documents inputs, parameters and outputs of the training run."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-09T06:51:59.586294+00:00",
+    "ended_at": "2026-10-09T06:51:59.586351+00:00",
+    "inputs": [
+      "This ML provenance record captures 9 activities and 39 entities linked by 55 lineage relations. Tracked steps include example_GR0_0, Training, Validation, TrainingButDifferent, TrainingButDifferent2, MSELoss/Training. The graph documents inputs, parameters and outputs of the training run."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: accept summary",
+    "started_at": "2026-10-09T06:51:59.586294+00:00",
+    "ended_at": "2026-10-09T06:51:59.586300+00:00",
+    "inputs": [
+      "no ungrounded figures"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-09T06:51:59.586294+00:00",
+    "ended_at": "2026-10-09T06:51:59.586299+00:00",
+    "inputs": [
+      "This ML provenance record captures 9 activities and 39 entities linked by 55 lineage relations. Tracked steps include example_GR0_0, Training, Validation, TrainingButDifferent, TrainingButDifferent2, MSELoss/Training. The graph documents inputs, parameters and outputs of the training run."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::cax-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.603979+00:00",
+    "ended_at": "2026-10-09T06:51:59.603994+00:00",
+    "inputs": [],
+    "outputs": [
+      "cax PROV under review (example_0::cax)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::cax-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check cax compliance",
+    "started_at": "2026-10-09T06:51:59.603979+00:00",
+    "ended_at": "2026-10-09T06:51:59.604023+00:00",
+    "inputs": [
+      "cax PROV under review (example_0::cax)"
+    ],
+    "outputs": [
+      "all structural checks held"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::cax-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: pass cax",
+    "started_at": "2026-10-09T06:51:59.603979+00:00",
+    "ended_at": "2026-10-09T06:51:59.603985+00:00",
+    "inputs": [
+      "all structural checks held"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::cax-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.607028+00:00",
+    "ended_at": "2026-10-09T06:51:59.607042+00:00",
+    "inputs": [],
+    "outputs": [
+      "NL_Summarizer PROV under audit (example_0::cax)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::cax-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit NL_Summarizer",
+    "started_at": "2026-10-09T06:51:59.607028+00:00",
+    "ended_at": "2026-10-09T06:51:59.607072+00:00",
+    "inputs": [
+      "NL_Summarizer PROV under audit (example_0::cax)"
+    ],
+    "outputs": [
+      "agent=NL_Summarizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::cax-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for NL_Summarizer is complete",
+    "started_at": "2026-10-09T06:51:59.607028+00:00",
+    "ended_at": "2026-10-09T06:51:59.607034+00:00",
+    "inputs": [
+      "agent=NL_Summarizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: receive producer record",
+    "started_at": "2026-10-09T06:51:59.608990+00:00",
+    "ended_at": "2026-10-09T06:51:59.609011+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.example_0"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: choose what to plot",
+    "started_at": "2026-10-09T06:51:59.608990+00:00",
+    "ended_at": "2026-10-09T06:51:59.609038+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.example_0"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: render chart (matplotlib)",
+    "started_at": "2026-10-09T06:51:59.608990+00:00",
+    "ended_at": "2026-10-09T06:51:59.756540+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.example_0"
+    ],
+    "outputs": [
+      "example_0_metrics.png"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: confirm the chart reached disk",
+    "started_at": "2026-10-09T06:51:59.756332+00:00",
+    "ended_at": "2026-10-09T06:51:59.756929+00:00",
+    "inputs": [
+      "example_0_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: revise chart",
+    "started_at": "2026-10-09T06:51:59.757349+00:00",
+    "ended_at": "2026-10-09T06:51:59.757357+00:00",
+    "inputs": [
+      "example_0_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: respond",
+    "started_at": "2026-10-09T06:51:59.757349+00:00",
+    "ended_at": "2026-10-09T06:51:59.757354+00:00",
+    "inputs": [
+      "example_0_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca2-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.760429+00:00",
+    "ended_at": "2026-10-09T06:51:59.760441+00:00",
+    "inputs": [],
+    "outputs": [
+      "ca2 PROV under review (example_0::ca2)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca2-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check ca2 compliance",
+    "started_at": "2026-10-09T06:51:59.760429+00:00",
+    "ended_at": "2026-10-09T06:51:59.760464+00:00",
+    "inputs": [
+      "ca2 PROV under review (example_0::ca2)"
+    ],
+    "outputs": [
+      "all structural checks held"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca2-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: pass ca2",
+    "started_at": "2026-10-09T06:51:59.760429+00:00",
+    "ended_at": "2026-10-09T06:51:59.760435+00:00",
+    "inputs": [
+      "all structural checks held"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca2-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.762422+00:00",
+    "ended_at": "2026-10-09T06:51:59.762434+00:00",
+    "inputs": [],
+    "outputs": [
+      "Metrics_Visualizer PROV under audit (example_0::ca2)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca2-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit Metrics_Visualizer",
+    "started_at": "2026-10-09T06:51:59.762422+00:00",
+    "ended_at": "2026-10-09T06:51:59.762463+00:00",
+    "inputs": [
+      "Metrics_Visualizer PROV under audit (example_0::ca2)"
+    ],
+    "outputs": [
+      "agent=Metrics_Visualizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca2-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for Metrics_Visualizer is complete",
+    "started_at": "2026-10-09T06:51:59.762422+00:00",
+    "ended_at": "2026-10-09T06:51:59.762428+00:00",
+    "inputs": [
+      "agent=Metrics_Visualizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Analytics_Agent",
+    "name": "CA3: receive provenance graph",
+    "started_at": "2026-10-09T06:51:59.764429+00:00",
+    "ended_at": "2026-10-09T06:51:59.764439+00:00",
+    "inputs": [],
+    "outputs": [
+      "provenance graph from producer.yprov4ml.example_0"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Analytics_Agent",
+    "name": "CA3: select analytics algorithms",
+    "started_at": "2026-10-09T06:51:59.764429+00:00",
+    "ended_at": "2026-10-09T06:51:59.764437+00:00",
+    "inputs": [
+      "provenance graph from producer.yprov4ml.example_0"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Analytics_Agent",
+    "name": "CA3: mine the provenance graph",
+    "started_at": "2026-10-09T06:51:59.764429+00:00",
+    "ended_at": "2026-10-09T06:51:59.770944+00:00",
+    "inputs": [
+      "provenance graph from producer.yprov4ml.example_0"
+    ],
+    "outputs": [
+      "Provenance analytics for 'example_0': 9 activities and 39 entities (82.1% typed), 7 derivations, 30 terminal entities. Wall-clock span 7.81s across 9 ordered activities. Energy streams: 11; resource streams: 6. Anomalies: 2; completeness findings: 2."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Analytics_Agent",
+    "name": "CA3: validate findings against invariants",
+    "started_at": "2026-10-09T06:51:59.770944+00:00",
+    "ended_at": "2026-10-09T06:51:59.770954+00:00",
+    "inputs": [
+      "Provenance analytics for 'example_0': 9 activities and 39 entities (82.1% typed), 7 derivations, 30 terminal entities. Wall-clock span 7.81s across 9 ordered activities. Energy streams: 11; resource streams: 6. Anomalies: 2; completeness findings: 2."
+    ],
+    "outputs": [
+      "2 invariant(s) breached, 2 completeness gap(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Analytics_Agent",
+    "name": "CA3: ANOMALY",
+    "started_at": "2026-10-09T06:51:59.770944+00:00",
+    "ended_at": "2026-10-09T06:51:59.770950+00:00",
+    "inputs": [
+      "2 invariant(s) breached, 2 completeness gap(s)"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "Analytics_Agent",
+    "name": "CA3: publish analytics report",
+    "started_at": "2026-10-09T06:51:59.770944+00:00",
+    "ended_at": "2026-10-09T06:51:59.770948+00:00",
+    "inputs": [
+      "Provenance analytics for 'example_0': 9 activities and 39 entities (82.1% typed), 7 derivations, 30 terminal entities. Wall-clock span 7.81s across 9 ordered activities. Energy streams: 11; resource streams: 6. Anomalies: 2; completeness findings: 2."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "StorageAgent",
+    "name": "CA1: receive record from bus",
+    "started_at": "2026-10-09T06:51:59.773596+00:00",
+    "ended_at": "2026-10-09T06:51:59.773616+00:00",
+    "inputs": [],
+    "outputs": [
+      "provenance record 'example_0' held for persistence"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "StorageAgent",
+    "name": "CA1: await consumers, plan store path",
+    "started_at": "2026-10-09T06:51:59.773596+00:00",
+    "ended_at": "2026-10-09T06:51:59.773608+00:00",
+    "inputs": [
+      "provenance record 'example_0' held for persistence"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "StorageAgent",
+    "name": "CA1: write to store (backend API)",
+    "started_at": "2026-10-09T06:51:59.773596+00:00",
+    "ended_at": "2026-10-09T06:51:59.775733+00:00",
+    "inputs": [
+      "provenance record 'example_0' held for persistence"
+    ],
+    "outputs": [
+      "stored provenance record for example_0"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "StorageAgent",
+    "name": "CA1: verify round-trip integrity",
+    "started_at": "2026-10-09T06:51:59.775611+00:00",
+    "ended_at": "2026-10-09T06:51:59.780792+00:00",
+    "inputs": [
+      "stored provenance record for example_0"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "StorageAgent",
+    "name": "CA1: accept the stored record",
+    "started_at": "2026-10-09T06:51:59.781613+00:00",
+    "ended_at": "2026-10-09T06:51:59.781621+00:00",
+    "inputs": [
+      "stored provenance record for example_0"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0",
+    "agent": "StorageAgent",
+    "name": "CA1: emit storage receipt",
+    "started_at": "2026-10-09T06:51:59.781613+00:00",
+    "ended_at": "2026-10-09T06:51:59.781624+00:00",
+    "inputs": [
+      "stored provenance record for example_0"
+    ],
+    "outputs": [
+      "storage receipt 21.T11999/yprovstore-abfe4946dd38 (sha256:abfe4946dd38...)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca1-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.783605+00:00",
+    "ended_at": "2026-10-09T06:51:59.783618+00:00",
+    "inputs": [],
+    "outputs": [
+      "ca1 PROV under review (example_0::ca1)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca1-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check ca1 compliance",
+    "started_at": "2026-10-09T06:51:59.783605+00:00",
+    "ended_at": "2026-10-09T06:51:59.783638+00:00",
+    "inputs": [
+      "ca1 PROV under review (example_0::ca1)"
+    ],
+    "outputs": [
+      "all structural checks held"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca1-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: pass ca1",
+    "started_at": "2026-10-09T06:51:59.783605+00:00",
+    "ended_at": "2026-10-09T06:51:59.783609+00:00",
+    "inputs": [
+      "all structural checks held"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca1-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.786606+00:00",
+    "ended_at": "2026-10-09T06:51:59.786617+00:00",
+    "inputs": [],
+    "outputs": [
+      "StorageAgent PROV under audit (example_0::ca1)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca1-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit StorageAgent",
+    "started_at": "2026-10-09T06:51:59.786606+00:00",
+    "ended_at": "2026-10-09T06:51:59.786642+00:00",
+    "inputs": [
+      "StorageAgent PROV under audit (example_0::ca1)"
+    ],
+    "outputs": [
+      "agent=StorageAgent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> PersistActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca1-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for StorageAgent is complete",
+    "started_at": "2026-10-09T06:51:59.786606+00:00",
+    "ended_at": "2026-10-09T06:51:59.786610+00:00",
+    "inputs": [
+      "agent=StorageAgent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> PersistActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca3-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.787606+00:00",
+    "ended_at": "2026-10-09T06:51:59.787619+00:00",
+    "inputs": [],
+    "outputs": [
+      "ca3 PROV under review (example_0::ca3)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca3-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check ca3 compliance",
+    "started_at": "2026-10-09T06:51:59.789118+00:00",
+    "ended_at": "2026-10-09T06:51:59.789147+00:00",
+    "inputs": [
+      "ca3 PROV under review (example_0::ca3)"
+    ],
+    "outputs": [
+      "all structural checks held"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca3-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: pass ca3",
+    "started_at": "2026-10-09T06:51:59.789118+00:00",
+    "ended_at": "2026-10-09T06:51:59.789123+00:00",
+    "inputs": [
+      "all structural checks held"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca3-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.790723+00:00",
+    "ended_at": "2026-10-09T06:51:59.790735+00:00",
+    "inputs": [],
+    "outputs": [
+      "Analytics_Agent PROV under audit (example_0::ca3)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca3-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit Analytics_Agent",
+    "started_at": "2026-10-09T06:51:59.790723+00:00",
+    "ended_at": "2026-10-09T06:51:59.790760+00:00",
+    "inputs": [
+      "Analytics_Agent PROV under audit (example_0::ca3)"
+    ],
+    "outputs": [
+      "agent=Analytics_Agent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> AnalysisActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_0::ca3-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for Analytics_Agent is complete",
+    "started_at": "2026-10-09T06:51:59.790723+00:00",
+    "ended_at": "2026-10-09T06:51:59.790728+00:00",
+    "inputs": [
+      "agent=Analytics_Agent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> AnalysisActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-09T06:51:59.794457+00:00",
+    "ended_at": "2026-10-09T06:51:59.794476+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.example_2"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-09T06:51:59.794457+00:00",
+    "ended_at": "2026-10-09T06:51:59.794463+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.example_2"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-09T06:51:59.794457+00:00",
+    "ended_at": "2026-10-09T06:51:59.800862+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.example_2"
+    ],
+    "outputs": [
+      "This ML provenance record captures 11 activities and 78 entities linked by 98 lineage relations. Tracked steps include example_GR0_2, Training, Validation, Test, CrossEntropyLoss/Training, codecarbon/Training. The graph documents inputs, parameters and outputs of the training run."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-09T06:51:59.801458+00:00",
+    "ended_at": "2026-10-09T06:51:59.801509+00:00",
+    "inputs": [
+      "This ML provenance record captures 11 activities and 78 entities linked by 98 lineage relations. Tracked steps include example_GR0_2, Training, Validation, Test, CrossEntropyLoss/Training, codecarbon/Training. The graph documents inputs, parameters and outputs of the training run."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: accept summary",
+    "started_at": "2026-10-09T06:51:59.801458+00:00",
+    "ended_at": "2026-10-09T06:51:59.801472+00:00",
+    "inputs": [
+      "no ungrounded figures"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-09T06:51:59.801458+00:00",
+    "ended_at": "2026-10-09T06:51:59.801463+00:00",
+    "inputs": [
+      "This ML provenance record captures 11 activities and 78 entities linked by 98 lineage relations. Tracked steps include example_GR0_2, Training, Validation, Test, CrossEntropyLoss/Training, codecarbon/Training. The graph documents inputs, parameters and outputs of the training run."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::cax-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.803457+00:00",
+    "ended_at": "2026-10-09T06:51:59.803469+00:00",
+    "inputs": [],
+    "outputs": [
+      "cax PROV under review (example_2::cax)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::cax-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check cax compliance",
+    "started_at": "2026-10-09T06:51:59.803457+00:00",
+    "ended_at": "2026-10-09T06:51:59.803483+00:00",
+    "inputs": [
+      "cax PROV under review (example_2::cax)"
+    ],
+    "outputs": [
+      "all structural checks held"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::cax-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: pass cax",
+    "started_at": "2026-10-09T06:51:59.803457+00:00",
+    "ended_at": "2026-10-09T06:51:59.803461+00:00",
+    "inputs": [
+      "all structural checks held"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::cax-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.806461+00:00",
+    "ended_at": "2026-10-09T06:51:59.806472+00:00",
+    "inputs": [],
+    "outputs": [
+      "NL_Summarizer PROV under audit (example_2::cax)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::cax-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit NL_Summarizer",
+    "started_at": "2026-10-09T06:51:59.806461+00:00",
+    "ended_at": "2026-10-09T06:51:59.806498+00:00",
+    "inputs": [
+      "NL_Summarizer PROV under audit (example_2::cax)"
+    ],
+    "outputs": [
+      "agent=NL_Summarizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::cax-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for NL_Summarizer is complete",
+    "started_at": "2026-10-09T06:51:59.806461+00:00",
+    "ended_at": "2026-10-09T06:51:59.806466+00:00",
+    "inputs": [
+      "agent=NL_Summarizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: receive producer record",
+    "started_at": "2026-10-09T06:51:59.808589+00:00",
+    "ended_at": "2026-10-09T06:51:59.808606+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.example_2"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: choose what to plot",
+    "started_at": "2026-10-09T06:51:59.808589+00:00",
+    "ended_at": "2026-10-09T06:51:59.808645+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.example_2"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: render chart (matplotlib)",
+    "started_at": "2026-10-09T06:51:59.808589+00:00",
+    "ended_at": "2026-10-09T06:51:59.926666+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.example_2"
+    ],
+    "outputs": [
+      "example_2_metrics.png"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: confirm the chart reached disk",
+    "started_at": "2026-10-09T06:51:59.926060+00:00",
+    "ended_at": "2026-10-09T06:51:59.926555+00:00",
+    "inputs": [
+      "example_2_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: revise chart",
+    "started_at": "2026-10-09T06:51:59.927623+00:00",
+    "ended_at": "2026-10-09T06:51:59.927628+00:00",
+    "inputs": [
+      "example_2_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: respond",
+    "started_at": "2026-10-09T06:51:59.927623+00:00",
+    "ended_at": "2026-10-09T06:51:59.927628+00:00",
+    "inputs": [
+      "example_2_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca2-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.930197+00:00",
+    "ended_at": "2026-10-09T06:51:59.930209+00:00",
+    "inputs": [],
+    "outputs": [
+      "ca2 PROV under review (example_2::ca2)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca2-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check ca2 compliance",
+    "started_at": "2026-10-09T06:51:59.930197+00:00",
+    "ended_at": "2026-10-09T06:51:59.930225+00:00",
+    "inputs": [
+      "ca2 PROV under review (example_2::ca2)"
+    ],
+    "outputs": [
+      "all structural checks held"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca2-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: pass ca2",
+    "started_at": "2026-10-09T06:51:59.930197+00:00",
+    "ended_at": "2026-10-09T06:51:59.930202+00:00",
+    "inputs": [
+      "all structural checks held"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca2-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.932196+00:00",
+    "ended_at": "2026-10-09T06:51:59.932208+00:00",
+    "inputs": [],
+    "outputs": [
+      "Metrics_Visualizer PROV under audit (example_2::ca2)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca2-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit Metrics_Visualizer",
+    "started_at": "2026-10-09T06:51:59.932196+00:00",
+    "ended_at": "2026-10-09T06:51:59.932233+00:00",
+    "inputs": [
+      "Metrics_Visualizer PROV under audit (example_2::ca2)"
+    ],
+    "outputs": [
+      "agent=Metrics_Visualizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca2-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for Metrics_Visualizer is complete",
+    "started_at": "2026-10-09T06:51:59.932196+00:00",
+    "ended_at": "2026-10-09T06:51:59.932201+00:00",
+    "inputs": [
+      "agent=Metrics_Visualizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Analytics_Agent",
+    "name": "CA3: receive provenance graph",
+    "started_at": "2026-10-09T06:51:59.935199+00:00",
+    "ended_at": "2026-10-09T06:51:59.935213+00:00",
+    "inputs": [],
+    "outputs": [
+      "provenance graph from producer.yprov4ml.example_2"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Analytics_Agent",
+    "name": "CA3: select analytics algorithms",
+    "started_at": "2026-10-09T06:51:59.935199+00:00",
+    "ended_at": "2026-10-09T06:51:59.935209+00:00",
+    "inputs": [
+      "provenance graph from producer.yprov4ml.example_2"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Analytics_Agent",
+    "name": "CA3: mine the provenance graph",
+    "started_at": "2026-10-09T06:51:59.935199+00:00",
+    "ended_at": "2026-10-09T06:51:59.944630+00:00",
+    "inputs": [
+      "provenance graph from producer.yprov4ml.example_2"
+    ],
+    "outputs": [
+      "Provenance analytics for 'example_2': 11 activities and 78 entities (89.7% typed), 9 derivations, 70 terminal entities. Wall-clock span 112.53s across 11 ordered activities. Energy streams: 33; resource streams: 18. Anomalies: 2; completeness findings: 2."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Analytics_Agent",
+    "name": "CA3: validate findings against invariants",
+    "started_at": "2026-10-09T06:51:59.944715+00:00",
+    "ended_at": "2026-10-09T06:51:59.944726+00:00",
+    "inputs": [
+      "Provenance analytics for 'example_2': 11 activities and 78 entities (89.7% typed), 9 derivations, 70 terminal entities. Wall-clock span 112.53s across 11 ordered activities. Energy streams: 33; resource streams: 18. Anomalies: 2; completeness findings: 2."
+    ],
+    "outputs": [
+      "2 invariant(s) breached, 2 completeness gap(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Analytics_Agent",
+    "name": "CA3: ANOMALY",
+    "started_at": "2026-10-09T06:51:59.944715+00:00",
+    "ended_at": "2026-10-09T06:51:59.944724+00:00",
+    "inputs": [
+      "2 invariant(s) breached, 2 completeness gap(s)"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "Analytics_Agent",
+    "name": "CA3: publish analytics report",
+    "started_at": "2026-10-09T06:51:59.944715+00:00",
+    "ended_at": "2026-10-09T06:51:59.944720+00:00",
+    "inputs": [
+      "Provenance analytics for 'example_2': 11 activities and 78 entities (89.7% typed), 9 derivations, 70 terminal entities. Wall-clock span 112.53s across 11 ordered activities. Energy streams: 33; resource streams: 18. Anomalies: 2; completeness findings: 2."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "StorageAgent",
+    "name": "CA1: receive record from bus",
+    "started_at": "2026-10-09T06:51:59.947718+00:00",
+    "ended_at": "2026-10-09T06:51:59.947746+00:00",
+    "inputs": [],
+    "outputs": [
+      "provenance record 'example_2' held for persistence"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "StorageAgent",
+    "name": "CA1: await consumers, plan store path",
+    "started_at": "2026-10-09T06:51:59.947718+00:00",
+    "ended_at": "2026-10-09T06:51:59.947738+00:00",
+    "inputs": [
+      "provenance record 'example_2' held for persistence"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "StorageAgent",
+    "name": "CA1: write to store (backend API)",
+    "started_at": "2026-10-09T06:51:59.947718+00:00",
+    "ended_at": "2026-10-09T06:51:59.951409+00:00",
+    "inputs": [
+      "provenance record 'example_2' held for persistence"
+    ],
+    "outputs": [
+      "stored provenance record for example_2"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "StorageAgent",
+    "name": "CA1: verify round-trip integrity",
+    "started_at": "2026-10-09T06:51:59.951717+00:00",
+    "ended_at": "2026-10-09T06:51:59.956909+00:00",
+    "inputs": [
+      "stored provenance record for example_2"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "StorageAgent",
+    "name": "CA1: accept the stored record",
+    "started_at": "2026-10-09T06:51:59.956715+00:00",
+    "ended_at": "2026-10-09T06:51:59.956721+00:00",
+    "inputs": [
+      "stored provenance record for example_2"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2",
+    "agent": "StorageAgent",
+    "name": "CA1: emit storage receipt",
+    "started_at": "2026-10-09T06:51:59.956715+00:00",
+    "ended_at": "2026-10-09T06:51:59.956726+00:00",
+    "inputs": [
+      "stored provenance record for example_2"
+    ],
+    "outputs": [
+      "storage receipt 21.T11999/yprovstore-377895f2bbbd (sha256:377895f2bbbd...)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca1-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.959225+00:00",
+    "ended_at": "2026-10-09T06:51:59.959237+00:00",
+    "inputs": [],
+    "outputs": [
+      "ca1 PROV under review (example_2::ca1)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca1-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check ca1 compliance",
+    "started_at": "2026-10-09T06:51:59.959225+00:00",
+    "ended_at": "2026-10-09T06:51:59.959251+00:00",
+    "inputs": [
+      "ca1 PROV under review (example_2::ca1)"
+    ],
+    "outputs": [
+      "all structural checks held"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca1-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: pass ca1",
+    "started_at": "2026-10-09T06:51:59.959225+00:00",
+    "ended_at": "2026-10-09T06:51:59.959230+00:00",
+    "inputs": [
+      "all structural checks held"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca1-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.961823+00:00",
+    "ended_at": "2026-10-09T06:51:59.961833+00:00",
+    "inputs": [],
+    "outputs": [
+      "StorageAgent PROV under audit (example_2::ca1)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca1-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit StorageAgent",
+    "started_at": "2026-10-09T06:51:59.961823+00:00",
+    "ended_at": "2026-10-09T06:51:59.961859+00:00",
+    "inputs": [
+      "StorageAgent PROV under audit (example_2::ca1)"
+    ],
+    "outputs": [
+      "agent=StorageAgent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> PersistActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca1-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for StorageAgent is complete",
+    "started_at": "2026-10-09T06:51:59.961823+00:00",
+    "ended_at": "2026-10-09T06:51:59.961827+00:00",
+    "inputs": [
+      "agent=StorageAgent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> PersistActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca3-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.963822+00:00",
+    "ended_at": "2026-10-09T06:51:59.963834+00:00",
+    "inputs": [],
+    "outputs": [
+      "ca3 PROV under review (example_2::ca3)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca3-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check ca3 compliance",
+    "started_at": "2026-10-09T06:51:59.963822+00:00",
+    "ended_at": "2026-10-09T06:51:59.963850+00:00",
+    "inputs": [
+      "ca3 PROV under review (example_2::ca3)"
+    ],
+    "outputs": [
+      "all structural checks held"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca3-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: pass ca3",
+    "started_at": "2026-10-09T06:51:59.963822+00:00",
+    "ended_at": "2026-10-09T06:51:59.963827+00:00",
+    "inputs": [
+      "all structural checks held"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca3-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-09T06:51:59.965823+00:00",
+    "ended_at": "2026-10-09T06:51:59.965835+00:00",
+    "inputs": [],
+    "outputs": [
+      "Analytics_Agent PROV under audit (example_2::ca3)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca3-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit Analytics_Agent",
+    "started_at": "2026-10-09T06:51:59.965823+00:00",
+    "ended_at": "2026-10-09T06:51:59.965861+00:00",
+    "inputs": [
+      "Analytics_Agent PROV under audit (example_2::ca3)"
+    ],
+    "outputs": [
+      "agent=Analytics_Agent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> AnalysisActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "example_2::ca3-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for Analytics_Agent is complete",
+    "started_at": "2026-10-09T06:51:59.965823+00:00",
+    "ended_at": "2026-10-09T06:51:59.965828+00:00",
+    "inputs": [
+      "agent=Analytics_Agent; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> AnalysisActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]
