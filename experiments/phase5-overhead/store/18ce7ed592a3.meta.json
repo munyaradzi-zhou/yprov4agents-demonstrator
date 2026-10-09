@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-18ce7ed592a3",
+  "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/store/18ce7ed592a3.txt",
+  "yp:contentHash": "sha256:18ce7ed592a31b7c7d946531f8be4f93bf72b8c55bf80b91e9eb8fc80c0ff524",
+  "size_bytes": 78,
+  "kind": "chart",
+  "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out/charts/example_0_metrics.png",
+  "created_at": "2026-10-09T05:11:26.676354+00:00"
+}

@@ -125,11 +125,13 @@ jobs:
       # to Phase 2's — attaching the callback baseline observes the run without altering
       # it. Phase 4 differs from Phase 3 by exactly two declared attributes, yp:summary_mode
       # and yp:report_mode, now recorded on the step that produced the text rather than only
-      # on the decision about it.
+      # on the decision about it. Phase 5 changed no provenance at all: the two defects
+      # the overhead study found were performance defects, and the records they produce are
+      # byte-identical before and after — which the gate is what establishes.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/phase4-reference \
+            --before experiments/phase5-overhead \
             --after out \
             --strict
 
