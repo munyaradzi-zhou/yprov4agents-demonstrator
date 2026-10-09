@@ -103,6 +103,7 @@ def _type_of(node: dict[str, Any]) -> str:
 
 
 class CA3Analytics(StreamingAgent):
+    agent_label = "Analytics_Agent"
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
@@ -424,7 +425,7 @@ class CA3Analytics(StreamingAgent):
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
     ) -> tuple[dict[str, Any], str]:
-        tracker = agent_tracker(self.role, session_id, "Analytics_Agent", energy=self.energy)
+        tracker = agent_tracker(self.role, session_id, self.agent_label, energy=self.energy)
 
         # S1 Receive — the graph to mine, and where it came from.
         with tracker.activity("ReceiveTaskActivity", "CA3: receive provenance graph") as prov:

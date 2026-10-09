@@ -10,8 +10,14 @@ The manifest is deliberately the same shape of evidence the demonstrator itself 
 provenance records: content hashes plus the context needed to interpret them.
 
     python -m eval.archive freeze --name baseline-pre-review --note "before any fixes"
+    python -m eval.archive freeze --name phase7-reference --require-clean
     python -m eval.archive verify --name baseline-pre-review
     python -m eval.archive list
+
+An archive is reconstructible when it names a commit and the tree matched that commit.
+When it did not, the uncommitted changes are saved beside the run as ``GIT_DIFF.patch``,
+so the commit plus the patch still rebuilds the code that produced it. Pass
+``--require-clean`` for an archive a paper will cite, and the freeze is refused instead.
 """
 
 from __future__ import annotations
@@ -27,7 +33,13 @@ import sys
 from pathlib import Path
 
 MANIFEST_NAME = "MANIFEST.json"
-MANIFEST_SCHEMA = "yprov4agents/experiment-manifest/1"
+#: Version 2 records what was uncommitted, not only that something was. Version 1
+#: manifests carry the same files and verify unchanged.
+MANIFEST_SCHEMA = "yprov4agents/experiment-manifest/2"
+
+#: The uncommitted changes to tracked files, saved when an archive is taken from a tree
+#: that did not match its commit.
+DIFF_NAME = "GIT_DIFF.patch"
 DEFAULT_ARCHIVE_ROOT = Path("experiments")
 
 # Artifacts that describe the archive rather than belonging to the run.
@@ -58,18 +70,42 @@ def _git(*args: str) -> str | None:
     return result.stdout.strip() if result.returncode == 0 else None
 
 
+def _git_diff() -> str | None:
+    """Every uncommitted change to a tracked file, as a patch ``git apply`` accepts."""
+    try:
+        result = subprocess.run(
+            ("git", "diff", "HEAD", "--binary"),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="surrogateescape",
+            timeout=30,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return result.stdout if result.returncode == 0 else None
+
+
 def git_provenance() -> dict[str, object]:
     """Describe the working tree the archive was taken from.
 
-    ``dirty`` is the honest part: an archive taken from a modified tree cannot be
-    reconstructed from its commit alone, and the manifest must say so.
+    Must be called before the archive is written. It used to run after the files were
+    copied into ``experiments/<name>/``, which is itself an untracked change, so every
+    archive reported a dirty tree whatever its state: the flag carried no information, and
+    a genuinely modified tree could not be told from a clean one.
+
+    ``changes`` lists what was uncommitted, so ``dirty`` can be checked rather than taken
+    on trust; untracked files are listed but cannot be rebuilt from the archive.
     """
     status = _git("status", "--porcelain")
+    changes = [line for line in (status or "").splitlines() if line.strip()]
     return {
         "commit": _git("rev-parse", "HEAD"),
         "branch": _git("rev-parse", "--abbrev-ref", "HEAD"),
         "describe": _git("describe", "--tags", "--always", "--dirty"),
-        "dirty": bool(status) if status is not None else None,
+        "dirty": bool(changes) if status is not None else None,
+        "changes": changes,
     }
 
 
@@ -124,6 +160,7 @@ def freeze(
     archive_root: Path = DEFAULT_ARCHIVE_ROOT,
     note: str = "",
     overwrite: bool = False,
+    require_clean: bool = False,
 ) -> Path:
     """Copy `source` into `archive_root/name/` and write its manifest.
 
@@ -134,9 +171,23 @@ def freeze(
     FileExistsError
         The destination exists and `overwrite` is False. Archives are immutable by
         default: silently replacing one would destroy the evidence it exists to preserve.
+    RuntimeError
+        `require_clean` is set and the working tree does not match its commit.
     """
     if not source.is_dir():
         raise FileNotFoundError(f"nothing to archive: {source} is not a directory")
+
+    # Before anything on disk changes: removing an old archive or writing a new one is
+    # itself a change to the tree, and would be reported as the tree's state.
+    git = git_provenance()
+    if require_clean and git["dirty"]:
+        changes = git.get("changes") or []
+        listed = "\n  ".join(str(c) for c in changes) if isinstance(changes, list) else ""
+        raise RuntimeError(
+            "refusing to freeze from a working tree that does not match its commit; "
+            f"commit or stash first:\n  {listed}"
+        )
+    diff = _git_diff() if git["dirty"] else None
 
     destination = archive_root / name
     if destination.exists():
@@ -148,6 +199,8 @@ def freeze(
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source, destination)
+    if diff:
+        (destination / DIFF_NAME).write_text(diff, encoding="utf-8", errors="surrogateescape")
 
     files, total = _inventory(destination)
     if not files:
@@ -160,7 +213,7 @@ def freeze(
         "note": note,
         "created_at": _utc_now(),
         "source": source.as_posix(),
-        "git": git_provenance(),
+        "git": git,
         "environment": environment(),
         "file_count": len(files),
         "total_bytes": total,
@@ -214,6 +267,7 @@ def _cmd_freeze(args: argparse.Namespace) -> int:
         archive_root=Path(args.archive_root),
         note=args.note,
         overwrite=args.overwrite,
+        require_clean=args.require_clean,
     )
     manifest = json.loads((destination / MANIFEST_NAME).read_text(encoding="utf-8"))
     print(
@@ -223,8 +277,13 @@ def _cmd_freeze(args: argparse.Namespace) -> int:
     git = manifest["git"]
     print(
         f"[archive] commit {git['describe'] or 'n/a'}"
-        f"{' (DIRTY working tree)' if git['dirty'] else ''}"
+        f"{' (DIRTY working tree)' if git['dirty'] else ' (clean working tree)'}"
     )
+    if git["dirty"]:
+        print(
+            f"[archive] {len(git.get('changes') or [])} uncommitted change(s) recorded; "
+            f"tracked-file edits saved as {DIFF_NAME}"
+        )
     return 0
 
 
@@ -278,6 +337,12 @@ def main(argv: list[str] | None = None) -> int:
     freeze_parser.add_argument("--note", default="", help="why this archive exists")
     freeze_parser.add_argument(
         "--overwrite", action="store_true", help="replace an existing archive"
+    )
+    freeze_parser.add_argument(
+        "--require-clean",
+        action="store_true",
+        help="refuse to freeze unless the working tree matches its commit (use for any "
+        "archive a published result cites)",
     )
     freeze_parser.set_defaults(func=_cmd_freeze)
 

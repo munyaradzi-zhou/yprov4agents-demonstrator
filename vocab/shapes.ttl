@@ -102,6 +102,42 @@ yp:DecisionShape
     ] .
 
 
+# ── Shapes that must fire when the thing they look for is absent ──────────────────
+#
+# Every other shape here targets a class, so it constrains the nodes of that class and is
+# silent when there are none. That made "every decision is justified" vacuously true of a
+# record with no decision in it: removing a decision's type made it no longer a decision,
+# nothing targeted it, and the record conformed. The two shapes below target nodes that are
+# always present — the agent, and every activity — so absence becomes a violation.
+
+yp:AgentDecidedShape
+    a               sh:NodeShape ;
+    rdfs:label      "an agent that took a decision"@en ;
+    sh:targetClass  prov:Agent ;
+    sh:property [
+        sh:path                 [ sh:inversePath prov:wasAssociatedWith ] ;
+        sh:qualifiedValueShape  [ sh:class yp:DecisionActivity ] ;
+        sh:qualifiedMinCount    1 ;
+        sh:name                 "decision-present" ;
+        sh:severity             sh:Violation ;
+        sh:message              """Every agent in a record must be associated with at least one
+            yp:DecisionActivity. Without this, the justification shapes are vacuous: a record
+            with no decision has no decision to leave unjustified, and conformed.""" ;
+    ] .
+
+
+yp:TypedActivityShape
+    a               sh:NodeShape ;
+    rdfs:label      "an activity with a lifecycle type"@en ;
+    sh:targetClass  prov:Activity ;
+    sh:class        yp:AgentLifecycleActivity ;
+    sh:name         "activity-typed" ;
+    sh:severity     sh:Violation ;
+    sh:message      """Every activity must be a yp:AgentLifecycleActivity. An untyped
+        activity escaped every other shape, because they target the lifecycle classes —
+        so a step whose type was dropped or misspelled was invisible to the standard.""" .
+
+
 yp:ActivityShape
     a               sh:NodeShape ;
     rdfs:label      "any lifecycle activity"@en ;

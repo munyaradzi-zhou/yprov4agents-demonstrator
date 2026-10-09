@@ -21,7 +21,10 @@ How the ordering is achieved (no extra coordination service needed):
 A `PERSIST_TIMEOUT_S` safety net persists anyway if a consumer never reports, so a
 crashed agent cannot silently lose a record — the receipt records which case applied.
 
-Decide★ verdicts: ACCEPT (round-trip integrity verified) / ESCALATE (I/O or hash mismatch).
+Decide★ verdicts: ACCEPT (round-trip integrity verified, consumed at quorum, complete) or
+ESCALATE, naming which condition failed: `integrity` (the stored bytes are wrong),
+`incomplete-input` (envelopes of the record never arrived, so what is stored is partial),
+or `consumption-unconfirmed` (archived by the timeout, before every consumer used it).
 """
 
 from __future__ import annotations
@@ -33,7 +36,13 @@ from typing import Any
 
 from yprov4agenticai import LightweightStore
 
-from ..base_agent import StreamingAgent, _merge_payload, stream_document
+from ..base_agent import (
+    INPUT_COMPLETE,
+    StreamingAgent,
+    _merge_payload,
+    missing_envelopes,
+    stream_document,
+)
 from ..envelope import ProvEventType, ProvRecordEnvelope
 from ..net_bus import NetworkBus
 from ..util import OUT_DIR, agent_tracker, prov_counts
@@ -49,9 +58,16 @@ PERSIST_TIMEOUT_S = float(os.environ.get("PERSIST_TIMEOUT_S", "25"))
 PERSIST_TRIGGER_QUORUM = "quorum"
 PERSIST_TRIGGER_TIMEOUT = "timeout"
 
+#: Escalation reasons, most severe first: a verdict names the first that applies.
+ESCALATION_INTEGRITY = "integrity"
+ESCALATION_INCOMPLETE = "incomplete-input"
+ESCALATION_UNCONFIRMED = "consumption-unconfirmed"
+
 
 class CA1Storage(StreamingAgent):
     """Persist-after-consume storage agent. Store lives behind it, not on the bus."""
+
+    agent_label = "StorageAgent"
 
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
@@ -70,6 +86,14 @@ class CA1Storage(StreamingAgent):
         # which would silently remove the safety net; and the guard has to be cancellable
         # once quorum is reached, or it keeps racing a decision that has already been made.
         self._guards: dict[str, asyncio.Task[None]] = {}
+        # session_id -> sequence numbers of the producer's envelopes that arrived, and the
+        # STREAM_END sequence number once it has (which is the stream's length).
+        self._seen: dict[str, set[int]] = {}
+        self._ended: dict[str, int] = {}
+        # session_id -> how many times it has been persisted. A session that arrives again
+        # is held and persisted again rather than ignored: it may be a replay, or a
+        # different document that happens to share the id, and dropping either loses data.
+        self._persisted: dict[str, int] = {}
 
     # ── startup: two subscriptions, not one ────────────────────────────────────
     async def start(self) -> None:
@@ -92,20 +116,44 @@ class CA1Storage(StreamingAgent):
     # ── inbound: the original record to hold ───────────────────────────────────
     async def _on_producer(self, subject: str, env: ProvRecordEnvelope) -> None:
         sid = env.session_id
+        if sid in self._done:
+            if env.event_type != ProvEventType.STREAM_START.value:
+                return  # a straggler of a stream already persisted
+            # The same session again. It used to be ignored without a word, so a replay —
+            # or a producer restarted by its supervisor — was never stored and nothing said
+            # so. It is held and persisted like any other, and the record says it repeated.
+            self._done.discard(sid)
+            print(f"[{self.role}] '{sid}' arrived again; holding it anew", flush=True)
         if env.event_type == ProvEventType.STREAM_START.value:
             self._pending[sid] = {}
             _merge_payload(self._pending[sid], env.payload)
-            return
         buf = self._pending.setdefault(sid, {})
+        self._seen.setdefault(sid, set()).add(env.sequence_no)
+        # The guard is armed by the first envelope of a record, not by its last. Arming it
+        # at STREAM_END meant that losing that one envelope left nothing to fire: the
+        # record was held for ever and never persisted or reported, which is the one
+        # outcome this agent exists to prevent.
+        if sid not in self._guards:
+            self._guards[sid] = asyncio.create_task(self._timeout_guard(sid))
         if env.event_type == ProvEventType.RECORD_CHUNK.value:
             _merge_payload(buf, env.payload)
         elif env.event_type == ProvEventType.STREAM_END.value:
+            self._ended[sid] = env.sequence_no
+            waiting = set(PERSIST_AFTER) - self._acks.get(sid, set())
+            if not waiting:
+                # Every consumer finished before this agent had the whole record. It waited
+                # for the end of its own copy rather than persist a partial one.
+                self._cancel_guard(sid)
+                await self._persist(
+                    sid,
+                    trigger=PERSIST_TRIGGER_QUORUM,
+                    reason="all expected consumers acknowledged",
+                )
+                return
             print(
-                f"[{self.role}] holding '{sid}' — awaiting consumers "
-                f"{sorted(set(PERSIST_AFTER) - self._acks.get(sid, set()))}",
+                f"[{self.role}] holding '{sid}' — awaiting consumers {sorted(waiting)}",
                 flush=True,
             )
-            self._guards[sid] = asyncio.create_task(self._timeout_guard(sid))
 
     # ── inbound: a consumer finished → one acknowledgement ─────────────────────
     async def _on_consumer_ack(self, subject: str, env: ProvRecordEnvelope) -> None:
@@ -120,6 +168,12 @@ class CA1Storage(StreamingAgent):
             return
         if sid in self._done or sid not in self._pending:
             return
+        if env.payload.get(INPUT_COMPLETE) is False:
+            # The consumer recorded that its own copy arrived with a gap, so it did not use
+            # the record. Counting it would let "persisted after consumption" be claimed
+            # for a record nobody consumed.
+            print(f"[{self.role}] '{role}' received '{sid}' incomplete; not an ack", flush=True)
+            return
         self._acks.setdefault(sid, set()).add(role)
         waiting = set(PERSIST_AFTER) - self._acks[sid]
         print(
@@ -128,6 +182,10 @@ class CA1Storage(StreamingAgent):
             + (f", waiting on {sorted(waiting)}" if waiting else ", quorum reached"),
             flush=True,
         )
+        if not waiting and sid not in self._ended:
+            # Quorum, but this agent's own copy is still arriving: persisting now would
+            # store whatever had arrived so far. _on_producer persists at its STREAM_END.
+            return
         if not waiting:
             # Stand the guard down before persisting. It is a fallback for a consumer that
             # never reports, not a competitor to one that just did; leaving it running
@@ -162,13 +220,16 @@ class CA1Storage(StreamingAgent):
         if sid in self._done:
             return
         self._done.add(sid)
+        self._persisted[sid] = self._persisted.get(sid, 0) + 1
         doc = self._pending.pop(sid, {})
         acked = sorted(self._acks.get(sid, set()))
+        ended = sid in self._ended
+        lost = missing_envelopes(self._seen.pop(sid, set()), self._ended.pop(sid, 0))
         # Session bookkeeping is finished with; holding it would grow without bound.
         self._acks.pop(sid, None)
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         prov, log = await loop.run_in_executor(
-            None, self._do_persist, sid, doc, acked, trigger, reason
+            None, self._do_persist, sid, doc, acked, trigger, reason, lost, ended
         )
         print(f"[{self.role}] {log}", flush=True)
         await stream_document(
@@ -202,6 +263,7 @@ class CA1Storage(StreamingAgent):
         counts: dict[str, int],
         payload_chars: int,
         integrity: str,
+        completeness: str = "",
     ) -> str:
         """State which ordering actually held, and what the integrity check established.
 
@@ -225,15 +287,22 @@ class CA1Storage(StreamingAgent):
                 f"this record is archived but its consumption is unconfirmed."
             )
         return (
-            f"{ordering} Record carries {counts['activities']} activities / "
+            f"{ordering} {completeness}Record carries {counts['activities']} activities / "
             f"{counts['entities']} entities / {counts['relations']} relations, "
             f"{payload_chars} bytes. Integrity: {integrity}. Verdict {verdict}."
         )
 
     def _do_persist(
-        self, sid: str, doc: dict[str, Any], acked: list, trigger: str, reason: str
+        self,
+        sid: str,
+        doc: dict[str, Any],
+        acked: list,
+        trigger: str,
+        reason: str,
+        lost: list[int] | None = None,
+        ended: bool = True,
     ) -> tuple[dict[str, Any], str]:
-        tracker = agent_tracker(self.role, sid, "StorageAgent", energy=self.energy)
+        tracker = agent_tracker(self.role, sid, self.agent_label, energy=self.energy)
 
         # S1 Receive — what is being held, and how big it is.
         with tracker.activity("ReceiveTaskActivity", "CA1: receive record from bus") as prov:
@@ -284,17 +353,50 @@ class CA1Storage(StreamingAgent):
             integrity_ok, integrity = self._verify(pointer["yp:pid"])
             self.store.save()  # refresh the derived manifest index
 
-        # S5 Decide — two independent conditions, so the verdict names which one failed.
+        times = self._persisted.get(sid, 1)
+        repeat = (
+            f"This session has now been persisted {times} times; the store is content-"
+            f"addressed, so an identical replay maps to the same pointer and a different "
+            f"document under the same session is kept alongside it. "
+            if times > 1
+            else ""
+        )
+
+        # S5 Decide — three independent conditions, so the verdict names which one failed.
+        # Partial input is stored rather than dropped (losing it is worse), and said to be
+        # partial, so nothing downstream mistakes it for the record that was sent.
+        lost = lost or []
+        incomplete = bool(lost) or not ended
+        if incomplete:
+            completeness = (
+                f"Envelope(s) {', '.join(map(str, lost))} of the record never arrived, so "
+                f"what was stored is partial. "
+                if lost
+                else "The record's final envelope never arrived, so what was stored may "
+                "be partial. "
+            )
+        else:
+            completeness = ""
         if not integrity_ok:
-            verdict, escalation = "ESCALATE", "integrity"
+            verdict, escalation = "ESCALATE", ESCALATION_INTEGRITY
+        elif incomplete:
+            verdict, escalation = "ESCALATE", ESCALATION_INCOMPLETE
         elif trigger != PERSIST_TRIGGER_QUORUM:
-            verdict, escalation = "ESCALATE", "consumption-unconfirmed"
+            verdict, escalation = "ESCALATE", ESCALATION_UNCONFIRMED
         else:
             verdict, escalation = "ACCEPT", ""
         tracker.decide(
             verdict,
             self._justify(
-                verdict, trigger, reason, acked, missing, counts, len(payload), integrity
+                verdict,
+                trigger,
+                reason,
+                acked,
+                missing,
+                counts,
+                len(payload),
+                integrity,
+                repeat + completeness,
             ),
             label=f"CA1: {verdict.lower()} the stored record",
             consumed=stored,
@@ -303,6 +405,8 @@ class CA1Storage(StreamingAgent):
                 "yp:consumers_required": len(PERSIST_AFTER),
                 "yp:consumers_acknowledged": len(acked),
                 **({"yp:escalation_reason": escalation} if escalation else {}),
+                **({"yp:envelopes_missing": ",".join(map(str, lost))} if lost else {}),
+                **({"yp:persist_count": times} if times > 1 else {}),
             },
         )
 

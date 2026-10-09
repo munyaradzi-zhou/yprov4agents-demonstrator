@@ -93,7 +93,7 @@ Reflexion* {S4,S5,S6}. ★ is the step that carries `yp:justification`.
 
 | | Agent | LLM | S5 verdicts | What it does |
 |---|---|:--:|---|---|
-| **CA1** | `StorageAgent` | — | ACCEPT / ESCALATE ×2 | persists after consumption; sha-256 + `yp:pid`; round-trip integrity check |
+| **CA1** | `StorageAgent` | — | ACCEPT / ESCALATE ×3 | persists after consumption; sha-256 + `yp:pid`; round-trip integrity check |
 | **CAx** | `NL_Summarizer` | ✅ | ACCEPT / REVISE | natural-language summary of a provenance document |
 | **CA2** | `Metrics_Visualizer` | — | ACCEPT / REVISE | renders charts from the graph |
 | **CA3** | `Analytics_Agent` | optional | OK / ANOMALY | **5 mining algorithms** over any PROV graph |
@@ -107,10 +107,20 @@ result, which is why the distinction is tracked: this table used to credit CAx w
 `ESCALATE` it cannot emit and MC3 with no verdict at all when it emits two (review finding
 A3).
 
-CA1's `ESCALATE` arrives down two independent paths, and `yp:escalation_reason` separates
-them: `integrity` means the stored bytes are wrong, `consumption-unconfirmed` means the
-data is fine and a consumer is down. They demand opposite responses, which is why the
-record has to say which. Reproduce any of it with
+CA1's `ESCALATE` arrives down three independent paths, and `yp:escalation_reason`
+separates them: `integrity` means the stored bytes are wrong, `incomplete-input` means part
+of the record was lost in transport and what was stored is partial, and
+`consumption-unconfirmed` means the data is fine and a consumer is down. They demand
+different responses, which is why the record has to say which.
+
+**Every agent can also record `INCOMPLETE`.** The bus is at-most-once, so an envelope can
+be lost. Each envelope is numbered, and an agent whose input arrives with a gap records the
+missing sequence numbers as its decision instead of processing the part that did arrive —
+which would produce a well-formed record about an input it never fully saw. The check lives
+in the base class all six agents share, so one fault scenario (`stream-gap`) exercises it
+for all of them. That scenario and CA1's `incomplete-input` path are observed by the fault
+suite in CI, and join `experiments/verdict-reachability` when the reference archives are
+next re-frozen (`todo.md` AU8). Reproduce any of it with
 `python -m eval.fault_injection --all`.
 
 **CA3 is an analytics agent, not an anomaly detector.** It applies a *set* of algorithms

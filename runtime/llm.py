@@ -28,7 +28,7 @@ import os
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, NamedTuple
 
 from yprov4agenticai.prompts import Prompt
 
@@ -62,6 +62,8 @@ class Completion:
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
     finish_reason: str | None = None
+    model_resolved: str | None = None
+    system_fingerprint: str | None = None
 
     @property
     def truncated(self) -> bool:
@@ -95,13 +97,33 @@ class Completion:
             attributes["yp:completion_tokens"] = self.completion_tokens
         if self.finish_reason is not None:
             attributes["yp:finish_reason"] = self.finish_reason
+        # ``yp:model`` is what was asked for, and a provider re-points an alias such as
+        # "gpt-4o" at new snapshots over time. Repeating a call needs the snapshot that
+        # actually answered, and the backend configuration it ran on.
+        if self.model_resolved is not None:
+            attributes["yp:model_resolved"] = self.model_resolved
+        if self.system_fingerprint is not None:
+            attributes["yp:system_fingerprint"] = self.system_fingerprint
         return attributes
 
 
+class RawResponse(NamedTuple):
+    """What the vendor call reports back. Fields the API did not report stay ``None``."""
+
+    text: str
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+    finish_reason: str | None = None
+    #: The model snapshot that answered, which may differ from the alias requested.
+    model: str | None = None
+    #: The provider's identifier for the backend configuration that served the call.
+    system_fingerprint: str | None = None
+
+
 #: The vendor call, isolated behind one signature: (model, temperature, max_tokens,
-#: system, user) -> (text, prompt_tokens, completion_tokens, finish_reason). Injecting it
-#: is what lets a test exercise the provenance without a network or an API key.
-RawCall = Callable[[str, float, int, str, str], tuple[str, int | None, int | None, str | None]]
+#: system, user) -> RawResponse, or a plain tuple of its leading fields. Injecting it is
+#: what lets a test exercise the provenance without a network or an API key.
+RawCall = Callable[[str, float, int, str, str], tuple[Any, ...]]
 
 
 class LLMClient:
@@ -131,19 +153,21 @@ class LLMClient:
     def complete(self, prompt: Prompt, user: str) -> Completion:
         """Send a registered prompt plus a user message, and return an accountable result."""
         started = time.perf_counter()
-        text, prompt_tokens, completion_tokens, finish_reason = self._raw(
-            self.model, self.temperature, self.max_tokens, prompt.text, user
+        response = RawResponse(
+            *self._raw(self.model, self.temperature, self.max_tokens, prompt.text, user)
         )
         return Completion(
-            text=text.strip(),
+            text=response.text.strip(),
             model=self.model,
             temperature=self.temperature,
             max_tokens=self.max_tokens,
             latency_s=time.perf_counter() - started,
             prompt=prompt,
-            prompt_tokens=prompt_tokens,
-            completion_tokens=completion_tokens,
-            finish_reason=finish_reason,
+            prompt_tokens=response.prompt_tokens,
+            completion_tokens=response.completion_tokens,
+            finish_reason=response.finish_reason,
+            model_resolved=response.model,
+            system_fingerprint=response.system_fingerprint,
         )
 
 
@@ -222,7 +246,7 @@ def get_llm() -> LLMClient | None:
 
     def raw(
         model: str, temperature: float, max_tokens: int, system: str, user: str
-    ) -> tuple[str, int | None, int | None, str | None]:
+    ) -> RawResponse:
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -234,11 +258,13 @@ def get_llm() -> LLMClient | None:
         )
         choice = response.choices[0]
         usage = response.usage
-        return (
-            choice.message.content or "",
-            getattr(usage, "prompt_tokens", None),
-            getattr(usage, "completion_tokens", None),
-            choice.finish_reason,
+        return RawResponse(
+            text=choice.message.content or "",
+            prompt_tokens=getattr(usage, "prompt_tokens", None),
+            completion_tokens=getattr(usage, "completion_tokens", None),
+            finish_reason=choice.finish_reason,
+            model=getattr(response, "model", None),
+            system_fingerprint=getattr(response, "system_fingerprint", None),
         )
 
     return LLMClient(raw, model=model)

@@ -126,10 +126,13 @@ def validate_run(prov_dir: Path) -> Report:
         # never matches anything is not enforcing a standard, it is decoration — and a
         # suite of such shapes would report perfect conformance over an empty check.
         for activity in (document.get("activity") or {}).values():
+            report.checks_exercised["prov:Activity (TypedActivityShape)"] += 1
             prov_type = activity.get("prov:type")
             name = prov_type.get("$", "") if isinstance(prov_type, dict) else ""
             if name:
                 report.checks_exercised[name] += 1
+        for _agent in document.get("agent") or {}:
+            report.checks_exercised["prov:Agent (AgentDecidedShape)"] += 1
         for entity in (document.get("entity") or {}).values():
             if entity.get("yp:pid"):
                 report.checks_exercised["yp:pid (PointerShape)"] += 1

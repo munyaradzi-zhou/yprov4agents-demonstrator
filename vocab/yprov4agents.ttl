@@ -227,7 +227,9 @@ yp:verdict
     rdfs:range          xsd:string ;
     rdfs:label          "verdict"@en ;
     rdfs:comment        """The conclusion: ACCEPT, REVISE, ESCALATE, PASS, FAIL, ANOMALY,
-        OK, COMPLETE, PARTIAL. Unlike the justification, a verdict is sometimes
+        OK, COMPLETE, PARTIAL — and INCOMPLETE, which any agent records when its input
+        stream arrived with an envelope missing and it declined to act on the part that
+        did arrive. Unlike the justification, a verdict is sometimes
         recoverable by an observer — it is a short token, and a developer who puts it in
         a step's label has published it. That is a property of the label, not of the
         observation channel."""@en .
@@ -247,7 +249,26 @@ yp:escalation_reason
     rdfs:comment        """Which of several independent conditions caused an escalation.
         Recorded separately from the justification because the conditions demand
         different responses: a failed integrity check means the data is suspect, an
-        unconfirmed consumption means a consumer is down."""@en .
+        unconfirmed consumption means a consumer is down, and an incomplete input means
+        part of the record was lost in transport and what was stored is partial."""@en .
+
+yp:envelopes_expected
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:integer ;
+    rdfs:label          "envelopes expected"@en ;
+    rdfs:comment        """How many envelopes the input stream declared, read from the
+        sequence number of its final envelope. Recorded with an INCOMPLETE verdict so the
+        size of the gap is a value rather than prose."""@en .
+
+yp:envelopes_missing
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "envelopes missing"@en ;
+    rdfs:comment        """The sequence numbers of input envelopes that never arrived,
+        comma-separated. The bus is at-most-once; this is how a record says that a loss
+        happened, instead of describing an input it only partly received."""@en .
 
 
 # ═════════════════════════════════════════════════════════════════════════════════
@@ -285,7 +306,27 @@ yp:model
     rdfs:domain yp:ToolCallActivity ;
     rdfs:range  xsd:string ;
     rdfs:label  "model identifier"@en ;
-    rdfs:comment "Which model produced this output."@en .
+    rdfs:comment """The model that was requested. Often an alias, such as "gpt-4o", that the
+        provider re-points at new snapshots over time — so on its own it does not identify
+        the model that answered. See yp:model_resolved."""@en .
+
+yp:model_resolved
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "resolved model"@en ;
+    rdfs:comment """The model snapshot that actually answered, as the provider reported it
+        (for example "gpt-4o-2024-08-06"). This, not the requested alias, is what a call
+        has to name to be repeated. Absent when the provider did not report it."""@en .
+
+yp:system_fingerprint
+    a           owl:DatatypeProperty ;
+    rdfs:domain yp:ToolCallActivity ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "system fingerprint"@en ;
+    rdfs:comment """The provider's identifier for the backend configuration that served the
+        call. Two calls with the same model, prompt and parameters can still differ when
+        this differs, so a record that wants to explain a changed output needs it."""@en .
 
 yp:temperature
     a           owl:DatatypeProperty ;

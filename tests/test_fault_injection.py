@@ -55,11 +55,19 @@ def test_the_two_escalation_paths_are_distinguishable() -> None:
         root = Path(temporary).resolve()
         integrity = run(by_name["ca1-integrity"], root)
         timeout = run(by_name["ca1-timeout"], root)
+        incomplete = run(by_name["ca1-incomplete"], root)
 
-    assert integrity["verdict"] == timeout["verdict"] == "ESCALATE"
+    assert integrity["verdict"] == timeout["verdict"] == incomplete["verdict"] == "ESCALATE"
     assert integrity["escalation_reason"] == "integrity"
     assert timeout["escalation_reason"] == "consumption-unconfirmed"
-    assert integrity["justification"] != timeout["justification"]
+    assert incomplete["escalation_reason"] == "incomplete-input"
+    justifications = {
+        integrity["justification"],
+        timeout["justification"],
+        incomplete["justification"],
+    }
+    assert len(justifications) == 3, "three causes, three different explanations"
+    assert "partial" in incomplete["justification"]
     assert "sha-256" in integrity["justification"] or "mismatch" in integrity["justification"]
     assert "ordering was not satisfied" in timeout["justification"]
 
@@ -67,7 +75,9 @@ def test_the_two_escalation_paths_are_distinguishable() -> None:
 def test_every_verdict_of_every_agent_is_covered() -> None:
     """The matrix closes, or the suite says which cell is missing.
 
-    Twelve verdicts across six agents. Nine come from the ordinary run; the other three —
+    Twelve verdicts across six agents, plus INCOMPLETE, which every agent can record
+    because the gap check lives in the base class they share; one scenario exercises that
+    shared path. Nine come from the ordinary run; the other three of the twelve —
     CA2's ACCEPT, CAx's REVISE, CA3's OK — are unreachable from the bundled sample data,
     because the real yProv4ML records carry no numeric values to plot and declare start
     times without end times. That is a finding about the input rather than about the
@@ -81,6 +91,9 @@ def test_every_verdict_of_every_agent_is_covered() -> None:
         "mc1": {"PASS", "FAIL"},
         "mc3": {"COMPLETE", "PARTIAL"},
     }
+    #: Recorded by the shared base class on a lost envelope, so observing it for any one
+    #: agent observes the code path every agent runs.
+    shared = {"INCOMPLETE"}
     from_faults: dict[str, set[str]] = {}
     for scenario in SCENARIOS:
         from_faults.setdefault(scenario.agent, set()).add(scenario.verdict)
@@ -102,6 +115,9 @@ def test_every_verdict_of_every_agent_is_covered() -> None:
         )
         for agent, verdicts in declared.items()
     }
+    observed_anywhere = set().union(*from_faults.values(), *from_happy_path.values())
+    if shared - observed_anywhere:
+        missing["*"] = sorted(shared - observed_anywhere)
     uncovered = {agent: gaps for agent, gaps in missing.items() if gaps}
     assert not uncovered, (
         f"verdicts declared in the README but never observed: {uncovered}. Either add a "
