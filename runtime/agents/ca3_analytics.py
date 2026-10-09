@@ -376,20 +376,26 @@ class CA3Analytics(StreamingAgent):
         Folding them together made ANOMALY the verdict for every real graph, which left
         the verdict carrying no information.
         """
+        # Each clause terminates itself. Without that the two halves of this justification
+        # ran together — "…median inter-activity gap of 0.008s Separately, 2 completeness
+        # gap(s)…" — in every record CA3 has emitted since Phase 1. Long prose hides a
+        # missing full stop, and the clean verdict is what exposed it: the fault-injection
+        # run was the first time the no-breach branch had ever been followed by the
+        # no-gaps branch.
         if anomalies:
             found = (
                 "Breached invariants: "
                 + "; ".join(anomalies[:_JUSTIFICATION_EXAMPLES])
                 + (
-                    f" (+{len(anomalies) - _JUSTIFICATION_EXAMPLES} more)"
+                    f" (+{len(anomalies) - _JUSTIFICATION_EXAMPLES} more)."
                     if len(anomalies) > _JUSTIFICATION_EXAMPLES
-                    else ""
+                    else "."
                 )
             )
         elif len(timing["gaps"]) >= _MIN_GAPS_FOR_OUTLIERS:
             found = (
                 f"No invariant breached: no ordering gap exceeds {_MAD_THRESHOLD:g} MAD "
-                f"above the median"
+                f"above the median."
             )
         else:
             # An outlier test over too few samples cannot fire, so it has to say it
@@ -397,7 +403,7 @@ class CA3Analytics(StreamingAgent):
             found = (
                 f"No invariant breached: only {len(timing['gaps'])} ordering gap(s), below "
                 f"the {_MIN_GAPS_FOR_OUTLIERS} needed to identify an outlier, so the "
-                f"timing check abstained"
+                f"timing check abstained."
             )
         if completeness:
             gaps = (
