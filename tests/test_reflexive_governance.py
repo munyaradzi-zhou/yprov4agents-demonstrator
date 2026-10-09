@@ -153,25 +153,74 @@ def test_mc3_reports_a_complete_trail_when_every_step_is_timed(mc3: MC3Audit) ->
 
 
 @pytest.mark.known_defect
-@pytest.mark.xfail(
-    strict=True,
-    reason="todo.md A4: no agent subscribes to governance.>, so meta-agent output is "
-    "terminal and the meta layer is never itself governed. Remove this marker when "
-    "the reflexivity claim is either implemented or narrowed in the documentation.",
-)
-def test_some_agent_governs_the_governance_layer() -> None:
-    """`governance.*` is published to but never read, so reflexivity stops one level deep."""
+def test_governance_output_is_terminal_by_design() -> None:
+    """Reflexivity is one level deep, and that is a property rather than a gap.
+
+    This test used to be an expected failure asserting the opposite — that *some* agent
+    consumes `governance.*` — on the grounds that "the system tracks its own trackers"
+    implies the meta layer is governed too. Phase 6 resolved it the other way, by deciding
+    the claim rather than the code.
+
+    The reason is termination. An agent that governs governance output emits a record that
+    is itself governance output, and nothing in the subject structure stops the next pass.
+    Publishing meta output to a prefix nobody subscribes to makes the recursion impossible
+    by construction, which is worth more than a depth limit enforced by a counter someone
+    can forget to check.
+
+    So the invariant under test is the bound: no agent consumes `governance.*`. If that
+    ever changes, either a bounded depth scheme arrived with it — in which case this test
+    should assert the bound instead — or the recursion is live, which a run would not
+    survive. README.md and docs/DESIGN.md §4 state the consequence for contribution C2;
+    todo.md A4 records what a bounded second level would involve.
+    """
     import importlib
 
-    subscriptions = []
-    for module_name, class_name in REGISTRY.values():
+    consumers: dict[str, str] = {}
+    for role, (module_name, class_name) in REGISTRY.items():
         module = importlib.import_module(f"runtime.agents.{module_name}")
         agent_class = getattr(module, class_name, None)
         subject = getattr(agent_class, "input_subject", None)
         if subject:
-            subscriptions.append(subject)
+            consumers[role] = subject
 
-    governed = [s for s in subscriptions if s.startswith("governance")]
-    assert governed, (
-        f"no agent consumes governance output; subscriptions are {sorted(set(subscriptions))}"
+    governance_consumers = {
+        role: subject for role, subject in consumers.items() if subject.startswith("governance")
+    }
+    assert not governance_consumers, (
+        f"an agent now consumes governance output: {governance_consumers}. Unbounded "
+        f"reflexivity does not terminate — if this is deliberate, the depth must be "
+        f"bounded in the subject and this test should assert that bound."
     )
+
+
+def test_the_meta_layer_satisfies_its_own_standard() -> None:
+    """What *is* established: MC1 passes the check MC1 enforces.
+
+    The capability half of the reflexivity claim. Governing the meta layer is not run in a
+    pipeline, but it is demonstrable — and before Phase 1 it was false: the compliance
+    agent demanded a justified decision activity and emitted none, so its own output would
+    have failed its own check. Nothing but self-application finds that.
+    """
+    from runtime.agents.mc1_compliance import MC1Compliance
+
+    agent = MC1Compliance.__new__(MC1Compliance)
+    agent.role = "mc1"
+    agent.bus = None  # type: ignore[assignment]
+    agent._buffers = {}
+    agent.energy = None
+
+    subject_record = {
+        "prefix": {"prov": "http://www.w3.org/ns/prov#", "yp": "http://x#"},
+        "activity": {
+            "yp:DecisionActivity_s_00": {
+                "prov:type": {"$": "yp:DecisionActivity", "type": "prov:QUALIFIED_NAME"},
+                "yp:justification": "Every structural check held.",
+                "yp:verdict": "PASS",
+            }
+        },
+    }
+    own_record, _ = agent.process("s", subject_record, "agent.lifecycle.cax.s")
+
+    failures, decisions = MC1Compliance._check(own_record)
+    assert decisions, "MC1's own record must contain a decision activity"
+    assert not failures, f"MC1 fails its own standard: {failures}"

@@ -6,7 +6,7 @@ number Paper 1 needs, so the evaluation is reproducible from the artifacts rathe
 hand-copied:
 
     E1 Coverage              typed activities / entities / relations, per agent
-    E2 Justification         % of DecisionActivities carrying a non-empty yp:justification
+    E2 Coverage              % of DecisionActivities justified, plus SHACL conformance
     E3 Strategy A vs B       measured against the callback baseline (eval/baseline.py)
     E4 Reflexivity           which agents were themselves governed, by whom
     E5 Governance            MC verdict tally
@@ -83,12 +83,41 @@ def load_runs(out_dir: Path) -> list[tuple[str, str, dict[str, Any]]]:
     return runs
 
 
+#: How each relation kind came to be in the record. The distinction is the substance of
+#: review finding B3: a single "relations" total mixes claims established in three
+#: different ways, and quoting it invites the reply that it counts steps rather than
+#: structure.
+#:
+#:   observed   a step stated that it read this entity, or wrote it
+#:   derived    computed from those statements by PROV's own definition
+#:   declared   a step stated that one entity came from another
+#:   attributed one edge per activity, to the agent that ran it — mechanical by
+#:              construction, and the largest single contributor to the old total
+RELATION_PROVENANCE = {
+    "used": "observed",
+    "wasGeneratedBy": "observed",
+    "wasInformedBy": "derived",
+    "wasDerivedFrom": "declared",
+    "wasAssociatedWith": "attributed",
+    "actedOnBehalfOf": "attributed",
+}
+
+
 def coverage(doc: dict[str, Any]) -> dict[str, int]:
-    return {
+    counts = {
         "activities": len(doc.get("activity") or {}),
         "entities": len(doc.get("entity") or {}),
         "relations": sum(len(doc.get(k) or {}) for k in REL_KEYS),
     }
+    for key in REL_KEYS:
+        counts[key] = len(doc.get(key) or {})
+    for kind in ("observed", "derived", "declared", "attributed"):
+        counts[kind] = sum(
+            len(doc.get(key) or {})
+            for key, group in RELATION_PROVENANCE.items()
+            if group == kind
+        )
+    return counts
 
 
 def decisions(doc: dict[str, Any]) -> tuple[int, int]:
@@ -110,6 +139,36 @@ def decisions(doc: dict[str, Any]) -> tuple[int, int]:
             if str(a.get("yp:justification", "")).strip():
                 justified += 1
     return total, justified
+
+
+def _shacl_section(out_dir: Path) -> str:
+    """The same claim, judged externally: do the records satisfy the declared shapes?
+
+    This is what gives E2 something to stand on. The rule — every yp:DecisionActivity
+    carries a non-empty yp:justification — is declared in vocab/shapes.ttl and applied
+    here by pyshacl over RDF converted by the reference `prov` library. Neither the rule
+    nor the engine is ours, which is the difference between a conformance statement and
+    a self-report.
+    """
+    try:
+        from eval.validate_shapes import validate_run
+    except ImportError:
+        return "*Shape validation not run: the `eval` extra provides rdflib and pyshacl.*"
+    try:
+        report = validate_run(out_dir)
+    except Exception as exc:  # pragma: no cover - a toolchain problem, not a result
+        return f"*Shape validation could not run: {exc}*"
+
+    verdict = "conform" if report.conforms else "**do not conform**"
+    return (
+        f"**{report.conforming}/{report.documents} records {verdict} to "
+        f"`vocab/shapes.ttl`**, validated with pyshacl over RDF converted by the "
+        f"reference `prov` library. The rule being checked — every decision carries a "
+        f"non-empty justification — is declared in the vocabulary rather than written "
+        f"into the agent that enforces it, so this is a statement about a standard and "
+        f"not about an implementation. Asking the two to agree found a real divergence: "
+        f"MC1 accepted a justification of pure whitespace and the shape did not."
+    )
 
 
 def main() -> None:
@@ -164,9 +223,72 @@ def main() -> None:
         )
     emit()
 
+    # ── B3: the relation total, split by what established each edge ────────────
+    every = [coverage(doc) for _, _, doc in runs]
+    total = {
+        key: sum(row.get(key, 0) for row in every)
+        for key in (
+            "relations",
+            "observed",
+            "derived",
+            "declared",
+            "attributed",
+            *REL_KEYS,
+        )
+    }
+    emit("### E1b — Relations, by what established them")
+    emit()
+    emit(
+        "A single relation total mixes three kinds of claim and one piece of "
+        "bookkeeping, which is why it should not be quoted on its own (todo.md B3). "
+        "**Observed** edges are what a step said it read or wrote. **Derived** edges "
+        "follow from those by PROV's own definition of `wasInformedBy`. **Declared** "
+        "edges are derivations a step asserted. **Attributed** edges are one per "
+        "activity, to the agent that ran it — mechanical by construction, and the "
+        "largest single contributor to the total."
+    )
+    emit()
+    emit("| How it was established | Relations | Share | Which |")
+    emit("|---|--:|--:|---|")
+    for kind, keys in (
+        ("Observed", ("used", "wasGeneratedBy")),
+        ("Derived", ("wasInformedBy",)),
+        ("Declared", ("wasDerivedFrom",)),
+        ("Attributed", ("wasAssociatedWith", "actedOnBehalfOf")),
+    ):
+        count = total[kind.lower()]
+        share = 100.0 * count / total["relations"] if total["relations"] else 0.0
+        names = ", ".join(f"`{key}` {total[key]}" for key in keys if total[key])
+        emit(f"| {kind} | {count} | {share:.0f}% | {names or '—'} |")
+    emit(f"| **Total** | **{total['relations']}** | 100% | |")
+    emit()
+    structural = total["observed"] + total["derived"] + total["declared"]
+    emit(
+        f"**The structural claim is {structural}, not {total['relations']}.** The "
+        f"remaining {total['attributed']} are agent attributions: one per activity, so "
+        f"they measure how many steps ran rather than how they were connected. Report "
+        f"the split."
+    )
+    emit()
+
     # ── E2 justification ───────────────────────────────────────────────────────
+    #
+    # Not the headline claim, and the table says so. The code that counts decisions is
+    # the code that justifies them, so no run of this system could report another number
+    # (todo.md B1). What makes the figure worth printing is the judge, not the ratio:
+    # since Phase 6 the rule is declared in vocab/shapes.ttl and applied by an
+    # independent SHACL engine, so "every decision is justified" is a conformance
+    # statement against an external standard rather than a self-report.
     tot_d = tot_j = 0
-    emit("## E2 — Justification coverage (the headline claim)")
+    emit("## E2 — Instrumentation coverage (not the headline claim)")
+    emit()
+    emit(
+        "Read this as a conformance check, not a result. Every decision point in this "
+        "system is instrumented, which is worth establishing — but the code that counts "
+        "decisions is the code that justifies them, so no run could produce another "
+        "number. The figure says nothing about whether a justification is *informative*; "
+        "see E3 for the claim that does the work."
+    )
     emit()
     emit("| Agent | Decisions | With `yp:justification` | Coverage |")
     emit("|---|--:|--:|--:|")
@@ -185,6 +307,8 @@ def main() -> None:
         emit(f"| {ROLE_NAMES.get(role, role)} | {d} | {j} | {pct} |")
     overall = f"{100.0 * tot_j / tot_d:.0f}%" if tot_d else "—"
     emit(f"| **All** | **{tot_d}** | **{tot_j}** | **{overall}** |")
+    emit()
+    emit(_shacl_section(out_dir))
     emit()
 
     # ── E3 Strategy A vs B ─────────────────────────────────────────────────────
