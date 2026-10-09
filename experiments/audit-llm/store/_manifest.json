@@ -1,0 +1,66 @@
+{
+  "21.T11999/yprovstore-1c85bec48d0e": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/store/1c85bec48d0e.txt",
+    "yp:contentHash": "sha256:1c85bec48d0ea03edaa23eb4d04f5516c4f8a0c3b431cc400d3f5108faec5212",
+    "size_bytes": 82,
+    "kind": "chart",
+    "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/charts/example_2_metrics.png",
+    "created_at": "2026-10-09T17:43:44.521803+00:00"
+  },
+  "21.T11999/yprovstore-3679edf13776": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/store/3679edf13776.txt",
+    "yp:contentHash": "sha256:3679edf137767384deee14ad411cea07410554bd1cf15abcfc2a4db3456868ca",
+    "size_bytes": 374,
+    "kind": "summary",
+    "preview": "The machine learning run involved several key activities, including example_GR0_2, Training, Validation, and Test. During the Training phase…",
+    "created_at": "2026-10-09T17:43:44.347815+00:00"
+  },
+  "21.T11999/yprovstore-377895f2bbbd": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/store/377895f2bbbd.txt",
+    "yp:contentHash": "sha256:377895f2bbbd812727556946e2363f05dbdc872944699f1641d080e12c5fee9e",
+    "size_bytes": 39286,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"CrossEntropyLoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:02:45.935328^^xsd:dateTime\"}, \"Test\": {\"prov:startedAtTime\"…",
+    "created_at": "2026-10-09T17:43:46.926243+00:00"
+  },
+  "21.T11999/yprovstore-49da2464c48f": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/store/49da2464c48f.txt",
+    "yp:contentHash": "sha256:49da2464c48fa8acc15d649367321ffa8eeb20ad8144983b69d584977e65a8a7",
+    "size_bytes": 697,
+    "kind": "analytics-report",
+    "preview": "The analysis reveals two significant anomalies in the timing of activities. The gap before 'Training' is 5.049 seconds, which constitutes 64…",
+    "created_at": "2026-10-09T17:43:42.669630+00:00"
+  },
+  "21.T11999/yprovstore-5126b1c5c2b3": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/store/5126b1c5c2b3.txt",
+    "yp:contentHash": "sha256:5126b1c5c2b3042d13bc3485ede81fb2058aa733a2b81b5c167c18e3c2700eb1",
+    "size_bytes": 795,
+    "kind": "analytics-report",
+    "preview": "The findings indicate two significant anomalies in the timing of activities. There is a substantial gap of 9.659 seconds before the 'Trainin…",
+    "created_at": "2026-10-09T17:43:46.898362+00:00"
+  },
+  "21.T11999/yprovstore-abf1178745a1": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/store/abf1178745a1.txt",
+    "yp:contentHash": "sha256:abf1178745a16fdd05cf3ad0ca595e56104409ecbb7ef8b471702e14bb36291b",
+    "size_bytes": 456,
+    "kind": "summary",
+    "preview": "The document outlines a machine-learning process involving nine key activities, including example_GR0_0, Training, Validation, TrainingButDi…",
+    "created_at": "2026-10-09T17:43:39.768083+00:00"
+  },
+  "21.T11999/yprovstore-abfe4946dd38": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/store/abfe4946dd38.txt",
+    "yp:contentHash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80",
+    "size_bytes": 21634,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"MSELoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:10:12.815807^^xsd:dateTime\"}, \"MSELoss/Validation\": {\"prov:startedAt…",
+    "created_at": "2026-10-09T17:43:42.677765+00:00"
+  },
+  "21.T11999/yprovstore-d9e9928e27b3": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/store/d9e9928e27b3.txt",
+    "yp:contentHash": "sha256:d9e9928e27b3ec6ba864b208bf7b5c1520fb2dee1cab0056a06daceb20706180",
+    "size_bytes": 82,
+    "kind": "chart",
+    "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out/llm/charts/example_0_metrics.png",
+    "created_at": "2026-10-09T17:43:39.989376+00:00"
+  }
+}

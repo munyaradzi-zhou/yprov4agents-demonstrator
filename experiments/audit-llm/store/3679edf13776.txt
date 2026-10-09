@@ -1,0 +1,1 @@
+The machine learning run involved several key activities, including example_GR0_2, Training, Validation, and Test. During the Training phase, CrossEntropyLoss was utilized, and codecarbon was employed to monitor the training process. The document details 11 activities, 78 entities, and 98 lineage relations, capturing the comprehensive workflow and data lineage of the run.

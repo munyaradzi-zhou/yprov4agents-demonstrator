@@ -1,0 +1,1 @@
+Provenance analytics for 'fault': 8 activities and 6 entities (100.0% typed), 0 derivations, 0 terminal entities. Wall-clock span 70.0s across 8 ordered activities. Energy streams: 2; resource streams: 2. Anomalies: 0; completeness findings: 0.

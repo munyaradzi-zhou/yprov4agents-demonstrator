@@ -15,9 +15,10 @@ import json
 import os
 import re
 import sys
+import threading
 from functools import partial
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, TextIO
 
 # Make the canonical core importable whether we run from the repo (dev) or the
 # image (where /app is the repo root on PYTHONPATH).
@@ -73,16 +74,42 @@ def write_prov(role: str, session_id: str, doc: dict[str, Any]) -> Path | None:
         # sanitise: session ids can contain ':' (e.g. "example_0::cax"), which is a
         # reserved char on Windows hosts where /out is bind-mounted. Keep it portable.
         safe = re.sub(r"[^A-Za-z0-9._-]", "_", session_id)
-        path = OUT_DIR / f"{safe}__{role}_prov.json"
-        n = 2
-        while path.exists():
-            path = OUT_DIR / f"{safe}__{role}__{n}_prov.json"
-            n += 1
-        path.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
+        path, handle = _claim_record_path(OUT_DIR, safe, role)
+        with handle:
+            handle.write(json.dumps(doc, indent=2, ensure_ascii=False))
         return path
     except Exception as exc:
         print(f"[{role}] could not write output: {exc}", flush=True)
         return None
+
+
+#: (directory, session, role) -> the suffix to try next. Lets a repeated write find a
+#: free name in one attempt. The first version probed ``__2``, ``__3``, … on every write,
+#: so the cost of writing grew with the number of records already written: 1.5 ms to
+#: 4.5 ms over sixty writes of one session, which the overhead study caught.
+_NEXT_SUFFIX: dict[tuple[str, str, str], int] = {}
+_SUFFIX_LOCK = threading.Lock()
+
+
+def _claim_record_path(directory: Path, safe: str, role: str) -> tuple[Path, TextIO]:
+    """Create, exclusively, the first unused record path for this session and role.
+
+    Exclusive creation (``"x"``) means two writers can never be handed the same name, which
+    a check-then-write could not guarantee. Agents write from executor threads, hence the
+    lock.
+    """
+    key = (str(directory), safe, role)
+    with _SUFFIX_LOCK:
+        n = _NEXT_SUFFIX.get(key, 1)
+        while True:
+            name = f"{safe}__{role}_prov.json" if n == 1 else f"{safe}__{role}__{n}_prov.json"
+            try:
+                handle = (directory / name).open("x", encoding="utf-8")
+            except FileExistsError:
+                n += 1
+                continue
+            _NEXT_SUFFIX[key] = n + 1
+            return directory / name, handle
 
 
 class ProvMode(NamedTuple):

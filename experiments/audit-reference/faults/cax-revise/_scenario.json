@@ -1,0 +1,12 @@
+{
+  "log": "summarised fault (llm) -> 54 chars [REVISE], PID 21.T11999/yprovstore-ed7a5d75f58f",
+  "verdict": "REVISE",
+  "escalation_reason": null,
+  "justification": "Summary of 54 characters produced by the llm path over a 8-activity / 6-entity graph. Figure(s) 4096, 512 appear in the summary but not in the graph's counts, so the text asserts something the record does not support. Verdict REVISE.",
+  "scenario": "cax-revise",
+  "agent": "cax",
+  "expected": "REVISE",
+  "condition": "grounding",
+  "how": "a scripted model reply naming figures that appear nowhere in the graph",
+  "as_expected": true
+}

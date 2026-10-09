@@ -1,0 +1,71 @@
+{
+  "level": "modes",
+  "environment": {
+    "captured_at": "2026-10-09T17:51:43.141041+00:00",
+    "python": "3.11.15",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840,
+    "git_commit": "6cda995ebb57f583e6626db90c36c5b831908175",
+    "git_dirty": false,
+    "llm_involved": false,
+    "energy_backend": "off",
+    "notes": {
+      "interpreter_clean": true
+    }
+  },
+  "iterations": 3000,
+  "modes": {
+    "B-DATA (full)": {
+      "median_ns": 655800.0,
+      "p95_ns": 1062200.0,
+      "output_bytes": 7697,
+      "activities": 6,
+      "entities": 8,
+      "relations": 29,
+      "justifications": 6,
+      "bytes_vs_full_pct": 0.0,
+      "time_vs_full_pct": 0.0
+    },
+    "B-META (activities only)": {
+      "median_ns": 604800.0,
+      "p95_ns": 1177200.0,
+      "output_bytes": 4800,
+      "activities": 6,
+      "entities": 1,
+      "relations": 11,
+      "justifications": 6,
+      "bytes_vs_full_pct": -37.63804079511498,
+      "time_vs_full_pct": -7.7767612076852695
+    },
+    "B-TRANS (nothing written)": {
+      "median_ns": 70400.0,
+      "p95_ns": 129000.0,
+      "output_bytes": 7696,
+      "activities": 6,
+      "entities": 8,
+      "relations": 29,
+      "justifications": 6,
+      "bytes_vs_full_pct": -0.012992074834351046,
+      "time_vs_full_pct": -89.2650198231168
+    },
+    "B-NOJUST (no justification)": {
+      "median_ns": 619300.0,
+      "p95_ns": 1001100.0,
+      "output_bytes": 6029,
+      "activities": 6,
+      "entities": 8,
+      "relations": 29,
+      "justifications": 0,
+      "bytes_vs_full_pct": -21.670780823697545,
+      "time_vs_full_pct": -5.565721256480634
+    }
+  },
+  "bytes_per_justification": 278.0,
+  "justifications_in_full_mode": 6,
+  "justification_share_of_a_record_pct": 21.670780823697545
+}

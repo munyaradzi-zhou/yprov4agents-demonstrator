@@ -1,0 +1,65 @@
+{
+  "level": "scaling",
+  "environment": {
+    "captured_at": "2026-10-09T17:51:35.804844+00:00",
+    "python": "3.11.15",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840,
+    "git_commit": "6cda995ebb57f583e6626db90c36c5b831908175",
+    "git_dirty": false,
+    "llm_involved": false,
+    "energy_backend": "off",
+    "notes": {
+      "interpreter_clean": true
+    }
+  },
+  "rows": [
+    {
+      "activities": 10,
+      "entities": 11,
+      "build_ns": 73100.0,
+      "to_prov_json_ns": 48600.0,
+      "peak_bytes": 10930,
+      "output_bytes": 10007,
+      "relations": 49
+    },
+    {
+      "activities": 100,
+      "entities": 101,
+      "build_ns": 769700.0,
+      "to_prov_json_ns": 522300.0,
+      "peak_bytes": 120596,
+      "output_bytes": 91724,
+      "relations": 499
+    },
+    {
+      "activities": 1000,
+      "entities": 1001,
+      "build_ns": 9785500.0,
+      "to_prov_json_ns": 11090200.0,
+      "peak_bytes": 1294168,
+      "output_bytes": 925120,
+      "relations": 4999
+    },
+    {
+      "activities": 10000,
+      "entities": 10001,
+      "build_ns": 133510200.0,
+      "to_prov_json_ns": 105429900.0,
+      "peak_bytes": 14087220,
+      "output_bytes": 9421116,
+      "relations": 49999
+    }
+  ],
+  "exponents": {
+    "build": 1.0889052743292835,
+    "to_prov_json": 1.1336001928409316,
+    "peak_memory": 1.0361273159249842,
+    "output_bytes": 0.9925110438559508
+  }
+}

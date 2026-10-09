@@ -1,0 +1,229 @@
+{
+  "level": "agent",
+  "environment": {
+    "captured_at": "2026-10-09T17:51:33.410704+00:00",
+    "python": "3.11.15",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840,
+    "git_commit": "6cda995ebb57f583e6626db90c36c5b831908175",
+    "git_dirty": false,
+    "llm_involved": false,
+    "energy_backend": "off",
+    "notes": {
+      "interpreter_clean": true
+    }
+  },
+  "repetitions": 30,
+  "agents": {
+    "CA3 Analytics (heuristic)": {
+      "median_ns": {
+        "OFF": 2453950.0,
+        "A": 2411650.0,
+        "B-TRANS": 2598300.0,
+        "B": 3921250.0
+      },
+      "p95_ns": {
+        "OFF": 5902600.0,
+        "A": 5382600.0,
+        "B-TRANS": 4404100.0,
+        "B": 6485700.0
+      },
+      "dispersion_ns": {
+        "OFF": 249150.0,
+        "A": 208050.0,
+        "B-TRANS": 280400.0,
+        "B": 295650.0
+      },
+      "vs_off": {
+        "pct": 59.793394323437724,
+        "resolvable": true,
+        "noise_ns": 295650.0
+      },
+      "vs_a": {
+        "pct": 62.596147865569215,
+        "resolvable": true,
+        "noise_ns": 295650.0
+      },
+      "build_only_pct_vs_off": 5.882352941176471,
+      "write_cost_ns": 1322950.0,
+      "output_bytes": 6250,
+      "repetitions": 30
+    },
+    "CA2 Metrics": {
+      "median_ns": {
+        "OFF": 109697600.0,
+        "A": 107537450.0,
+        "B-TRANS": 105832500.0,
+        "B": 108623900.0
+      },
+      "p95_ns": {
+        "OFF": 149190600.0,
+        "A": 151763600.0,
+        "B-TRANS": 120830900.0,
+        "B": 186103800.0
+      },
+      "dispersion_ns": {
+        "OFF": 8623800.0,
+        "A": 6370800.0,
+        "B-TRANS": 4541350.0,
+        "B": 6852950.0
+      },
+      "vs_off": {
+        "pct": -0.9787816688788087,
+        "resolvable": false,
+        "noise_ns": 8623800.0
+      },
+      "vs_a": {
+        "pct": 1.0102992027428583,
+        "resolvable": false,
+        "noise_ns": 6852950.0
+      },
+      "build_only_pct_vs_off": -3.5234134566298625,
+      "write_cost_ns": 2791400.0,
+      "output_bytes": 5133,
+      "repetitions": 30
+    },
+    "CAx Summariser (computed)": {
+      "median_ns": {
+        "OFF": 4730100.0,
+        "A": 4719300.0,
+        "B-TRANS": 4684150.0,
+        "B": 7940900.0
+      },
+      "p95_ns": {
+        "OFF": 6733900.0,
+        "A": 6125600.0,
+        "B-TRANS": 9173000.0,
+        "B": 9805800.0
+      },
+      "dispersion_ns": {
+        "OFF": 529250.0,
+        "A": 562150.0,
+        "B-TRANS": 799900.0,
+        "B": 702950.0
+      },
+      "vs_off": {
+        "pct": 67.88017166656095,
+        "resolvable": true,
+        "noise_ns": 702950.0
+      },
+      "vs_a": {
+        "pct": 68.26436124001441,
+        "resolvable": true,
+        "noise_ns": 702950.0
+      },
+      "build_only_pct_vs_off": -0.9714382359780978,
+      "write_cost_ns": 3256750.0,
+      "output_bytes": 5635,
+      "repetitions": 30
+    },
+    "MC1 Compliance": {
+      "median_ns": {
+        "OFF": 109300.0,
+        "A": 96550.0,
+        "B-TRANS": 146900.0,
+        "B": 1632400.0
+      },
+      "p95_ns": {
+        "OFF": 184500.0,
+        "A": 198200.0,
+        "B-TRANS": 265400.0,
+        "B": 2559600.0
+      },
+      "dispersion_ns": {
+        "OFF": 6400.0,
+        "A": 4550.0,
+        "B-TRANS": 7550.0,
+        "B": 132650.0
+      },
+      "vs_off": {
+        "pct": 1393.5041171088747,
+        "resolvable": true,
+        "noise_ns": 132650.0
+      },
+      "vs_a": {
+        "pct": 1590.7301916105644,
+        "resolvable": true,
+        "noise_ns": 132650.0
+      },
+      "build_only_pct_vs_off": 34.400731930466605,
+      "write_cost_ns": 1485500.0,
+      "output_bytes": 3445,
+      "repetitions": 30
+    },
+    "MC3 Audit": {
+      "median_ns": {
+        "OFF": 166350.0,
+        "A": 176650.0,
+        "B-TRANS": 239000.0,
+        "B": 2160800.0
+      },
+      "p95_ns": {
+        "OFF": 217800.0,
+        "A": 224400.0,
+        "B-TRANS": 327300.0,
+        "B": 3820500.0
+      },
+      "dispersion_ns": {
+        "OFF": 16850.0,
+        "A": 35600.0,
+        "B-TRANS": 38750.0,
+        "B": 167750.0
+      },
+      "vs_off": {
+        "pct": 1198.9480012022843,
+        "resolvable": true,
+        "noise_ns": 167750.0
+      },
+      "vs_a": {
+        "pct": 1123.2097367676197,
+        "resolvable": true,
+        "noise_ns": 167750.0
+      },
+      "build_only_pct_vs_off": 43.67297865945296,
+      "write_cost_ns": 1921800.0,
+      "output_bytes": 3526,
+      "repetitions": 30
+    },
+    "CA1 Storage (persist path)": {
+      "median_ns": {
+        "OFF": 5367050.0,
+        "A": 5272000.0,
+        "B-TRANS": 5414950.0,
+        "B": 7357250.0
+      },
+      "p95_ns": {
+        "OFF": 9182300.0,
+        "A": 7501900.0,
+        "B-TRANS": 7883400.0,
+        "B": 10418600.0
+      },
+      "dispersion_ns": {
+        "OFF": 923300.0,
+        "A": 772750.0,
+        "B-TRANS": 710850.0,
+        "B": 1338500.0
+      },
+      "vs_off": {
+        "pct": 37.08182334802172,
+        "resolvable": false,
+        "noise_ns": 1338500.0
+      },
+      "vs_a": {
+        "pct": 39.5533004552352,
+        "resolvable": false,
+        "noise_ns": 1338500.0
+      },
+      "build_only_pct_vs_off": 0.8924828350769977,
+      "write_cost_ns": 1942300.0,
+      "output_bytes": 5556,
+      "repetitions": 30,
+      "note": "persist path (_do_persist), not process(): CA1 persists on quorum or timeout"
+    }
+  }
+}

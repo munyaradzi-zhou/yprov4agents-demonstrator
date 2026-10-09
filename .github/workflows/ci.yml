@@ -129,12 +129,23 @@ jobs:
       # the overhead study found were performance defects, and the records they produce are
       # byte-identical before and after — which the gate is what establishes. Phase 6
       # adds exactly one declared attribute: MC1 cites the standard it checked against.
+      # The audit fixes (docs/AUDIT.md) changed no record of the reference run, and the gate
+      # now compares lineage edges rather than relation counts; the reference is the archive
+      # frozen from a clean commit after them.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/verdict-reachability \
+            --before experiments/audit-reference \
             --after out \
             --strict
+
+      # Every verdict the README advertises must still be reachable. Each fault goes into
+      # the input or the environment, never into the check being tested, so this measures
+      # the agents rather than the harness. It runs before the conformance suite because
+      # that suite counts the terms the fault scenarios emit — the off-path ones, such as
+      # yp:escalation_reason and yp:envelopes_missing, appear nowhere else.
+      - name: Provoke every alternative verdict
+        run: uv run python -m eval.fault_injection --all --out-dir out/faults
 
       - name: Run the conformance suite against freshly emitted provenance
         run: uv run pytest -v -m conformance --prov-dir out
@@ -144,12 +155,6 @@ jobs:
       # standard rather than a self-report by the agent that enforces it.
       - name: Validate the emitted records against vocab/shapes.ttl
         run: uv run python -m eval.validate_shapes --prov-dir out
-
-      # Every verdict the README advertises must still be reachable. Each fault goes into
-      # the input or the environment, never into the check being tested, so this measures
-      # the agents rather than the harness.
-      - name: Provoke every alternative verdict
-        run: uv run python -m eval.fault_injection --all --out-dir out/faults
 
       - uses: actions/upload-artifact@v4
         if: always()
