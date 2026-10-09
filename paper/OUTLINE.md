@@ -600,49 +600,88 @@ more honest and more persuasive than drawing it as uniformly poor.
 
 ---
 
-## The cut: 7,900 words into 6 pages
+## The cut
 
-A full draft is the right thing to over-write and the wrong thing to submit. Measured per
-section, with four figures and nine tables also competing for the space:
+The full draft was written long on purpose — over-writing and then cutting beats the reverse
+— and then cut in four passes. The per-section plan that guided those passes referred to the
+pre-merge section numbering (Background and Related work were separate, Evaluation was §7)
+and recommended dropping the energy result first. Both are now out of date: the sections are
+renumbered in `DRAFT.md`, and **energy is non-negotiable**. The live plan is below.
 
-| § | Words | Verdict |
-|---|--:|---|
-| 1 Introduction | 568 | keep; it carries the three contributions |
-| 2 Background | 326 | cut to ~200 — PROV needs two sentences for this venue, not six |
-| 3 Related work | 245 | keep, possibly grow: the non-identifiability result is load-bearing |
-| 4 Vocabulary | 594 | cut to ~400; the class list becomes a figure or a table |
-| 5 Instrumentation | 736 | keep ~600; §5.4 folds into §6 |
-| **6 Demonstrator** | **953** | **cut to ~500** — the agent table and the ASCII topology do the work; §6.2 and §6.5 compress to a paragraph each |
-| **7 Evaluation** | **3,391** | **cut to ~1,400.** This is where the paper is won or lost |
-| 8 Limitations | 673 | cut to ~450 by merging the two resource bounds and the two scope limits |
-| 9 Conclusion | 401 | keep ~350 |
+### Settling the page question
 
-**The evaluation is the whole problem, and the order of sacrifice should be deliberate.**
-Ranked by what each result buys against what it costs in space:
+**The energy result is non-negotiable** (author's decision, 9 October 2026). It is a
+first-class subsection with its own table, not a limitation clause, so it is removed from
+the cut menu below and every other item absorbs the difference.
 
-1. **Keep whole.** E3 (§7.4) and the worked example (§7.5) — this is C1, and the earned
-   zero is the paper. E6's headline and decomposition (§7.8). E2's declared-standard
-   result and the whitespace defect (§7.3).
-2. **Keep, compressed to two or three sentences.** E0 conformance (§7.1) — the 0-of-24
-   inversion is one striking sentence, not five. E1b's relation split (§7.2) — keep the
-   228-not-324 point and drop the table. E4 self-application (§7.6). E5's reachability
-   matrix (§7.10) — keep the 12-of-12 figure, the `mc1:FAIL`-as-a-property paragraph, and
-   cut the seven-row table to prose.
-3. **Candidates for an appendix or a companion report.** §7.9 (which figures transfer) is
-   methodologically the most honest thing in the paper and the most expensive per word;
-   reduce to the one-sentence rule — *quote the bytes, the complexity class and the
-   verdicts* — plus a pointer to `docs/E6_RESULTS.md`. The scaling sweep and the two
-   library defects go the same way: one sentence each, details in the artifact.
-4. **Cut first if a page is still over.** The energy negative result (§7.7, second half).
-   It is a genuine contribution and it is also the only result that is not about
-   provenance capture; it would carry a short workshop note of its own. Model provenance
-   (§7.7, first half) stays, compressed to the attribute list and the prompt-registry
-   lesson.
+The draft now stands at **5,613 words, 3 figures, 4 tables**, after four passes. Whether
+that is 6 pages or 7 cannot be answered by arithmetic: estimates of a two-column IEEE page
+range from ~900 to ~1,200 words, and that band spans "fits" and "a page over". Earlier
+versions of this file asserted a 4,000-word budget and then a 3,300-word one; both were
+guesses dressed as constraints, and they drove cuts that may not have been needed.
+
+**The fix is to typeset it.** No LaTeX toolchain is installed on the development host, so
+the next concrete step is an `IEEEtran` conference skeleton under `paper/tex/` with the
+three figures wired in, built either on a machine with TeX or on Overleaf. That converts
+"does it fit" from an argument into a page number, and it has a second payoff: an Overleaf
+project is also how a co-author edits the draft, which is on the critical path to
+8 November.
+
+Until then the honest statement is the one in the draft header: the length is known, the
+page count is not.
+
+### What two passes of prose compression achieved, and where they stopped
+
+Four passes took the draft from 7,900 to 5,613 words without dropping a result, by
+compressing prose, merging Background with Related work, and reducing nine tables to four
+and four figures to three.
+
+| Change | Effect |
+|---|---|
+| Per-agent coverage table, relation-split table | became prose |
+| Background + Related work | merged into one section |
+| `f5_a_versus_b` figure | withdrawn; Table 2 states the same 30 values precisely |
+| Energy | **restored** from a limitation clause to a full subsection with its table |
+
+**Dropping `f5_a_versus_b` costs nothing.** It plots exactly the values Table 2 lists, and
+the table is both more precise and no larger. It stays rendered and in reserve in case a
+reviewer prefers the picture, which is the right place for a figure whose argument the text
+already carries.
+
+**The returns per pass fell off sharply**: 7,900 → 5,894 → 5,814 → 5,561. The last two
+passes moved 253 words between them. Sentence-level trimming is the wrong instrument for a
+further 20% reduction, and the remaining candidates are listed below — every one of them
+deletes a result rather than tightening a sentence.
+
+**If typesetting shows a gap, these are the cuts, ranked by what each costs.** Energy is
+absent from this list by decision and is not a candidate at any page count.
+
+1. **§6.1 conformance to one sentence** (~90 w). "A single non-standard key made a conforming
+   parser reject all 24 documents; after the fix, 24 of 24 are accepted and all 8 pointers
+   dereference, judged by the reference `prov` library." Nothing is lost but breathing room.
+2. **§6.6 reachability to its two load-bearing claims** (~120 w): twelve of twelve observed,
+   and `mc1:FAIL` unreachable from this library's own records. The finding-about-the-input
+   paragraph is excellent and expendable.
+3. **§6.4 model provenance to its attribute list plus the prompt-registry lesson** (~90 w).
+4. **§6.5's "which figures transfer" to the one-sentence rule plus the criterion correction**
+   (~130 w), with the stability detail left to `docs/E6_RESULTS.md`.
+5. **§3 and §4 by a quarter** (~250 w): the class enumeration becomes a reference to the
+   ontology, and the prose around the code block carries more weight than it earns.
+6. **§7 limitations from seven paragraphs to five** (~130 w) by merging the transport and
+   resource bounds into the scale paragraph.
+7. **Last resort:** Figure 2 and its paragraph (~160 w). It is the paper's best evidence for
+   C1 and the argument survives in §6.2's prose, which is exactly why it goes last rather
+   than never.
+
+Items 1–6 total roughly 810 words and land near 4,750 without touching a result's substance.
+Item 7 reaches ~4,600 with three figures becoming two.
 
 **Do not cut, under any pressure:** the four zeros that were wrong and are now one earned
 zero; the resolvability-criterion correction; the fabricated-lineage disclosure; the
-justification-quality limitation. Each of them is a place where the paper concedes
-something a reviewer would otherwise find, and that is what the concessions are for.
+justification-quality limitation; the energy negative result. The first four are places where
+the paper concedes something a reviewer would otherwise find. The fifth is a result the
+community needs in order to stop publishing per-step energy figures that are artifacts of a
+sampling period.
 
 **A4 is resolved, by deciding the claim rather than the code.** Reflexivity in a run is
 one level deep: the operational agents are governed and the governance layer is not.
