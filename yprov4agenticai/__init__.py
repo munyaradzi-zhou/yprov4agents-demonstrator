@@ -39,6 +39,7 @@ from .energy import (
     NullBackend,
     session_energy_summary,
 )
+from .null import NullTracker
 from .store import LightweightStore, ptr_kwargs
 from .tracker import (
     GRANULARITIES,
@@ -67,6 +68,7 @@ __all__ = [
     "EnergyTracker",
     "LightweightStore",
     "NullBackend",
+    "NullTracker",
     "ProvTracker",
     "now_iso",
     "prompts",

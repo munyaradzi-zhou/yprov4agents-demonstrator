@@ -21,7 +21,13 @@ from typing import Any
 import pytest
 
 from runtime.agents.ca2_metrics import CA2Metrics
-from runtime.util import ENERGY_ENV, GRANULARITY_ENV, PERSISTENCE_ENV, prov_mode
+from runtime.util import (
+    ENERGY_ENV,
+    GRANULARITY_ENV,
+    INSTRUMENTATION_ENV,
+    PERSISTENCE_ENV,
+    prov_mode,
+)
 from yprov4agenticai import ProvTracker
 
 REL_KEYS = ("used", "wasGeneratedBy", "wasDerivedFrom")
@@ -41,10 +47,32 @@ def _producer_document() -> dict[str, Any]:
 
 
 # ── the mode is read from the environment, once ───────────────────────────────────
-def test_the_default_mode_is_full_and_persistent(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv(GRANULARITY_ENV, raising=False)
-    monkeypatch.delenv(PERSISTENCE_ENV, raising=False)
-    assert prov_mode() == ("DATA", "PERSISTENT")
+def test_the_default_mode_is_full_persistent_and_enabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Provenance on, complete, and written, unless a deployment says otherwise."""
+    for variable in (GRANULARITY_ENV, PERSISTENCE_ENV, INSTRUMENTATION_ENV):
+        monkeypatch.delenv(variable, raising=False)
+    assert prov_mode() == ("DATA", "PERSISTENT", True)
+
+
+def test_instrumentation_can_be_turned_off_entirely(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The off switch is a deployment decision, and condition OFF of the overhead study."""
+    monkeypatch.setenv(INSTRUMENTATION_ENV, "off")
+    assert prov_mode().enabled is False
+
+
+def test_a_disabled_agent_emits_nothing_and_still_runs(
+    ca2: CA2Metrics, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv(INSTRUMENTATION_ENV, "off")
+    document, log_line = ca2.process("s", _producer_document(), "producer.yprov4ml.s")
+
+    assert document == {}, "no record is built"
+    assert not list(tmp_path.glob("*_prov.json")), "and none is written"
+    assert "visualised" in log_line, "but the agent did its actual work"
 
 
 def test_an_unknown_mode_fails_at_start_up(monkeypatch: pytest.MonkeyPatch) -> None:
