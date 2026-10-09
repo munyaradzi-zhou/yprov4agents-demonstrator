@@ -17,7 +17,7 @@ from typing import Any
 import pytest
 
 from runtime.agents.cax_summariser import CAxSummariser
-from runtime.llm import Completion, LLMClient
+from runtime.llm import Completion, LLMClient, RawResponse
 from yprov4agenticai.prompts import ACT_SYSTEM, NARRATE_FINDINGS, PROMPTS, Prompt
 
 REPLY = "Nine activities and thirty-nine entities, linked by fifty-five relations."
@@ -217,3 +217,69 @@ def test_the_completion_type_is_what_the_agents_record() -> None:
         "yp:prompt_version",
         "yp:prompt_sha",
     }
+
+
+# ── which model answered ──────────────────────────────────────────────────────────
+#
+# "gpt-4o" is an alias the provider re-points at new snapshots. The archived LLM run
+# recorded only that alias, so an auditor repeating the call later would reach a different
+# model than the one that produced the record (docs/AUDIT.md, finding [7]).
+
+
+def test_the_snapshot_that_answered_is_recorded_beside_the_alias_requested() -> None:
+    def raw(*_args: object) -> RawResponse:
+        return RawResponse(
+            text=REPLY,
+            finish_reason="stop",
+            model="gpt-4o-2024-08-06",
+            system_fingerprint="fp_6b68a8204b",
+        )
+
+    attributes = LLMClient(raw, model="gpt-4o").complete(ACT_SYSTEM, "x").provenance()
+    assert attributes["yp:model"] == "gpt-4o"
+    assert attributes["yp:model_resolved"] == "gpt-4o-2024-08-06"
+    assert attributes["yp:system_fingerprint"] == "fp_6b68a8204b"
+
+
+def test_a_snapshot_the_api_did_not_report_is_absent_rather_than_guessed() -> None:
+    attributes = LLMClient(fake_raw(), model="gpt-4o").complete(ACT_SYSTEM, "x").provenance()
+    assert "yp:model_resolved" not in attributes
+    assert "yp:system_fingerprint" not in attributes
+
+
+def test_the_openai_call_reads_the_snapshot_from_the_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Through the real `get_llm`, with the vendor client replaced by one shaped like it."""
+    import sys
+    import types
+
+    class Response:
+        model = "gpt-4o-2024-08-06"
+        system_fingerprint = "fp_6b68a8204b"
+        usage = types.SimpleNamespace(prompt_tokens=12, completion_tokens=3)
+        choices = (
+            types.SimpleNamespace(
+                message=types.SimpleNamespace(content=REPLY), finish_reason="stop"
+            ),
+        )
+
+    class OpenAI:
+        def __init__(self, api_key: str) -> None:
+            self.chat = types.SimpleNamespace(
+                completions=types.SimpleNamespace(create=lambda **_kwargs: Response())
+            )
+
+    monkeypatch.setitem(sys.modules, "openai", types.SimpleNamespace(OpenAI=OpenAI))
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key-not-real")
+    monkeypatch.setenv("OPENAI_MODEL", "gpt-4o")
+
+    from runtime.llm import get_llm
+
+    client = get_llm()
+    assert client is not None
+    attributes = client.complete(ACT_SYSTEM, "x").provenance()
+    assert attributes["yp:model"] == "gpt-4o"
+    assert attributes["yp:model_resolved"] == "gpt-4o-2024-08-06"
+    assert attributes["yp:system_fingerprint"] == "fp_6b68a8204b"
+    assert attributes["yp:prompt_tokens"] == 12
