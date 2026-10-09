@@ -202,6 +202,9 @@ def test_quorum_cancels_the_timeout_guard(ca1: CA1Storage) -> None:
 
         ca1._persist = record_persist  # type: ignore[method-assign]
         ca1._pending["held"] = subject_record()
+        # CA1 has its whole copy: the stream's end arrived. Without this, quorum correctly
+        # waits for the end of CA1's own copy instead of persisting a partial one.
+        ca1._ended["held"] = 3
         ca1._guards["held"] = asyncio.create_task(ca1._timeout_guard("held"))
 
         for role in ("cax", "ca2", "ca3"):

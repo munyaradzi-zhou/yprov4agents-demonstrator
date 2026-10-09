@@ -44,6 +44,7 @@ _FACT_ACTIVITIES = 6
 
 
 class CAxSummariser(StreamingAgent):
+    agent_label = "NL_Summarizer"
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
@@ -180,7 +181,7 @@ class CAxSummariser(StreamingAgent):
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
     ) -> tuple[dict[str, Any], str]:
-        tracker = agent_tracker(self.role, session_id, "NL_Summarizer", energy=self.energy)
+        tracker = agent_tracker(self.role, session_id, self.agent_label, energy=self.energy)
 
         # S1 Receive — what arrived, and from where.
         with tracker.activity("ReceiveTaskActivity", "CAx: receive producer record") as prov:

@@ -377,6 +377,78 @@ def _ca3_ok(out_dir: Path) -> dict[str, Any]:
     return {"log": log, **_verdicts(document)}
 
 
+def _ca1_incomplete(out_dir: Path) -> dict[str, Any]:
+    """CA1's own copy arrived with a gap: stored, said to be partial → ESCALATE."""
+    from runtime.agents.ca1_storage import CA1Storage
+
+    agent = _headless(CA1Storage, out_dir, store=LightweightStore(root=str(out_dir / "store")))
+    document, log = agent._do_persist(
+        _SESSION,
+        _producer_record(),
+        ["ca2", "ca3", "cax"],
+        "quorum",
+        "all consumers acked",
+        [3],
+        True,
+    )
+    return {"log": log, **_verdicts(document)}
+
+
+class _CapturingBus:
+    """Records what an agent publishes, so a stream can be replayed with a gap in it."""
+
+    def __init__(self) -> None:
+        self.published: list[tuple[str, Any]] = []
+
+    async def publish(self, subject: str, envelope: Any) -> None:
+        self.published.append((subject, envelope))
+
+
+def _stream_gap(out_dir: Path) -> dict[str, Any]:
+    """A consumer is handed a stream whose middle chunk was lost in transport → INCOMPLETE.
+
+    The fault is in the delivery: the real sender numbers the stream, one envelope is
+    withheld, and the real agent receives the rest. Before this was checked, the agent
+    processed the partial document and emitted a well-formed record about it.
+    """
+    import asyncio
+
+    from runtime.agents.cax_summariser import CAxSummariser
+    from runtime.base_agent import stream_document
+
+    sent = _CapturingBus()
+    asyncio.run(
+        stream_document(
+            sent,  # type: ignore[arg-type]
+            "producer.yprov4ml.fault",
+            session_id=_SESSION,
+            producer_id="yprov4ml-replay",
+            doc=_producer_record(),
+        )
+    )
+    envelopes = [envelope for _, envelope in sent.published]
+    lost = envelopes[2]
+
+    received = _CapturingBus()
+    agent = _headless(CAxSummariser, out_dir, bus=received)
+
+    async def deliver() -> None:
+        for envelope in envelopes:
+            if envelope is not lost:
+                await agent._on_envelope("producer.yprov4ml.fault", envelope)
+
+    asyncio.run(deliver())
+    document: dict[str, Any] = {}
+    for _, envelope in received.published:
+        for section, value in (envelope.payload or {}).items():
+            if isinstance(value, dict):
+                document.setdefault(section, {}).update(value)
+    return {
+        "log": f"withheld envelope {lost.sequence_no} of {len(envelopes)}",
+        **_verdicts(document),
+    }
+
+
 SCENARIOS: tuple[Scenario, ...] = (
     Scenario(
         name="ca1-integrity",
@@ -393,6 +465,23 @@ SCENARIOS: tuple[Scenario, ...] = (
         condition="consumption-unconfirmed",
         how="no consumer acknowledged; the record is archived anyway, ordering forfeited",
         run=_ca1_timeout,
+    ),
+    Scenario(
+        name="ca1-incomplete",
+        agent="ca1",
+        verdict="ESCALATE",
+        condition="incomplete-input",
+        how="CA1's own copy lost an envelope; what arrived is stored and said to be partial",
+        run=_ca1_incomplete,
+    ),
+    Scenario(
+        name="stream-gap",
+        agent="cax",
+        verdict="INCOMPLETE",
+        condition="envelope-lost",
+        how="one envelope of the input stream is lost in transport; the agent records the "
+        "gap instead of processing a partial document",
+        run=_stream_gap,
     ),
     Scenario(
         name="mc1-unjustified",

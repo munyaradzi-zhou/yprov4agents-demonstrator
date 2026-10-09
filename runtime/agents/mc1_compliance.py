@@ -67,6 +67,7 @@ def _type_of(a: dict[str, Any]) -> str:
 
 
 class MC1Compliance(StreamingAgent):
+    agent_label = "ComplianceChecker"
     input_subject = "agent.lifecycle.>"
     output_prefix = "governance"
 
@@ -113,7 +114,7 @@ class MC1Compliance(StreamingAgent):
         tracker = agent_tracker(
             self.role,
             session_id,
-            "ComplianceChecker",
+            self.agent_label,
             sid=f"{session_id}-mc1",
             energy=self.energy,
         )

@@ -4,8 +4,10 @@ base_agent.py — the shared machinery every streaming agent reuses.
 A `StreamingAgent`:
   1. connects to the bus and subscribes to an input subject,
   2. buffers the incoming chunk stream per session (STREAM_START..RECORD_CHUNK..STREAM_END),
-  3. on STREAM_END, calls `process(session, merged_doc, source_subject)` — the ONLY method
-     each concrete agent implements — which returns (result_prov_json, log_line),
+  3. on STREAM_END, checks that every envelope of the stream arrived, and if so calls
+     `process(session, merged_doc, source_subject)` — the ONLY method each concrete agent
+     implements — which returns (result_prov_json, log_line). If any envelope is missing
+     it records an INCOMPLETE decision instead of processing (see `missing_envelopes`),
   4. re-emits that result as its own chunk stream on its output subject,
   5. announces readiness at startup so the producer waits for it.
 
@@ -24,7 +26,16 @@ from typing import Any
 
 from .envelope import ProvEventType, ProvRecordEnvelope
 from .net_bus import NetworkBus
-from .util import energy_tracker
+from .util import agent_tracker, energy_tracker
+
+#: The verdict an agent records when the stream it was handed has a gap. Not a judgement
+#: about the input's content — the agent never saw all of it — but about its delivery.
+VERDICT_INCOMPLETE = "INCOMPLETE"
+
+#: Set on the STREAM_END of an agent's own output when that output records an INCOMPLETE
+#: input. CA1 counts a consumer's STREAM_END as "this consumer used the record"; a consumer
+#: that only recorded a gap did not use it, and must not be counted.
+INPUT_COMPLETE = "input_complete"
 
 # PROV-JSON top-level sections we know how to merge when reassembling a stream.
 _PROV_SECTIONS = (
@@ -50,6 +61,27 @@ def _merge_payload(target: dict[str, Any], payload: dict[str, Any]) -> None:
             target.setdefault(section, {}).update(value)
         else:
             target[section] = value
+
+
+def missing_envelopes(seen: set[int], end_sequence_no: int) -> list[int]:
+    """The sequence numbers a stream carried and this receiver never saw.
+
+    `stream_document` numbers a stream's envelopes 1, 2, 3, … without gaps, ending with
+    STREAM_END, so STREAM_END's own sequence number is the length of the stream and needs
+    no separate count. A stream is complete exactly when every number below it arrived.
+
+    This matters more than it looks. The bus is at-most-once, and before this check an
+    agent processed whatever it had buffered when STREAM_END arrived: a lost relations
+    chunk produced a well-formed record with activities, entities and no lineage, which
+    governance passed and storage persisted. Losing a record is disclosed in the paper;
+    turning a lost envelope into a plausible, wrong record would not have been.
+
+    A sender that does not number its envelopes (every one 0) cannot be checked, and is
+    reported as complete rather than as entirely missing.
+    """
+    if end_sequence_no <= 1:
+        return []
+    return [n for n in range(1, end_sequence_no) if n not in seen]
 
 
 def _chunk_document(doc: dict[str, Any]) -> list[dict[str, Any]]:
@@ -80,8 +112,13 @@ async def stream_document(
     producer_id: str,
     doc: dict[str, Any],
     delay_ms: float = 0.0,
+    end_payload: dict[str, Any] | None = None,
 ) -> int:
-    """Emit `doc` onto `subject` as STREAM_START → RECORD_CHUNK(s) → STREAM_END."""
+    """Emit `doc` onto `subject` as STREAM_START → RECORD_CHUNK(s) → STREAM_END.
+
+    `end_payload` travels on STREAM_END; it is how an agent marks an output that records
+    an incomplete input (:data:`INPUT_COMPLETE`).
+    """
     seq = 0
 
     async def send(event_type: str, payload: dict[str, Any]) -> None:
@@ -101,7 +138,7 @@ async def stream_document(
     await send(ProvEventType.STREAM_START.value, {"prefix": doc.get("prefix", {})})
     for chunk in _chunk_document(doc):
         await send(ProvEventType.RECORD_CHUNK.value, chunk)
-    await send(ProvEventType.STREAM_END.value, {})
+    await send(ProvEventType.STREAM_END.value, dict(end_payload or {}))
     return seq
 
 
@@ -113,6 +150,8 @@ class StreamingAgent:
     #: Prefix for this agent's output subject. The full subject is
     #: f"{output_prefix}.{role}.{session}".
     output_prefix: str = "agent.lifecycle"
+    #: The name this agent records itself under in its own PROV.
+    agent_label: str = "StreamingAgent"
 
     def __init__(self, role: str, bus: NetworkBus) -> None:
         self.role = role
@@ -154,32 +193,89 @@ class StreamingAgent:
     async def _on_envelope(self, subject: str, env: ProvRecordEnvelope) -> None:
         sid = env.session_id
         if env.event_type == ProvEventType.STREAM_START.value:
-            self._buffers[sid] = {"_subject": subject}
+            self._buffers[sid] = {"_subject": subject, "_seen": {env.sequence_no}}
             _merge_payload(self._buffers[sid], env.payload)
             return
         buf = self._buffers.setdefault(sid, {"_subject": subject})
+        seen: set[int] = buf.setdefault("_seen", set())
+        seen.add(env.sequence_no)
         if env.event_type == ProvEventType.RECORD_CHUNK.value:
             _merge_payload(buf, env.payload)
             return
         if env.event_type == ProvEventType.STREAM_END.value:
             src = buf.pop("_subject", subject)
+            missing = missing_envelopes(seen, env.sequence_no)
             doc = {k: v for k, v in buf.items() if not k.startswith("_")}
-            await self._finalize(sid, doc, src)
             self._buffers.pop(sid, None)
+            await self._finalize(sid, doc, src, missing=missing, expected=env.sequence_no)
 
     async def _finalize(
-        self, session_id: str, doc: dict[str, Any], source_subject: str
+        self,
+        session_id: str,
+        doc: dict[str, Any],
+        source_subject: str,
+        *,
+        missing: list[int] | None = None,
+        expected: int = 0,
     ) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         # run the (sync) domain logic off the event loop so a slow LLM call
         # doesn't block the subscription.
-        prov_json, log_line = await loop.run_in_executor(
-            None, self.process, session_id, doc, source_subject
-        )
+        end_payload: dict[str, Any] = {}
+        if missing:
+            prov_json, log_line = await loop.run_in_executor(
+                None, self.record_incomplete, session_id, source_subject, missing, expected
+            )
+            end_payload = {INPUT_COMPLETE: False, "missing": missing}
+        else:
+            prov_json, log_line = await loop.run_in_executor(
+                None, self.process, session_id, doc, source_subject
+            )
         print(f"[{self.role}] {log_line}", flush=True)
         # re-emit this agent's own PROV as a stream on its output subject
         out_session = f"{session_id}::{self.role}"
         out_subject = f"{self.output_prefix}.{self.role}.{session_id}"
         await stream_document(
-            self.bus, out_subject, session_id=out_session, producer_id=self.role, doc=prov_json
+            self.bus,
+            out_subject,
+            session_id=out_session,
+            producer_id=self.role,
+            doc=prov_json,
+            end_payload=end_payload,
+        )
+
+    def record_incomplete(
+        self, session_id: str, source_subject: str, missing: list[int], expected: int
+    ) -> tuple[dict[str, Any], str]:
+        """Record that the input arrived with a gap, instead of acting on what did arrive.
+
+        The agent does not process a partial document, because every output it could
+        produce would describe an input it never fully saw. It records the gap as its
+        decision, so the absence is in the provenance — governed like any other record —
+        rather than only in a log line.
+        """
+        tracker = agent_tracker(self.role, session_id, self.agent_label, energy=self.energy)
+        received = expected - len(missing)
+        with tracker.activity(
+            "ReceiveTaskActivity", f"{self.role}: receive {source_subject}"
+        ) as prov:
+            partial = prov.produces(
+                "TaskEntity", f"partial stream: {received} of {expected} envelopes"
+            )
+        tracker.decide(
+            VERDICT_INCOMPLETE,
+            f"The input stream on {source_subject} declared {expected} envelopes and "
+            f"{len(missing)} never arrived (sequence {', '.join(map(str, missing))}). "
+            f"The document was not processed: any output would describe an input this "
+            f"agent did not fully receive. Verdict {VERDICT_INCOMPLETE}.",
+            label=f"{self.role}: incomplete input",
+            consumed=partial,
+            attributes={
+                "yp:envelopes_expected": expected,
+                "yp:envelopes_missing": ",".join(map(str, missing)),
+            },
+        )
+        return (
+            tracker.emit(),
+            f"INCOMPLETE input [{session_id}]: missing envelope(s) {missing} of {expected}",
         )

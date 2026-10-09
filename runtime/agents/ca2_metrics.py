@@ -64,6 +64,7 @@ class ChartSpec(NamedTuple):
 
 
 class CA2Metrics(StreamingAgent):
+    agent_label = "Metrics_Visualizer"
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
@@ -167,7 +168,7 @@ class CA2Metrics(StreamingAgent):
     ) -> tuple[dict[str, Any], str]:
         # The sink is where the emitted document goes; giving it to the tracker keeps the
         # destination out of the lifecycle below, which is then purely about what happened.
-        tracker = agent_tracker(self.role, session_id, "Metrics_Visualizer", energy=self.energy)
+        tracker = agent_tracker(self.role, session_id, self.agent_label, energy=self.energy)
 
         # S1 Receive — what arrived, and from where.
         with tracker.activity(

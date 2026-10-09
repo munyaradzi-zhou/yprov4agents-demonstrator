@@ -82,6 +82,7 @@ def _reconstruct(doc: dict[str, Any]) -> Trail:
 
 
 class MC3Audit(StreamingAgent):
+    agent_label = "AuditabilityAgent"
     input_subject = "agent.lifecycle.>"
     output_prefix = "governance"
 
@@ -98,7 +99,7 @@ class MC3Audit(StreamingAgent):
         tracker = agent_tracker(
             self.role,
             session_id,
-            "AuditabilityAgent",
+            self.agent_label,
             sid=f"{session_id}-mc3",
             energy=self.energy,
         )
