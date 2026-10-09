@@ -1,0 +1,67 @@
+{
+  "level": "pipeline",
+  "environment": {
+    "captured_at": "2026-10-09T05:14:20.235229+00:00",
+    "python": "3.11.15",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840,
+    "git_commit": "301251ef049593c5ead6aa28c989923257fc7569",
+    "git_dirty": true,
+    "llm_involved": false,
+    "energy_backend": "off",
+    "notes": {
+      "interpreter_clean": true
+    }
+  },
+  "topology": "sequential, single-process, in-process bus (PLAN.md R8)",
+  "persist_timeout_s": 2,
+  "repetitions": 3,
+  "input_records": 2,
+  "median_ns": {
+    "OFF": 6296637200.0,
+    "A": 6398279000.0,
+    "B-TRANS": 6160632000.0,
+    "B": 6453974000.0
+  },
+  "dispersion_ns": {
+    "OFF": 27281200.0,
+    "A": 80134800.0,
+    "B-TRANS": 13286500.0,
+    "B": 48480400.0
+  },
+  "records_per_second": {
+    "OFF": 0.31762986122179626,
+    "A": 0.31258405580625664,
+    "B-TRANS": 0.3246420172475811,
+    "B": 0.30988659080436337
+  },
+  "artefacts": {
+    "OFF": {
+      "documents": 0,
+      "bytes": 0
+    },
+    "A": {
+      "documents": 0,
+      "bytes": 0
+    },
+    "B-TRANS": {
+      "documents": 0,
+      "bytes": 0
+    },
+    "B": {
+      "documents": 24,
+      "bytes": 130259
+    }
+  },
+  "vs_off": {
+    "pct": 2.4987432974540758,
+    "resolvable": true,
+    "noise_ns": 48480400.0
+  },
+  "caveat": "Dominated by a fixed CA1 persist window and by process start-up, both of which are the same under every condition. Read the ratio, not the absolute."
+}

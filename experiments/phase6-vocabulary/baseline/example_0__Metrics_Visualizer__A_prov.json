@@ -1,0 +1,164 @@
+{
+  "prefix": {
+    "cb": "urn:yprov4agents:callback-baseline#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "yp": "http://hpci-lab.org/yProv4Agents#"
+  },
+  "agent": {
+    "cb:agent_8b8ef5556183": {
+      "prov:label": "Metrics_Visualizer"
+    }
+  },
+  "activity": {
+    "cb:activity_00": {
+      "prov:label": "Metrics: receive producer record",
+      "prov:startTime": "2026-10-09T06:01:35.247745+00:00",
+      "prov:endTime": "2026-10-09T06:01:35.247912+00:00",
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_01": {
+      "prov:label": "Metrics: choose what to plot",
+      "prov:startTime": "2026-10-09T06:01:35.247745+00:00",
+      "prov:endTime": "2026-10-09T06:01:35.247851+00:00",
+      "prov:type": {
+        "$": "yp:PlanningActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_02": {
+      "prov:label": "Metrics: render chart (matplotlib)",
+      "prov:startTime": "2026-10-09T06:01:35.247745+00:00",
+      "prov:endTime": "2026-10-09T06:01:35.494814+00:00",
+      "prov:type": {
+        "$": "yp:ToolCallActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_03": {
+      "prov:label": "Metrics: confirm the chart reached disk",
+      "prov:startTime": "2026-10-09T06:01:35.495285+00:00",
+      "prov:endTime": "2026-10-09T06:01:35.495849+00:00",
+      "prov:type": {
+        "$": "yp:ObservationActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_04": {
+      "prov:label": "Metrics: revise chart",
+      "prov:startTime": "2026-10-09T06:01:35.495285+00:00",
+      "prov:endTime": "2026-10-09T06:01:35.495294+00:00",
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:verdict": "REVISE",
+      "cb:verdict_source": "scraped-from-label"
+    },
+    "cb:activity_05": {
+      "prov:label": "Metrics: respond",
+      "prov:startTime": "2026-10-09T06:01:35.495285+00:00",
+      "prov:endTime": "2026-10-09T06:01:35.495290+00:00",
+      "prov:type": {
+        "$": "yp:ResponseActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    }
+  },
+  "entity": {
+    "cb:entity_955bd305b5e8": {
+      "prov:value": "producer doc on producer.yprov4ml.example_0"
+    },
+    "cb:entity_c0e96408db34": {
+      "prov:value": "example_0_metrics.png"
+    }
+  },
+  "used": {
+    "_:u0": {
+      "prov:activity": "cb:activity_01",
+      "prov:entity": "cb:entity_955bd305b5e8"
+    },
+    "_:u1": {
+      "prov:activity": "cb:activity_02",
+      "prov:entity": "cb:entity_955bd305b5e8"
+    },
+    "_:u2": {
+      "prov:activity": "cb:activity_03",
+      "prov:entity": "cb:entity_c0e96408db34"
+    },
+    "_:u3": {
+      "prov:activity": "cb:activity_04",
+      "prov:entity": "cb:entity_c0e96408db34"
+    },
+    "_:u4": {
+      "prov:activity": "cb:activity_05",
+      "prov:entity": "cb:entity_c0e96408db34"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "cb:entity_955bd305b5e8",
+      "prov:activity": "cb:activity_00"
+    },
+    "_:g1": {
+      "prov:entity": "cb:entity_c0e96408db34",
+      "prov:activity": "cb:activity_02"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "cb:activity_00",
+      "prov:agent": "cb:agent_8b8ef5556183"
+    },
+    "_:a1": {
+      "prov:activity": "cb:activity_01",
+      "prov:agent": "cb:agent_8b8ef5556183"
+    },
+    "_:a2": {
+      "prov:activity": "cb:activity_02",
+      "prov:agent": "cb:agent_8b8ef5556183"
+    },
+    "_:a3": {
+      "prov:activity": "cb:activity_03",
+      "prov:agent": "cb:agent_8b8ef5556183"
+    },
+    "_:a4": {
+      "prov:activity": "cb:activity_04",
+      "prov:agent": "cb:agent_8b8ef5556183"
+    },
+    "_:a5": {
+      "prov:activity": "cb:activity_05",
+      "prov:agent": "cb:agent_8b8ef5556183"
+    }
+  },
+  "wasInformedBy": {
+    "_:i0": {
+      "prov:informed": "cb:activity_01",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i1": {
+      "prov:informed": "cb:activity_02",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i2": {
+      "prov:informed": "cb:activity_03",
+      "prov:informant": "cb:activity_02"
+    },
+    "_:i3": {
+      "prov:informed": "cb:activity_04",
+      "prov:informant": "cb:activity_02"
+    },
+    "_:i4": {
+      "prov:informed": "cb:activity_05",
+      "prov:informant": "cb:activity_02"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d0": {
+      "prov:generatedEntity": "cb:entity_c0e96408db34",
+      "prov:usedEntity": "cb:entity_955bd305b5e8"
+    }
+  }
+}

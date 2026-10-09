@@ -277,16 +277,25 @@ storage cost rather than a compute cost — held *after* Phase 1 made the justif
 compute something. Measuring it before that fix would have published the right answer for
 the wrong reason.
 
-### Phase 6 — Vocabulary, tables, truth pass · ~3 days
+### Phase 6 — Vocabulary, tables, truth pass · ~3 days ✅ *complete 2026-10-09*
 
-- [ ] **P7** — `vocab/yprov4agents.ttl` + SHACL shape; reframe MC1 as shape validation
-- [ ] **P8 / B1** — reframe E2 as a conformance check, or give it a real denominator
-- [ ] **B3** — re-report E1/E3 split mechanical vs. observed
-- [ ] **A3 / A4** — correct the verdict table and the reflexivity claim in README and
-      `DESIGN.md` §4
-- [ ] **H2 / H3** — CA1 state pruning, or state both in limitations; disclose at-most-once
-- [ ] Full doc truth-pass: every claim in README / DESIGN / INSTRUMENTATION / OUTLINE traced
-      to code or deleted
+- [x] **P7** — `vocab/yprov4agents.ttl` (every term taken from the frozen archives, not from
+      the documentation) and `vocab/shapes.ttl`; MC1 reframed as the in-process subset of a
+      declared standard, with `eval.validate_shapes` applying the full set. Asking the agent
+      and the shapes to agree found MC1 accepting a justification of pure whitespace —
+      three implementations of one rule, and that was the one that disagreed
+- [x] **P8 / B1** — E2 relabelled an instrumentation-coverage check, *and* given an external
+      judge: 24/24 records conform under pyshacl over RDF from the reference `prov` library.
+      The denominator is still tautological; the judge is not
+- [x] **B3** — E1b reports 126 observed / 72 derived / 30 declared / 96 attributed
+- [x] **A3 / A4** — verdict table corrected and marked observed-versus-reachable; the
+      reflexivity claim narrowed with its termination argument, and the bound turned into a
+      tested invariant. **No strict-xfails remain in the suite**
+- [x] **H2 / H3** — disclosed in `docs/DESIGN.md` §5b, with four more limitations the phases
+      measured
+- [x] Full doc truth-pass — `DESIGN.md`'s results table still carried the four wrong
+      Strategy A zeros; README's verdict table had two errors; `INSTRUMENTATION.md` §5 was
+      corrected in Phase 2
 
 ---
 
