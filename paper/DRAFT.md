@@ -11,7 +11,11 @@
 > `paper/OUTLINE.md` for the ranked cuts that close a gap of up to ~1,400 words if one exists.
 
 > Every figure quoted here is read from a frozen archive under `experiments/`, named at the
-> point of use. Where a number could not be measured, the text says so rather than estimating.
+> point of use — **with one exception, now labelled in place**: the two energy figures in §6.3
+> come from a Phase-4 development run recorded in `docs/phases/PHASE_4.md`, not from a hashed
+> archive, and no archived record carries a `yp:energy_*` attribute at all. Energy is also the
+> one quantity here that is **modelled rather than measured**, for the platform reason §6.3
+> states. Both facts are disclosed at the point of use.
 
 **Figures** (`python -m paper.figures`): Figure 1 = `f1_two_layers` ·
 Figure 2 = `f4_two_escalations` · Figure 3 = `f9_where_the_overhead_is`. `f5_a_versus_b` is
@@ -336,12 +340,30 @@ and the choice to archive anyway rather than lose the record. Because CA1 escala
 independent reasons calling for opposite responses, A cannot distinguish *"storage is corrupting
 records"* from *"ca3 is not running"*.
 
-### 6.3 Energy: a negative result, and what a record must disclose
+### 6.3 Energy: two negative results, and what a record must disclose
 
 Energy is a first-class concern for the infrastructure this work targets, so we wired a sampling
-backend into the capture API. The wiring produced a result worth reporting on its own terms.
+backend into the capture API. The wiring produced two results worth reporting on their own terms,
+and the first is about the figures themselves.
 
-**A sampling backend cannot attribute energy to a step shorter than its sampling period.**
+**Our energy figures are modelled, not measured, and the record has to say so.** On the
+development host — a Windows laptop — no hardware energy counter is reachable. Intel RAPL is a
+Linux `sysfs` interface and does not exist; Intel Power Gadget is absent and discontinued; the
+Windows Energy Meter Interface is advertised as available by the backend and returns a processor
+energy delta of **0.0 under a CPU-saturating load**, because it needs OEM firmware support this
+machine does not provide. The backend therefore falls back to estimating processor power from CPU
+load as `TDP × (0.1 + 0.9 × load³)`, and RAM power as a flat function of installed capacity — a
+constant 10 W here, which supplied **41% of the total** in a four-second calibration run. Neither
+component is observed. Every figure below is consequently published with
+`yp:energy_source = "modelled"`, and a reader who needs measured values needs a host with a
+readable counter.
+
+This is not a defect of the design but a property of the platform, and it generalises: **a
+provenance system cannot tell a measured watt from a modelled one unless the backend is asked,
+so it must ask and record the answer.** A record that carries a number without its provenance
+invites a reader to treat a cubic function of CPU load as an instrument reading.
+
+**Second, a sampling backend cannot attribute energy to a step shorter than its sampling period.**
 codecarbon's default period is 15 seconds and these steps last milliseconds, so a delta lands on
 whichever step happens to read after a tick:
 
@@ -351,18 +373,26 @@ whichever step happens to read after a tick:
 | render chart (matplotlib) | 4.6 µWh | 1.328 s |
 
 **Table 3.** Two steps of one record under a 15-second sampling period. The step that did the work
-was charged a tenth of what the step that did nothing was charged.
+was charged a tenth of what the step that did nothing was charged. *(Modelled power, per above;
+these figures come from the Phase-4 development run recorded in `docs/phases/PHASE_4.md` rather
+than from a hashed archive under `experiments/` — the only numbers in this paper of which that is
+true.)*
 
 A second artifact was worse: the *first* step of each record was charged 28.3 seconds of
 inter-message idle time, because the energy tracker outlives any one record. Both are now handled —
-the baseline resets when a record begins, so no step is charged for the gap before it — but the
-substantive contribution is what the record says about its own figure. Each measurement is published
-alongside `yp:energy_sampling_period_s` and `yp:energy_attributable`, so the record states that the
-number is real consumption in a real window and **not** an attribution to the step it is attached to.
-**Energy belongs at session granularity**, and any per-step energy claim in this literature needs a
-backend sampling faster than the steps and should state its period. *A provenance record that reports
-an energy figure without its sampling period is not reporting a measurement; it is reporting an
-artifact of when the sampler last ticked.*
+the baseline resets when a record begins, so no step is charged for the gap before it. **This
+attribution result is independent of whether the underlying power is measured or modelled**: a
+backend sampling every 15 seconds cannot resolve a millisecond step by either route, which is why
+it survives the caveat above.
+
+The contribution is what the record says about its own figure. Each measurement is published
+alongside `yp:energy_sampling_period_s`, `yp:energy_source` and `yp:energy_attributable`, so the
+record states the period, whether the number was observed or estimated, and that it is **not** an
+attribution to the step it is attached to. **Energy belongs at session granularity**, and any
+per-step energy claim in this literature needs a backend sampling faster than the steps and should
+state both its period and its source. *A provenance record that reports an energy figure without
+its sampling period is not reporting a measurement; it is reporting an artifact of when the sampler
+last ticked.*
 
 ### 6.4 Model provenance
 
