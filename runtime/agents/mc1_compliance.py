@@ -6,8 +6,15 @@ it against the project's structural standard: is it typed W3C PROV, does it reco
 DecisionActivity, and does that decision carry the required `yp:justification`? Emits
 a PASS/FAIL verdict AND its own reflexive PROV (the checker is itself auditable).
 
+**The standard is declared, not hard-coded here.** `vocab/shapes.ttl` states it in SHACL
+and `eval.validate_shapes` applies it with a standard engine; this agent enforces the
+subset that can be checked from one record, in process, without an RDF toolchain in the
+container. The check names below are the shape names, so a verdict can be traced to the
+rule it was reached against.
+
 Publishes to `governance.*` (a different prefix from what it consumes) so meta output
-never re-triggers the meta layer.
+never re-triggers the meta layer. That bound is deliberate and is discussed under A4 in
+`todo.md`: unbounded reflexivity does not terminate.
 """
 
 from __future__ import annotations
@@ -19,14 +26,33 @@ from ..base_agent import StreamingAgent
 from ..net_bus import NetworkBus
 from ..util import agent_tracker
 
-#: The structural standard MC1 enforces. Named so the emitted record can state which
-#: checks were applied rather than leaving a reader to infer it from a verdict.
+#: The structural standard MC1 enforces, named after the SHACL shapes that declare it.
+#:
+#: The standard itself lives in ``vocab/shapes.ttl``, not here. That matters for three
+#: reasons: a consumer can validate a record with any SHACL engine without running this
+#: agent, the checks have names a reader can cite instead of line numbers, and the agent
+#: can be tested *against* the declaration — if the two disagree, one of them is wrong,
+#: which is a question with an answer.
+#:
+#: Asking it found a defect in this file. ``decision-justified`` was implemented as
+#: ``not a.get("yp:justification")``, so a justification of pure whitespace passed. The
+#: shape's ``sh:pattern "\S"`` rejects it, and ``eval.evaluate`` strips before counting —
+#: three implementations of one rule, and this was the one that disagreed. See
+#: ``tests/test_shapes.py::test_the_shapes_and_the_compliance_agent_agree``.
+#:
+#: MC1 enforces a *subset* of the shapes: what can be checked from a single record, in
+#: process, without an RDF toolchain in the agent's container. ``eval.validate_shapes``
+#: applies the full set offline.
 CHECK_NAMES = (
-    "namespace-declarations",
-    "typed-activities",
-    "decision-present",
-    "decision-justified",
+    "namespace-declarations",  # not a shape: PROV-JSON prefixes, lost in RDF conversion
+    "typed-activities",  # yp:ActivityShape, in aggregate
+    "decision-present",  # not a shape: SHACL cannot require a node to exist
+    "decision-justified",  # yp:DecisionShape / decision-justified
 )
+
+#: Where the full standard is declared. Cited in the emitted record so a reader of a
+#: verdict can find the shapes it was reached against.
+SHAPES_REFERENCE = "vocab/shapes.ttl"
 
 
 def _iter_activities(doc: dict[str, Any]) -> Iterator[tuple[str, dict[str, Any]]]:
@@ -68,7 +94,11 @@ class MC1Compliance(StreamingAgent):
         if not decisions:
             failures.append("no yp:DecisionActivity present")
         else:
-            missing = [aid for aid, a in decisions if not a.get("yp:justification")]
+            # Stripped, because whitespace is not a justification. The shape's
+            # sh:pattern "\S" says the same thing, and this line used to disagree with it.
+            missing = [
+                aid for aid, a in decisions if not str(a.get("yp:justification", "")).strip()
+            ]
             if missing:
                 failures.append(f"{len(missing)} decision(s) without yp:justification")
         return failures, decisions
@@ -111,6 +141,7 @@ class MC1Compliance(StreamingAgent):
                 **{
                     "yp:target_agent": src_role,
                     "yp:checks_applied": ",".join(CHECK_NAMES),
+                    "yp:standard": SHAPES_REFERENCE,
                     "yp:activities_examined": len(doc.get("activity") or {}),
                     "yp:decisions_examined": len(decisions),
                 }
