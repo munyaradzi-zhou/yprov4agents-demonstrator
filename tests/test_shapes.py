@@ -20,6 +20,7 @@ wrong, and the last test here asks the question.
 from __future__ import annotations
 
 import copy
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -105,59 +106,85 @@ def test_every_emitted_term_is_defined(
     assert not undefined, f"emitted but undefined in the vocabulary: {sorted(undefined)}"
 
 
+def _emitted_terms(documents: list[dict[str, Any]]) -> set[str]:
+    """Every ``yp:`` attribute and type a set of records carries, agents included."""
+    emitted: set[str] = set()
+    for document in documents:
+        for section in ("activity", "entity", "agent"):
+            for node in (document.get(section) or {}).values():
+                emitted |= {key for key in node if key.startswith("yp:")}
+                prov_type = node.get("prov:type")
+                value = prov_type.get("$", "") if isinstance(prov_type, dict) else prov_type
+                if isinstance(value, str) and value.startswith("yp:"):
+                    emitted.add(value)
+    return emitted
+
+
 def test_the_vocabulary_defines_nothing_the_demonstrator_cannot_emit(
     defined_terms: set[str],
+    prov_dir: Path,
+    prov_documents: list[tuple[Path, dict[str, Any]]],
 ) -> None:
-    """The reverse direction, and it is allowed to fail — with a named exception list.
+    """The reverse direction: every defined term is emitted, or is listed with its reason.
 
-    A vocabulary may legitimately define more than one demonstrator exercises; a library
-    feature the demonstrator does not use is a documented gap, not a lie. What is not
-    acceptable is an *undocumented* one, so the exceptions are enumerated here and in
-    docs/DESIGN.md rather than left to a reader to discover.
+    A vocabulary may legitimately define more than one run exercises, but not silently. This
+    test's docstring always promised that, and its body never checked it: it asserted only
+    that the exception list was a subset of the vocabulary, so a term could be added to the
+    ontology without being emitted or listed and the test still passed (docs/AUDIT.md,
+    *Found while fixing*). It now computes what the run and its fault scenarios emit.
+
+    The exceptions come in two kinds, kept apart because they mean different things: terms
+    the demonstrator never emits, and terms it emits only on a path the reference run does
+    not take.
     """
-    library_only = {
-        "yp:MemoryStateEntity",  # register_memory: offered, not exercised — see DESIGN.md
-        "yp:evidence",  # abstract superproperty, never emitted directly
-        "yp:outcome",  # only on a step that raised
-        "yp:error_type",  # only on a step that raised
-        "yp:confidence_score",  # offered; no agent currently scores its own confidence
-        "yp:MetaAgent",  # the meta agents are typed yp:OperationalAgent today — see A3
-        "yp:AgentLifecycleActivity",  # superclass, never emitted as a concrete type
-        "yp:GovernanceActivity",  # superclass, never emitted as a concrete type
-        "yp:energy_kwh",  # energy accounting is opt-in (PROV_ENERGY)
+    fault_records = [
+        json.loads(path.read_text(encoding="utf-8"))
+        for path in sorted((prov_dir / "faults").rglob("*_prov.json"))
+    ]
+    emitted = _emitted_terms([doc for _, doc in prov_documents] + fault_records)
+
+    #: Emitted by the demonstrator, but only on a path the deterministic reference run and
+    #: its fault scenarios do not take. Each is evidenced in a named archive.
+    emitted_elsewhere = {
+        # Reported only by a real provider — experiments/audit-llm. The other model
+        # attributes are emitted by the cax-revise fault scenario's scripted model, which
+        # reports no snapshot and so, correctly, records none.
+        "yp:model_resolved",
+        "yp:system_fingerprint",
+        # energy accounting is opt-in (PROV_ENERGY)
+        "yp:energy_kwh",
         "yp:emissions_kg",
         "yp:energy_source",
         "yp:energy_sampling_period_s",
         "yp:energy_attributable",
         "yp:duration_s",
-        "yp:model",  # model provenance needs a key; archived in phase4-llm
-        "yp:temperature",
-        "yp:max_tokens",
-        "yp:prompt_id",
-        "yp:prompt_version",
-        "yp:prompt_sha",
-        "yp:prompt_tokens",
-        "yp:completion_tokens",
-        "yp:finish_reason",
-        "yp:response_sha",
-        "yp:llm_latency_s",
-        "yp:RecordShape",  # shape names, defined in shapes.ttl's namespace
-        "yp:DecisionShape",
-        "yp:ActivityShape",
-        "yp:PointerShape",
-        "yp:EnergyShape",
-        "yp:ModelCallShape",
+        # only on a session that arrives twice — tests/test_sessions.py
+        "yp:persist_count",
+        # only on a step that raised
+        "yp:outcome",
+        "yp:error_type",
     }
-    # Nothing to assert about the exceptions themselves; the test exists so that adding a
-    # term to the vocabulary without either emitting it or listing it here fails.
-    assert library_only <= defined_terms | {
-        "yp:RecordShape",
-        "yp:DecisionShape",
-        "yp:ActivityShape",
-        "yp:PointerShape",
-        "yp:EnergyShape",
-        "yp:ModelCallShape",
-    }, "the exception list names a term the vocabulary does not define"
+    #: Defined, and emitted by nothing in the demonstrator.
+    library_only = {
+        "yp:MemoryStateEntity",  # register_memory: offered, not exercised — see DESIGN.md
+        "yp:evidence",  # abstract superproperty, never emitted directly
+        "yp:confidence_score",  # offered; no agent currently scores its own confidence
+        "yp:MetaAgent",  # the meta agents are typed yp:OperationalAgent today — see A3
+        "yp:AgentLifecycleActivity",  # superclass, never emitted as a concrete type
+        "yp:GovernanceActivity",  # superclass, never emitted as a concrete type
+    }
+
+    listed = emitted_elsewhere | library_only
+    assert listed <= defined_terms, (
+        f"an exception names a term the vocabulary does not define: "
+        f"{sorted(listed - defined_terms)}"
+    )
+    stale = sorted(listed & emitted)
+    assert not stale, f"listed as not emitted, but the run emits them: {stale}"
+    unaccounted = sorted(defined_terms - emitted - listed)
+    assert not unaccounted, (
+        f"defined in the vocabulary, emitted by nothing, and not listed: {unaccounted}"
+    )
 
 
 # ── the shapes validate real records ──────────────────────────────────────────────

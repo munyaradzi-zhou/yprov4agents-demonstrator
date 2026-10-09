@@ -1,0 +1,12 @@
+{
+  "log": "analysed fault (computed) -> OK, 0 anomaly(ies), 0 completeness gap(s), PID 21.T11999/yprovstore-8872c206e705",
+  "verdict": "OK",
+  "escalation_reason": null,
+  "justification": "Applied 5 algorithms (structure, timing, sustainability, resource, anomaly) to a 8-activity / 6-entity graph. No invariant breached: no ordering gap exceeds 3.5 MAD above the median. No completeness gaps: every activity is closed, typing is complete, and energy and resource streams are present. Verdict OK.",
+  "scenario": "ca3-ok",
+  "agent": "ca3",
+  "expected": "OK",
+  "condition": "no-invariant-breached",
+  "how": "a fully instrumented graph with regular timing: nothing true left to report",
+  "as_expected": true
+}

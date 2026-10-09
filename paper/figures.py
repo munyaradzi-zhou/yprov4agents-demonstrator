@@ -39,7 +39,7 @@ ARCHIVES = REPO / "experiments"
 OUTPUT = Path(__file__).resolve().parent / "figures"
 
 #: The run every structural figure reads from.
-REFERENCE = ARCHIVES / "verdict-reachability"
+REFERENCE = ARCHIVES / "audit-reference"
 #: The run the escalation figure reads from — the only one where the timeout path fires.
 FAULTS = REFERENCE / "faults"
 #: Benchmark results, carried inside the reference archive.
@@ -69,7 +69,9 @@ plt.rcParams.update(
         "ytick.color": MUTED,
         "figure.dpi": 150,
         "savefig.bbox": "tight",
-        "savefig.pad_inches": 0.02,
+        # The tight crop measures text from its glyph metrics, and at 0.02" it shaved the
+        # last character off F9's right-hand annotation.
+        "savefig.pad_inches": 0.06,
     }
 )
 
@@ -82,8 +84,11 @@ def _read(path: Path) -> dict[str, Any]:
 
 def _save(fig: plt.Figure, name: str) -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    for suffix in ("pdf", "png"):
-        fig.savefig(OUTPUT / f"{name}.{suffix}")
+    # No creation timestamp in the PDF: a figure whose data did not change must not change
+    # on disk either, or every re-render shows up as a modified file and a real change
+    # hides among the false ones.
+    fig.savefig(OUTPUT / f"{name}.pdf", metadata={"CreationDate": None})
+    fig.savefig(OUTPUT / f"{name}.png")
     plt.close(fig)
     print(f"  wrote {name}.pdf and {name}.png")
 
@@ -506,9 +511,13 @@ def figure_nine() -> None:
         bbox_to_anchor=(0.5, -0.32),
         ncol=3,
     )
+    # The title states only what held on every occasion measured. It used to add "and for
+    # every agent that does real work it is unresolvable" — typed in, not read from the
+    # data — and a later occasion drew CA3 and CAx resolved directly beneath it: they sit
+    # at the 3x threshold and fall on either side of it between occasions. Per-agent
+    # verdicts belong in the annotations, which are computed.
     ax.set_title(
-        "overhead is one file write — and for every agent that does real work it is "
-        "unresolvable",
+        "building the record is a sliver of every bar; the cost is writing it to disk",
         pad=10,
         fontsize=9,
         color=INK,

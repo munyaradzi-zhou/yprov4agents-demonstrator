@@ -241,6 +241,25 @@ audit that reports only what it anticipated understates how much was wrong.
   is real: its in-process bus is passed where a `NetworkBus` is expected, with no shared
   protocol saying the two are interchangeable. *(open, AU13)*
 - **This audit's own evidence for [6] was wrong** — see the correction under [5].
+- **The AU6 fix introduced a performance regression, and the overhead study caught it.**
+  Never-overwrite probed `__2`, `__3`, … on every write, so write cost grew with the number of
+  records already written (1.5 → 4.5 ms over sixty writes). Fixed to one attempt per write,
+  with exclusive creation; tested by counting attempts rather than timing. *(fixed with AU8)*
+- **Two of the paper's "unresolvable" agents sit on the threshold.** CA3 and CAx measured at
+  2.9× of their dispersion on the published occasion and at 5.0× and 4.6× on the post-audit
+  one, so their verdict flips with ordinary noise. "The verdicts were unchanged for every
+  agent" was true of two occasions by luck. A hypothesis that the post-audit benchmark
+  measures a costlier new-file write was tested and rejected (1.1× an overwrite).
+  *(evidence in `experiments/audit-reference`; paper wording is AU9)*
+- **A vocabulary test whose body did not do what its docstring promised.**
+  `test_the_vocabulary_defines_nothing_the_demonstrator_cannot_emit` only checked that its
+  exception list was a subset of the ontology, so any term could be added unemitted. Its
+  first honest run found the exception list itself wrong. *(fixed with AU8)*
+- **F9 carried a typed-in claim that a later occasion contradicted** — its title said overhead
+  was unresolvable for every agent doing real work, above two agents drawn resolved. The
+  title now states only what held on every occasion. PDFs also embedded a creation
+  timestamp, so every re-render showed as a change; they are now byte-identical when the
+  data is. *(fixed with AU8)*
 
 ## Checked and found sound
 

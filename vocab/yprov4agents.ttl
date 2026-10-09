@@ -252,6 +252,16 @@ yp:escalation_reason
         unconfirmed consumption means a consumer is down, and an incomplete input means
         part of the record was lost in transport and what was stored is partial."""@en .
 
+yp:persist_count
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:integer ;
+    rdfs:label          "persist count"@en ;
+    rdfs:comment        """How many times the storage agent has persisted this session,
+        recorded when it is more than once. A session that arrives again is held and
+        persisted again rather than ignored: it may be a replay, or a different document
+        sharing the id, and dropping either loses data."""@en .
+
 yp:envelopes_expected
     a                   owl:DatatypeProperty ;
     rdfs:domain         yp:DecisionActivity ;

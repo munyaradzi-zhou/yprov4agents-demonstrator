@@ -99,7 +99,7 @@ def test_every_verdict_of_every_agent_is_covered() -> None:
         from_faults.setdefault(scenario.agent, set()).add(scenario.verdict)
 
     # What the happy path produces, read from the frozen reference run rather than assumed.
-    reference = Path(__file__).resolve().parent.parent / "experiments" / "phase6-vocabulary"
+    reference = Path(__file__).resolve().parent.parent / "experiments" / "audit-reference"
     from_happy_path: dict[str, set[str]] = {}
     if reference.is_dir():
         for path in reference.glob("*_prov.json"):

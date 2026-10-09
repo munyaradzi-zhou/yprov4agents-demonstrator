@@ -6,7 +6,7 @@ module applies it — with a standard engine, over the same records, so the agen
 checked *against* the shapes rather than being the only thing that knows them.
 
     python -m eval.validate_shapes --prov-dir out
-    python -m eval.validate_shapes --prov-dir experiments/phase4-llm --verbose
+    python -m eval.validate_shapes --prov-dir experiments/audit-llm --verbose
 
 The path from an emitted record to a validated one has one step worth explaining. The
 demonstrator emits PROV-JSON, and SHACL validates RDF graphs. The ``prov`` library — the

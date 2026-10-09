@@ -14,8 +14,8 @@ Absolute nanosecond figures are machine-specific. The transferable results are t
 | Memory | 15.8 GiB |
 | OS | Windows-10-10.0.26200-SP0 |
 | Python | CPython 3.11.15 |
-| Commit | `301251ef0495` (dirty working tree) |
-| Captured | 2026-10-09T05:14:30.332032+00:00 |
+| Commit | `6cda995ebb57` |
+| Captured | 2026-10-09T17:51:14.077522+00:00 |
 | Model involved | no |
 | Energy backend | off |
 
@@ -27,33 +27,33 @@ Timer floor on this machine: **200 ns** for two clock reads around an empty call
 
 | Operation | Median | p95 | p99 |
 |---|--:|--:|--:|
-| `now_iso()` — the clock, rendered as text | 2.88 µs | 5.70 µs | 10.10 µs |
-| …of which: reading the clock | 510 ns | 1.50 µs | 2.00 µs |
-| …of which: formatting it | 1.75 µs | 2.70 µs | 5.70 µs |
-| `register_entity()` | 569 ns | 1.50 µs | 2.40 µs |
-| `register_entity(pid=…)` — pointer path | 1.50 µs | 1.60 µs | 2.40 µs |
-| `record_activity()` — minimal | 1.60 µs | 5.00 µs | 10.50 µs |
-| `record_activity(justification=…)` | 1.98 µs | 3.70 µs | 8.00 µs |
-| `record_activity(extra_attrs=…)` | 1.97 µs | 5.80 µs | 11.80 µs |
-| `to_prov_json()` — 6 activities | 32.40 µs | 81.00 µs | 97.50 µs |
-| `json.dumps(document)` | 115.05 µs | 228.90 µs | 266.70 µs |
-| `store.put()` — sha-256 + file write | 1.49 ms | 2.53 ms | 4.67 ms |
-| `write_prov()` — file write | 562.70 µs | 894.30 µs | 28.11 ms |
-| `store.resolve()` — read + verify | 718.55 µs | 1.13 ms | 1.64 ms |
-| one step via the capture API | 16.31 µs | 20.30 µs | 41.10 µs |
-| one step via the primitives | 7.70 µs | 25.40 µs | 40.40 µs |
+| `now_iso()` — the clock, rendered as text | 2.59 µs | 7.40 µs | 8.90 µs |
+| …of which: reading the clock | 795 ns | 1.50 µs | 1.70 µs |
+| …of which: formatting it | 2.29 µs | 5.50 µs | 6.10 µs |
+| `register_entity()` | 555 ns | 1.80 µs | 2.30 µs |
+| `register_entity(pid=…)` — pointer path | 1.32 µs | 3.70 µs | 5.80 µs |
+| `record_activity()` — minimal | 2.38 µs | 4.90 µs | 10.50 µs |
+| `record_activity(justification=…)` | 3.30 µs | 5.70 µs | 11.10 µs |
+| `record_activity(extra_attrs=…)` | 3.31 µs | 5.30 µs | 10.30 µs |
+| `to_prov_json()` — 6 activities | 33.10 µs | 99.90 µs | 155.80 µs |
+| `json.dumps(document)` | 109.80 µs | 252.40 µs | 532.30 µs |
+| `store.put()` — sha-256 + file write | 1.96 ms | 2.97 ms | 5.59 ms |
+| `write_prov()` — file write | 641.25 µs | 966.90 µs | 1.93 ms |
+| `store.resolve()` — read + verify | 531.35 µs | 886.60 µs | 2.15 ms |
+| one step via the capture API | 17.82 µs | 51.80 µs | 143.10 µs |
+| one step via the primitives | 13.78 µs | 27.30 µs | 64.40 µs |
 
 ### What this says
 
-**Recording the headline field costs nothing this machine can resolve: over 40 interleaved rounds of 1,000 calls each, the paired difference is 26 ns against a round-to-round spread of ± 352 ns.** `yp:justification` is the thing this project argues for, and attaching one to a `record_activity()` call is a dictionary insertion of a string that already exists. Set that against the storage: the justification used here is **254 bytes** of text, and what it costs a *serialised record* — more, once the key, the quoting and the escaping are counted — is measured in E6c, which is the figure to quote. The trade is **storage for explainability, not speed for explainability** — a far more defensible claim than "it is free", and the one the data supports.
+**Recording the headline field costs nothing this machine can resolve: over 40 interleaved rounds of 1,000 calls each, the paired difference is 54 ns against a round-to-round spread of ± 726 ns.** `yp:justification` is the thing this project argues for, and attaching one to a `record_activity()` call is a dictionary insertion of a string that already exists. Set that against the storage: the justification used here is **254 bytes** of text, and what it costs a *serialised record* — more, once the key, the quoting and the escaping are counted — is measured in E6c, which is the figure to quote. The trade is **storage for explainability, not speed for explainability** — a far more defensible claim than "it is free", and the one the data supports.
 
-**64% of the cost of recording a step is the timestamp — and most of that is formatting it, not measuring it.** One tracked step is 4.49 µs, of which 2.88 µs is `now_iso()`. Reading the clock is 510 ns of that; rendering the result as ISO-8601 text adds 1.54 µs more, 3.0× the reading it formats (paired, ± 32 ns). So the dominant per-step cost of this library is producing a string. That is a property of what PROV stores rather than of how it is built: a faster hot path means changing the record format, not the instrumentation.
+**52% of the cost of recording a step is the timestamp — and most of that is formatting it, not measuring it.** One tracked step is 4.97 µs, of which 2.59 µs is `now_iso()`. Reading the clock is 795 ns of that; rendering the result as ISO-8601 text adds 1.42 µs more, 1.8× the reading it formats (paired, ± 105 ns). So the dominant per-step cost of this library is producing a string. That is a property of what PROV stores rather than of how it is built: a faster hot path means changing the record format, not the instrumentation.
 
-**The ergonomic API costs 5.59 µs more per step than the primitives it wraps** (paired, ± 717 ns). Reported because the relative figure looks large and the absolute figure does not: against agent steps measured in milliseconds (E6b) it is noise, and against a tight loop over `record_activity` it is not. Readers who need the latter have the primitives, which remain public.
+**The ergonomic API costs 5.92 µs more per step than the primitives it wraps** (paired, ± 1.33 µs). Reported because the relative figure looks large and the absolute figure does not: against agent steps measured in milliseconds (E6b) it is noise, and against a tight loop over `record_activity` it is not. Readers who need the latter have the primitives, which remain public.
 
-**A typed attribute set is in the same place as the justification.** Adding four `yp:` attributes to a call is 214 ns, also inside the ± 244 ns round-to-round spread. Typing a record is not where the cost of typing a record is.
+**A typed attribute set is in the same place as the justification.** Adding four `yp:` attributes to a call is 507 ns, also inside the ± 1.02 µs round-to-round spread. Typing a record is not where the cost of typing a record is.
 
-**A six-step session costs 62.73 µs** to build in memory — six tracked steps, six entities, and one serialisation. Writing it to disk costs an order of magnitude more (E6b, E6c).
+**A six-step session costs 66.27 µs** to build in memory — six tracked steps, six entities, and one serialisation. Writing it to disk costs an order of magnitude more (E6b, E6c).
 
 ---
 
@@ -63,20 +63,20 @@ Each agent's full step, 30 repetitions per condition, interleaved round-robin so
 
 | Agent | OFF | A | B-TRANS | B | B vs OFF | of which the write | Output |
 |---|--:|--:|--:|--:|--:|--:|--:|
-| CA3 Analytics (heuristic) | 4.20 ms | 4.00 ms | 4.18 ms | 6.35 ms | *in noise* (2.9×) | — | 6,249 B |
-| CA2 Metrics | 126.44 ms | 126.10 ms | 124.24 ms | 123.65 ms | *in noise* (0.5×) | — | 5,133 B |
-| CAx Summariser (computed) | 5.16 ms | 5.14 ms | 5.02 ms | 6.82 ms | *in noise* (2.9×) | — | 5,635 B |
-| MC1 Compliance | 95.70 µs | 87.10 µs | 137.65 µs | 1.67 ms | **+1645%** | 1.53 ms | 3,371 B |
-| MC3 Audit | 91.65 µs | 89.70 µs | 130.90 µs | 1.48 ms | **+1519%** | 1.35 ms | 3,526 B |
-| CA1 Storage (persist path) | 8.31 ms | 8.30 ms | 8.05 ms | 10.22 ms | *in noise* (0.9×) | — | 5,556 B |
+| CA3 Analytics (heuristic) | 2.45 ms | 2.41 ms | 2.60 ms | 3.92 ms | **+60%** | 1.32 ms | 6,250 B |
+| CA2 Metrics | 109.70 ms | 107.54 ms | 105.83 ms | 108.62 ms | *in noise* (0.1×) | — | 5,133 B |
+| CAx Summariser (computed) | 4.73 ms | 4.72 ms | 4.68 ms | 7.94 ms | **+68%** | 3.26 ms | 5,635 B |
+| MC1 Compliance | 109.30 µs | 96.55 µs | 146.90 µs | 1.63 ms | **+1394%** | 1.49 ms | 3,445 B |
+| MC3 Audit | 166.35 µs | 176.65 µs | 239.00 µs | 2.16 ms | **+1199%** | 1.92 ms | 3,526 B |
+| CA1 Storage (persist path) | 5.37 ms | 5.27 ms | 5.41 ms | 7.36 ms | *in noise* (1.5×) | — | 5,556 B |
 
 ### What this says
 
-**Lead with the worst case: MC1 Compliance, at +1645%.** A meta agent's own work is trivial — 95.70 µs — while it still emits a complete typed record, so it carries the highest ratio in the system by construction. A paper that reports its own worst case is worth more than one that reports its best.
+**Lead with the worst case: MC1 Compliance, at +1394%.** A meta agent's own work is trivial — 109.30 µs — while it still emits a complete typed record, so it carries the highest ratio in the system by construction. A paper that reports its own worst case is worth more than one that reports its best.
 
-**But read the decomposition before believing the ratio.** For that same agent, building the record costs 41.95 µs and writing it costs 1.53 ms — **97% of the overhead is one file write**. The same split holds for every agent in the table. Explicit instrumentation is not expensive to compute; persisting its output is, and that is a storage decision a deployment can make differently (E6c).
+**But read the decomposition before believing the ratio.** For that same agent, building the record costs 37.60 µs and writing it costs 1.49 ms — **98% of the overhead is one file write**. The same split holds for every agent in the table. Explicit instrumentation is not expensive to compute; persisting its output is, and that is a storage decision a deployment can make differently (E6c).
 
-**Instrumentation is cheaper than the noise floor of the work it instruments.** 4 of the 6 agents show no resolvable overhead at 30 repetitions — the difference between running them with and without provenance is smaller than their own run-to-run variance. Those rows carry the margin in parentheses: the multiple of the sample dispersion the difference reaches, where **3× is required** before a figure is printed as a result.
+**Instrumentation is cheaper than the noise floor of the work it instruments.** 2 of the 6 agents show no resolvable overhead at 30 repetitions — the difference between running them with and without provenance is smaller than their own run-to-run variance. Those rows carry the margin in parentheses: the multiple of the sample dispersion the difference reaches, where **3× is required** before a figure is printed as a result.
 
 That criterion is stricter than it was, and the correction matters. It used to be *larger than the noise*, which treats any consistent bias as a finding — and a loaded machine supplies plenty. Under the old rule two of these rows reported resolved overheads at margins of 2.9×. They are now reported as what they are. The project's own guard test caught it: on a shared CI runner, timing the **same function twice** produced a 147.5 ns difference against 61.0 ns of noise and called it real.
 
@@ -90,16 +90,16 @@ One six-step record, built and emitted 3,000 times per mode. Measured through `e
 
 | Mode | Time | vs full | Output | vs full | Activities | Entities | Relations | Justifications |
 |---|--:|--:|--:|--:|--:|--:|--:|--:|
-| B-DATA (full) | 742.20 µs | +0.0% | 7,697 B | +0.0% | 6 | 8 | 29 | 6 |
-| B-META (activities only) | 677.85 µs | -8.7% | 4,800 B | -37.6% | 6 | 1 | 11 | 6 |
-| B-TRANS (nothing written) | 69.30 µs | -90.7% | 7,696 B | -0.0% | 6 | 8 | 29 | 6 |
-| B-NOJUST (no justification) | 744.25 µs | +0.3% | 6,029 B | -21.7% | 6 | 8 | 29 | 0 |
+| B-DATA (full) | 655.80 µs | +0.0% | 7,697 B | +0.0% | 6 | 8 | 29 | 6 |
+| B-META (activities only) | 604.80 µs | -7.8% | 4,800 B | -37.6% | 6 | 1 | 11 | 6 |
+| B-TRANS (nothing written) | 70.40 µs | -89.3% | 7,696 B | -0.0% | 6 | 8 | 29 | 6 |
+| B-NOJUST (no justification) | 619.30 µs | -5.6% | 6,029 B | -21.7% | 6 | 8 | 29 | 0 |
 
 ### What this says
 
-**91% of the time cost of emitting a record is writing it to a disk.** TRANSIENT builds the identical document — the byte counts differ by one byte, a timestamp digit — and simply does not hand it to its sink. This is the same finding E6b reaches from the other direction, by two independent measurements.
+**89% of the time cost of emitting a record is writing it to a disk.** TRANSIENT builds the identical document — the byte counts differ by one byte, a timestamp digit — and simply does not hand it to its sink. This is the same finding E6b reaches from the other direction, by two independent measurements.
 
-**METADATA buys 38% fewer bytes for 9% less time.** The saving is in storage, not compute, and it keeps every justification: the lean mode buys less *data*, never less reasoning. A mode that shed justifications would be a different product rather than a cheaper one.
+**METADATA buys 38% fewer bytes for 8% less time.** The saving is in storage, not compute, and it keeps every justification: the lean mode buys less *data*, never less reasoning. A mode that shed justifications would be a different product rather than a cheaper one.
 
 **A justification is 278 bytes, 21.7% of a record.** Together with E6a's compute figure this is the central result of the overhead study: the field the project argues for costs about a fifth of a record's bytes and nothing measurable in time.
 
@@ -111,18 +111,18 @@ A tracker accumulates activities and entities until it emits, and `to_prov_json(
 
 | Activities | Build | `to_prov_json()` | Output | Peak memory | Relations |
 |---|--:|--:|--:|--:|--:|
-| 10 | 80.65 µs | 47.85 µs | 10 KiB | 0.0 MiB | 49 |
-| 100 | 746.80 µs | 492.70 µs | 90 KiB | 0.1 MiB | 499 |
-| 1,000 | 8.09 ms | 5.96 ms | 903 KiB | 1.2 MiB | 4,999 |
-| 10,000 | 130.78 ms | 116.17 ms | 9,200 KiB | 13.4 MiB | 49,999 |
+| 10 | 73.10 µs | 48.60 µs | 10 KiB | 0.0 MiB | 49 |
+| 100 | 769.70 µs | 522.30 µs | 90 KiB | 0.1 MiB | 499 |
+| 1,000 | 9.79 ms | 11.09 ms | 903 KiB | 1.2 MiB | 4,999 |
+| 10,000 | 133.51 ms | 105.43 ms | 9,200 KiB | 13.4 MiB | 49,999 |
 
 Fitted exponents (`cost ≈ k · size^b`, least squares on log-log axes):
 
 | Quantity | Exponent | Reading |
 |---|--:|---|
-| `build` | 1.066 | linear |
-| `to_prov_json` | 1.124 | linear |
-| `peak_memory` | 1.034 | linear |
+| `build` | 1.089 | linear |
+| `to_prov_json` | 1.134 | linear |
+| `peak_memory` | 1.036 | linear |
 | `output_bytes` | 0.993 | linear |
 
 ### What this says
@@ -141,16 +141,16 @@ The whole six-agent demonstrator, end to end, 3 runs per condition, each in a fr
 
 | Condition | Wall clock | Records/s | Documents written | Bytes written |
 |---|--:|--:|--:|--:|
-| OFF | 6.35 s | 0.31 | 0 | 0.0 KiB |
-| A | 6.26 s | 0.32 | 0 | 0.0 KiB |
-| B-TRANS | 6.43 s | 0.31 | 0 | 0.0 KiB |
-| B | 6.23 s | 0.32 | 24 | 127.2 KiB |
+| OFF | 5.49 s | 0.36 | 0 | 0.0 KiB |
+| A | 5.38 s | 0.37 | 0 | 0.0 KiB |
+| B-TRANS | 5.37 s | 0.37 | 0 | 0.0 KiB |
+| B | 5.38 s | 0.37 | 24 | 127.5 KiB |
 
 ### What this says
 
-**The time figure is -1.8%, and that is the honest result.** The run is dominated by a fixed 2-second persist window and by process start-up, both identical under every condition, so a few milliseconds of instrumentation across 24 records cannot be resolved at this scale.
+**The time figure is **inside the noise**, and that is the honest result.** The run is dominated by a fixed 2-second persist window and by process start-up, both identical under every condition, so a few milliseconds of instrumentation across 24 records cannot be resolved at this scale.
 
-**The useful figure here is bytes, not seconds.** Condition B writes 24 documents totalling 127.2 KiB for 2 input records — **63.6 KiB of provenance per record processed**. That is the systems-level cost of this design, and it is a storage and bus cost.
+**The useful figure here is bytes, not seconds.** Condition B writes 24 documents totalling 127.5 KiB for 2 input records — **63.8 KiB of provenance per record processed**. That is the systems-level cost of this design, and it is a storage and bus cost.
 
 **Two confounds to state in the paper.** The bus awaits each handler inline in subscription order, so this is a sequential sum rather than a throughput measurement — any claim about pipeline throughput needs the NATS path. And the persist window is an architectural delay, not work; it is held constant here precisely so it cancels.
 
@@ -162,27 +162,27 @@ The whole study, run twice on the same machine on separate occasions. **This tab
 
 | Figure | Occasion 1 | Occasion 2 | Change |
 |---|--:|--:|--:|
-| One tracked step | 3.57 µs | 4.49 µs | +25.7% |
-| Six-step session | 52.13 µs | 62.73 µs | +20.3% |
+| One tracked step | 4.49 µs | 4.97 µs | +10.9% |
+| Six-step session | 62.73 µs | 66.27 µs | +5.6% |
 | Bytes per justification | 278 | 278 | +0.0% |
 | METADATA output | 4,800 | 4,800 | +0.0% |
-| Exponent: building a record | 1.077 | 1.066 | -1.0% |
-| Exponent: `to_prov_json()` | 1.148 | 1.124 | -2.1% |
+| Exponent: building a record | 1.066 | 1.089 | +2.1% |
+| Exponent: `to_prov_json()` | 1.124 | 1.134 | +0.9% |
 
 | Agent | Occasion 1 | Occasion 2 |
 |---|--:|--:|
-| CA3 Analytics (heuristic) | *in noise* | *in noise* |
+| CA3 Analytics (heuristic) | *in noise* | +60% |
 | CA2 Metrics | *in noise* | *in noise* |
-| CAx Summariser (computed) | +35% | *in noise* |
-| MC1 Compliance | +1569% | +1645% |
-| MC3 Audit | +1439% | +1519% |
+| CAx Summariser (computed) | *in noise* | +68% |
+| MC1 Compliance | +1645% | +1394% |
+| MC3 Audit | +1519% | +1199% |
 | CA1 Storage (persist path) | *in noise* | *in noise* |
 
 Judged under the criterion in force now — a difference must reach 3× the dispersion of its samples — applied to the stored measurements rather than to the verdicts those files were written with.
 
 ### What this says
 
-**The absolute timings do not transfer, and the document should not be read as though they do.** 2 of the figures above moved by more than 10% between occasions — the largest by 26% — on the same machine, with the same code, under the same conditions. This is a four-core laptop with other processes on it; a quiet server would be tighter, and the reader's machine is neither.
+**The absolute timings do not transfer, and the document should not be read as though they do.** 1 of the figures above moved by more than 10% between occasions — the largest by 11% — on the same machine, with the same code, under the same conditions. This is a four-core laptop with other processes on it; a quiet server would be tighter, and the reader's machine is neither.
 
 **The byte counts are exact.** 2 figures were identical to the byte across occasions. Output size is deterministic given the record, which is why E6c's conclusion — a justification is 278 bytes and 21.7% of a record — is the firmest number in the study and the one to quote.
 

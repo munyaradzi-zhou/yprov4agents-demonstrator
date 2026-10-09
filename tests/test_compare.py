@@ -22,7 +22,7 @@ import pytest
 
 from eval.compare import compare_document, compare_runs, main, reduce_document
 
-REFERENCE = Path("experiments/verdict-reachability/example_0__ca1_prov.json")
+REFERENCE = Path("experiments/audit-reference/example_0__ca1_prov.json")
 
 Doc = dict[str, Any]
 

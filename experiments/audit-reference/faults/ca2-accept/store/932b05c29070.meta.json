@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-932b05c29070",
+  "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/ref/faults/ca2-accept/store/932b05c29070.txt",
+  "yp:contentHash": "sha256:932b05c29070dc8f45b6cc1c481ff0b4b761fd0bffbc70c87f1fc520492791ba",
+  "size_bytes": 96,
+  "kind": "chart",
+  "preview": "C:/Users/HP/Desktop/yprov4agents-demonstrator/out/ref/faults/ca2-accept/charts/fault_metrics.png",
+  "created_at": "2026-10-09T17:50:58.639788+00:00"
+}

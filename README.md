@@ -102,7 +102,7 @@ Reflexion* {S4,S5,S6}. ★ is the step that carries `yp:justification`.
 
 **Every verdict in that table has been observed in an archived run** — twelve of twelve,
 six from the ordinary pipeline and six from seven injected faults under
-`experiments/verdict-reachability`. A verdict that has never fired is a claim rather than a
+`experiments/audit-reference`. A verdict that has never fired is a claim rather than a
 result, which is why the distinction is tracked: this table used to credit CAx with an
 `ESCALATE` it cannot emit and MC3 with no verdict at all when it emits two (review finding
 A3).
@@ -118,9 +118,8 @@ be lost. Each envelope is numbered, and an agent whose input arrives with a gap 
 missing sequence numbers as its decision instead of processing the part that did arrive —
 which would produce a well-formed record about an input it never fully saw. The check lives
 in the base class all six agents share, so one fault scenario (`stream-gap`) exercises it
-for all of them. That scenario and CA1's `incomplete-input` path are observed by the fault
-suite in CI, and join `experiments/verdict-reachability` when the reference archives are
-next re-frozen (`todo.md` AU8). Reproduce any of it with
+for all of them. That scenario and CA1's `incomplete-input` path are observed in
+`experiments/audit-reference` and re-checked by the fault suite in CI. Reproduce any of it with
 `python -m eval.fault_injection --all`.
 
 **CA3 is an analytics agent, not an anomaly detector.** It applies a *set* of algorithms

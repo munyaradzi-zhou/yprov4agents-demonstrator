@@ -129,10 +129,13 @@ jobs:
       # the overhead study found were performance defects, and the records they produce are
       # byte-identical before and after — which the gate is what establishes. Phase 6
       # adds exactly one declared attribute: MC1 cites the standard it checked against.
+      # The audit fixes (docs/AUDIT.md) changed no record of the reference run, and the gate
+      # now compares lineage edges rather than relation counts; the reference is the archive
+      # frozen from a clean commit after them.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/verdict-reachability \
+            --before experiments/audit-reference \
             --after out \
             --strict
 
