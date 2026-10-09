@@ -137,9 +137,16 @@ def test_the_vocabulary_defines_nothing_the_demonstrator_cannot_emit(
     the demonstrator never emits, and terms it emits only on a path the reference run does
     not take.
     """
+    faults = prov_dir / "faults"
+    if not faults.is_dir():
+        pytest.fail(
+            f"no fault scenarios under {faults}: several terms are emitted only on the paths "
+            f"they provoke. Run `python -m eval.fault_injection --all --out-dir {faults}` "
+            f"first, or point --prov-dir at an archive that carries them."
+        )
     fault_records = [
         json.loads(path.read_text(encoding="utf-8"))
-        for path in sorted((prov_dir / "faults").rglob("*_prov.json"))
+        for path in sorted(faults.rglob("*_prov.json"))
     ]
     emitted = _emitted_terms([doc for _, doc in prov_documents] + fault_records)
 

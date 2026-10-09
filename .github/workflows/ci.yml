@@ -139,6 +139,14 @@ jobs:
             --after out \
             --strict
 
+      # Every verdict the README advertises must still be reachable. Each fault goes into
+      # the input or the environment, never into the check being tested, so this measures
+      # the agents rather than the harness. It runs before the conformance suite because
+      # that suite counts the terms the fault scenarios emit — the off-path ones, such as
+      # yp:escalation_reason and yp:envelopes_missing, appear nowhere else.
+      - name: Provoke every alternative verdict
+        run: uv run python -m eval.fault_injection --all --out-dir out/faults
+
       - name: Run the conformance suite against freshly emitted provenance
         run: uv run pytest -v -m conformance --prov-dir out
 
@@ -147,12 +155,6 @@ jobs:
       # standard rather than a self-report by the agent that enforces it.
       - name: Validate the emitted records against vocab/shapes.ttl
         run: uv run python -m eval.validate_shapes --prov-dir out
-
-      # Every verdict the README advertises must still be reachable. Each fault goes into
-      # the input or the environment, never into the check being tested, so this measures
-      # the agents rather than the harness.
-      - name: Provoke every alternative verdict
-        run: uv run python -m eval.fault_injection --all --out-dir out/faults
 
       - uses: actions/upload-artifact@v4
         if: always()
