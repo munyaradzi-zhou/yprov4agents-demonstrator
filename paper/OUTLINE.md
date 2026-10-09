@@ -644,6 +644,52 @@ zero; the resolvability-criterion correction; the fabricated-lineage disclosure;
 justification-quality limitation. Each of them is a place where the paper concedes
 something a reviewer would otherwise find, and that is what the concessions are for.
 
+### After the cut: measured, and what remains
+
+Two passes took the draft from 7,900 to **5,814 words**, entirely by compressing prose and
+dropping redundant tables (the per-agent coverage table and the relation-split table became
+prose; the energy table moved into §8 as a clause). Nine tables became five.
+
+| § | Before | After | Target |
+|---|--:|--:|--:|
+| 1 Introduction | 568 | 483 | 400 |
+| 2 Background | 326 | 227 | 180 |
+| 3 Related work | 245 | 222 | 190 |
+| 4 Vocabulary | 594 | 480 | 330 |
+| 5 Instrumentation | 736 | 512 | 420 |
+| 6 Demonstrator | 953 | 571 | 400 |
+| **7 Evaluation** | **3,391** | **2,240** | **1,250** |
+| 8 Limitations | 673 | 572 | 400 |
+| 9 Conclusion | 401 | 388 | 300 |
+
+**Prose compression is now exhausted, and the budget is ~3,300 not 4,000.** Six IEEE pages
+hold roughly 5,700 words of pure text; subtract ~0.4 page of title block, ~0.5 page of
+references, ~1 page for four figures and ~0.7 page for five tables. So about 2,500 words
+still have to go, and they can only come out of *results*. Ranked by what each costs:
+
+1. **Drop the energy paragraph entirely** (§8, ~110 w). Already reduced from a full
+   subsection to a limitation. It is a real contribution and the only one not about
+   provenance capture; it would carry a short note of its own. **Recommended first.**
+2. **Cut §7.1 conformance to one sentence** (~113 → 40 w) and delete its table. "A single
+   non-standard key made a conforming parser reject all 24 documents; after the fix, 24 of
+   24 are accepted, judged by the reference `prov` library." The table's second row (PID
+   dereferencing) moves to §7.2 as a clause.
+3. **Cut §7.8 reachability to its two load-bearing claims** (~288 → 120 w): twelve of twelve
+   observed, and `mc1:FAIL` unreachable from this library's own records. The
+   finding-about-the-input paragraph is excellent and expendable.
+4. **Halve §7.7's transfer and confound paragraphs** (~330 → 160 w), keeping the one-sentence
+   rule and the criterion correction, and moving the rest to the artifact.
+5. **Fold §7.6 self-application into §6.1** (~61 w saved as a clause).
+6. **Compress §4 and §5 by a third** (~330 w): the class enumeration becomes a figure
+   reference, and §5.1's prose around the code block carries more weight than it earns.
+7. **Last resort, and only if a page is still over:** merge §7.5's worked example into §7.4
+   as a single quoted pair. It is the paper's best evidence for C1, so it goes last.
+
+Items 1–6 total roughly 1,400 words, which lands near 4,400 — still over. The honest
+conclusion is that **either the figure count drops from four to three, or the paper targets a
+venue with more pages.** Figure 2 (the two escalations) is the one whose argument §7.5 already
+makes in prose, so it is the cheapest of the four to lose.
+
 **A4 is resolved, by deciding the claim rather than the code.** Reflexivity in a run is
 one level deep: the operational agents are governed and the governance layer is not.
 Contribution C2 carries that qualifier, and the reason is termination — an agent that
