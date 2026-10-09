@@ -54,7 +54,7 @@ Homepage = "https://github.com/HPCI-Lab/yprov4agenticai"
 
 [tool.hatch.build.targets.wheel]
 # Three distributable packages: the instrumentation core, the agent runtime, the harness.
-packages = ["yprov4agenticai", "runtime", "eval"]
+packages = ["yprov4agenticai", "runtime", "eval", "paper"]
 
 [tool.uv]
 # Use the operating system certificate store rather than the bundled roots. Required on
