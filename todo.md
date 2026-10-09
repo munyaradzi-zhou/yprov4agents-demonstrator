@@ -55,8 +55,8 @@ against those archives. Energy (PR #11) is parked by decision.
 **Code**
 - [x] **AU1** — `eval.compare` gate compares relation counts, not endpoints; rewired lineage passes `--strict` *(audit [1])*
 - [x] **AU2** — `sequence_no` never checked; a lost chunk becomes a well-formed record of a truncated input *(audit [3])*
-- [ ] **AU3** — MC1: typed-literal whitespace justification passes; `typed-activities` never checks a type; namespace URIs unchecked *(audit [5])*
-- [ ] **AU4** — SHACL shapes accept a record with no decision; add an existence constraint *(audit [6])*
+- [x] **AU3** — MC1: typed-literal whitespace justification passes; `typed-activities` never checks a type; namespace URIs unchecked *(audit [5])*
+- [x] **AU4** — SHACL shapes accept a record with no decision; add an existence constraint *(audit [6])*
 - [ ] **AU5** — LLM records the alias `gpt-4o`, not the resolved snapshot or `system_fingerprint` *(audit [7])*
 - [ ] **AU6** — CA1 silently drops a repeated session; session id is per folder, so per-rank files would collide *(audit [8])*
 - [ ] **AU7** — `freeze` reads git status after copying, so every manifest says `dirty: true`; no record of what changed *(audit [4])*
@@ -66,7 +66,7 @@ against those archives. Energy (PR #11) is parked by decision.
 
 **Paper**
 - [ ] **AU9** — *also update §6.6: the verdict matrix gained INCOMPLETE (shared) and a third CA1 escalation path, so "twelve of twelve" needs restating after AU8.* The headline "0 of 24" is a verbatim test; 16 of 24 are meta-agent restatements. Narrow to the decision rule over the 8 operational decisions *(audit [2])*
-- [ ] **AU10** — "a rule written once in one place" is not true; reword §3 *(audit [9])*
+- [ ] **AU10** — "a rule written once in one place" is not true; reword §3. *Also: the shapes are now 16 named constraints, not 14, and MC1 deliberately requires a decision's type to be stated where the shapes infer it — say so.* *(audit [9])*
 
 **Coverage**
 - [ ] **AU11** — the NATS/container path never runs in CI; add a compose-backed job *(audit [10])*

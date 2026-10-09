@@ -127,8 +127,15 @@ committed code. `eval/archive.py` has **0% test coverage**, which is how this su
 | record | MC1 (runtime) | SHACL (the "external judge") |
 |---|---|---|
 | justification written as a PROV-JSON typed literal of whitespace, `{"$": " ", "type": "xsd:string"}` | **passes** | rejects |
-| every activity untyped, or typed with a non-existent class | **passes** | **conforms** |
+| a step untyped, or typed with a non-existent class | **passes** | **conforms** |
 | `yp` prefix bound to the wrong namespace | **passes** | — |
+
+> **Corrected while fixing it.** An earlier version of this table also listed "a decision
+> loses its `prov:type`" as conforming to the shapes, as evidence for [6]. That was a bad
+> test, not a finding: the ontology gives `yp:justification` the domain
+> `yp:DecisionActivity`, so under RDFS inference a node carrying a justification *is* a
+> decision, and the shapes were right to accept it. MC1, which has no reasoner, now
+> rejects that record — a deliberate difference, pinned by a test rather than hidden.
 
 The first row reintroduces the whitespace defect the paper says was found and fixed, through
 the standard PROV-JSON encoding for typed literals — the encoding third-party tools emit, and
@@ -143,9 +150,13 @@ where they actually differ.
 
 ### [6] The shapes accept a record with no decision in it *(proven)*
 
-**What happens.** Removing `prov:type` from the decision activity means it is no longer a
-decision, so no shape targets it — and the record **conforms**. "24 of 24 records satisfy the
-published shapes" would remain true of a pipeline that recorded no decisions at all.
+**What happens.** Every shape targets a class, so it is silent when no node of that class
+exists. Deleting the decision activity outright — the node and the relations that mention
+it — leaves a record that **conforms** under the shapes as published. "24 of 24 records
+satisfy the published shapes" would remain true of a pipeline that recorded no decisions
+at all. *(The first version of this finding demonstrated it by removing the decision's
+`prov:type`. That was the wrong test — see the correction under [5] — and the finding was
+re-established by deletion before it was fixed.)*
 
 **Fix.** Add an existence constraint: target the agent and require at least one
 `yp:DecisionActivity` via an inverse-path qualified count (`sh:qualifiedMinCount 1`). MC1's

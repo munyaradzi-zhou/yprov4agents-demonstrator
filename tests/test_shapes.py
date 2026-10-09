@@ -172,6 +172,39 @@ def test_every_emitted_record_conforms(prov_dir: Path) -> None:
 
 
 # ── the shapes have teeth ─────────────────────────────────────────────────────────
+def _decision_id(d: dict[str, Any]) -> str:
+    return next(a for a, n in d["activity"].items() if "yp:justification" in n)
+
+
+def _other_step_id(d: dict[str, Any]) -> str:
+    decision = _decision_id(d)
+    return next(a for a in d["activity"] if a != decision)
+
+
+def _delete_decision(d: dict[str, Any]) -> None:
+    """Remove the decision and every relation that mentions it."""
+    decision = _decision_id(d)
+    d["activity"].pop(decision)
+    for relation in ("used", "wasGeneratedBy", "wasInformedBy", "wasAssociatedWith"):
+        for rid in [r for r, e in (d.get(relation) or {}).items() if decision in e.values()]:
+            d[relation].pop(rid)
+
+
+def _untype_a_step(d: dict[str, Any]) -> None:
+    d["activity"][_other_step_id(d)].pop("prov:type")
+
+
+def _mistype_a_step(d: dict[str, Any]) -> None:
+    d["activity"][_other_step_id(d)]["prov:type"] = {
+        "$": "yp:NotARealClass",
+        "type": "prov:QUALIFIED_NAME",
+    }
+
+
+def _typed_literal_whitespace(d: dict[str, Any]) -> None:
+    d["activity"][_decision_id(d)]["yp:justification"] = {"$": "   ", "type": "xsd:string"}
+
+
 def _caught(document: dict[str, Any]) -> bool:
     from eval.validate_shapes import _to_rdf, validate_document
 
@@ -218,6 +251,10 @@ def _caught(document: dict[str, Any]) -> bool:
             "a pointer with no content hash",
             lambda d: [e.pop("yp:contentHash", None) for e in d["entity"].values()],
         ),
+        ("a record with its decision deleted", _delete_decision),
+        ("an activity with no type", _untype_a_step),
+        ("an activity typed with a class that does not exist", _mistype_a_step),
+        ("a typed-literal justification of only whitespace", _typed_literal_whitespace),
         (
             "a content hash that is not a sha-256",
             lambda d: [
@@ -254,13 +291,26 @@ def test_the_shapes_and_the_compliance_agent_agree(
 
     MC1 enforces four named checks in Python; ``shapes.ttl`` declares them in SHACL. Where
     they disagree, one of them is wrong — and until this test existed there was no way to
-    ask. Run over a record and over mutations of it, both must reach the same verdict on
-    the thing they both check: that every decision carries a non-empty justification.
+    ask. Run over a record and over mutations of it, both must reach the same verdict.
+
+    It originally covered only a missing or blank justification, and the two agreed there
+    while disagreeing elsewhere: MC1 passed an untyped step, a misspelled type, a ``yp``
+    prefix bound to the wrong namespace and a typed-literal justification of whitespace,
+    and the shapes passed a record with no decision at all (docs/AUDIT.md, [5] and [6]).
+    Every one of those is now a row here.
     """
     _skip_without_rdf_tooling()
     from runtime.agents.mc1_compliance import MC1Compliance
 
+    def wrong_namespace(d: dict[str, Any]) -> None:
+        d["prefix"]["yp"] = "http://example.org/not-yprov4agents#"
+
     mutations: list[tuple[str, Any]] = [
+        ("a record with its decision deleted", _delete_decision),
+        ("an activity with no type", _untype_a_step),
+        ("an activity typed with a class that does not exist", _mistype_a_step),
+        ("a typed-literal justification of only whitespace", _typed_literal_whitespace),
+        ("the yp prefix bound to the wrong namespace", wrong_namespace),
         ("unmodified", lambda d: None),
         (
             "justification removed",
@@ -287,6 +337,46 @@ def test_the_shapes_and_the_compliance_agent_agree(
             f"{'reject' if shapes_reject else 'accept'} — one of the two statements of "
             f"this standard is wrong"
         )
+
+
+def test_the_one_place_the_agent_is_deliberately_stricter_than_the_shapes(
+    conforming_record: dict[str, Any],
+) -> None:
+    """A decision that keeps its justification but loses its stated type.
+
+    The ontology gives ``yp:justification`` the domain ``yp:DecisionActivity``, so under
+    RDFS inference anything carrying a justification *is* a decision, and the shapes accept
+    the record. MC1 has no reasoner and neither do most PROV-JSON consumers, so it requires
+    the type to be stated. That is a real difference between the two statements of the
+    standard, and it is kept on purpose — so it is pinned here rather than left to be
+    rediscovered. If either side changes, this test says so.
+    """
+    _skip_without_rdf_tooling()
+    from runtime.agents.mc1_compliance import MC1Compliance
+
+    candidate = copy.deepcopy(conforming_record)
+    candidate["activity"][_decision_id(candidate)].pop("prov:type")
+
+    failures, _ = MC1Compliance._check(candidate)
+    assert failures, "MC1 must require a decision's type to be stated"
+    assert not _caught(candidate), "the shapes infer the type from yp:justification's domain"
+
+
+def test_the_agents_list_of_lifecycle_types_is_the_ontologys() -> None:
+    """MC1 carries a copy of the lifecycle classes, because its container has no RDF
+    toolchain. A copy can drift; this derives the set from the ontology and compares."""
+    _skip_without_rdf_tooling()
+    import rdflib
+    from rdflib.namespace import RDFS
+
+    from runtime.agents.mc1_compliance import LIFECYCLE_ACTIVITY_TYPES
+
+    graph = rdflib.Graph().parse(ONTOLOGY, format="turtle")
+    yp = rdflib.Namespace("http://hpci-lab.org/yProv4Agents#")
+    root = yp.AgentLifecycleActivity
+    subclasses = set(graph.transitive_subjects(RDFS.subClassOf, root)) - {root}
+    from_ontology = {"yp:" + str(cls).split("#", 1)[1] for cls in subclasses}
+    assert from_ontology == LIFECYCLE_ACTIVITY_TYPES
 
 
 def test_the_shapes_file_is_referenced_by_the_compliance_agent() -> None:

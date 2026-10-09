@@ -44,9 +44,9 @@ from ..util import agent_tracker
 #: process, without an RDF toolchain in the agent's container. ``eval.validate_shapes``
 #: applies the full set offline.
 CHECK_NAMES = (
-    "namespace-declarations",  # not a shape: PROV-JSON prefixes, lost in RDF conversion
-    "typed-activities",  # yp:ActivityShape, in aggregate
-    "decision-present",  # not a shape: SHACL cannot require a node to exist
+    "namespace-declarations",  # not a shape: PROV-JSON prefixes, resolved in conversion
+    "typed-activities",  # yp:TypedActivityShape / activity-typed
+    "decision-present",  # yp:AgentDecidedShape / decision-present
     "decision-justified",  # yp:DecisionShape / decision-justified
 )
 
@@ -54,16 +54,58 @@ CHECK_NAMES = (
 #: verdict can find the shapes it was reached against.
 SHAPES_REFERENCE = "vocab/shapes.ttl"
 
+#: The namespaces a record's two prefixes must be bound to. Checking only that the prefix
+#: *names* exist accepted a record whose ``yp`` was bound to some other vocabulary, in which
+#: ``yp:DecisionActivity`` means something else entirely.
+NAMESPACES = {
+    "prov": "http://www.w3.org/ns/prov#",
+    "yp": "http://hpci-lab.org/yProv4Agents#",
+}
+
+#: Every subclass of ``yp:AgentLifecycleActivity`` in ``vocab/yprov4agents.ttl``.
+#:
+#: A copy, because this agent checks records without an RDF toolchain in its container — and
+#: a copy can drift, so ``tests/test_shapes.py`` derives the same set from the ontology and
+#: fails if the two differ. ``typed-activities`` used to test only that the activity table
+#: was non-empty, so a record whose steps carried no type at all passed a check named for
+#: typing.
+LIFECYCLE_ACTIVITY_TYPES = frozenset(
+    {
+        "yp:AnalysisActivity",
+        "yp:AuditActivity",
+        "yp:ComplianceCheckActivity",
+        "yp:DecisionActivity",
+        "yp:GovernanceActivity",
+        "yp:ObservationActivity",
+        "yp:PersistActivity",
+        "yp:PlanningActivity",
+        "yp:ReceiveTaskActivity",
+        "yp:ResponseActivity",
+        "yp:ToolCallActivity",
+    }
+)
+
 
 def _iter_activities(doc: dict[str, Any]) -> Iterator[tuple[str, dict[str, Any]]]:
     yield from (doc.get("activity") or {}).items()
 
 
+def _literal(value: Any) -> str:
+    """The text of an attribute value, whether plain or a PROV-JSON typed literal.
+
+    PROV-JSON may write a string either plainly or as ``{"$": "text", "type": "xsd:string"}``,
+    and tools other than this library commonly use the second form. Taking ``str()`` of that
+    dictionary is never empty, so a typed literal of pure whitespace passed the
+    justification check — reintroducing, through an encoding, the defect the shapes were
+    declared to catch.
+    """
+    if isinstance(value, dict):
+        return str(value.get("$", ""))
+    return "" if value is None else str(value)
+
+
 def _type_of(a: dict[str, Any]) -> str:
-    t = a.get("prov:type")
-    if isinstance(t, dict):
-        return str(t.get("$", ""))
-    return str(t or "")
+    return _literal(a.get("prov:type"))
 
 
 class MC1Compliance(StreamingAgent):
@@ -86,8 +128,25 @@ class MC1Compliance(StreamingAgent):
         prefix = doc.get("prefix", {})
         if "prov" not in prefix or "yp" not in prefix:
             failures.append("prefix missing prov/yp declarations")
-        if not doc.get("activity"):
+        else:
+            wrong = sorted(n for n, uri in NAMESPACES.items() if prefix.get(n) != uri)
+            if wrong:
+                failures.append(f"prefix bound to the wrong namespace: {', '.join(wrong)}")
+
+        activities = dict(_iter_activities(doc))
+        if not activities:
             failures.append("no typed activities")
+        else:
+            untyped = sorted(
+                aid
+                for aid, a in activities.items()
+                if _type_of(a) not in LIFECYCLE_ACTIVITY_TYPES
+            )
+            if untyped:
+                failures.append(
+                    f"{len(untyped)} activit{'y' if len(untyped) == 1 else 'ies'} without a "
+                    f"lifecycle type"
+                )
 
         decisions = [
             (aid, a) for aid, a in _iter_activities(doc) if _type_of(a) == "yp:DecisionActivity"
@@ -98,7 +157,7 @@ class MC1Compliance(StreamingAgent):
             # Stripped, because whitespace is not a justification. The shape's
             # sh:pattern "\S" says the same thing, and this line used to disagree with it.
             missing = [
-                aid for aid, a in decisions if not str(a.get("yp:justification", "")).strip()
+                aid for aid, a in decisions if not _literal(a.get("yp:justification")).strip()
             ]
             if missing:
                 failures.append(f"{len(missing)} decision(s) without yp:justification")
