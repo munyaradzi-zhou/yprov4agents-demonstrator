@@ -149,9 +149,12 @@ def render_micro(data: dict[str, Any]) -> list[str]:
     lines += [
         f"**Recording the headline field costs {verdict}.** `yp:justification` is the thing "
         f"this project argues for, and attaching one to a `record_activity()` call is a "
-        f"dictionary insertion of a string that already exists. Set that against "
-        f"**{derived['bytes_per_justification']} bytes** of output per justification (E6c "
-        f"measures the share of a record it occupies). The trade is **storage for "
+        f"dictionary insertion of a string that already exists. Set that against the "
+        f"storage: the justification used here is "
+        f"**{derived['bytes_per_justification']} bytes** of text, and what it costs a "
+        f"*serialised record* — more, once the key, the quoting and the escaping are "
+        f"counted — is measured in E6c, which is the figure to quote. The trade is "
+        f"**storage for "
         f"explainability, not speed for explainability** — a far more defensible claim "
         f'than "it is free", and the one the data supports.',
         "",

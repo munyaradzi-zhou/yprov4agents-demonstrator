@@ -408,6 +408,11 @@ def _derived_micro_figures(
         "clock_read_alone_ns": clock_read,
         "formatting_over_clock_read": formatting.delta_ns / clock_read if clock_read else None,
         "cost_of_a_six_step_session_ns": session,
+        # The justification *text*, not what it costs a record. The modes level reports a
+        # key of the same name meaning the latter — key, quoting and escaping included —
+        # and that is the larger, quotable figure. Two measurements, one name; the report
+        # distinguishes them in prose rather than renaming a key that archived results
+        # already carry.
         "bytes_per_justification": len(SAMPLE_JUSTIFICATION.encode("utf-8")),
     }
 

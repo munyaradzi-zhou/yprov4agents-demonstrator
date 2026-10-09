@@ -594,8 +594,55 @@ more honest and more persuasive than drawing it as uniformly poor.
    the ontology and the SHACL shapes, so contribution C3 has an artifact a reader can
    download, validate against, and disagree with.
 6. ~~Render the figures~~ — **done**: four, from `python -m paper.figures`.
-   §1–§5 drafted in `paper/DRAFT.md` (~2,500 words); §6–§9 remain.
-7. Decide authorship and venue date with Sandro.
+7. ~~Draft the paper~~ — **done**: `paper/DRAFT.md` carries §1–§9. It is **roughly twice
+   the page budget**, deliberately; see the cut plan below.
+8. Decide authorship and venue date with Sandro.
+
+---
+
+## The cut: 7,900 words into 6 pages
+
+A full draft is the right thing to over-write and the wrong thing to submit. Measured per
+section, with four figures and nine tables also competing for the space:
+
+| § | Words | Verdict |
+|---|--:|---|
+| 1 Introduction | 568 | keep; it carries the three contributions |
+| 2 Background | 326 | cut to ~200 — PROV needs two sentences for this venue, not six |
+| 3 Related work | 245 | keep, possibly grow: the non-identifiability result is load-bearing |
+| 4 Vocabulary | 594 | cut to ~400; the class list becomes a figure or a table |
+| 5 Instrumentation | 736 | keep ~600; §5.4 folds into §6 |
+| **6 Demonstrator** | **953** | **cut to ~500** — the agent table and the ASCII topology do the work; §6.2 and §6.5 compress to a paragraph each |
+| **7 Evaluation** | **3,391** | **cut to ~1,400.** This is where the paper is won or lost |
+| 8 Limitations | 673 | cut to ~450 by merging the two resource bounds and the two scope limits |
+| 9 Conclusion | 401 | keep ~350 |
+
+**The evaluation is the whole problem, and the order of sacrifice should be deliberate.**
+Ranked by what each result buys against what it costs in space:
+
+1. **Keep whole.** E3 (§7.4) and the worked example (§7.5) — this is C1, and the earned
+   zero is the paper. E6's headline and decomposition (§7.8). E2's declared-standard
+   result and the whitespace defect (§7.3).
+2. **Keep, compressed to two or three sentences.** E0 conformance (§7.1) — the 0-of-24
+   inversion is one striking sentence, not five. E1b's relation split (§7.2) — keep the
+   228-not-324 point and drop the table. E4 self-application (§7.6). E5's reachability
+   matrix (§7.10) — keep the 12-of-12 figure, the `mc1:FAIL`-as-a-property paragraph, and
+   cut the seven-row table to prose.
+3. **Candidates for an appendix or a companion report.** §7.9 (which figures transfer) is
+   methodologically the most honest thing in the paper and the most expensive per word;
+   reduce to the one-sentence rule — *quote the bytes, the complexity class and the
+   verdicts* — plus a pointer to `docs/E6_RESULTS.md`. The scaling sweep and the two
+   library defects go the same way: one sentence each, details in the artifact.
+4. **Cut first if a page is still over.** The energy negative result (§7.7, second half).
+   It is a genuine contribution and it is also the only result that is not about
+   provenance capture; it would carry a short workshop note of its own. Model provenance
+   (§7.7, first half) stays, compressed to the attribute list and the prompt-registry
+   lesson.
+
+**Do not cut, under any pressure:** the four zeros that were wrong and are now one earned
+zero; the resolvability-criterion correction; the fabricated-lineage disclosure; the
+justification-quality limitation. Each of them is a place where the paper concedes
+something a reviewer would otherwise find, and that is what the concessions are for.
 
 **A4 is resolved, by deciding the claim rather than the code.** Reflexivity in a run is
 one level deep: the operational agents are governed and the governance layer is not.
