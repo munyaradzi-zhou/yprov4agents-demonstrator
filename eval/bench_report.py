@@ -14,10 +14,14 @@ only way a results document stays true after the third revision.
 from __future__ import annotations
 
 import argparse
+import statistics
 from pathlib import Path
 from typing import Any
 
 from eval.bench_support import RESOLVE_MULTIPLE, read_results
+
+#: The conditions that do work, as opposed to E7's IDLE.
+CONDITIONS_TIMED = ("OFF", "A", "B-TRANS", "B")
 
 #: Operations whose median is reported in E6a, in the order the paper reads them.
 E6A_ROWS = (
@@ -603,12 +607,114 @@ def render_stability(first: Path, second: Path) -> list[str]:
     return lines
 
 
+def render_energy(data: dict[str, Any]) -> list[str]:
+    """E7: per-session energy under each condition, CPU and RAM labelled separately."""
+    source, summary = data["source"], data["summary"]
+    rows = summary["conditions"]
+    idle_s = statistics.median(w["duration_s"] for w in data["windows"]["IDLE"])
+    work_s = statistics.median(
+        w["duration_s"] for name in CONDITIONS_TIMED for w in data["windows"][name]
+    )
+    lines = [
+        "## E7 — Energy *(whole sessions)*",
+        "",
+        f"{data['rounds']} rounds; each round runs every condition for "
+        f"{data['sessions_per_window']} whole six-agent sessions (a median {work_s:.0f} s "
+        f"window), plus an IDLE window of {idle_s:.0f} s, interleaved with the starting "
+        f"condition rotated, after one whole round recorded and excluded as a warm-up. "
+        f"Energy is read from "
+        f"codecarbon {source['codecarbon']}'s cumulative counters at each window's edges, "
+        f"sampling every {source['sampling_period_s']:g} s.",
+        "",
+        "| Component | Interface | Source | What it covers |",
+        "|---|---|---|---|",
+        f"| CPU | `{source['cpu_interface']}` | **{source['cpu_source']}** | "
+        f"{source['cpu_scope']} |",
+        f"| RAM | {source['ram_interface']} | **{source['ram_source']}** | a flat "
+        f"{source['ram_power_w']:g} W, whatever the memory does |",
+        "",
+        "| Condition | CPU per session | vs OFF | above idle | vs OFF | CPU power "
+        "| Time per session |",
+        "|---|--:|--:|--:|--:|--:|--:|",
+    ]
+
+    def cell(verdict: dict[str, Any] | None) -> str:
+        if verdict is None:
+            return "—"
+        if verdict["margin"] is None:
+            return f"{verdict['pct']:+.1f}% *(too few rounds)*"
+        if verdict["resolvable"]:
+            return f"**{verdict['pct']:+.1f}%** ({verdict['margin']:.1f}×)"
+        return f"*in noise* ({verdict['margin']:.1f}×)"
+
+    for name, row in rows.items():
+        lines.append(
+            f"| {name} | {row['cpu_j_per_session']:.2f} J | {cell(row.get('vs_off_gross'))} "
+            f"| {row['cpu_j_per_session_above_idle']:.2f} J | {cell(row.get('vs_off'))} "
+            f"| {row['cpu_w']:.1f} W | {row['seconds_per_session'] * 1e3:.0f} ms |"
+        )
+
+    off, full = rows["OFF"], rows["B"]
+    ram_share = (
+        100.0
+        * full["ram_j_per_session"]
+        / (full["ram_j_per_session"] + full["cpu_j_per_session"])
+    )
+    resolved = [
+        f"{name} ({basis})"
+        for name in ("A", "B-TRANS", "B")
+        for key, basis in (("vs_off_gross", "gross"), ("vs_off", "above idle"))
+        if rows[name][key]["resolvable"]
+    ]
+    lines += [
+        "",
+        f"The machine draws {summary['idle_cpu_w']:.1f} W of CPU power idle; that is "
+        f"subtracted, round by round, to give the energy of the work itself.",
+        "",
+        "### What this says",
+        "",
+        (
+            f"**Recording provenance changes the energy of a session by an amount this "
+            f"study cannot resolve.** No condition differs from OFF by "
+            f"{RESOLVE_MULTIPLE:g}× the spread of its own rounds, gross or above idle: a full "
+            f"session costs {off['cpu_j_per_session']:.2f} J of CPU energy without "
+            f"provenance and {full['cpu_j_per_session']:.2f} J with it."
+            if not resolved
+            else f"**Resolved against OFF: {', '.join(resolved)}.** A full session costs "
+            f"{off['cpu_j_per_session']:.2f} J of CPU energy without provenance and "
+            f"{full['cpu_j_per_session']:.2f} J with it."
+        ),
+        "",
+        f"**The medians point where E6 points.** Building the record without writing it "
+        f"(B-TRANS) moves a session's CPU energy by "
+        f"{rows['B-TRANS']['vs_off_gross']['pct']:+.0f}%; building and writing it (B) by "
+        f"{rows['B']['vs_off_gross']['pct']:+.0f}%, alongside "
+        f"{100 * (full['seconds_per_session'] / off['seconds_per_session'] - 1):+.0f}% in "
+        f"time per session. Neither difference resolves, so neither is a result; the "
+        f"ordering is the same as the timing study's, where the write is the cost.",
+        "",
+        f"**Measured and modelled are not added together.** The CPU figure is "
+        f"{source['cpu_source']}; the RAM figure is {source['ram_source']}, and at a flat "
+        f"{source['ram_power_w']:g} W it is {ram_share:.0f}% of the total a single sum "
+        f"would report, contributing nothing but elapsed time. It is published, labelled, "
+        f"and left out of every comparison above.",
+        "",
+        "**The counter covers the whole processor package**, not this process. Background "
+        "load is shared by every condition through interleaving and removed from each "
+        "round by its own IDLE window, but it is not absent; a quiet machine would "
+        "tighten every spread in this table.",
+        "",
+    ]
+    return lines
+
+
 RENDERERS = {
     "micro.json": render_micro,
     "agent.json": render_agent,
     "modes.json": render_modes,
     "scaling.json": render_scaling,
     "pipeline.json": render_pipeline,
+    "energy.json": render_energy,
 }
 
 

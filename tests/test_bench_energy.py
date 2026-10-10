@@ -58,3 +58,32 @@ def test_every_condition_leads_a_round_in_turn() -> None:
     leaders = [_round_order(index)[0] for index in range(len(ENERGY_CONDITIONS))]
     assert sorted(leaders) == sorted(ENERGY_CONDITIONS)
     assert all(sorted(_round_order(i)) == sorted(ENERGY_CONDITIONS) for i in range(7))
+
+
+def test_the_report_labels_each_component_and_never_sums_them() -> None:
+    from eval.bench_report import render_energy
+
+    windows = _study([150.0, 152.0, 148.0, 151.0, 149.0])
+    text = "\n".join(
+        render_energy(
+            {
+                "rounds": 5,
+                "sessions_per_window": 10,
+                "windows": windows,
+                "summary": summarise(windows),
+                "source": {
+                    "codecarbon": "3.3.1",
+                    "sampling_period_s": 1.0,
+                    "cpu_interface": "windows_emi",
+                    "cpu_source": "measured",
+                    "cpu_scope": "the whole processor package",
+                    "ram_interface": "codecarbon RAM model",
+                    "ram_source": "modelled",
+                    "ram_power_w": 10.0,
+                },
+            }
+        )
+    )
+    assert "| CPU | `windows_emi` | **measured** |" in text
+    assert "| RAM | codecarbon RAM model | **modelled** |" in text
+    assert "cannot resolve" in text
