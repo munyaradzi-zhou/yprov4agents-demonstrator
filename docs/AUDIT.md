@@ -239,7 +239,8 @@ audit that reports only what it anticipated understates how much was wrong.
   AU6)*
 - **`run_local.py` is outside the CI type check**, and it has two type errors, one of which
   is real: its in-process bus is passed where a `NetworkBus` is expected, with no shared
-  protocol saying the two are interchangeable. *(open, AU13)*
+  protocol saying the two are interchangeable. Agents are now typed against a `Bus`
+  protocol both satisfy, and `run_local.py` is in the CI type check. *(fixed with AU13)*
 - **This audit's own evidence for [6] was wrong** — see the correction under [5].
 - **The AU6 fix introduced a performance regression, and the overhead study caught it.**
   Never-overwrite probed `__2`, `__3`, … on every write, so write cost grew with the number of

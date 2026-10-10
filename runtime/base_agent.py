@@ -25,7 +25,7 @@ import asyncio
 from typing import Any
 
 from .envelope import ProvEventType, ProvRecordEnvelope
-from .net_bus import NetworkBus
+from .net_bus import Bus
 from .util import agent_tracker, energy_tracker
 
 #: The verdict an agent records when the stream it was handed has a gap. Not a judgement
@@ -105,7 +105,7 @@ def _chunk_document(doc: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 async def stream_document(
-    bus: NetworkBus,
+    bus: Bus,
     subject: str,
     *,
     session_id: str,
@@ -153,7 +153,7 @@ class StreamingAgent:
     #: The name this agent records itself under in its own PROV.
     agent_label: str = "StreamingAgent"
 
-    def __init__(self, role: str, bus: NetworkBus) -> None:
+    def __init__(self, role: str, bus: Bus) -> None:
         self.role = role
         self.bus = bus
         # merged docs, keyed by session_id, still streaming

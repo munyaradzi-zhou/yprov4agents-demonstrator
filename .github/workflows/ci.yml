@@ -37,8 +37,8 @@ jobs:
     name: Lint and format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
         with:
           enable-cache: true
       - run: uv sync --frozen --extra eval --extra dev
@@ -57,12 +57,12 @@ jobs:
         # that is valid on 3.11 and broken on 3.12 (or the reverse) reach a release.
         python: ["3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
         with:
           enable-cache: true
       - run: uv sync --frozen --extra eval --extra dev --python ${{ matrix.python }}
-      - run: uv run --python ${{ matrix.python }} mypy yprov4agenticai runtime eval tests
+      - run: uv run --python ${{ matrix.python }} mypy yprov4agenticai runtime eval tests run_local.py
 
   test:
     name: Tests (py${{ matrix.python }}, ${{ matrix.os }})
@@ -76,8 +76,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python: ["3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
         with:
           enable-cache: true
       - run: uv sync --frozen --extra eval --extra dev --python ${{ matrix.python }}
@@ -95,8 +95,8 @@ jobs:
     name: End-to-end pipeline
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
         with:
           enable-cache: true
       - run: uv sync --frozen --extra eval --extra dev
@@ -156,21 +156,83 @@ jobs:
       - name: Validate the emitted records against vocab/shapes.ttl
         run: uv run python -m eval.validate_shapes --prov-dir out
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         if: always()
         with:
           name: pipeline-provenance
           path: out/
           retention-days: 14
 
+  # The same agents over a real NATS broker, one container per role, as compose deploys
+  # them. The in-process path above awaits each handler inline, so it never exercises the
+  # concurrency, the readiness handshake, or the network transport; this job does, and
+  # holds the result to the same lineage comparison and the same shapes (docs/AUDIT.md [10]).
+  distributed:
+    name: Distributed pipeline (NATS, containers)
+    runs-on: ubuntu-latest
+    env:
+      OUT_HOST_DIR: ../out-nats
+      EXPECTED_RECORDS: "24"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --extra eval --extra dev
+
+      # The image runs as an unprivileged user; a bind-mounted directory the runner
+      # creates would otherwise be owned by root and unwritable to it.
+      - name: Prepare the output directory
+        run: mkdir -p out-nats && chmod 0777 out-nats
+
+      - name: Start the broker, six agents and the producer
+        run: docker compose -f deploy/docker-compose.yml up --build -d
+
+      - name: Wait for every record
+        shell: bash
+        run: |
+          for _ in $(seq 1 60); do
+            count=$(find out-nats -maxdepth 1 -name '*_prov.json' | wc -l)
+            echo "records: $count / $EXPECTED_RECORDS"
+            [ "$count" -ge "$EXPECTED_RECORDS" ] && exit 0
+            sleep 5
+          done
+          echo "::error::timed out with $count of $EXPECTED_RECORDS records"
+          exit 1
+
+      - name: Container logs
+        if: always()
+        run: docker compose -f deploy/docker-compose.yml logs --no-color
+
+      - name: Stop the stack
+        if: always()
+        run: docker compose -f deploy/docker-compose.yml down
+
+      - name: Assert the distributed run emits the reference provenance
+        run: |
+          uv run python -m eval.compare \
+            --before experiments/audit-reference \
+            --after out-nats \
+            --strict
+
+      - name: Validate the distributed run's records against vocab/shapes.ttl
+        run: uv run python -m eval.validate_shapes --prov-dir out-nats
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        if: always()
+        with:
+          name: distributed-provenance
+          path: out-nats/
+          retention-days: 14
+
   image:
     name: Container image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f  # v3
       - name: Build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8  # v6
         with:
           context: .
           file: deploy/Dockerfile

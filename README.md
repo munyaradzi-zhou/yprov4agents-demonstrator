@@ -31,7 +31,10 @@ python -m eval.evaluate --out-dir out
 ```
 
 Both paths run the *same agents with the same instrumentation* and emit the same PROV —
-only the transport differs. No API key is required: CAx falls back to a deterministic
+only the transport differs. CI runs both on every commit and holds each to the same
+lineage comparison against `experiments/audit-reference` and the same SHACL shapes; set
+`OUT_HOST_DIR=../out-nats` to keep a container run's records apart from a local one's. The
+broker is published on `127.0.0.1` only: it has no authentication. No API key is required: CAx falls back to a deterministic
 summary and CA3 reports its computed findings without LLM narration.
 
 Artifacts land in `./out`: one PROV-JSON per agent per session, the governance records

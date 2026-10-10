@@ -5,8 +5,12 @@
 # image provably holds the same versions as a local run. A paper artifact whose container
 # and host disagree about library versions cannot support a reproducibility claim.
 
-FROM ghcr.io/astral-sh/uv:0.7.2 AS uv
-FROM python:3.11-slim AS runtime
+# Base images are pinned by digest as well as tag. A tag is a pointer its publisher can
+# move — python:3.11-slim is rebuilt for every security patch — so the tag alone names a
+# different image from one month to the next. The tag stays for the reader; the digest is
+# what is pulled. Refresh both together, deliberately.
+FROM ghcr.io/astral-sh/uv:0.7.2@sha256:3b898ca84fbe7628c5adcd836c1de78a0f1ded68344d019af8478d4358417399 AS uv
+FROM python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce AS runtime
 
 COPY --from=uv /uv /usr/local/bin/uv
 

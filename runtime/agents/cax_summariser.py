@@ -27,7 +27,7 @@ from yprov4agenticai.prompts import ACT_SYSTEM
 
 from ..base_agent import StreamingAgent
 from ..llm import Completion, get_llm, llm_is_required
-from ..net_bus import NetworkBus
+from ..net_bus import Bus
 from ..util import OUT_DIR, agent_tracker, prov_counts
 
 #: Numerals in prose that are units or ordinary language rather than claims about the
@@ -48,7 +48,7 @@ class CAxSummariser(StreamingAgent):
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
-    def __init__(self, bus: NetworkBus) -> None:
+    def __init__(self, bus: Bus) -> None:
         super().__init__(role="cax", bus=bus)
         self.llm = get_llm()
         self.store = LightweightStore(root=str(OUT_DIR / "store"))

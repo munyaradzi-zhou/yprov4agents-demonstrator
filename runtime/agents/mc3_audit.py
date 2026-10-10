@@ -13,7 +13,7 @@ from __future__ import annotations
 from typing import Any, NamedTuple
 
 from ..base_agent import StreamingAgent
-from ..net_bus import NetworkBus
+from ..net_bus import Bus
 from ..util import agent_tracker
 
 
@@ -86,7 +86,7 @@ class MC3Audit(StreamingAgent):
     input_subject = "agent.lifecycle.>"
     output_prefix = "governance"
 
-    def __init__(self, bus: NetworkBus) -> None:
+    def __init__(self, bus: Bus) -> None:
         super().__init__(role="mc3", bus=bus)
 
     def process(

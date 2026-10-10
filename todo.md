@@ -69,11 +69,11 @@ against those archives. Energy (PR #11) is parked by decision.
 - [x] **AU10** — "a rule written once in one place" is not true; reword §3. *Also: the shapes are now 16 named constraints, not 14, and MC1 deliberately requires a decision's type to be stated where the shapes infer it — say so.* *(audit [9])*
 
 **Coverage**
-- [ ] **AU11** — the NATS/container path never runs in CI; add a compose-backed job *(audit [10])*
+- [x] **AU11** — the NATS/container path never runs in CI; add a compose-backed job *(audit [10])*
 - [ ] **AU12** — `bench_overhead`, `bench_report`, `archive` at 0% coverage; they produce the paper's numbers *(audit [11])* — *`archive` covered with AU7; `bench_report` and `evaluate`'s byte arithmetic covered with AU9; `bench_overhead` still open*
 
 **Hygiene**
-- [ ] **AU13** — delete `.env.corrupted.bak`; bind NATS to localhost; fix `Homepage`; `get_running_loop()` (done for the base agent and CA1); pin image digests; bring `run_local.py` under the CI type check with a bus protocol shared by `LocalBus` and `NetworkBus`
+- [x] **AU13** — delete `.env.corrupted.bak`; bind NATS to localhost; fix `Homepage`; `get_running_loop()` (done for the base agent and CA1); pin image digests; bring `run_local.py` under the CI type check with a bus protocol shared by `LocalBus` and `NetworkBus`
 
 ## Priority queue for 8 November
 

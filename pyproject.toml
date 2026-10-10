@@ -50,7 +50,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/HPCI-Lab/yprov4agenticai"
+Homepage = "https://github.com/munyaradzi-zhou/yprov4agents-demonstrator"
 
 [tool.hatch.build.targets.wheel]
 # Three distributable packages: the instrumentation core, the agent runtime, the harness.

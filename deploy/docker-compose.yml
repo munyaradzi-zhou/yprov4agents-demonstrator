@@ -8,7 +8,9 @@
 #   producer --(producer.yprov4ml.*)--> [cax, ca2, ca3] --(agent.lifecycle.*)--> [mc1, mc3]
 #                                   \__ ca1 holds the record, persists AFTER consumers ack
 #
-# Broker: NATS. Outputs (emitted PROV-JSON, charts, store) land in ./out on your host.
+# Broker: NATS. Outputs (emitted PROV-JSON, charts, store) land in ./out on your host, or in
+# the directory named by OUT_HOST_DIR (relative to this file) — CI uses that to keep a
+# distributed run's records apart from an in-process run's.
 
 x-runtime: &runtime
   build:
@@ -17,7 +19,7 @@ x-runtime: &runtime
   image: yprov4agents-demonstrator:0.2.0
   depends_on: [broker]
   volumes:
-    - ../out:/out                    # emitted PROV-JSON + charts + store, on your host
+    - ${OUT_HOST_DIR:-../out}:/out   # emitted PROV-JSON + charts + store, on your host
   # Compose resolves a bare `.env` against THIS file's directory, so the repository-root
   # .env is invisible to `-f deploy/docker-compose.yml`. Name it explicitly.
   env_file:
@@ -28,11 +30,15 @@ x-runtime: &runtime
 services:
   # ── the broker: the "post office" every message passes through ──────────────
   broker:
-    image: nats:2.10-alpine
+    image: nats:2.10-alpine@sha256:b83efabe3e7def1e0a4a31ec6e078999bb17c80363f881df35edc70fcb6bb927  # pinned; see deploy/Dockerfile
     command: ["-m", "8222"]          # HTTP monitoring on :8222
+    # Published on loopback only. The broker has no authentication, so on every other
+    # interface it would accept publishes from anyone on the network — including forged
+    # lifecycle records for the meta agents to govern. The agents reach it over the
+    # compose network, which this does not affect.
     ports:
-      - "4222:4222"                  # client port
-      - "8222:8222"                  # monitoring
+      - "127.0.0.1:4222:4222"        # client port
+      - "127.0.0.1:8222:8222"        # monitoring
 
   # ── operational agents ──────────────────────────────────────────────────────
   ca1:                               # CA1 — persist, AFTER consumers have used the record
@@ -85,5 +91,5 @@ services:
       EXPECTED_AGENTS: ca1,cax,ca2,ca3,mc1,mc3
       STREAM_DELAY_MS: "150"
     volumes:
-      - ../out:/out
+      - ${OUT_HOST_DIR:-../out}:/out
       - ../data/yprov4ml:/data:ro    # the real example_0 / example_2 records

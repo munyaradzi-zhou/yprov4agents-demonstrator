@@ -32,7 +32,7 @@ import matplotlib
 from yprov4agenticai import LightweightStore
 
 from ..base_agent import StreamingAgent
-from ..net_bus import NetworkBus
+from ..net_bus import Bus
 from ..util import OUT_DIR, agent_tracker, prov_counts
 
 matplotlib.use("Agg")  # headless: no display in a container
@@ -68,7 +68,7 @@ class CA2Metrics(StreamingAgent):
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
-    def __init__(self, bus: NetworkBus) -> None:
+    def __init__(self, bus: Bus) -> None:
         super().__init__(role="ca2", bus=bus)
         self.store = LightweightStore(root=str(OUT_DIR / "store"))
 
