@@ -43,6 +43,8 @@ def test_a_difference_well_outside_the_spread_is() -> None:
     verdict = summarise(_study([200.0, 202.0, 198.0, 201.0, 199.0]))["conditions"]["B"]
     assert verdict["vs_off"]["resolvable"]
     assert verdict["vs_off"]["pct"] == pytest.approx(50.0)
+    # Gross per session: 20 J against 15 J, idle power included.
+    assert verdict["vs_off_gross"]["pct"] == pytest.approx(100.0 * 5 / 15)
 
 
 def test_too_few_rounds_give_no_verdict_rather_than_an_infinite_one() -> None:

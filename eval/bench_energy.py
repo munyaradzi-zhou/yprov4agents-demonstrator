@@ -61,6 +61,11 @@ JOULES_PER_KWH = 3.6e6
 #: look infinitely resolved.
 MIN_ROUNDS_FOR_A_VERDICT = 3
 
+#: Sessions timed to size a window, after two discarded ones. The first sessions of a
+#: process run cold — imports, caches, the chart backend — and sizing from three of them
+#: made a pilot's work windows 12 s against a 20 s target.
+CALIBRATION_SESSIONS = 10
+
 
 # ── the backend's counters ─────────────────────────────────────────────────────────
 class EnergyMeter:
@@ -202,7 +207,7 @@ def _window(
 # ── the study ─────────────────────────────────────────────────────────────────────
 def level_energy(
     out_dir: Path,
-    rounds: int = 8,
+    rounds: int = 12,
     window_s: float = 20.0,
     period_s: float = 1.0,
     country_iso_code: str = "ITA",
@@ -214,11 +219,12 @@ def level_energy(
         # Warm up, then size a window from the uninstrumented session time, so every
         # condition does the same work and a slower condition simply takes longer.
         with condition("OFF"):
-            session()
-            started = time.perf_counter()
-            for _ in range(3):
+            for _ in range(2):
                 session()
-        per_session_s = (time.perf_counter() - started) / 3
+            started = time.perf_counter()
+            for _ in range(CALIBRATION_SESSIONS):
+                session()
+        per_session_s = (time.perf_counter() - started) / CALIBRATION_SESSIONS
         sessions = max(1, math.ceil(window_s / per_session_s))
         print(
             f"[energy] {per_session_s * 1e3:.0f} ms per session; {sessions} sessions per "
@@ -227,7 +233,12 @@ def level_energy(
         )
 
         windows: dict[str, list[dict[str, float]]] = {name: [] for name in ENERGY_CONDITIONS}
+        warmup: dict[str, dict[str, float]] = {}
         with EnergyMeter(country_iso_code, period_s) as meter:
+            # One whole round first, recorded and excluded. In the pilot the first window
+            # after the meter started read 12 W idle against 2-6 W for every later one.
+            for name in ENERGY_CONDITIONS:
+                warmup[name] = _window(meter, name, session, sessions, sessions * per_session_s)
             for index in range(rounds):
                 for name in _round_order(index):
                     result = _window(meter, name, session, sessions, sessions * per_session_s)
@@ -250,6 +261,7 @@ def level_energy(
         "sessions_per_window": sessions,
         "records_per_session": 1,
         "windows": windows,
+        "warmup_round_excluded": warmup,
         "summary": summarise(windows),
     }
     write_results(out_dir / "energy.json", payload)
@@ -296,21 +308,37 @@ def summarise(windows: dict[str, list[dict[str, float]]]) -> dict[str, Any]:
             "cpu_w": statistics.median(w["cpu_j"] / w["duration_s"] for w in rows),
         }
 
-    off_net = _per_session_net(windows, "OFF")
+    # Two comparisons, because they answer different questions. Above idle: the energy of
+    # the work alone — but the idle power it subtracts wanders with background load, which
+    # adds its own spread. Gross: what a session costs the machine, including the idle
+    # power drawn for as long as the session takes — so a slower condition pays for its
+    # extra time, which is a real cost and not noise.
+    def per_session(name: str) -> list[float]:
+        return [w["cpu_j"] / w["sessions"] for w in windows[name]]
+
     for name in ("A", "B-TRANS", "B"):
-        values = _per_session_net(windows, name)
-        delta = statistics.median(values) - statistics.median(off_net)
-        noise = max(dispersion(off_net), dispersion(values))
-        judged = len(values) >= MIN_ROUNDS_FOR_A_VERDICT and noise > 0
-        margin = abs(delta) / noise if judged else None
-        summary["conditions"][name]["vs_off"] = {
-            "delta_cpu_j_per_session": delta,
-            "pct": 100.0 * delta / statistics.median(off_net),
-            "noise_j": noise,
-            "margin": margin,
-            "resolvable": margin is not None and margin > RESOLVE_MULTIPLE,
-        }
+        summary["conditions"][name]["vs_off"] = _verdict(
+            _per_session_net(windows, "OFF"), _per_session_net(windows, name)
+        )
+        summary["conditions"][name]["vs_off_gross"] = _verdict(
+            per_session("OFF"), per_session(name)
+        )
     return summary
+
+
+def _verdict(baseline: list[float], measured: list[float]) -> dict[str, Any]:
+    """The difference of two sets of per-session values, judged by the 3x rule."""
+    delta = statistics.median(measured) - statistics.median(baseline)
+    noise = max(dispersion(baseline), dispersion(measured))
+    judged = len(measured) >= MIN_ROUNDS_FOR_A_VERDICT and noise > 0
+    margin = abs(delta) / noise if judged else None
+    return {
+        "delta_cpu_j_per_session": delta,
+        "pct": 100.0 * delta / statistics.median(baseline),
+        "noise_j": noise,
+        "margin": margin,
+        "resolvable": margin is not None and margin > RESOLVE_MULTIPLE,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -319,7 +347,7 @@ def main(argv: list[str] | None = None) -> int:
         description="E7: the energy of instrumentation, measured over whole sessions.",
     )
     parser.add_argument("--out-dir", default="out/bench")
-    parser.add_argument("--rounds", type=int, default=8)
+    parser.add_argument("--rounds", type=int, default=12)
     parser.add_argument("--window-s", type=float, default=20.0)
     parser.add_argument(
         "--period-s", type=float, default=1.0, help="codecarbon's sampling period"
