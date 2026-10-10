@@ -629,7 +629,8 @@ renumbered in `DRAFT.md`, and **energy is non-negotiable**. The live plan is bel
 first-class subsection with its own table, not a limitation clause, so it is removed from
 the cut menu below and every other item absorbs the difference.
 
-The draft now stands at **6,275 words, 3 figures, 5 tables**: 5,613 after four passes, then
+The draft now stands at **6,733 words, 3 figures, 6 tables** (6,428 from §1), after the
+session-level energy study added ~420 to §6.3. Before that it was 6,275 words, 5 tables: 5,613 after four passes, then
 ~610 more when the audit (`docs/AUDIT.md`) narrowed the rationale and overhead claims and the
 fact-level table (Table 3) was added to carry the narrowed one. Whether
 that is 6 pages or 7 cannot be answered by arithmetic: estimates of a two-column IEEE page

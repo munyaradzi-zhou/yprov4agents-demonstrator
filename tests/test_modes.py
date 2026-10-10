@@ -240,15 +240,12 @@ def test_an_energy_figure_states_whether_it_can_be_attributed_to_the_step() -> N
 
 
 def test_a_modelled_figure_is_never_labelled_measured() -> None:
-    """`source_label` must require a counter that is *delivering*, not merely selected.
+    """`source_label` must require a CPU counter that is *delivering*, not merely selected,
+    and must never call a sum with a modelled RAM component "measured".
 
-    This has been wrong in both directions. It first probed only the Linux RAPL sysfs
-    path, which reports "modelled" on every non-Linux host even where a real counter is
-    in use. Trusting codecarbon's selected mode instead is the opposite trap: on the
-    development host it selects `windows_emi`, and that interface returns a processor
-    energy delta of 0.0 under a saturating load because it needs OEM firmware the machine
-    does not have. A mode name alone would have labelled a fallback as an instrument
-    reading, which is the error that quietly corrupts a published figure.
+    It has been wrong three ways: probing only Linux RAPL, trusting a mode name, and
+    checking the CPU+RAM total — which the RAM model makes non-zero whatever the processor
+    counter reads. The last row of cases is the one that caught that.
     """
     from yprov4agenticai.energy import CodeCarbonBackend
 
@@ -258,22 +255,28 @@ def test_a_modelled_figure_is_never_labelled_measured() -> None:
         def __init__(self, mode: str | None) -> None:
             self._mode = mode
 
+    class _Energy:
+        def __init__(self, kwh: float) -> None:
+            self.kWh = kwh
+
     class _Tracker:
-        def __init__(self, mode: str | None, energy: float) -> None:
+        def __init__(self, mode: str | None, cpu: float, ram: float = 1e-6) -> None:
             self._hardware = [_Hardware(mode)]
-            self._total_energy = energy
+            self._total_cpu_energy = _Energy(cpu)
+            self._total_energy = _Energy(cpu + ram)
 
     cases = [
         ("cpu_load", 1e-6, "modelled", "a load model is not an observation"),
         ("constant", 1e-6, "modelled", "a TDP constant is not an observation"),
-        ("windows_emi", 0.0, "modelled", "an interface returning zero is not delivering"),
+        ("windows_emi", 0.0, "modelled", "a counter reading zero is not delivering"),
         ("intel_rapl", 0.0, "modelled", "RAPL present but unreadable falls back silently"),
-        ("intel_rapl", 1e-6, "measured", "a readable counter with a reading is measured"),
-        ("windows_emi", 1e-6, "measured", "EMI backed by real firmware is measured"),
+        ("intel_rapl", 1e-6, "partly-measured", "a delivering CPU counter; RAM still modelled"),
+        ("windows_emi", 1e-6, "partly-measured", "EMI delivering, as on the development host"),
     ]
-    for mode, energy, expected, why in cases:
-        backend._tracker = _Tracker(mode, energy)
-        assert backend.source_label == expected, f"{mode}/{energy}: {why}"
+    for mode, cpu, expected, why in cases:
+        backend._tracker = _Tracker(mode, cpu)
+        assert backend.source_label == expected, f"{mode}/{cpu}: {why}"
+        assert backend.source_label != "measured", "the RAM component is never observed"
 
     backend._tracker = None
     assert backend.source_label == "modelled", "no tracker means nothing was measured"

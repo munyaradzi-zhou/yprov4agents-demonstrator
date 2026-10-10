@@ -63,7 +63,10 @@ MIN_ROUNDS_FOR_A_VERDICT = 3
 
 #: Sessions timed to size a window, after two discarded ones. The first sessions of a
 #: process run cold — imports, caches, the chart backend — and sizing from three of them
-#: made a pilot's work windows 12 s against a 20 s target.
+#: made a pilot's work windows 12 s against a 20 s target. Ten narrows that and does not
+#: close it: the archived run calibrated at 207 ms against 104 ms in its windows, which
+#: therefore lasted ~10 s. Every window still spans ten samples, and the duration of each
+#: is recorded rather than assumed, so the figures are per session either way.
 CALIBRATION_SESSIONS = 10
 
 

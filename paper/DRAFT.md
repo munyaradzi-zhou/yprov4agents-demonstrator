@@ -1,7 +1,7 @@
 # Capture, Not Retrieve: Behavioural Provenance for Agentic AI
 
-> **6,275 words, 3 figures, 5 tables** — measured with `wc -w` over this file, not estimated;
-> 6,004 from §1 onwards. Four earlier versions of this line stated a target I was aiming at
+> **6,733 words, 3 figures, 6 tables** — measured with `wc -w` over this file, not estimated;
+> 6,428 from §1 onwards, of which ~420 came with the session-level energy study (§6.3). Four earlier versions of this line stated a target I was aiming at
 > instead of the file's actual length; the number above is the only kind worth printing. The
 > post-audit rewrite added ~610 words, mostly Table 3 and the fact-level argument it carries. Cut from the 7,900-word full draft at
 > commit `53c5b61`, which remains the reservoir for anything a reviewer asks to see expanded.
@@ -12,11 +12,10 @@
 > `paper/OUTLINE.md` for the ranked cuts that close a gap of up to ~1,000 words if one exists.
 
 > Every figure quoted here is read from a frozen archive under `experiments/`, named at the
-> point of use — **with one exception, now labelled in place**: the two energy figures in §6.3
-> come from a Phase-4 development run recorded in `docs/phases/PHASE_4.md`, not from a hashed
-> archive, and no archived record carries a `yp:energy_*` attribute at all. Energy is also the
-> one quantity here that is **modelled rather than measured**, for the platform reason §6.3
-> states. Both facts are disclosed at the point of use.
+> point of use — **with one exception, labelled in place**: Table 5's per-step energy figures
+> come from a Phase-4 development run recorded in `docs/phases/PHASE_4.md`. The session-level
+> energy study is archived in `experiments/energy-session`; its CPU figures are measured and its
+> RAM figures modelled, and the two are never summed.
 > The reference archives are `experiments/audit-reference` and `experiments/audit-llm`, frozen
 > from clean commits after the audit in `docs/AUDIT.md`, which narrowed the rationale result
 > (§6.2) and the overhead headline (§6.5).
@@ -77,7 +76,8 @@ We also measure the cost, because an argument that explicit instrumentation is *
 worth little if it is expensive. Building the record, justification included, moves no operational
 agent's step by more than its own run-to-run variance, on either of two occasions; the
 justifications are 6.5% of the records' bytes. What costs is writing the record to disk, and that
-is a deployment decision the library exposes (§6.5).
+is a deployment decision the library exposes (§6.5). Measured CPU energy per session shows no
+resolvable difference either (§6.3).
 
 ---
 
@@ -376,59 +376,61 @@ decision, the verdict. B records the trigger, the quorum, the reason, the integr
 cannot tell *"storage is corrupting records"* from *"ca3 is not running"*, and the two call for
 opposite responses.
 
-### 6.3 Energy: two negative results, and what a record must disclose
+### 6.3 Energy: what can be measured, and what a record must disclose
 
-Energy is a first-class concern for the infrastructure this work targets, so we wired a sampling
-backend into the capture API. The wiring produced two results worth reporting on their own terms,
-and the first is about the figures themselves.
+Energy is a first-class concern for the infrastructure this work targets, so the capture API
+carries a sampling backend (codecarbon), opt-in. Measured where energy *can* be measured, over
+whole sessions, provenance makes no difference we can resolve; and getting there produced two
+results about what an energy figure in a record has to say about itself.
 
-**Our energy figures are modelled, not measured, and the record has to say so.** On the
-development host — a Windows laptop — no hardware energy counter is reachable. Intel RAPL is a
-Linux `sysfs` interface and does not exist; Intel Power Gadget is absent and discontinued; the
-Windows Energy Meter Interface is advertised as available by the backend and returns a processor
-energy delta of **0.0 under a CPU-saturating load**, because it needs OEM firmware support this
-machine does not provide. The backend therefore falls back to estimating processor power from CPU
-load as `TDP × (0.1 + 0.9 × load³)`, and RAM power as a flat function of installed capacity — a
-constant 10 W here, which supplied **41% of the total** in a four-second calibration run. Neither
-component is observed. Every figure below is consequently published with
-`yp:energy_source = "modelled"`, and a reader who needs measured values needs a host with a
-readable counter.
+**Over whole sessions, the energy cost does not resolve.** We ran all six agents on a real record,
+97 sessions to a window, under each condition, plus an idle window, in 12 interleaved rounds with
+the order rotated and a warm-up round excluded (`experiments/energy-session`):
 
-This is not a defect of the design but a property of the platform, and it generalises: **a
-provenance system cannot tell a measured watt from a modelled one unless the backend is asked,
-so it must ask and record the answer.** A record that carries a number without its provenance
-invites a reader to treat a cubic function of CPU load as an instrument reading.
+| CPU energy per session | OFF | A | B-TRANS | B |
+|---|--:|--:|--:|--:|
+| gross | 1.43 J | 1.47 J | 1.50 J | 1.72 J |
+| vs OFF (margin) | — | +2.7% (0.5×) | +5.3% (0.9×) | +20.3% (2.3×) |
+| time per session | 104 ms | 105 ms | 105 ms | 114 ms |
 
-**Second, a sampling backend cannot attribute energy to a step shorter than its sampling period.**
-codecarbon's default period is 15 seconds and these steps last milliseconds, so a delta lands on
-whichever step happens to read after a tick:
+**Table 4.** Measured CPU energy (Windows EMI package counter, 1 s sampling); RAM, modelled at a
+flat 10 W, is reported separately and excluded. No difference reaches 3× its dispersion, gross or
+above the 3.2 W idle draw.
+
+No condition is a result, but the medians point where the timing study does: building the record
+(B-TRANS) moves a session's energy by 5%, and building and writing it (B) by 20%, alongside 9% more
+time. A pilot run, kept in the archive and excluded because its procedure differed, agrees.
+
+**A record must say which components it measured.** codecarbon reports processor and memory
+separately, and on this host only the processor is observed: the Windows Energy Meter Interface
+reads the package counter (5 W idle, 21 W with one core busy, 31 W with all eight), while memory is
+a flat 10 W per installed capacity, 40% of a summed figure and a function of nothing but elapsed
+time. A sum of the two is neither measured nor modelled, so the record says `partly-measured`, and
+the vocabulary's shape rejects any other label on an energy figure. We got this wrong twice before
+it held. A first calibration concluded the counter was broken because it read zero, when it had been
+read before its first sample; and a labelling check that tested the *total* for a non-zero reading
+tested nothing, because the memory model makes the total non-zero whatever the processor counter
+does. *A provenance system cannot tell a measured watt from a modelled one unless it asks the
+backend, component by component, and records the answer.*
+
+**A sampling backend cannot attribute energy to a step shorter than its period.** At codecarbon's
+default 15 s, with steps lasting milliseconds, a delta lands on whichever step reads after a tick:
 
 | Step | Energy charged | Step duration |
 |---|--:|--:|
 | choose what to plot | 46.9 µWh | 0.000 s |
 | render chart (matplotlib) | 4.6 µWh | 1.328 s |
 
-**Table 4.** Two steps of one record under a 15-second sampling period. The step that did the work
-was charged a tenth of what the step that did nothing was charged. *(Modelled power, per above;
-these figures come from the Phase-4 development run recorded in `docs/phases/PHASE_4.md` rather
-than from a hashed archive under `experiments/` — the only numbers in this paper of which that is
-true.)*
+**Table 5.** Two steps of one record under a 15-second sampling period: the step that did the work
+was charged a tenth of what the step that did nothing was. *(A development run recorded in
+`docs/phases/PHASE_4.md`, with modelled power — the only figures in this paper not from a hashed
+archive. The result is about sampling, not power, and holds either way.)*
 
-A second artifact was worse: the *first* step of each record was charged 28.3 seconds of
-inter-message idle time, because the energy tracker outlives any one record. Both are now handled —
-the baseline resets when a record begins, so no step is charged for the gap before it. **This
-attribution result is independent of whether the underlying power is measured or modelled**: a
-backend sampling every 15 seconds cannot resolve a millisecond step by either route, which is why
-it survives the caveat above.
-
-The contribution is what the record says about its own figure. Each measurement is published
-alongside `yp:energy_sampling_period_s`, `yp:energy_source` and `yp:energy_attributable`, so the
-record states the period, whether the number was observed or estimated, and that it is **not** an
-attribution to the step it is attached to. **Energy belongs at session granularity**, and any
-per-step energy claim in this literature needs a backend sampling faster than the steps and should
-state both its period and its source. *A provenance record that reports an energy figure without
-its sampling period is not reporting a measurement; it is reporting an artifact of when the sampler
-last ticked.*
+The record therefore carries each energy figure with `yp:energy_sampling_period_s`,
+`yp:energy_source` and `yp:energy_attributable`, so it states its period, what was observed, and
+that the figure is **not** an attribution to the step it is attached to. **Energy belongs at session
+granularity**, which is where Table 4 measures it. *A record that reports an energy figure without
+its sampling period and its source is reporting when the sampler last ticked, and how it guessed.*
 
 ### 6.4 Model provenance
 
@@ -479,7 +481,7 @@ justification is **54 ns against a round-to-round spread of ±726 ns**. In stora
 | …plus writing it to disk | **+1,485 µs** |
 | total overhead | **+1,394%** (margin 11.5×) |
 
-**Table 5.** The worst ratio in the system, decomposed. 98% of it is one file write; for every
+**Table 6.** The worst ratio in the system, decomposed. 98% of it is one file write; for every
 agent whose overhead resolves, the write is at least 90%.
 
 Read the decomposition before believing the ratio. Explicit instrumentation is not expensive to
@@ -565,6 +567,10 @@ provenance deserves a sentence in a provenance paper. Numbered envelopes turn a 
 `INCOMPLETE` record; a stream lost whole is still silent. And a tracker holds its whole record in
 memory until it emits (~1.3 KiB per activity), which is why a metadata-only granularity exists.
 
+**Energy, on one machine.** The CPU counter covers the whole processor package, so background load
+reaches every window; interleaving shares it and the idle windows subtract it, but neither removes
+it. Memory energy is a model on this host and is excluded from the comparison rather than measured.
+
 **Scale, a single producer, and our own baseline.** Two input records, 24 emitted documents, one
 producer; nothing in the agents is ML-specific, but that generality is argued from the code rather than
 demonstrated against a second producer. And we built Strategy A, so we could in principle have built
@@ -591,8 +597,10 @@ instrumentation layer — a published `yp:` vocabulary with SHACL shapes, and an
 refuses a blank justification — and demonstrated it across six heterogeneous agents in a running
 reflexive system, including the agents that govern the others. We measured the cost: building the record is inside every operational
 agent's run-to-run variance, the justifications are 6.5% of the records' bytes, and where overhead
-resolves at all, at least 90% of it is the write to disk. And we report a negative
-result on energy that constrains how this community should record it at all.
+resolves at all, at least 90% of it is the write to disk. Measured over whole sessions, the
+energy cost does not resolve either; and per step it cannot be measured at all, which constrains
+how this community should record energy, and what a record must say about where its figure came
+from.
 
 The honest summary of the trade is one sentence: **storage for explainability, not speed for
 explainability.**

@@ -271,28 +271,31 @@ class CodeCarbonBackend(EnergyBackend):
 
     @property
     def source_label(self) -> str:
-        """``"measured"`` only when a hardware counter is both selected and delivering.
+        """``"partly-measured"`` when the CPU reads a delivering counter; else ``"modelled"``.
 
-        Two traps, and we have been caught by both. Probing only the Linux RAPL path
-        (``/sys/class/powercap/...``) reports "modelled" on every non-Linux host even
-        when a real counter is in use — the mistake this method used to make. Trusting
-        the backend's selected mode instead reports "measured" whenever the interface
-        merely *loads*: on the development host codecarbon selects ``windows_emi`` and
-        that interface returns a processor energy delta of 0.0 under a saturating load,
-        because it needs OEM firmware the machine does not provide.
+        The figure this labels is a sum, CPU plus RAM, and codecarbon's RAM figure is always
+        a model — a flat power per installed capacity. So the sum is never wholly measured,
+        and the best this backend can honestly say is that its processor component is.
 
-        So the label requires both: a hardware mode, and a non-zero cumulative energy
-        reading to show the counter is actually delivering. An idle host could in
-        principle read zero and be downgraded to "modelled"; that is the safe direction
-        to be wrong in, because overclaiming a measurement is the error that corrupts a
-        result and underclaiming one only costs a footnote.
+        Three traps, and this method has fallen into each. Probing only the Linux RAPL path
+        reported "modelled" on every other host, real counter or not. Trusting the selected
+        mode alone would report a counter that loads but never reads. And checking that
+        the *total* is non-zero tested nothing, because the RAM model makes it non-zero
+        whatever the processor counter does; the check is on the CPU's own total.
+
+        A counter that has not yet sampled also reads zero — which is how an early
+        calibration concluded that this host's ``windows_emi`` counter was broken, when it
+        had simply been read before its first tick (docs/phases/PHASE_7.md). The label
+        downgrades in that case, which is the safe direction to be wrong in: overclaiming a
+        measurement corrupts a result, underclaiming one costs a footnote.
         """
         mode = self._cpu_mode()
         if mode is None or mode not in self._HARDWARE_MODES:
             return "modelled"
-        if float(getattr(self._tracker, "_total_energy", 0.0) or 0.0) <= 0.0:
+        cpu_energy = getattr(self._tracker, "_total_cpu_energy", None)
+        if float(getattr(cpu_energy, "kWh", 0.0) or 0.0) <= 0.0:
             return "modelled"
-        return "measured"
+        return "partly-measured"
 
     def _cpu_mode(self) -> str | None:
         """The interface codecarbon chose for the CPU, asked rather than inferred."""

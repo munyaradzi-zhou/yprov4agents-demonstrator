@@ -196,6 +196,13 @@ firmware this machine does not provide. codecarbon therefore estimates processor
 `TDP x (0.1 + 0.9 x load^3)` and RAM power as a flat function of installed capacity — a
 constant 10 W here, which supplied 41% of the total in a four-second calibration run.
 
+> **Corrected in Phase 7.** The EMI counter was not broken. It reads zero until its
+> first sample, and the four-second calibration read it before that. Read properly, it
+> follows the load (5 W idle, 21 W one core, 31 W all cores), so on this laptop the
+> **processor energy is measured** and only the memory figure is modelled. The per-step
+> figures in this section came from an older codecarbon (3.2.7) that used the load model,
+> so they are still modelled. See [`PHASE_7.md`](PHASE_7.md).
+
 Getting real values means booting Linux with a readable RAPL counter. Nothing below
 depends on that: the attribution problem is a property of the sampling period against the
 step duration, and a 15-second sampler cannot resolve a millisecond step whether its watts
@@ -233,6 +240,11 @@ record and its first delta covers the gap since the last message.
 
   This host  --->  windows_emi SELECTED, returns 0.0  --->  "modelled"
 ```
+
+> **Corrected in Phase 7:** the "returns 0.0" was a read before the first sample, and the
+> "cumulative energy > 0" test checked CPU + RAM, which the RAM model always makes positive.
+> The label now checks the processor's own total and says `partly-measured`, because the
+> RAM half of the sum is never observed.
 
 Checking the mode alone would have labelled this host's zeros as a measurement. Checking
 only the Linux RAPL path — which is what the code did first — labels every non-Linux host

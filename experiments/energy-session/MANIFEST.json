@@ -1,0 +1,48 @@
+{
+  "schema": "yprov4agents/experiment-manifest/2",
+  "name": "energy-session",
+  "note": "E7: CPU energy (measured, Windows EMI package counter) and RAM energy (modelled, flat 10 W) per six-agent session under OFF, A, B-TRANS and B; 12 interleaved rounds plus an excluded warm-up round; pilot run kept in pilot/ and excluded",
+  "created_at": "2026-10-10T10:12:02.698571+00:00",
+  "source": "out/bench-energy",
+  "git": {
+    "commit": "3f4183ae2ed58a169827c47e1a6356511e08286e",
+    "branch": "energy-benchmark",
+    "describe": "v1.1.0-verdicts-26-g3f4183a",
+    "dirty": false,
+    "changes": []
+  },
+  "environment": {
+    "python": "3.11.15",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840
+  },
+  "file_count": 4,
+  "total_bytes": 28993,
+  "files": [
+    {
+      "path": "E7_RESULTS.md",
+      "size_bytes": 2502,
+      "content_hash": "sha256:2140a824c597a67b6c5f1b2dee68a7a5f3470c12d661e92250de54a27a24cc3f"
+    },
+    {
+      "path": "energy.json",
+      "size_bytes": 15262,
+      "content_hash": "sha256:93e5e47abe3ffc9e7ef2972747b1c1405263276eee8518b2057470898088837f"
+    },
+    {
+      "path": "pilot/energy.json",
+      "size_bytes": 10536,
+      "content_hash": "sha256:dcd765986d05e92c8db27c376ec67cdc190387e76108569cf6349993cc172f1b"
+    },
+    {
+      "path": "pilot/README.md",
+      "size_bytes": 693,
+      "content_hash": "sha256:b4d4d0299ad73740fefb858c966a924b2ade5574f4a7f367974a1e8e74bc8072"
+    }
+  ]
+}
