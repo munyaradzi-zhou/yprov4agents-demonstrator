@@ -55,7 +55,9 @@ def _ns(value: float) -> str:
     return f"{sign}{magnitude:.0f} ns"
 
 
-def _resolves(row: dict[str, Any], baseline: str = "OFF") -> tuple[bool, float]:
+def _resolves(
+    row: dict[str, Any], baseline: str = "OFF", condition: str = "B"
+) -> tuple[bool, float]:
     """Re-judge a stored agent measurement under the criterion in force now.
 
     Returns ``(resolvable, margin)``. The medians and the dispersion are measurements and
@@ -63,14 +65,28 @@ def _resolves(row: dict[str, Any], baseline: str = "OFF") -> tuple[bool, float]:
     judgements belong to the code doing the reporting rather than to a file written weeks
     earlier. When the criterion tightened from 1x the noise to 3x, two rows in this table
     stopped earning the overhead figure they had been printing.
+
+    The noise is the larger of the two conditions' dispersions, as in
+    :func:`eval.bench_support.resolvable`, so any pair of conditions is judged by one rule:
+    ``condition="B-TRANS"`` asks whether *building* the record is resolvable at all.
     """
-    medians = row["median_ns"]
-    noise = row["vs_off"]["noise_ns"] if baseline == "OFF" else row["vs_a"]["noise_ns"]
-    delta = abs(medians["B"] - medians[baseline])
+    medians, spread = row["median_ns"], row["dispersion_ns"]
+    noise = max(spread[baseline], spread[condition])
+    delta = abs(medians[condition] - medians[baseline])
     if not noise:
         return True, float("inf")
     margin = delta / noise
     return margin > RESOLVE_MULTIPLE, margin
+
+
+def _verdict(row: dict[str, Any], condition: str = "B") -> str:
+    """One cell: the overhead if it resolves, otherwise the margin it reached."""
+    is_resolved, margin = _resolves(row, condition=condition)
+    off = row["median_ns"]["OFF"]
+    if not is_resolved or not off:
+        return f"*in noise* ({margin:.1f}×)"
+    pct = 100.0 * (row["median_ns"][condition] - off) / off
+    return f"**{pct:+.0f}%** ({margin:.1f}×)"
 
 
 def _environment_block(environment: dict[str, Any]) -> list[str]:
@@ -210,27 +226,31 @@ def render_agent(data: dict[str, Any]) -> list[str]:
         f"the record and writes nothing, which separates what the provenance costs to "
         f"*construct* from what it costs to *store*.",
         "",
-        "| Agent | OFF | A | B-TRANS | B | B vs OFF | of which the write | Output |",
-        "|---|--:|--:|--:|--:|--:|--:|--:|",
+        "| Agent | OFF | A | B-TRANS | B | Building it | Building and writing it "
+        "| of which the write | Output |",
+        "|---|--:|--:|--:|--:|--:|--:|--:|--:|",
     ]
     resolved: dict[str, tuple[bool, float]] = {
         label: _resolves(row) for label, row in data["agents"].items()
     }
+    built: dict[str, tuple[bool, float]] = {
+        label: _resolves(row, condition="B-TRANS") for label, row in data["agents"].items()
+    }
     for label, row in data["agents"].items():
         medians = row["median_ns"]
-        overhead = row["vs_off"]
-        is_resolved, margin = resolved[label]
-        ratio = (
-            f"**{overhead['pct']:+.0f}%**"
-            if is_resolved and overhead["pct"] is not None
-            else f"*in noise* ({margin:.1f}×)"
-        )
-        write = _ns(row["write_cost_ns"]) if is_resolved else "—"
+        write = _ns(row["write_cost_ns"]) if resolved[label][0] else "—"
         lines.append(
             f"| {label} | {_ns(medians['OFF'])} | {_ns(medians['A'])} | "
-            f"{_ns(medians['B-TRANS'])} | {_ns(medians['B'])} | {ratio} | {write} | "
+            f"{_ns(medians['B-TRANS'])} | {_ns(medians['B'])} | "
+            f"{_verdict(row, 'B-TRANS')} | {_verdict(row)} | {write} | "
             f"{row['output_bytes']:,} B |"
         )
+    lines += [
+        "",
+        f"Each verdict cell carries its margin: the multiple of the sample dispersion the "
+        f"difference from OFF reaches, where **{RESOLVE_MULTIPLE:g}× is required** before "
+        f"a figure is printed as a result.",
+    ]
 
     worst = max(
         (
@@ -247,6 +267,13 @@ def render_agent(data: dict[str, Any]) -> list[str]:
         build_cost = row["median_ns"]["B-TRANS"] - row["median_ns"]["OFF"]
         write_cost = row["write_cost_ns"]
         share = 100.0 * write_cost / max(write_cost + build_cost, 1)
+        write_shares = [
+            100.0
+            * other["write_cost_ns"]
+            / max(other["median_ns"]["B"] - other["median_ns"]["OFF"], 1)
+            for name, other in data["agents"].items()
+            if resolved[name][0]
+        ]
         lines += [
             f"**Lead with the worst case: {label}, at {row['vs_off']['pct']:+.0f}%.** A "
             f"meta agent's own work is trivial — {_ns(row['median_ns']['OFF'])} — while it "
@@ -256,29 +283,29 @@ def render_agent(data: dict[str, Any]) -> list[str]:
             "",
             f"**But read the decomposition before believing the ratio.** For that same "
             f"agent, building the record costs {_ns(build_cost)} and writing it costs "
-            f"{_ns(write_cost)} — **{share:.0f}% of the overhead is one file write**. The "
-            f"same split holds for every agent in the table. Explicit instrumentation is "
-            f"not expensive to compute; persisting its output is, and that is a storage "
-            f"decision a deployment can make differently (E6c).",
+            f"{_ns(write_cost)} — **{share:.0f}% of the overhead is one file write**. "
+            f"Across the {len(write_shares)} agents whose overhead resolves, the write is at "
+            f"least {min(write_shares):.0f}% of it. Explicit "
+            f"instrumentation is not expensive to compute; persisting its output is, and "
+            f"that is a storage decision a deployment can make differently (E6c).",
             "",
         ]
-    unresolved = [label for label, (ok, _) in resolved.items() if not ok]
+    unbuilt = [label for label, (ok, _) in built.items() if not ok]
     lines += [
-        f"**Instrumentation is cheaper than the noise floor of the work it instruments.** "
-        f"{len(unresolved)} of the {len(resolved)} agents show no resolvable overhead at "
-        f"{data['repetitions']} repetitions — the difference between running them with and "
-        f"without provenance is smaller than their own run-to-run variance. Those rows "
-        f"carry the margin in parentheses: the multiple of the sample dispersion the "
-        f"difference reaches, where **{RESOLVE_MULTIPLE:g}× is required** before a figure "
-        f"is printed as a result.",
+        f"**Building the record is unresolvable for {len(unbuilt)} of the {len(built)} "
+        f"agents** at {data['repetitions']} repetitions: "
+        f"{', '.join(label.split(' ')[0] for label in unbuilt)}. For those, constructing a "
+        f"complete typed record moves the agent's step by less than its own run-to-run "
+        f"variance. Whether *writing* it also stays inside the noise depends on the agent "
+        f"and, near the threshold, on the occasion — E6f says which verdicts held.",
         "",
-        "That criterion is stricter than it was, and the correction matters. It used to be "
-        "*larger than the noise*, which treats any consistent bias as a finding — and a "
-        "loaded machine supplies plenty. Under the old rule two of these rows reported "
-        "resolved overheads at margins of 2.9×. They are now reported as what they are. "
-        "The project's own guard test caught it: on a shared CI runner, timing the **same "
-        "function twice** produced a 147.5 ns difference against 61.0 ns of noise and "
-        "called it real.",
+        "The 3× criterion is stricter than the one this study began with, and the "
+        "correction matters. It used to be *larger than the noise*, which treats any "
+        "consistent bias as a finding — and a loaded machine supplies plenty. Under the old "
+        "rule two rows of the first occasion's table reported resolved overheads at margins "
+        "of 2.9×. The project's own guard test caught it: on a shared CI runner, timing "
+        "the **same function twice** produced a 147.5 ns difference against 61.0 ns of "
+        "noise and called it real.",
         "",
         "**Condition A is indistinguishable from OFF everywhere.** Appending one event per "
         "node costs nothing any agent step can resolve, which is the honest reading: the "
@@ -326,11 +353,13 @@ def render_modes(data: dict[str, Any]) -> list[str]:
         f"never less reasoning. A mode that shed justifications would be a different "
         f"product rather than a cheaper one.",
         "",
-        f"**A justification is {data['bytes_per_justification']:.0f} bytes, "
-        f"{data['justification_share_of_a_record_pct']:.1f}% of a record.** Together with "
-        f"E6a's compute figure this is the central result of the overhead study: the field "
-        f"the project argues for costs about a fifth of a record's bytes and nothing "
-        f"measurable in time.",
+        f"**A justification of this benchmark's length is "
+        f"{data['bytes_per_justification']:.0f} bytes.** This record justifies all "
+        f"{data['modes']['B-DATA (full)']['justifications']} of its steps, so here they "
+        f"are {data['justification_share_of_a_record_pct']:.1f}% of it — an upper bound "
+        f"on the share, not a typical one. The agents justify only their decision; E2 "
+        f"reports what the justifications are of the records the demonstrator actually "
+        f"emits.",
         "",
     ]
     return lines
@@ -375,8 +404,8 @@ def render_scaling(data: dict[str, Any]) -> list[str]:
         "sweep fitted an exponent of **1.468** on building a record, and a 10,000-activity "
         "record took **1.72 s**. The cause was a duplicate check on declared derivations "
         "that scanned a list — O(n) per declaration, O(n²) over a run. With an O(1) "
-        "membership set the same record takes **88 ms**, a 19.6× improvement, and the "
-        "exponent is 1.036.",
+        "membership set the same record took **88 ms**, a 19.6× improvement. The "
+        "exponents in the table above are this occasion's.",
         "",
         "That defect was invisible at every scale the tests and the demonstrator use: six "
         "activities. It would have reached the paper as an unqualified O(A+E) claim. **This "
@@ -505,24 +534,26 @@ def render_stability(first: Path, second: Path) -> list[str]:
     agents_second = read_results(second / "agent.json")["agents"]
     lines += [
         "",
-        "| Agent | Occasion 1 | Occasion 2 |",
-        "|---|--:|--:|",
+        "| Agent | Building it, occasion 1 | occasion 2 | Building and writing it, "
+        "occasion 1 | occasion 2 |",
+        "|---|--:|--:|--:|--:|",
     ]
 
-    def verdict(row: dict[str, Any] | None) -> str:
-        if row is None:
-            return "*not measured*"
-        overhead = row.get("vs_off", {})
-        is_resolved, _ = _resolves(row)
-        if not is_resolved or overhead.get("pct") is None:
-            return "*in noise*"
-        return f"{overhead['pct']:+.0f}%"
+    def verdict(row: dict[str, Any] | None, condition: str) -> str:
+        return "*not measured*" if row is None else _verdict(row, condition)
 
-    for label in agents_first:
-        lines.append(
-            f"| {label} | {verdict(agents_first[label])} | "
-            f"{verdict(agents_second.get(label))} |"
-        )
+    flipped: dict[str, list[str]] = {"B-TRANS": [], "B": []}
+    for label, row in agents_first.items():
+        other = agents_second.get(label)
+        cells = []
+        for condition in ("B-TRANS", "B"):
+            cells += [verdict(row, condition), verdict(other, condition)]
+            if other is not None and (
+                _resolves(row, condition=condition)[0]
+                != _resolves(other, condition=condition)[0]
+            ):
+                flipped[condition].append(label.split(" ")[0])
+        lines.append(f"| {label} | {' | '.join(cells)} |")
     lines.append("")
     lines.append(
         f"Judged under the criterion in force now — a difference must reach "
@@ -532,6 +563,14 @@ def render_stability(first: Path, second: Path) -> list[str]:
 
     timings = [row for row in rows if abs(row[3]) > 10.0]
     exact = [row for row in rows if abs(row[3]) < 0.01]
+    exponents = [row for row in rows if row[0].startswith("Exponent")]
+
+    def held(condition: str) -> str:
+        names = flipped[condition]
+        if not names:
+            return "held for every agent"
+        return f"changed for {', '.join(names)}"
+
     lines += [
         "",
         "### What this says",
@@ -545,19 +584,20 @@ def render_stability(first: Path, second: Path) -> list[str]:
         f"is neither.",
         "",
         f"**The byte counts are exact.** {len(exact)} figures were identical to the byte "
-        f"across occasions. Output size is deterministic given the record, which is why "
-        f"E6c's conclusion — a justification is 278 bytes and 21.7% of a record — is the "
-        f"firmest number in the study and the one to quote.",
+        f"across occasions. Output size is deterministic given the record, which makes the "
+        f"byte counts the firmest numbers in the study.",
         "",
-        "**The complexity class is stable.** The fitted exponents agree to within 2%, and "
-        "both occasions say the same thing: building a record and serialising it are "
-        "linear in the size of the graph. A complexity class is a property of the "
-        "algorithm rather than of the afternoon.",
+        f"**The complexity class is stable.** The fitted exponents agree to within "
+        f"{max((abs(row[3]) for row in exponents), default=0):.1f}%, and both occasions say "
+        f"the same thing: building a record and serialising it are linear in the size of "
+        f"the graph. A complexity class is a property of the algorithm rather than of the "
+        f"afternoon.",
         "",
-        "**The agent ratios are stable in order of magnitude and not in digits.** The meta "
-        "agents are the worst case on both occasions, by a factor of twenty or so over the "
-        "operational agents; CA2 is inside the noise on both. Report the ranking and the "
-        "decomposition, not the second significant figure.",
+        f"**Whether building the record resolves {held('B-TRANS')}; whether building and "
+        f"writing it resolves {held('B')}.** A verdict that changes between two occasions "
+        f"is not a result in either direction, whatever margin either occasion reached. "
+        f"Quote the verdicts that held, and the decomposition, not the second significant "
+        f"figure.",
         "",
     ]
     return lines

@@ -21,7 +21,7 @@ from pathlib import Path
 
 from .base_agent import stream_document
 from .envelope import ProvRecordEnvelope
-from .net_bus import NetworkBus
+from .net_bus import Bus, NetworkBus
 
 DATA_DIR = os.environ.get("DATA_DIR", "/data")
 EXPECTED = [
@@ -87,7 +87,7 @@ def sessions_for(paths: Iterable[Path], root: Path) -> list[tuple[Path, str]]:
     return named
 
 
-async def _wait_for_agents(bus: NetworkBus, timeout: float = 30.0) -> None:
+async def _wait_for_agents(bus: Bus, timeout: float = 30.0) -> None:
     seen: set[str] = set()
     want = set(EXPECTED)
     done = asyncio.Event()

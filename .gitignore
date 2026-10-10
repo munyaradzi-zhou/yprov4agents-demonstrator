@@ -2,6 +2,7 @@
 # Regenerate with `uv run python run_local.py`. Frozen snapshots that back a published
 # result live under experiments/ and ARE versioned; this directory is scratch.
 out/
+out-*/
 _smoke/
 
 # ── Secrets ──────────────────────────────────────────────────────────────────────

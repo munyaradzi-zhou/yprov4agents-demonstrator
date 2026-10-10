@@ -44,7 +44,7 @@ from ..base_agent import (
     stream_document,
 )
 from ..envelope import ProvEventType, ProvRecordEnvelope
-from ..net_bus import NetworkBus
+from ..net_bus import Bus
 from ..util import OUT_DIR, agent_tracker, prov_counts
 
 # consumer roles whose use of a record must precede persistence
@@ -72,7 +72,7 @@ class CA1Storage(StreamingAgent):
     input_subject = "producer.>"
     output_prefix = "agent.lifecycle"
 
-    def __init__(self, bus: NetworkBus) -> None:
+    def __init__(self, bus: Bus) -> None:
         super().__init__(role="ca1", bus=bus)
         self.store = LightweightStore(root=str(OUT_DIR / "store"))
         # session_id -> reassembled original producer document, awaiting consumers

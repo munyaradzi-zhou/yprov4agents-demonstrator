@@ -65,15 +65,15 @@ against those archives. Energy (PR #11) is parked by decision.
 - [x] **AU8** — re-run the pipeline and re-freeze the reference archives once, from a clean committed tree *(audit [4])*
 
 **Paper**
-- [ ] **AU9** — *also: E6's per-agent verdicts are not stable — CA3 and CAx straddle 3× across occasions (2.9× then 5.0×/4.6×); narrow the 'cheaper than the noise floor' headline to the build cost, and cite experiments/audit-reference and audit-llm.* *Also update §6.6: the verdict matrix gained INCOMPLETE (shared) and a third CA1 escalation path, so "twelve of twelve" needs restating after AU8.* The headline "0 of 24" is a verbatim test; 16 of 24 are meta-agent restatements. Narrow to the decision rule over the 8 operational decisions *(audit [2])*
-- [ ] **AU10** — "a rule written once in one place" is not true; reword §3. *Also: the shapes are now 16 named constraints, not 14, and MC1 deliberately requires a decision's type to be stated where the shapes infer it — say so.* *(audit [9])*
+- [x] **AU9** — *also: E6's per-agent verdicts are not stable — CA3 and CAx straddle 3× across occasions (2.9× then 5.0×/4.6×); narrow the 'cheaper than the noise floor' headline to the build cost, and cite experiments/audit-reference and audit-llm.* *Also update §6.6: the verdict matrix gained INCOMPLETE (shared) and a third CA1 escalation path, so "twelve of twelve" needs restating after AU8.* The headline "0 of 24" is a verbatim test; 16 of 24 are meta-agent restatements. Narrow to the decision rule over the 8 operational decisions *(audit [2])*
+- [x] **AU10** — "a rule written once in one place" is not true; reword §3. *Also: the shapes are now 16 named constraints, not 14, and MC1 deliberately requires a decision's type to be stated where the shapes infer it — say so.* *(audit [9])*
 
 **Coverage**
-- [ ] **AU11** — the NATS/container path never runs in CI; add a compose-backed job *(audit [10])*
-- [ ] **AU12** — `bench_overhead`, `bench_report`, `archive` at 0% coverage; they produce the paper's numbers *(audit [11])*
+- [x] **AU11** — the NATS/container path never runs in CI; add a compose-backed job *(audit [10])*
+- [ ] **AU12** — `bench_overhead`, `bench_report`, `archive` at 0% coverage; they produce the paper's numbers *(audit [11])* — *`archive` covered with AU7; `bench_report` and `evaluate`'s byte arithmetic covered with AU9; `bench_overhead` still open*
 
 **Hygiene**
-- [ ] **AU13** — delete `.env.corrupted.bak`; bind NATS to localhost; fix `Homepage`; `get_running_loop()` (done for the base agent and CA1); pin image digests; bring `run_local.py` under the CI type check with a bus protocol shared by `LocalBus` and `NetworkBus`
+- [x] **AU13** — delete `.env.corrupted.bak`; bind NATS to localhost; fix `Homepage`; `get_running_loop()` (done for the base agent and CA1); pin image digests; bring `run_local.py` under the CI type check with a bus protocol shared by `LocalBus` and `NetworkBus`
 
 ## Priority queue for 8 November
 

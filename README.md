@@ -31,7 +31,10 @@ python -m eval.evaluate --out-dir out
 ```
 
 Both paths run the *same agents with the same instrumentation* and emit the same PROV —
-only the transport differs. No API key is required: CAx falls back to a deterministic
+only the transport differs. CI runs both on every commit and holds each to the same
+lineage comparison against `experiments/audit-reference` and the same SHACL shapes; set
+`OUT_HOST_DIR=../out-nats` to keep a container run's records apart from a local one's. The
+broker is published on `127.0.0.1` only: it has no authentication. No API key is required: CAx falls back to a deterministic
 summary and CA3 reports its computed findings without LLM narration.
 
 Artifacts land in `./out`: one PROV-JSON per agent per session, the governance records
@@ -101,8 +104,9 @@ Reflexion* {S4,S5,S6}. ★ is the step that carries `yp:justification`.
 | **MC3** | `AuditabilityAgent` | — | COMPLETE / PARTIAL | reconstructs the who-did-what-when trail |
 
 **Every verdict in that table has been observed in an archived run** — twelve of twelve,
-six from the ordinary pipeline and six from seven injected faults under
-`experiments/audit-reference`. A verdict that has never fired is a claim rather than a
+six from the ordinary pipeline and six from nine injected scenarios under
+`experiments/audit-reference/faults`, which also observe CA1's ESCALATE by each of its three
+reasons and `INCOMPLETE`. A verdict that has never fired is a claim rather than a
 result, which is why the distinction is tracked: this table used to credit CAx with an
 `ESCALATE` it cannot emit and MC3 with no verdict at all when it emits two (review finding
 A3).

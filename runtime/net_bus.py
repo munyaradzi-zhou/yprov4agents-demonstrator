@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Awaitable, Callable
-from typing import Any
+from typing import Any, Protocol
 
 from .envelope import ProvRecordEnvelope
 
@@ -33,6 +33,22 @@ NATSClient = Any
 
 # A handler receives (subject, envelope) and may be async.
 Handler = Callable[[str, ProvRecordEnvelope], Awaitable[None]]
+
+
+class Bus(Protocol):
+    """What an agent needs from a bus: publish, subscribe, close.
+
+    Agents are typed against this rather than against :class:`NetworkBus`, because two
+    buses satisfy it — this one, over NATS, and the in-process bus in ``run_local.py``.
+    Typing them against the concrete class made the in-process run a type error that
+    nothing checked (docs/AUDIT.md, *Found while fixing*).
+    """
+
+    async def publish(self, subject: str, envelope: ProvRecordEnvelope) -> None: ...
+
+    async def subscribe(self, subject: str, handler: Handler) -> None: ...
+
+    async def close(self) -> None: ...
 
 
 class NetworkBus:

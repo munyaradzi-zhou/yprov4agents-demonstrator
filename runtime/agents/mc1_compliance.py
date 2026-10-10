@@ -23,7 +23,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from ..base_agent import StreamingAgent
-from ..net_bus import NetworkBus
+from ..net_bus import Bus
 from ..util import agent_tracker
 
 #: The structural standard MC1 enforces, named after the SHACL shapes that declare it.
@@ -113,7 +113,7 @@ class MC1Compliance(StreamingAgent):
     input_subject = "agent.lifecycle.>"
     output_prefix = "governance"
 
-    def __init__(self, bus: NetworkBus) -> None:
+    def __init__(self, bus: Bus) -> None:
         super().__init__(role="mc1", bus=bus)
 
     @staticmethod

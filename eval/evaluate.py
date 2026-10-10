@@ -141,6 +141,35 @@ def decisions(doc: dict[str, Any]) -> tuple[int, int]:
     return total, justified
 
 
+def _serialised_size(doc: dict[str, Any]) -> int:
+    """Bytes of a record as ``runtime.util.write_prov`` writes it."""
+    return len(json.dumps(doc, indent=2, ensure_ascii=False).encode("utf-8"))
+
+
+def justification_bytes(doc: dict[str, Any]) -> tuple[int, int]:
+    """(bytes the record's justifications cost it, bytes of the whole record).
+
+    Measured as the difference the field makes to the serialised record — key, quoting
+    and escaping included — rather than as the length of the text. The overhead study
+    reports the same quantity for one synthetic record that justifies every step (E6c);
+    this is the figure for the records the agents actually emit, which justify only their
+    decision.
+    """
+    stripped = {
+        section: (
+            {
+                node_id: {k: v for k, v in node.items() if k != "yp:justification"}
+                for node_id, node in body.items()
+            }
+            if section == "activity" and isinstance(body, dict)
+            else body
+        )
+        for section, body in doc.items()
+    }
+    whole = _serialised_size(doc)
+    return whole - _serialised_size(stripped), whole
+
+
 def _shacl_section(out_dir: Path) -> str:
     """The same claim, judged externally: do the records satisfy the declared shapes?
 
@@ -279,7 +308,7 @@ def main() -> None:
     # since Phase 6 the rule is declared in vocab/shapes.ttl and applied by an
     # independent SHACL engine, so "every decision is justified" is a conformance
     # statement against an external standard rather than a self-report.
-    tot_d = tot_j = 0
+    tot_d = tot_j = tot_jb = tot_b = 0
     emit("## E2 — Instrumentation coverage (not the headline claim)")
     emit()
     emit(
@@ -290,23 +319,46 @@ def main() -> None:
         "see E3 for the claim that does the work."
     )
     emit()
-    emit("| Agent | Decisions | With `yp:justification` | Coverage |")
-    emit("|---|--:|--:|--:|")
+    emit(
+        "| Agent | Decisions | With `yp:justification` | Coverage "
+        "| Justification bytes | Share of the record |"
+    )
+    emit("|---|--:|--:|--:|--:|--:|")
     for role in list(OPERATIONAL) + list(META):
         rows = [doc for _, r, doc in runs if r == role]
         if not rows:
             continue
-        d = j = 0
+        d = j = jb = b = 0
         for doc in rows:
-            a, b = decisions(doc)
-            d += a
-            j += b
+            made, justified = decisions(doc)
+            d += made
+            j += justified
+            spent, size = justification_bytes(doc)
+            jb += spent
+            b += size
         tot_d += d
         tot_j += j
+        tot_jb += jb
+        tot_b += b
         pct = f"{100.0 * j / d:.0f}%" if d else "—"
-        emit(f"| {ROLE_NAMES.get(role, role)} | {d} | {j} | {pct} |")
+        per = f"{jb / j:,.0f} B each" if j else "—"
+        emit(
+            f"| {ROLE_NAMES.get(role, role)} | {d} | {j} | {pct} | {per} | "
+            f"{100.0 * jb / b:.1f}% |"
+        )
     overall = f"{100.0 * tot_j / tot_d:.0f}%" if tot_d else "—"
-    emit(f"| **All** | **{tot_d}** | **{tot_j}** | **{overall}** |")
+    share = 100.0 * tot_jb / tot_b if tot_b else 0.0
+    emit(
+        f"| **All** | **{tot_d}** | **{tot_j}** | **{overall}** | "
+        f"**{tot_jb:,} B** | **{share:.1f}%** |"
+    )
+    emit()
+    emit(
+        f"**The justifications are {share:.1f}% of these records, serialised** — "
+        f"{tot_jb:,} of {tot_b:,}. That is the storage cost of the field this project "
+        f"argues for, in the records the agents emit; E6c's larger share is a synthetic "
+        f"record that justifies every step."
+    )
     emit()
     emit(_shacl_section(out_dir))
     emit()

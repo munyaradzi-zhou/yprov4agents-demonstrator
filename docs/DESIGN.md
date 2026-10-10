@@ -126,10 +126,10 @@ Rootless-friendly, so the same image converts cleanly to Apptainer for HPC later
 **This table used to read 0 / 78 / 44 / 250 down the Strategy A column, and four of those
 figures were wrong.** A callback handler sees every node, times it, reconstructs the whole
 relation set, and serialises to conformant PROV-JSON. It even recovers the verdicts, by
-scraping the labels developers wrote them into. What it does not recover, under any
-configuration, is the reasoning — measured by searching every string the handler was handed
-for the justifications in the explicit record, and finding none of them. One earned zero is
-worth more than four unearned ones. See `paper/OUTLINE.md` E3 and `eval/baseline.py`.
+scraping the labels developers wrote them into. It finds no justification verbatim.
+The verbatim search is close to true by construction — a sentence assembled at run time rarely survives intact anywhere — so the claim rests on a fact-level measure instead (`eval.baseline`, E3b; `docs/AUDIT.md` [2]): of the facts the eight operational justifications cite, the handler saw 61%
+somewhere, and none of the values the agents computed in order to decide. What it never has is
+the decision rule — which facts were combined, against what threshold. See `eval/baseline.py`.
 
 Read the relation total as a split, not a number: 126 observed, 72 derived, 30 declared,
 96 agent attributions. The attributions are one per activity, so they count steps rather

@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import contextlib
+import io
 import os
 import sys
 from pathlib import Path
@@ -40,8 +41,9 @@ if str(HERE) not in sys.path:
 # Windows consoles default to cp1252, which cannot encode the box-drawing and arrow
 # characters the agents log. Never let a print() kill a run.
 for _stream in (sys.stdout, sys.stderr):
-    with contextlib.suppress(Exception):
-        _stream.reconfigure(encoding="utf-8", errors="replace")
+    if isinstance(_stream, io.TextIOWrapper):  # not when a test harness has replaced it
+        with contextlib.suppress(Exception):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
 
 
 # ── a NATS-compatible in-process bus ───────────────────────────────────────────
@@ -59,7 +61,7 @@ def subject_matches(pattern: str, subject: str) -> bool:
 
 
 class LocalBus:
-    """Drop-in replacement for NetworkBus with in-process delivery."""
+    """Drop-in replacement for NetworkBus with in-process delivery; satisfies ``Bus``."""
 
     def __init__(self, url: str = "local://", name: str = "local") -> None:
         self.url, self.name = url, name
