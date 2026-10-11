@@ -203,6 +203,7 @@ paper/                paper outline and results
 
 | Document | What it covers |
 |---|---|
+| `docs/SYSTEM_LAYOUT.md` | **the whole system, phase by phase**: data flow, information model, the `yp:` ontology, UML |
 | `docs/DESIGN.md` | why the demonstrator is shaped this way; scope; build plan; risks |
 | `docs/INSTRUMENTATION.md` | **how to instrument any agent** — library vs API vs OpenTelemetry |
 | `paper/OUTLINE.md` | the paper this demonstrator is the evaluation for |
