@@ -31,7 +31,9 @@ OUT = PAPER / "tex"
 #: Figure number in the draft -> rendered file. Drawn ~6.8 in wide, so it spans both
 #: columns: scaled to one column, its text would be unreadable at print size.
 FIGURES = {
-    "1": "f4_two_escalations",
+    "1": "da_architecture_wide",
+    "2": "f5_a_versus_b",
+    "3": "f9_where_the_overhead_is",
 }
 
 #: The reference list, keyed as the draft cites it (``[@key]``). Written into ``main.tex``

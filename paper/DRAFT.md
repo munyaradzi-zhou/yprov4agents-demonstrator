@@ -127,10 +127,14 @@ activities recorded zero duration.
 
 ## 4. The Demonstrator
 
-A producer replays real yProv4ML records over a NATS bus to four operational agents, which do
+A producer replays real yProv4ML records over a provenance bus (NATS) to four operational agents, which do
 work and emit typed PROV about themselves; two meta agents consume *that* and emit PROV in turn.
 There is no agent framework: the agents are bare asyncio daemons, the strongest evidence that the
-library is not tied to one runtime.
+library is not tied to one runtime. Figure 1 shows the architecture.
+
+> **Figure 1.** The demonstrator. A producer replays yProv4ML records onto the provenance bus;
+> four operational agents do the work and emit their own PROV, which two meta agents govern.
+> CA1 writes to yProvStore through the store's API, never over the bus.
 
 | Agent | Work | Verdicts |
 |---|---|---|
@@ -174,18 +178,11 @@ real gaps in yProv4ML's records: 8 of 9 activities declare a start and no end.
 
 Strategy A is a callback-level baseline we built ourselves from the *same run*, fed every step
 event a framework handler receives. It is an upper bound: its events carry the structural facts
-the explicit instrumentation declared.
+the explicit instrumentation declared. Figure 2 compares the two over the 24 records.
 
-| Signal | A | B |
-|---|--:|--:|
-| Activities, typed | 96 | 96 |
-| Entities, typed | 0 of 54 | 78 of 78 |
-| Relations | 324 | 324 |
-| Verdicts | 24 | 24 |
-| Justifications | 0 | 24 |
-| Accepted by the PROV parser | 24 | 24 |
-
-**Table 3.** Callback baseline (A, with a ten-rule type map) against explicit capture (B).
+> **Figure 2.** Callback baseline (A, with a ten-rule type map) against explicit capture (B),
+> signal by signal over the 24 records. A recovers every activity, relation and verdict; it
+> types no entity, carries no pointer and recovers no justification.
 
 Structure is recoverable, and so are the verdicts, scraped from node labels, which a graph
 naming its decision node `decide` would defeat. No justification appears verbatim in the 12,425
@@ -196,7 +193,7 @@ characters A observed, but a run-time sentence rarely survives verbatim, so we t
 | Operational | 8 | 49 | 30 (61%) | 2 |
 | Meta | 16 | 16 | 16 (100%) | 16 |
 
-**Table 4.** Each justification's facts (figures, hashes, names, roles) searched for in
+**Table 3.** Each justification's facts (figures, hashes, names, roles) searched for in
 everything A saw. Seeing a fact over-counts knowing it.
 
 The 19 facts A never saw are those the agents *computed in order to decide*: a record's byte
@@ -206,11 +203,8 @@ values sent it to a fallback chart, nor that the fallback is why it said REVISE.
 justifications restate structure A already has, and are not counted. **The inputs to a decision
 may be observable; the rule that combined them is not.**
 
-> **Figure 1.** One verdict, two causes: CA1's integrity and timeout escalations, with both
-> justifications quoted as the record carries them.
-
-Figure 1 shows the cost. CA1 says ESCALATE for three reasons; A recovers the verdict, never the
-reason, so it cannot tell *"storage is corrupting records"* from *"a consumer is down"*.
+The cost is visible in one agent. CA1 says ESCALATE for three reasons; A recovers the verdict,
+never the reason, so it cannot tell *"storage is corrupting records"* from *"a consumer is down"*.
 
 ### 5.3 Energy
 
@@ -224,13 +218,13 @@ concluded the counter was broken; it reads zero until its first sample.
 | joules | 1.43 | 1.50 | 1.72 |
 | vs OFF (margin) | baseline | +5% (0.9x) | +20% (2.3x) |
 
-**Table 5.** Measured CPU energy per six-agent session, 12 interleaved rounds with idle windows
+**Table 4.** Measured CPU energy per six-agent session, 12 interleaved rounds with idle windows
 (`experiments/energy-session`). No difference reaches 3x its spread.
 
 Per step, energy cannot be attributed at all: at a 15 s sampling period a step that did nothing
 was charged ten times the step that rendered a chart. Each figure therefore carries
 `yp:energy_sampling_period_s` and `yp:energy_attributable`, and **energy belongs at session
-granularity**, where Table 5 measures it.
+granularity**, where Table 4 measures it.
 
 ### 5.4 Model provenance
 
@@ -245,13 +239,17 @@ fingerprint, and the four calls of one run returned three fingerprints.
 Each agent's step was timed 30 times per condition, interleaved: provenance off, built but not
 written (B-TRANS), and built and written (B); a difference counts only at 3x its spread. On two
 occasions, **building the record was inside every operational agent's run-to-run variance**
-(margins 0.0 to 0.5x). Writing it resolves for some agents, and there it dominates: for the worst
+(margins 0.0 to 0.5x). Writing it resolves for some agents, and there it dominates (Figure 3): for the worst
 case, MC1, a 109 µs step gains 38 µs to build the record and 1,485 µs to write it (+1,394%, 98%
 of it the write). Transient mode removes 89% of the time cost; metadata mode 38% of the bytes,
 keeping every justification. Recording a justification costs 54 ns against a ±726 ns spread, and
 justifications are 6.5% of the records' bytes. Cost is linear (fitted exponents 1.09 and 1.13 to
 10,000 activities). Across occasions, two agents' verdicts flipped between resolved and not, so
 we quote the verdicts that held, the bytes and the complexity class, not the timings.
+
+> **Figure 3.** Where the overhead is: each agent's own work, building the PROV record, and
+> writing it to disk, as shares of one record's end-to-end time, with the measured total and
+> the overhead against no provenance (CA2, inside the noise, is omitted).
 
 ### 5.6 Verdict reachability
 
