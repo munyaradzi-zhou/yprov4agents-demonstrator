@@ -217,8 +217,11 @@ def test_an_energy_figure_states_whether_it_can_be_attributed_to_the_step() -> N
 
     Measured on this demonstrator with codecarbon's 15-second default: a step of 0.000 s
     was handed 46.9 µWh while the rendering step that actually did the work was handed
-    4.6 µWh. The number is real consumption in a real window, so it is recorded rather
-    than dropped — what is not real is the attribution, and the record has to say which.
+    4.6 µWh. The figure is kept rather than dropped and the attribution denied instead.
+
+    Attributability is independent of whether the watts were observed or estimated —
+    `source` carries that, and the two can fail together. See
+    `test_a_modelled_figure_is_never_labelled_measured`.
     """
     from yprov4agenticai import EnergyDelta
 
@@ -234,6 +237,49 @@ def test_an_energy_figure_states_whether_it_can_be_attributed_to_the_step() -> N
     assert attrs["yp:energy_sampling_period_s"] == 15.0
     assert attrs["yp:energy_attributable"] is False
     assert "yp:energy_sampling_period_s" not in unsampled.to_attrs()
+
+
+def test_a_modelled_figure_is_never_labelled_measured() -> None:
+    """`source_label` must require a CPU counter that is *delivering*, not merely selected,
+    and must never call a sum with a modelled RAM component "measured".
+
+    It has been wrong three ways: probing only Linux RAPL, trusting a mode name, and
+    checking the CPU+RAM total — which the RAM model makes non-zero whatever the processor
+    counter reads. The last row of cases is the one that caught that.
+    """
+    from yprov4agenticai.energy import CodeCarbonBackend
+
+    backend = CodeCarbonBackend(country_iso_code="GBR")
+
+    class _Hardware:
+        def __init__(self, mode: str | None) -> None:
+            self._mode = mode
+
+    class _Energy:
+        def __init__(self, kwh: float) -> None:
+            self.kWh = kwh
+
+    class _Tracker:
+        def __init__(self, mode: str | None, cpu: float, ram: float = 1e-6) -> None:
+            self._hardware = [_Hardware(mode)]
+            self._total_cpu_energy = _Energy(cpu)
+            self._total_energy = _Energy(cpu + ram)
+
+    cases = [
+        ("cpu_load", 1e-6, "modelled", "a load model is not an observation"),
+        ("constant", 1e-6, "modelled", "a TDP constant is not an observation"),
+        ("windows_emi", 0.0, "modelled", "a counter reading zero is not delivering"),
+        ("intel_rapl", 0.0, "modelled", "RAPL present but unreadable falls back silently"),
+        ("intel_rapl", 1e-6, "partly-measured", "a delivering CPU counter; RAM still modelled"),
+        ("windows_emi", 1e-6, "partly-measured", "EMI delivering, as on the development host"),
+    ]
+    for mode, cpu, expected, why in cases:
+        backend._tracker = _Tracker(mode, cpu)
+        assert backend.source_label == expected, f"{mode}/{cpu}: {why}"
+        assert backend.source_label != "measured", "the RAM component is never observed"
+
+    backend._tracker = None
+    assert backend.source_label == "modelled", "no tracker means nothing was measured"
 
 
 def test_the_first_step_is_not_charged_for_the_agent_idling(

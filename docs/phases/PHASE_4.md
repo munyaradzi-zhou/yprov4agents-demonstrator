@@ -187,7 +187,29 @@ And then the measurement said something I did not expect.
    So a delta lands on whichever step happened to read AFTER a tick.
 ```
 
-Measured, first attempt:
+**First, what kind of number this is.** These figures are **modelled, not measured.** On
+this Windows laptop no hardware energy counter is reachable: RAPL is a Linux `sysfs`
+interface and does not exist, Intel Power Gadget is absent and discontinued, and the
+Windows Energy Meter Interface is advertised as available by codecarbon yet returns a
+processor energy delta of **0.0** under a CPU-saturating load, because it needs OEM
+firmware this machine does not provide. codecarbon therefore estimates processor power as
+`TDP x (0.1 + 0.9 x load^3)` and RAM power as a flat function of installed capacity — a
+constant 10 W here, which supplied 41% of the total in a four-second calibration run.
+
+> **Corrected in Phase 7.** The EMI counter was not broken. It reads zero until its
+> first sample, and the four-second calibration read it before that. Read properly, it
+> follows the load (5 W idle, 21 W one core, 31 W all cores), so on this laptop the
+> **processor energy is measured** and only the memory figure is modelled. The per-step
+> figures in this section came from an older codecarbon (3.2.7) that used the load model,
+> so they are still modelled. See [`PHASE_7.md`](PHASE_7.md).
+
+Getting real values means booting Linux with a readable RAPL counter. Nothing below
+depends on that: the attribution problem is a property of the sampling period against the
+step duration, and a 15-second sampler cannot resolve a millisecond step whether its watts
+are observed or estimated. But the distinction has to be recorded, which is what
+`yp:energy_source` is for — see the ascii sketch at the end of this section.
+
+Recorded, first attempt:
 
 | step | energy charged | step duration |
 |---|--:|--:|
@@ -198,6 +220,36 @@ The step that did nothing was charged **ten times** what the step that drew the 
 charged. And a second artifact was worse: the *first* step of every record was charged
 **28.3 seconds** of inter-message idle time, because the energy tracker outlives any one
 record and its first delta covers the gap since the last message.
+
+### Measured or modelled: how the record tells you
+
+```
+  Is a hardware counter SELECTED?            (codecarbon picks the mode)
+        |                        |
+       no                       yes   intel_rapl / windows_emi / power_gadget
+        |                        |
+        v                        v
+   cpu_load or constant     Is it DELIVERING?   (cumulative energy > 0)
+   TDP x load curve              |          |
+        |                       no         yes
+        |                        |          |
+        v                        v          v
+   yp:energy_source =      "modelled"   "measured"
+       "modelled"        (the EMI trap:
+                          loads, reads 0)
+
+  This host  --->  windows_emi SELECTED, returns 0.0  --->  "modelled"
+```
+
+> **Corrected in Phase 7:** the "returns 0.0" was a read before the first sample, and the
+> "cumulative energy > 0" test checked CPU + RAM, which the RAM model always makes positive.
+> The label now checks the processor's own total and says `partly-measured`, because the
+> RAM half of the sum is never observed.
+
+Checking the mode alone would have labelled this host's zeros as a measurement. Checking
+only the Linux RAPL path — which is what the code did first — labels every non-Linux host
+"modelled" even where a counter works. Both checks are needed, and overclaiming is the
+worse direction to be wrong in, so the label requires both.
 
 ### Both are fixed, and the fix is the contribution
 

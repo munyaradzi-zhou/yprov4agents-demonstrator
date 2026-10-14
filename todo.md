@@ -52,6 +52,14 @@ Full findings, evidence and re-check commands in [`docs/AUDIT.md`](docs/AUDIT.md
 the code is fixed first, the archives are re-frozen **once**, and the paper is rewritten last
 against those archives. Energy (PR #11) is parked by decision.
 
+**Energy, 10 October 2026** — done on branch `energy-benchmark`
+([`docs/phases/PHASE_7.md`](docs/phases/PHASE_7.md)). PR #11's labelling commit is carried
+there, corrected: the EMI counter works on this host (it read zero only before its first
+sample), so CPU energy is measured and RAM modelled, and a summed figure is labelled
+`partly-measured`. Session-level study archived in `experiments/energy-session`: no
+condition resolves against OFF. PR #11 can be closed as superseded.
+- [ ] A second occasion on a Linux host with RAPL, to confirm the session-level result
+
 **Code**
 - [x] **AU1** — `eval.compare` gate compares relation counts, not endpoints; rewired lineage passes `--strict` *(audit [1])*
 - [x] **AU2** — `sequence_no` never checked; a lost chunk becomes a well-formed record of a truncated input *(audit [3])*

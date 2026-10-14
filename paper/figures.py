@@ -343,7 +343,7 @@ def figure_five() -> None:
         [p - width / 2 for p in positions],
         a_values,
         width,
-        label="Strategy A — callback handler",
+        label="Strategy A: callback handler",
         color=LIGHT,
         edgecolor=MUTED,
         linewidth=0.8,
@@ -352,7 +352,7 @@ def figure_five() -> None:
         [p + width / 2 for p in positions],
         b_values,
         width,
-        label="Strategy B — explicit instrumentation",
+        label="Strategy B: explicit capture",
         color=[ACCENT if flag else "#aab6e4" for flag in highlight],
         edgecolor=ACCENT,
         linewidth=0.8,
@@ -387,7 +387,7 @@ def figure_five() -> None:
 
     # The cliff, named where it happens.
     ax.annotate(
-        f"0 of {b['justifications']}\nthe only earned zero",
+        f"0 of {b['justifications']}\nno justification recovered",
         xy=(len(rows) - 1 - width / 2, 4),
         xytext=(len(rows) - 2.5, max(b_values) * 0.42),
         fontsize=8,
@@ -441,7 +441,10 @@ def figure_nine() -> None:
         write = max(row["write_cost_ns"], 0)
         total = own + build + write
         shares.append((100 * own / total, 100 * build / total, 100 * write / total))
-        totals.append(total / 1e6)
+        # The printed total is the measured median, not the sum of the segments: a build
+        # cost inside the noise can measure slightly negative and is drawn as zero, so the
+        # sum would overstate the step by that amount (CAx: 7.99 ms summed, 7.94 measured).
+        totals.append(medians["B"] / 1e6)
 
         noise = row["vs_off"]["noise_ns"]
         margin = abs(medians["B"] - own) / noise if noise else float("inf")

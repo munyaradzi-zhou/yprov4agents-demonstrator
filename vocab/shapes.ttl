@@ -192,7 +192,8 @@ yp:EnergyShape
     sh:targetSubjectsOf yp:energy_kwh ;
     sh:property [
         sh:path     yp:energy_source ;
-        sh:in       ( "measured"^^xsd:string "modelled"^^xsd:string "null"^^xsd:string ) ;
+        sh:in       ( "measured"^^xsd:string "partly-measured"^^xsd:string
+                      "modelled"^^xsd:string "null"^^xsd:string ) ;
         sh:minCount 1 ;
         sh:name     "energy-sourced" ;
         sh:message  """An energy figure must say where it came from. A modelled estimate

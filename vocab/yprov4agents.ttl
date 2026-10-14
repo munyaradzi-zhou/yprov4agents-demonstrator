@@ -446,9 +446,12 @@ yp:energy_source
     rdfs:domain prov:Activity ;
     rdfs:range  xsd:string ;
     rdfs:label  "energy measurement source"@en ;
-    rdfs:comment """`measured` when a hardware counter was readable, `modelled` when a
-        thermal-design-power estimate was used, `null` when accounting was enabled with
-        no backend. A labelled zero is a different claim from an absent measurement."""@en .
+    rdfs:comment """`measured` when every component of the figure came from a hardware
+        counter; `partly-measured` when the processor did and memory was estimated, which is
+        what codecarbon reports on a host with a readable CPU counter; `modelled` when the
+        figure is an estimate from load and rated power; `null` when accounting was enabled
+        with no backend. A labelled zero is a different claim from an absent
+        measurement."""@en .
 
 yp:energy_sampling_period_s
     a           owl:DatatypeProperty ;
