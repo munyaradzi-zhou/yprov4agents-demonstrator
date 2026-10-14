@@ -1,620 +1,283 @@
 # Capture, Not Retrieve: Behavioural Provenance for Agentic AI
 
-> **6,733 words, 3 figures, 6 tables** — measured with `wc -w` over this file, not estimated;
-> 6,428 from §1 onwards, of which ~420 came with the session-level energy study (§6.3). Four earlier versions of this line stated a target I was aiming at
-> instead of the file's actual length; the number above is the only kind worth printing. The
-> post-audit rewrite added ~610 words, mostly Table 3 and the fact-level argument it carries. Cut from the 7,900-word full draft at
-> commit `53c5b61`, which remains the reservoir for anything a reviewer asks to see expanded.
->
-> **Whether this fits 6 IEEE pages is not yet known.** Word-count estimates for a two-column
-> page range from ~900 to ~1,200, which spans "fits" and "a page over", so the question can
-> only be settled by typesetting it. No LaTeX toolchain is installed here; see
-> `paper/OUTLINE.md` for the ranked cuts that close a gap of up to ~1,000 words if one exists.
-
-> Every figure quoted here is read from a frozen archive under `experiments/`, named at the
-> point of use — **with one exception, labelled in place**: Table 5's per-step energy figures
-> come from a Phase-4 development run recorded in `docs/phases/PHASE_4.md`. The session-level
-> energy study is archived in `experiments/energy-session`; its CPU figures are measured and its
-> RAM figures modelled, and the two are never summed.
-> The reference archives are `experiments/audit-reference` and `experiments/audit-llm`, frozen
-> from clean commits after the audit in `docs/AUDIT.md`, which narrowed the rationale result
-> (§6.2) and the overhead headline (§6.5).
-
-**Figures** (`python -m paper.figures`): Figure 1 = `f1_two_layers` ·
-Figure 2 = `f4_two_escalations` · Figure 3 = `f9_where_the_overhead_is`. `f5_a_versus_b` is
-rendered and held in reserve: it plots the same 30 values as Table 2, which states them
-precisely in comparable space.
+> **Six-page version.** Condensed from `paper/DRAFT_full.md` (the long draft, kept as the
+> reservoir for anything a reviewer asks to see expanded) and given a state-of-the-art section.
+> Every figure is read from a frozen archive under `experiments/` — `audit-reference`,
+> `audit-llm`, `energy-session` — named at the point of use. Citations are `[@key]` markers,
+> resolved against the reference list in `paper/build_tex.py`.
 
 ---
 
 ## 1. Introduction
 
-Scientific computing infrastructure is acquiring autonomous agents. They summarise runs, select
-hyperparameters, decide what to archive, and increasingly act on those decisions without a human
-in the loop. The provenance community has a mature answer to *what* such a system did: W3C PROV
-describes activities, entities and the lineage between them, and tooling to capture that lineage
-automatically is now routine.
+Scientific computing infrastructure is acquiring autonomous agents: they summarise runs, judge
+results and decide what to archive, increasingly without a human in the loop. The provenance
+community has a mature answer to *what* such a system did. W3C PROV [@provdm] describes
+activities, entities and the lineage between them, and capturing that lineage automatically is
+routine. It has almost no answer to *why*. When a storage agent declines to archive a record, an
+operator, an auditor and — under the EU AI Act [@euaiact] — a regulator need the reason, not the
+outcome.
 
-It has almost no answer to *why*.
+We argue that this gap is **structural, not a matter of tooling**:
 
-When a storage agent declines to archive a record, when a summariser rejects its own output, when
-a compliance agent fails a colleague's record — an operator, an auditor, and increasingly a
-regulator need the reason, not the outcome. The EU AI Act's transparency obligations are written
-in the language of explanation rather than of logging. A record that says a decision was taken,
-and when, and by which component, and still cannot say why, does not meet that bar.
+> The rationale for a decision is a local computation at the moment of decision. A callback
+> fires after the function returns; a span wraps the call; a query reads the store afterwards.
+> Each may see the facts the decision used. None can retrieve the rule that combined them into a
+> verdict, because that rule was never a value anything passed.
 
-Our claim is that this gap is **structural rather than a matter of insufficient tooling**:
+We call this **capture, not retrieve**, and make three contributions.
+**C1 — The argument, measured.** Against a deliberately generous callback-level baseline over
+the same run, which recovers every activity, relation and verdict, we show that the facts an
+agent *computed* in order to decide, and the rule that combined them, are unrecoverable.
+**C2 — A reflexive multi-agent architecture.** Four operational agents emit typed PROV about
+themselves; two meta agents govern that output, to a depth bounded by design.
+**C3 — The `yp:` vocabulary**, published as an OWL ontology with SHACL shapes, and an API whose
+one hand-written call records the decision. We also measure the cost, in time and in energy.
 
-> The rationale for a decision is a local variable at the moment of decision. A callback fires
-> after the function returns; a span wraps the call; a query reads the store afterwards. Each may
-> see the facts the decision used. None of them can retrieve the rule that combined those facts
-> into a verdict, because that rule was never a value anything passed.
+## 2. Background and State of the Art
 
-We call this **capture, not retrieve**. The corollary is uncomfortable for the
-observability-first approach that dominates agent tooling: no amount of additional collection
-closes the gap, because the information is not in the span. Behavioural provenance therefore has
-an irreducible explicit component — instrumentation a developer must write, at the point of
-decision, that no framework can supply.
+### 2.1 Provenance models and capture systems
 
-**C1 — Capture, not retrieve.** A structural argument supported by an A-versus-B comparison over
-the *same agents in the same run*. We build the callback-level baseline ourselves and make it as
-strong as we can: it reconstructs 96 of 96 activities, all 324 relations and 24 of 24 verdicts,
-and its output is accepted by the reference W3C PROV parser. It recovers no justification
-verbatim, and we do not rest on that. Searched fact by fact, it saw 61% of what the eight
-operational justifications cite — and none of the values the agents computed in order to decide
-(§6.2).
+W3C PROV [@provdm; @provo] models provenance as entities, activities and agents linked by a small
+set of relations; it is deliberately domain-neutral, and says nothing about rationale. Capture
+systems differ in where they observe. *Script and workflow* tools — noWorkflow [@noworkflow] for
+Python scripts, YesWorkflow [@yesworkflow] for annotated workflows — recover lineage from code and
+execution. *System-level* collectors such as SPADE [@spade] and CamFlow [@camflow] capture
+whole-system provenance from the operating system, CamFlow emitting W3C PROV-JSON directly.
+*Machine-learning* trackers record runs, parameters and artifacts: MLflow [@mlflow] with its own
+schema, and the yProv family — yProv4ML [@yprov4ml] for training runs, yProv4WFs for workflows —
+in W3C PROV. Surveys of the field [@freire2008; @herschel2017] classify provenance by *what* it
+records and *how* it is captured; across all of them, what is recorded is an observable event.
+Our demonstrator consumes real yProv4ML records, and every system above could, in principle,
+observe the agents we build. None could observe their reasoning.
 
-**C2 — A reflexive multi-agent provenance architecture.** Four operational agents emit typed PROV
-about themselves; two meta agents consume *that* and emit PROV in turn. Containerised, run over a
-real message bus in CI, and governing its own governance layer to a depth we state exactly (§5.1).
+### 2.2 Agents, and the observability built for them
 
-**C3 — The `yp:` vocabulary and a six-step lifecycle**, published as an OWL ontology with SHACL
-shapes, instantiated by four heterogeneous agents — deterministic, LLM-backed and hybrid — and
-governed uniformly against the declared shapes (§3).
+Agent frameworks interleave reasoning and tool use [@react] and compose agents into multi-agent
+systems [@autogen; @langgraph]. Their runs are observed by a fast-maturing layer:
+OpenTelemetry's semantic conventions for generative AI [@otelgenai], and tracing platforms such as
+OpenLLMetry [@openllmetry], Langfuse [@langfuse] and LangSmith [@langsmith], which record prompts,
+completions, tool calls, latencies and token counts. This layer is built for debugging and cost
+attribution. It does not model W3C PROV, and the only rationale it can hold is text a model
+happened to emit. PROV-AGENT [@provagent] is the closest prior work: it extends PROV to agentic
+workflows and makes agents and their model calls first-class provenance subjects — a richer
+*what*, with no field for the reason behind a decision.
 
-We also measure the cost, because an argument that explicit instrumentation is *necessary* is
-worth little if it is expensive. Building the record, justification included, moves no operational
-agent's step by more than its own run-to-run variance, on either of two occasions; the
-justifications are 6.5% of the records' bytes. What costs is writing the record to disk, and that
-is a deployment decision the library exposes (§6.5). Measured CPU energy per session shows no
-resolvable difference either (§6.3).
+### 2.3 Rationale, explanation and accountability
 
----
+Interpretability research asks how a model reaches outputs [@doshivelez2017], and documentation
+practice — model cards [@modelcards], datasheets [@datasheets] — records how artifacts were made.
+Two results bear directly on agents. A model's stated chain of thought is not necessarily
+faithful to the process that produced its answer [@turpin2023; @lanham2023], so text a model emits
+is weak evidence of the rule an agent applied. And proposals for the oversight of deployed agents
+call for exactly the per-action visibility — identifiers, activity logs, the basis of
+decisions — that a provenance record could carry [@chan2024]. Energy is the third concern of the
+field: reporting it for ML workloads is now expected [@strubell2019; @henderson2020], usually
+through sampling tools such as CodeCarbon [@codecarbon], whose limits for short steps we revisit
+in Section 5.3.
 
-## 2. Background and related work
+| Approach | W3C PROV | Automatic | Agent-aware | Decision rule |
+|---|:-:|:-:|:-:|:-:|
+| Script, workflow and system capture | yes | yes | no | no |
+| ML lifecycle trackers | partly | yes | no | no |
+| LLM and agent observability | no | yes | yes | no |
+| PROV-AGENT | yes | yes | yes | no |
+| This work | yes | partly | yes | **yes** |
 
-**W3C PROV** models provenance as three classes — `prov:Entity`, `prov:Activity`, `prov:Agent` —
-and a small set of relations between them. Its deliberate domain-neutrality is why it says nothing
-about rationale: PROV describes *what was derived from what, by whom*, and a justification is none
-of those things. It is a property of an activity that no relation can express, which is why an
-extension vocabulary is needed rather than a modelling convention. This work sits in the **yProv**
-family, which instruments machine-learning runs (yProv4ML) and workflows (yProv4WFs) with
-content-addressed storage for large payloads; our demonstrator consumes real yProv4ML records, so
-the agents are exercised against provenance not written for them.
+**Table 1.** The state of the technology. "Decision rule" means the reason an agent's code reached
+its verdict, as opposed to model text that may describe one. Our capture is automatic except for
+that one field.
 
-Agent frameworks differ in their abstractions but converge on a recurring shape, which we take as
-the unit of instrumentation, in three phases: *ingestion and scoping* (S1 receive, S2 plan),
-*execution* (S3 act — the model call, the tool call, the write), and *governance and reflexion*
-(S4 observe, **S5 decide**, S6 respond). S5 is the step this paper is about, and the only one
-whose content an external observer cannot reconstruct.
+**Our position is to ride the automatic layer rather than compete with it**: consume what it
+collects, and add the one thing it structurally cannot.
 
-**PROV-AGENT** (Souza et al.) is the closest prior work: it extends PROV for agentic systems and
-treats agents as first-class provenance subjects, but models data as untyped `DomainData` and
-carries no decision rationale — it records a richer *what*, and the *why* remains outside the
-model. Work on post-hoc reasoning reconstruction (AER; Vispute et al.) formalises a result we rely
-on: **a reasoning trace cannot in general be identified from inputs and outputs alone**, because
-many distinct reasoning processes are consistent with the same observable behaviour. Where that
-literature treats this as a limit on explanation, we treat it as a design requirement. Meanwhile
-OpenTelemetry's GenAI conventions, OpenLLMetry, Langfuse and LangSmith have effectively solved
-automatic collection of the *what*; none models W3C PROV and none captures rationale, because they
-are built for debugging and cost attribution. **Our position is to ride that layer rather than
-compete with it.** The planning/tool-use/reflection vocabulary of the applied agent literature
-supplies our lifecycle; we add nothing to it, we instrument it.
+## 3. Vocabulary and Instrumentation
 
----
+**The `yp:` vocabulary** is published as an OWL ontology (86 terms) with SHACL [@shacl] shapes
+(16 named constraints). It emits only terms the system uses, checked in both directions by a test,
+and uses PROV's own term wherever one exists — all lineage relations are PROV's. It adds two
+things PROV lacks: a typed decision lifecycle — Receive, Plan, Act, Observe, **Decide**, Respond,
+as subclasses of `prov:Activity` — and `yp:justification`, with `rdfs:domain yp:DecisionActivity`,
+beside `yp:verdict` and `yp:escalation_reason`. The shapes declare the standard: every decision is
+justified and concluded; every step is typed, dated, ended and attributed; every agent decides
+something; every `yp:pid` carries a `sha256:` hash. An agent's own runtime check is tested against
+the shapes rather than trusted to match them, which has found four disagreements, each fixed.
 
-## 3. The `yp:` vocabulary
-
-Published as an OWL ontology (`vocab/yprov4agents.ttl`, 86 terms) with SHACL shapes
-(`vocab/shapes.ttl`, 16 named constraints). Two rules governed its contents. **Only terms the
-system emits**: the inventory was taken from frozen archives of actual runs rather than from design
-documents, and a test enforces it in both directions, with terms the library offers but the demonstrator
-does not exercise enumerated explicitly rather than left for a reader to discover. **Standard terms wherever
-one exists**: all six lineage relations are PROV's, and `yp:` adds exactly two things PROV has no
-term for — the typed steps of a decision lifecycle, and the reasoning behind a decision. Eleven
-lifecycle activity classes specialise `prov:Activity`, including **`Decision`** and two governance
-subclasses; five entity classes specialise `prov:Entity`, including `QualityEntity`, the outcome of
-a check made an entity rather than a flag so a decision can declare it was *derived from* the
-finding it rests on.
-
-**`yp:justification`** is one `owl:DatatypeProperty` with `rdfs:domain yp:DecisionActivity`.
-Alongside it sit `yp:verdict`, `yp:confidence_score`, and `yp:escalation_reason`. The asymmetry
-between verdict and justification is worth stating, because our own measurements surfaced it. A
-verdict is a short token from a fixed vocabulary, and a determined observer can sometimes recover
-one: our baseline recovers 24 of 24 by scraping the labels developers wrote them into. A
-justification combines evidence by a rule the step never returned to anyone, and no labelling
-convention exposes the rule. **The conclusion is sometimes recoverable, and often the facts are;
-the rule that joined them is not.**
-
-**Shapes: declaring the standard.** A compliance agent that enforces a structural standard in
-hand-written predicates has made that standard a property of one implementation. `vocab/shapes.ttl`
-declares it instead: every `yp:DecisionActivity` carries a non-empty justification and a verdict;
-every lifecycle activity is dated, ended and attributed; every `yp:pid` is accompanied by a
-`sha256:` hash; every record declares its granularity and persistence; and every agent decides
-something — a constraint we lacked until deleting a record's decision left it conforming, since a
-shape targeting a class is silent when no node of the class exists. A consumer can validate with any
-SHACL engine without running our agent, and the agent's runtime check, a second implementation of
-the standard, is tested *against* the declaration. That test has found them disagreeing on
-whitespace justifications (plain, and as PROV-JSON typed literals), untyped or mistyped steps, and
-the deleted decision. **The standard is declared once, and each implementation is tested against
-it rather than trusted to match it.** One difference is deliberate and pinned: the agent requires
-a decision to state its type, which the shapes infer from `rdfs:domain`. The shapes are themselves tested for falsifiability: twelve
-mutations of a conforming record each produce the objection the corresponding shape exists to
-produce.
-
----
-
-## 4. Instrumentation: two layers
-
-> **Figure 1.** The two layers: what an external observer can collect automatically, and what it
-> structurally cannot.
-
-Behavioural provenance splits cleanly in two, and the split follows from what an observer can see
-rather than from an effort budget. **Layer 1, what happened and when**: activities, timings, tool
-and model calls, token counts, dataflow — a framework callback receives run trees with inputs,
-outputs and parents, from which all of it follows mechanically, so *this layer can be automated and
-the ecosystem has already automated it.* **Layer 2, why it happened**: the verdict, the confidence,
-the justification. *This layer cannot be automated*, for the reason in §1. Our position follows:
-**consume Layer 1 where it exists, own Layer 2.** The vocabulary is framework-independent and only a
-thin adapter binds the lifecycle to a framework's events; the demonstrator is the bare-daemon case,
-with no agent framework at all, which is the strongest available evidence that the library is not
-welded to one runtime.
+**Two layers.** *Layer 1, what happened* — activities, timings, model calls, dataflow — follows
+mechanically from what a framework callback receives, and the ecosystem of Section 2.2 already
+collects it. *Layer 2, why* — the verdict and its justification — cannot be automated. The
+library automates the first and leaves one call hand-written:
 
 ```python
-tracker = ProvTracker(sid=session, agent_label="NL_Summarizer", sink=publish)
-
 with tracker.activity("ToolCallActivity", "write the summary") as prov:
     prov.consumes(task)
     summary = llm.complete(ACT_SYSTEM, facts)
     prov.produces("ResponseEntity", summary.text, pid=pointer, derived_from=task)
-    prov.note(**summary.provenance())          # model, prompt hash, tokens, latency
+    prov.note(**summary.provenance())        # model, prompt hash, tokens
 
-tracker.decide(                                 # the hand-written line
-    verdict="REVISE",
-    justification="Figures 4096 and 512 appear in the summary but not in the graph's "
-                  "counts, so the text asserts something the record does not support.",
-)
-tracker.emit()
+tracker.decide(verdict="REVISE",             # the hand-written line
+    justification="Figures 4096 and 512 appear in the summary but not in the graph.")
 ```
 
-The wrappers supply exactly what is observable: type, label, start instant, measured duration,
-attribution, sequence position, and the failure case — a step that raises is recorded as having run
-and failed, because a gap in a record is indistinguishable from a step that never ran. What must be
-declared is what is not observable. A wrapper sees that a function ran; it does not see which of the
-values in scope that function treated as its input, so lineage is stated through the scope and never
-inferred. We learned this the hard way: an earlier tracker inferred derivations from registration
-order, producing 74 confident and wrong edges out of 250. `wasInformedBy` is the one relation that
-*is* automatic, because PROV defines it as derivable.
+`decide()` raises on a blank justification. Lineage is declared, never inferred — an early
+tracker that inferred derivations from registration order produced 74 confident, wrong edges of
+250 — except `wasInformedBy`, which PROV defines as derivable. Durations come from a monotonic
+counter: on our host the wall clock advances in 15.6 ms steps, and before this fix 96 of 96
+activities recorded zero duration.
 
-**`decide()` raises on a blank justification.** Every other field can be filled in by machinery;
-this one cannot, so the API refuses to let a caller skip it — at the call site, where the reasoning
-still exists as a value. This has a consequence we did not anticipate (§6.6).
+## 4. The Demonstrator
 
-**Timing is measured, not merely stamped.** PROV records an activity as two instants, which invites
-reading both from the wall clock. That loses short steps: our host's clock advances in steps of
-roughly 15.6 ms, so two readings either side of a sub-millisecond operation return the *same* value.
-Before we corrected this, **96 of 96 activities recorded a zero duration** — a timeline from which
-nothing about where a run spent its time can be recovered. The start instant now comes from the wall
-clock, where it must be to compare across processes; the duration from a monotonic counter.
+A producer replays real yProv4ML records over a NATS bus to four operational agents, which do
+work and emit typed PROV about themselves; two meta agents consume *that* and emit PROV in turn.
+There is no agent framework: the agents are bare asyncio daemons, the strongest evidence that the
+library is not tied to one runtime.
 
----
+| Agent | Work | Verdicts |
+|---|---|---|
+| CAx Summariser | LLM summary, figures checked against the graph | ACCEPT/REVISE |
+| CA2 Metrics | renders a chart of the run | ACCEPT/REVISE |
+| CA3 Analytics | five mining algorithms over any PROV graph | OK/ANOMALY |
+| CA1 Storage | persists only after consumers used the record | ACCEPT/ESCALATE |
+| MC1 Compliance | checks records against the shapes | PASS/FAIL |
+| MC3 Audit | rebuilds the who-did-what-when trail | COMPLETE/PARTIAL |
 
-## 5. The demonstrator
+**Table 2.** The six agents. All are domain-agnostic: they compute from PROV itself.
 
-A message bus, a producer replaying real yProv4ML records, four operational agents that do work and
-emit typed PROV about themselves, and two meta agents that consume *that* and emit PROV in turn.
-There is **no agent framework**; the agents are bare asyncio daemons.
+CA1 writes through the store's API, never the bus, which carries only a receipt (a `yp:pid` and a
+SHA-256). It persists *after* consumption — at a quorum of consumer acknowledgements, with a
+timeout guard so a crashed consumer cannot lose a record — and its `yp:escalation_reason`
+separates three conditions demanding different responses: *integrity*, *incomplete-input* and
+*consumption-unconfirmed*. Envelopes on the bus are numbered, and an agent that finds a gap
+records an `INCOMPLETE` decision rather than a well-formed record of a truncated input.
 
-| | Agent | What it does | Kind |
-|---|---|---|---|
-| CA1 | StorageAgent | hashes, stores, mints a `yp:pid`, verifies the round trip | deterministic |
-| CAx | NL_Summarizer | summarises a graph in natural language | LLM, computed fallback |
-| CA2 | Metrics_Visualizer | renders a chart from the graph's measurements | deterministic |
-| CA3 | Analytics_Agent | five algorithms over any PROV graph | heuristic |
-| MC1 | ComplianceChecker | enforces the declared shapes over other agents' records | deterministic |
-| MC3 | AuditabilityAgent | reconstructs a who-did-what-when trail | deterministic |
+**Reflexivity is one level deep, by construction.** Meta agents publish to a subject prefix
+nothing subscribes to, so governance cannot re-trigger itself. Within that bound the meta agents
+are fully instrumented, and MC1 satisfies the standard it enforces. One container image serves
+all roles; CI runs both the containerised NATS path and an in-process path and holds each to the
+same lineage comparison.
 
-**Table 1.** The six agents. All are domain-agnostic: every computation derives from PROV itself —
-types, roles, timestamps, relations — never from an ML-specific schema.
+## 5. Evaluation
 
-The operational agents instantiate all six lifecycle steps; the meta agents instantiate a three-step
-subset, because they neither plan an approach nor answer a caller. We therefore phrase C3 as **a
-template with declared subsets**, not as uniform instantiation.
+The reference run is two input records through six agents: **24 PROV documents**, 96 activities,
+324 relations (`experiments/audit-reference`). Every figure is regenerated by code from archives
+frozen from clean commits, with per-file hashes; 246 tests run on Linux and Windows.
 
-Two design decisions are visible in the provenance, and worth stating because the record is what
-makes them checkable. The store sits *behind* the persist agent rather than on the bus: CA1 writes
-through the store's own API, and the bus carries a storage receipt — a `yp:pid` and a content hash —
-never a payload. And persistence happens *after* consumption: CA1 holds each record, counts
-acknowledgements from three named consumers, and persists at quorum, with a timeout guard so a
-crashed subscriber cannot lose a record. The agent must say which path it took, and
-`yp:escalation_reason` separates three: *integrity*, *incomplete-input* and
-*consumption-unconfirmed* — conditions that demand different operator responses. Every envelope
-on the bus is numbered, and an agent that finds a gap records an `INCOMPLETE` decision naming the
-missing envelopes rather than a well-formed record of a truncated input.
+### 5.1 Conformance
 
-### 5.1 Reflexivity, and the depth we claim
+All 24 documents are accepted by the reference `prov` parser, and all 24 conform to the published
+shapes under `pyshacl` [@pyshacl] — an external judge of an external rule. The relation total is
+the wrong number to quote: 126 relations are observed, 72 derived, 30 declared and 96 are
+one-per-activity attributions, so the structural claim is 228. Applied to its input, CA3 found
+real gaps in yProv4ML's records: 8 of 9 activities declare a start and no end.
 
-Meta agents subscribe to `agent.lifecycle.>` and publish to `governance.<role>.<session>`. Nothing
-subscribes to `governance.*`, so the governance layer cannot re-trigger itself and **reflexivity in a
-run is one level deep**: the operational agents are governed; the governance layer is not.
+### 5.2 Capture, not retrieve
 
-That bound is a termination property rather than an oversight — an agent that governs governance
-output emits a record which is itself governance output, and nothing in the subject structure stops
-the next pass. Publishing to a prefix nobody subscribes to makes the recursion impossible by
-construction, which is worth more than a depth counter someone can forget to check, and it is
-enforced as a test rather than documented as a caveat. Two things hold at that depth, both stronger
-than a governance table: the meta agents are fully instrumented, and **MC1 satisfies its own
-standard** — applying MC1 to MC1's own output **failed** when first run, because the checker could
-not satisfy its own rule. It now passes, as does MC1 applied to MC3.
+Strategy A is a callback-level baseline we built ourselves from the *same run*, fed every step
+event a framework handler receives. It is an upper bound: its events carry the structural facts
+the explicit instrumentation declared.
 
-One container image serves all six roles and is rootless-friendly, so it converts cleanly to
-Apptainer for HPC. A second path runs the same agents over an in-process bus; CI runs both on every
-commit and holds each to the same structural comparison against the reference archive. They are not the same evidence — the
-in-process bus awaits each handler inline in subscription order, exercising none of the distributed
-path's concurrency — so we use it for isolation in measurement, never as evidence about ordering or
-throughput.
-
----
-
-## 6. Evaluation
-
-Every figure is regenerated from frozen archives under `experiments/` by
-`uv run python run_local.py && uv run python -m eval.evaluate`; none is transcribed by hand. Each
-archive carries per-file hashes and the commit it was frozen from, and refuses to freeze from a
-working tree with uncommitted changes. A CI matrix (Linux and Windows, Python 3.11 and 3.12) re-runs
-the pipeline and fails if any lineage edge of the emitted provenance changes without the change
-being declared; 239 tests pass. The reference run (`experiments/audit-reference`) is two input
-records through six agents, producing **24 PROV documents**.
-
-### 6.1 Conformance, coverage, and a declared standard
-
-Interoperability with W3C PROV is judged by an independent implementation. A single non-standard key
-at the document root made the reference `prov` parser reject **every one of 24 documents** whole —
-the interoperability claim had been *inverted*, not merely weak — and after the fix all 24 are
-accepted and all 8 `yp:pid` pointers dereference from a fresh process. The run produces 96 activities
-and 324 relations, and the total is the wrong number to quote: **126 observed**, **72 derived** from
-PROV's definition of `wasInformedBy`, **30 declared**, and **96 attributed**, one per activity. That
-last category counts how many steps ran rather than how they were connected, so **the structural
-claim is 228, not 324.**
-
-Two further measurements are easy to confuse, and only the second is a result. **Coverage: 24 of 24
-decisions carry a justification** — a conformance check on our own instrumentation, since the code
-that counts decision activities is the code that justifies them, so no run could report another
-number and the figure says nothing about whether a justification is *informative*. **Conformance: 24
-of 24 records satisfy the published shapes**, including the constraint that each agent decided
-something — and this has an external judge, `pyshacl` over RDF converted by the reference `prov`
-library. Neither the rule nor the engine is ours.
-
-Applied to its own input rather than to our output, CA3 found **real completeness gaps in yProv4ML's
-published records**: 8 of 9 activities declare a start time with no end time, and entity typing
-coverage is 82.1%.
-
-### 6.2 Capture, not retrieve
-
-Strategy A is a callback-level baseline we built ourselves, fed the 96 step events a framework
-callback handler receives — node name, timings, input and output payloads, errors — from the *same
-run* as Strategy B.
-
-| Signal | A, zero config | A, with type map | B |
-|---|--:|--:|--:|
-| Documents emitted | 24 | 24 | 24 |
-| Activities | 96 | 96 | 96 |
-| …of them typed | 0 | 96 | 96 |
-| Entities | 54 | 54 | 78 |
-| …of them typed | 0 | 0 | 78 |
-| …carrying a resolvable pointer | 0 | 0 | 8 |
-| Relations, total | 324 | 324 | 324 |
-| Decisions carrying `yp:verdict` | 0 | **24** | 24 |
-| Decisions carrying **`yp:justification`** | **0** | **0** | **24** |
-| Accepted by the reference `prov` parser | 24 | 24 | 24 |
-
-**Table 2.** Strategy A against Strategy B, signal by signal.
-
-***A is an upper bound, deliberately.*** Its event stream is built from the declarations the explicit
-instrumentation made. A real handler receives a node's whole input payload and must guess which part
-mattered, so it would over-report `used`. Conceding A every structural fact B declared turns the last
-row into a statement about the **ceiling**: even granted everything explicit instrumentation
-declares, the rationale is unreachable.
-
-***Structure is recoverable, and the baseline recovers all of it*** — 96 activities and all 324
-relations, identical to B. An earlier version of this table claimed four zeros down the A column and
-three were false, including the claim that a callback reconstruction produces no conformant
-PROV-JSON. Syntax was never the differentiator.
-
-***Types and identity are where the structural gap is.*** A types nothing with no configuration and
-everything with ten hand-written label patterns, so the types exist as a per-system artifact someone
-maintains, and only because these labels happen to be descriptive. A is handed payloads rather than
-references, so it mints identity from content, types none of the 54 entities, and carries no pointer.
-
-***The verdict is often recoverable.*** A recovers 24 of 24 verdicts, which we report as fragile
-rather than impressive: it scrapes a developer-chosen node label, and a graph whose decision node is
-named `decide` yields none.
-
-***The facts are often recoverable; the rule is not.*** Searching everything the handler could
-read, 222 strings and 12,425 characters, finds no justification verbatim. We report that and do not
-rest on it, because a sentence assembled at run time almost never survives intact anywhere. The
-harder test splits each justification into the facts it cites (figures, hashes, names, files,
-agent roles) and searches for each as a whole token:
-
-| Decisions | Count | Verbatim | Facts cited | Seen by A | Every fact seen |
-|---|--:|--:|--:|--:|--:|
-| Operational (CA1, CA2, CA3, CAx) | 8 | 0 | 49 | 30 (61%) | 2 |
-| Meta (MC1, MC3) | 16 | 0 | 16 | 16 (100%) | 16 |
-
-**Table 3.** The rationale, fact by fact (`python -m eval.baseline` over the reference archive).
-Seeing a fact over-counts knowing it: a role name in the stream is not knowledge that the role
-acknowledged.
-
-The 19 facts A never saw are those the agents *computed in order to decide*: a record's byte count,
-a timing gap and its share of the run, a summary's length, the threshold its figures were checked
-against. Where A saw every fact, it still lacks the rule: CA2 cites only figures and a file name A
-observed, but not that finding no numeric `prov:value` sent it to a fallback chart, nor that the
-fallback is why it said REVISE. The meta-agent justifications restate structure A reconstructs in
-full, so they do not count toward the claim. **The inputs to a decision may be observable; the rule
-that combined them is not.**
-
-> **Figure 2.** One verdict, two causes: the integrity path and the timeout path through the same
-> code, with both justifications quoted as the record carries them.
-
-What the gap costs is visible in one agent (Figure 2). CA1 says ESCALATE for three reasons, and its
-justification differs by which one held. On an integrity failure it cites the two content hashes
-that did not match; on a timeout, *"Persisted WITHOUT confirmed consumption … still waiting on [ca2,
-ca3, cax] when the record was archived anyway to avoid losing it"*; on a lost envelope, *"Envelope(s)
-3 of the record never arrived, so what was stored is partial."* A recovers one fact about each
-decision, the verdict. B records the trigger, the quorum, the reason, the integrity check that
-*passed* on the timeout path, and the choice to archive anyway rather than lose the record. So A
-cannot tell *"storage is corrupting records"* from *"ca3 is not running"*, and the two call for
-opposite responses.
-
-### 6.3 Energy: what can be measured, and what a record must disclose
-
-Energy is a first-class concern for the infrastructure this work targets, so the capture API
-carries a sampling backend (codecarbon), opt-in. Measured where energy *can* be measured, over
-whole sessions, provenance makes no difference we can resolve; and getting there produced two
-results about what an energy figure in a record has to say about itself.
-
-**Over whole sessions, the energy cost does not resolve.** We ran all six agents on a real record,
-97 sessions to a window, under each condition, plus an idle window, in 12 interleaved rounds with
-the order rotated and a warm-up round excluded (`experiments/energy-session`):
-
-| CPU energy per session | OFF | A | B-TRANS | B |
-|---|--:|--:|--:|--:|
-| gross | 1.43 J | 1.47 J | 1.50 J | 1.72 J |
-| vs OFF (margin) | — | +2.7% (0.5×) | +5.3% (0.9×) | +20.3% (2.3×) |
-| time per session | 104 ms | 105 ms | 105 ms | 114 ms |
-
-**Table 4.** Measured CPU energy (Windows EMI package counter, 1 s sampling); RAM, modelled at a
-flat 10 W, is reported separately and excluded. No difference reaches 3× its dispersion, gross or
-above the 3.2 W idle draw.
-
-No condition is a result, but the medians point where the timing study does: building the record
-(B-TRANS) moves a session's energy by 5%, and building and writing it (B) by 20%, alongside 9% more
-time. A pilot run, kept in the archive and excluded because its procedure differed, agrees.
-
-**A record must say which components it measured.** codecarbon reports processor and memory
-separately, and on this host only the processor is observed: the Windows Energy Meter Interface
-reads the package counter (5 W idle, 21 W with one core busy, 31 W with all eight), while memory is
-a flat 10 W per installed capacity, 40% of a summed figure and a function of nothing but elapsed
-time. A sum of the two is neither measured nor modelled, so the record says `partly-measured`, and
-the vocabulary's shape rejects any other label on an energy figure. We got this wrong twice before
-it held. A first calibration concluded the counter was broken because it read zero, when it had been
-read before its first sample; and a labelling check that tested the *total* for a non-zero reading
-tested nothing, because the memory model makes the total non-zero whatever the processor counter
-does. *A provenance system cannot tell a measured watt from a modelled one unless it asks the
-backend, component by component, and records the answer.*
-
-**A sampling backend cannot attribute energy to a step shorter than its period.** At codecarbon's
-default 15 s, with steps lasting milliseconds, a delta lands on whichever step reads after a tick:
-
-| Step | Energy charged | Step duration |
+| Signal | A | B |
 |---|--:|--:|
-| choose what to plot | 46.9 µWh | 0.000 s |
-| render chart (matplotlib) | 4.6 µWh | 1.328 s |
+| Activities, typed | 96 | 96 |
+| Entities, typed | 0 of 54 | 78 of 78 |
+| Relations | 324 | 324 |
+| Verdicts | 24 | 24 |
+| Justifications | 0 | 24 |
+| Accepted by the PROV parser | 24 | 24 |
 
-**Table 5.** Two steps of one record under a 15-second sampling period: the step that did the work
-was charged a tenth of what the step that did nothing was. *(A development run recorded in
-`docs/phases/PHASE_4.md`, with modelled power — the only figures in this paper not from a hashed
-archive. The result is about sampling, not power, and holds either way.)*
+**Table 3.** Callback baseline (A, with a ten-rule type map) against explicit capture (B).
 
-The record therefore carries each energy figure with `yp:energy_sampling_period_s`,
-`yp:energy_source` and `yp:energy_attributable`, so it states its period, what was observed, and
-that the figure is **not** an attribution to the step it is attached to. **Energy belongs at session
-granularity**, which is where Table 4 measures it. *A record that reports an energy figure without
-its sampling period and its source is reporting when the sampler last ticked, and how it guessed.*
+Structure is recoverable, and the verdicts are too — scraped from node labels, which a graph
+naming its decision node `decide` would defeat. No justification appears verbatim in the 12,425
+characters A observed, but a run-time sentence rarely survives verbatim, so we test facts:
 
-### 6.4 Model provenance
+| Decisions | Count | Facts | Seen by A | All seen |
+|---|--:|--:|--:|--:|
+| Operational | 8 | 49 | 30 (61%) | 2 |
+| Meta | 16 | 16 | 16 (100%) | 16 |
 
-Before this work the graph named no model, no sampling parameters, no prompt and no token counts, so
-the one step in the pipeline that was not deterministic was the one step the record could not account
-for. Every model-bearing step now carries the model, temperature, token limit, prompt identity,
-version and content hash, token counts, latency, finish reason, and a hash of the response
-(`experiments/audit-llm`: four calls, 2,071 prompt and 480 completion tokens). Three details
-generalise. *The model a caller names is not the model that answers*: the record carries the
-requested alias `gpt-4o`, the snapshot that answered, `gpt-4o-2024-08-06`, and the provider's
-`system_fingerprint` — and the four calls of one run returned three distinct fingerprints. *A prompt is apparatus and had to be routed like one*: a prompt registry with versions
-and hashes already existed and nothing imported it, because both LLM agents built prompts as inline
-f-strings; the fix was making the call site take a prompt object rather than a string, so a prompt
-cannot reach a model without its identity reaching the record. And *an absence is recorded as an
-absence*: the computed fallback path stamps no model attributes at all, rather than zeros, because a
-zero token count is a measurement and on that path none was made.
+**Table 4.** Each justification's facts (figures, hashes, names, roles) searched for in
+everything A saw. Seeing a fact over-counts knowing it.
 
-### 6.5 What the instrumentation costs
+The 19 facts A never saw are those the agents *computed in order to decide*: a record's byte
+count, a timing gap and its share of the run, a summary's length, a threshold. Where A saw every
+fact, it still lacks the rule: CA2's facts were all visible, but not that finding no numeric
+values sent it to a fallback chart, nor that the fallback is why it said REVISE. Meta-agent
+justifications restate structure A already has, and are not counted. **The inputs to a decision
+may be observable; the rule that combined them is not.**
 
-Absolute timings are machine-specific — a four-core laptop, CPython 3.11, with other processes on it.
-The transferable results are the ratios, the byte counts and the complexity class. A difference is
-reported as a result only if it reaches **3× the dispersion of its own samples**.
+> **Figure 1.** One verdict, two causes: CA1's integrity and timeout escalations, with both
+> justifications quoted as the record carries them.
 
-Figures are from `experiments/audit-reference/bench`, with a second occasion in
-`bench-previous`.
+Figure 1 shows the cost. CA1 says ESCALATE for three reasons; A recovers the verdict, never the
+reason — so it cannot tell *"storage is corrupting records"* from *"a consumer is down"*.
 
-**Building the record is inside the noise; writing it is not always.** Each agent's step was timed
-30 times per condition, interleaved, with provenance off, built but not written, and built and
-written. For all four operational agents, *building* a complete typed record moved the step by
-less than its own run-to-run variance on both occasions (margins 0.0–0.5×). Whether *writing* it
-did depends on the agent and, for two of them, on the day.
+### 5.3 Energy
 
-**The field this paper argues for costs nothing we can resolve in time.** Over 40 interleaved
-rounds of 1,000 calls, the paired difference between recording an activity with and without a
-justification is **54 ns against a round-to-round spread of ±726 ns**. In storage it costs bytes:
-240–738 per justification in the reference records, **6.5% of their serialised size**. The trade is
-**storage for explainability, not speed for explainability**.
+On our host the CPU is measured — the Windows Energy Meter Interface reads the package counter,
+tracking load from 5 W idle to 31 W saturated — while memory is a flat 10 W model. A record must
+say so per component: a sum of the two is labelled `partly-measured`, never `measured`. We first
+concluded the counter was broken; it reads zero until its first sample.
 
-> **Figure 3.** Where the overhead actually is: each agent's own work, building the record, and
-> writing it, as shares of one end-to-end record.
+| CPU energy per session | OFF | B-TRANS | B |
+|---|--:|--:|--:|
+| joules | 1.43 | 1.50 | 1.72 |
+| vs OFF (margin) | — | +5% (0.9x) | +20% (2.3x) |
 
-**Where overhead resolves, it is the write** (Figure 3). We lead with the worst case:
+**Table 5.** Measured CPU energy per six-agent session, 12 interleaved rounds with idle windows
+(`experiments/energy-session`). No difference reaches 3x its spread.
 
-| | MC1 ComplianceChecker, the worst case in the system |
-|---|--:|
-| the agent's own work | 109 µs |
-| …plus building a complete typed PROV record | **+38 µs** |
-| …plus writing it to disk | **+1,485 µs** |
-| total overhead | **+1,394%** (margin 11.5×) |
+Per step, energy cannot be attributed at all: at a 15 s sampling period a step that did nothing
+was charged ten times the step that rendered a chart. Each figure therefore carries
+`yp:energy_sampling_period_s` and `yp:energy_attributable`, and **energy belongs at session
+granularity**, where Table 5 measures it.
 
-**Table 6.** The worst ratio in the system, decomposed. 98% of it is one file write; for every
-agent whose overhead resolves, the write is at least 90%.
+### 5.4 Model provenance
 
-Read the decomposition before believing the ratio. Explicit instrumentation is not expensive to
-*compute*; persisting its output is, and persistence is a deployment decision. Both knobs are exposed
-and measured: transient mode is **−89% of the time cost** for a byte-identical record, and metadata
-granularity **−37.6% of the bytes** while retaining every justification. A mode that shed
-justifications would be a different product, not a cheaper one.
+Every model-bearing step records the model, sampling parameters, prompt identity, version and
+hash, token counts, latency and a response hash (`experiments/audit-llm`: four calls, 2,071
+prompt and 480 completion tokens). The model a caller names is not the one that answers: the
+record carries the alias `gpt-4o`, the snapshot `gpt-4o-2024-08-06` and the provider's
+fingerprint — and the four calls of one run returned three fingerprints.
 
-Two further results transfer. **The dominant per-step cost is rendering an instant as text** — of a
-4.97 µs tracked step, 2.59 µs is the timestamp, and formatting the value costs 1.8× reading the
-clock. And **the cost is linear, but was not when first measured**: the first sweep fitted an
-exponent of 1.468 because a duplicate check on declared derivations scanned a list, and a
-10,000-activity record went from 1.72 s to 88 ms once that became an O(1) set; the exponents are now
-1.09 for building a record and 1.13 for serialising it. That defect was
-invisible at the six activities every test uses and would have reached this paper as an unqualified
-linear claim.
+### 5.5 Overhead
 
-**Which figures transfer.** Across two occasions the headline timings moved by 6–11%, byte counts
-were identical, and exponents agreed within 2.1%. Not every verdict held: for CA3 and CAx, building
-and writing went from 2.9× the dispersion to 5.0× and 4.6×, resolved on one occasion and not the
-other, which is a result in neither direction. **Quote the bytes, the complexity class, the
-verdicts that held and the decomposition; quote the timings as orders of magnitude.** The 3×
-criterion is stricter than the one we began with, *larger than the noise*, which treats any
-consistent bias as a finding, and a loaded machine supplies plenty. The project's own guard test
-caught it — on a shared CI runner, timing the **same function twice** produced a 147.5 ns difference
-against 61.0 ns of dispersion and called it real. **Write the guard test that fails when your harness
-reports noise as a result.**
+Each agent's step was timed 30 times per condition, interleaved: provenance off, built but not
+written (B-TRANS), and built and written (B); a difference counts only at 3x its spread. On two
+occasions, **building the record was inside every operational agent's run-to-run variance**
+(margins 0.0–0.5x). Writing it resolves for some agents, and there it dominates: for the worst
+case, MC1, a 109 µs step gains 38 µs to build the record and 1,485 µs to write it (+1,394%, 98%
+of it the write). Transient mode removes 89% of the time cost; metadata mode 38% of the bytes,
+keeping every justification. Recording a justification costs 54 ns against a ±726 ns spread, and
+justifications are 6.5% of the records' bytes. Cost is linear (fitted exponents 1.09 and 1.13 to
+10,000 activities). Across occasions, two agents' verdicts flipped between resolved and not, so
+we quote the verdicts that held, the bytes and the complexity class, not the timings.
 
-### 6.6 Verdict reachability
+### 5.6 Verdict reachability
 
-A verdict that only ever takes one value carries no information, so what has to be established is that
-the alternatives are **reachable**. The six agents have two verdicts each; the ordinary run reaches six
-of those twelve. Nine injected scenarios (`experiments/audit-reference/faults`) reach the other six,
-CA1's ESCALATE by each of its three reasons, and `INCOMPLETE`, which any stream-consuming agent
-records when an envelope goes missing. **All thirteen verdicts are observed.** Three of the
-scenarios are not faults at all, and that matters: CA2's ACCEPT, CAx's REVISE and CA3's OK are unreachable from the bundled sample
-data because the real records carry no numeric values to plot and declare start times without end
-times. So *"CA2 always says REVISE"* was a finding about the **input**, not about CA2.
+The ordinary run reaches six of twelve two-valued verdicts; nine injected scenarios reach the
+rest, each of CA1's three escalations, and `INCOMPLETE` — all thirteen are observed. Three
+scenarios are not faults: CA2 says REVISE on the bundled data because yProv4ML records carry no
+numeric values, a finding about the input. `mc1:FAIL` is unreachable from this library's own
+records, because `decide()` refuses a blank justification; it is reached by a third-party record,
+which is what a compliance checker is for.
 
-One row is a property rather than a result. **`mc1:FAIL` is unreachable from records this library
-produces**, because `decide()` refuses a blank justification at the call site. FAIL is reachable for
-records the library did not write — exactly the case a compliance checker exists for, since it is
-pointed at agents you do not control. *The instrumentation makes the violation unrepresentable, and
-the governance layer catches it in input that was not instrumented.* Every fault is injected into the
-input or the environment, **never into the check being tested**, so a verdict advertised and never
-observed fails the build.
+## 6. Limitations
 
----
+**We show that justifications exist and that the decision rule is unrecoverable, not that they
+are good**; whether they improve an operator's decisions needs a human study. The fact-level
+measure is coarse in both directions. A model-bearing step is repeatable from its record, not
+reproducible: three fingerprints in one run is a backend changing under a caller that changed
+nothing. The bus is at-most-once: numbered envelopes expose a partial loss, but a stream lost
+whole is silent. The evaluation uses two input records, one producer and one machine, and we
+built the baseline ourselves — mitigated by granting it every declared structural fact.
 
-## 7. Discussion and limitations
+## 7. Conclusion
 
-**We measure that justifications exist and that their decision rule is externally unrecoverable;
-we do not measure whether they are *good*.** This is the most significant limitation of the
-evaluation. §6.1's coverage figure is a self-report by construction, and §6.2 establishes
-unrecoverability, not quality. §6.2's fact-level measure is also coarse in both directions: it
-counts a fact as seen wherever the same token appears, and it cannot see a rule that cites no
-checkable fact at all. Whether an
-operator handed one of these justifications acts correctly more often is an empirical question
-requiring a human study, and we have not run one. Figure 2 is an argument, not evidence.
-
-**Reflexivity is one level deep**, and self-application is demonstrated as a property rather than as a
-running loop, so C2 carries that qualifier.
-
-**A provenance system can over-report as easily as under-report.** An earlier version of our tracker
-asserted derivation from registration order and informed-by from recording order, producing exactly
-*n*−1 edges for *n* items regardless of what the agent did. The relations were corrected to
-declared-or-derived, and the correction changed the graph's *topology* rather than only its size: the
-old chain asserted a single dependency spine where the real dataflow is a tree. We disclose this
-because it is what makes the counts in §6.1 trustworthy, and because **relation counts are the easiest
-place in a provenance system for over-reporting to go unnoticed.**
-
-**A model-bearing step is repeatable from its record, not bitwise reproducible.** The record carries
-what an auditor needs to re-run a call and what catches a forgotten version bump, but it cannot make a
-hosted model deterministic. Recording the resolved snapshot and fingerprint narrows the gap without
-closing it: three fingerprints in four calls of one run is a backend changing underneath a caller
-that changed nothing.
-
-**Identifiers, transport, and resource bounds.** The `21.T11999` prefix is not registered and nothing
-resolves it globally, and identical payloads collapse to one identifier, so a pointer identifies
-*content* rather than a storage event. NATS core is at-most-once with JetStream unconfigured, so a
-subscriber not running when a record is published never sees it — a provenance bus that can lose
-provenance deserves a sentence in a provenance paper. Numbered envelopes turn a *partial* loss into an
-`INCOMPLETE` record; a stream lost whole is still silent. And a tracker holds its whole record in
-memory until it emits (~1.3 KiB per activity), which is why a metadata-only granularity exists.
-
-**Energy, on one machine.** The CPU counter covers the whole processor package, so background load
-reaches every window; interleaving shares it and the idle windows subtract it, but neither removes
-it. Memory energy is a model on this host and is excluded from the comparison rather than measured.
-
-**Scale, a single producer, and our own baseline.** Two input records, 24 emitted documents, one
-producer; nothing in the agents is ML-specific, but that generality is argued from the code rather than
-demonstrated against a second producer. And we built Strategy A, so we could in principle have built
-it badly — the mitigation is to grant it every structural fact the explicit instrumentation declares
-and report it as an upper bound, which is why Table 2 concedes A everything except the one row the
-paper is about.
-
----
-
-## 8. Conclusion and future work
-
-The provenance community can describe what an agentic system did. With the automatic-capture tooling
-that dominates agent observability it cannot describe why — and this is a structural property rather
-than a tooling deficiency. The facts a decision used may cross a step boundary; the rule that combined
-them is a local computation at the moment of decision, and no callback, span, or post-hoc query can
-retrieve what was never captured.
-
-We made that argument measurable by building the strongest callback-level baseline we could and
-granting it every structural advantage: it reconstructs 96 of 96 activities, all 324 relations and 24
-of 24 verdicts, and serialises to conformant W3C PROV-JSON. It sees 61% of the facts the operational
-justifications cite, none of the values the agents computed in order to decide, and not one decision
-rule. We discharged the argument with a small explicit
-instrumentation layer — a published `yp:` vocabulary with SHACL shapes, and an API whose decision call
-refuses a blank justification — and demonstrated it across six heterogeneous agents in a running
-reflexive system, including the agents that govern the others. We measured the cost: building the record is inside every operational
-agent's run-to-run variance, the justifications are 6.5% of the records' bytes, and where overhead
-resolves at all, at least 90% of it is the write to disk. Measured over whole sessions, the
-energy cost does not resolve either; and per step it cannot be measured at all, which constrains
-how this community should record energy, and what a record must say about where its figure came
-from.
-
-The honest summary of the trade is one sentence: **storage for explainability, not speed for
-explainability.**
-
-Four extensions follow directly. **Actuation** is the largest: the meta layer today observes, judges
-and gates, and making it *reconfigure* or *activate* an operational agent requires a control-channel
-design with its own provenance — an action taken on the basis of a justification should be derivable
-from it. **Bounded second-level reflexivity**, with the depth carried in the subject so recursion
-remains impossible by construction, would lift the one-level qualifier on C2. **A Layer-1
-OpenTelemetry bridge** would let the automatic half of the record come from instrumentation a
-deployment already runs, leaving only the irreducible explicit part to the developer. And **a
-justification-quality study** is the missing evaluation: we have shown that a decision rule can only
-be captured and never retrieved, and not yet that capturing it makes an operator's decisions better.
-
-**Artifact availability.** *(To be completed: the library, the vocabulary and SHACL shapes, the frozen
-experiment archives and the benchmark harness are all in the project repository; a citable archive is
-pending a decision on public release.)*
+Provenance can describe what an agentic system did; with automatic capture alone it cannot
+describe why, because the rule behind a decision never leaves the agent. We made that measurable
+against a generous baseline, discharged it with a vocabulary and an API whose one hand-written
+call records the decision, and found the cost to be storage rather than speed — *storage for
+explainability, not speed for explainability*. Next: an OpenTelemetry bridge for the automatic
+half, bounded second-level reflexivity, meta agents that act on their verdicts, and a study of
+whether justifications improve operators' decisions.

@@ -7,12 +7,16 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{tabularx}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
 \lstset{basicstyle=\ttfamily\scriptsize, columns=fullflexible, keepspaces=true,
   frame=tb, aboveskip=4pt, belowskip=4pt, showstringspaces=false,
-  commentstyle=\color{gray}}
+  commentstyle=\color{gray}, breaklines=true, breakatwhitespace=true}
+% Tables are exactly one column wide: the first column wraps, the others size to content.
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\setlength{\tabcolsep}{3pt}
 
 \begin{document}
 
@@ -50,301 +54,216 @@ provenance, W3C PROV, agentic AI, explainability, multi-agent systems, SHACL
 
 \section{Introduction}\label{sec:1}
 
-Scientific computing infrastructure is acquiring autonomous agents. They summarise runs, select hyperparameters, decide what to archive, and increasingly act on those decisions without a human in the loop. The provenance community has a mature answer to \emph{what} such a system did: W3C PROV~\cite{prov-dm} describes activities, entities and the lineage between them, and tooling to capture that lineage automatically is now routine.
+\noindent Scientific computing infrastructure is acquiring autonomous agents: they summarise runs, judge results and decide what to archive, increasingly without a human in the loop. The provenance community has a mature answer to \emph{what} such a system did. W3C PROV~\cite{provdm} describes activities, entities and the lineage between them, and capturing that lineage automatically is routine. It has almost no answer to \emph{why}. When a storage agent declines to archive a record, an operator, an auditor and --- under the EU AI Act~\cite{euaiact} --- a regulator need the reason, not the outcome.
 
-It has almost no answer to \emph{why}.
-
-When a storage agent declines to archive a record, when a summariser rejects its own output, when a compliance agent fails a colleague's record --- an operator, an auditor, and increasingly a regulator need the reason, not the outcome. The EU AI Act~\cite{euaiact}'s transparency obligations are written in the language of explanation rather than of logging. A record that says a decision was taken, and when, and by which component, and still cannot say why, does not meet that bar.
-
-Our claim is that this gap is \textbf{structural rather than a matter of insufficient tooling}:
+\noindent We argue that this gap is \textbf{structural, not a matter of tooling}:
 
 \begin{quote}
-The rationale for a decision is a local variable at the moment of decision. A callback fires after the function returns; a span wraps the call; a query reads the store afterwards. Each may see the facts the decision used. None of them can retrieve the rule that combined those facts into a verdict, because that rule was never a value anything passed.
+The rationale for a decision is a local computation at the moment of decision. A callback fires after the function returns; a span wraps the call; a query reads the store afterwards. Each may see the facts the decision used. None can retrieve the rule that combined them into a verdict, because that rule was never a value anything passed.
 \end{quote}
 
-We call this \textbf{capture, not retrieve}. The corollary is uncomfortable for the observability-first approach that dominates agent tooling: no amount of additional collection closes the gap, because the information is not in the span. Behavioural provenance therefore has an irreducible explicit component --- instrumentation a developer must write, at the point of decision, that no framework can supply.
+\noindent We call this \textbf{capture, not retrieve}, and make three contributions. \textbf{C1 --- The argument, measured.} Against a deliberately generous callback-level baseline over the same run, which recovers every activity, relation and verdict, we show that the facts an agent \emph{computed} in order to decide, and the rule that combined them, are unrecoverable. \textbf{C2 --- A reflexive multi-agent architecture.} Four operational agents emit typed PROV about themselves; two meta agents govern that output, to a depth bounded by design. \textbf{C3 --- The \texttt{yp:\allowbreak{}} vocabulary}, published as an OWL ontology with SHACL shapes, and an API whose one hand-written call records the decision. We also measure the cost, in time and in energy.
 
-\textbf{C1 --- Capture, not retrieve.} A structural argument supported by an A-versus-B comparison over the \emph{same agents in the same run}. We build the callback-level baseline ourselves and make it as strong as we can: it reconstructs 96 of 96 activities, all 324 relations and 24 of 24 verdicts, and its output is accepted by the reference W3C PROV parser. It recovers no justification verbatim, and we do not rest on that. Searched fact by fact, it saw 61\% of what the eight operational justifications cite --- and none of the values the agents computed in order to decide (Section~\ref{sec:6.2}).
+\section{Background and State of the Art}\label{sec:2}
 
-\textbf{C2 --- A reflexive multi-agent provenance architecture.} Four operational agents emit typed PROV about themselves; two meta agents consume \emph{that} and emit PROV in turn. Containerised, run over a real message bus in CI, and governing its own governance layer to a depth we state exactly (Section~\ref{sec:5.1}).
+\subsection{Provenance models and capture systems}\label{sec:2.1}
 
-\textbf{C3 --- The \texttt{yp:\allowbreak{}} vocabulary and a six-step lifecycle}, published as an OWL ontology with SHACL~\cite{shacl} shapes, instantiated by four heterogeneous agents --- deterministic, LLM-backed and hybrid --- and governed uniformly against the declared shapes (Section~\ref{sec:3}).
+\noindent W3C PROV~\cite{provdm,provo} models provenance as entities, activities and agents linked by a small set of relations; it is deliberately domain-neutral, and says nothing about rationale. Capture systems differ in where they observe. \emph{Script and workflow} tools --- noWorkflow~\cite{noworkflow} for Python scripts, YesWorkflow~\cite{yesworkflow} for annotated workflows --- recover lineage from code and execution. \emph{System-level} collectors such as SPADE~\cite{spade} and CamFlow~\cite{camflow} capture whole-system provenance from the operating system, CamFlow emitting W3C PROV-JSON directly. \emph{Machine-learning} trackers record runs, parameters and artifacts: MLflow~\cite{mlflow} with its own schema, and the yProv family --- yProv4ML~\cite{yprov4ml} for training runs, yProv4WFs for workflows --- in W3C PROV. Surveys of the field~\cite{freire2008,herschel2017} classify provenance by \emph{what} it records and \emph{how} it is captured; across all of them, what is recorded is an observable event. Our demonstrator consumes real yProv4ML records, and every system above could, in principle, observe the agents we build. None could observe their reasoning.
 
-We also measure the cost, because an argument that explicit instrumentation is \emph{necessary} is worth little if it is expensive. Building the record, justification included, moves no operational agent's step by more than its own run-to-run variance, on either of two occasions; the justifications are 6.5\% of the records' bytes. What costs is writing the record to disk, and that is a deployment decision the library exposes (Section~\ref{sec:6.5}). Measured CPU energy per session shows no resolvable difference either (Section~\ref{sec:6.3}).
+\subsection{Agents, and the observability built for them}\label{sec:2.2}
 
-\section{Background and related work}\label{sec:2}
+\noindent Agent frameworks interleave reasoning and tool use~\cite{react} and compose agents into multi-agent systems~\cite{autogen,langgraph}. Their runs are observed by a fast-maturing layer: OpenTelemetry's semantic conventions for generative AI~\cite{otelgenai}, and tracing platforms such as OpenLLMetry~\cite{openllmetry}, Langfuse~\cite{langfuse} and LangSmith~\cite{langsmith}, which record prompts, completions, tool calls, latencies and token counts. This layer is built for debugging and cost attribution. It does not model W3C PROV, and the only rationale it can hold is text a model happened to emit. PROV-AGENT~\cite{provagent} is the closest prior work: it extends PROV to agentic workflows and makes agents and their model calls first-class provenance subjects --- a richer \emph{what}, with no field for the reason behind a decision.
 
-\textbf{W3C PROV} models provenance as three classes --- \texttt{prov:\allowbreak{}Entity}, \texttt{prov:\allowbreak{}Activity}, \texttt{prov:\allowbreak{}Agent} --- and a small set of relations between them. Its deliberate domain-neutrality is why it says nothing about rationale: PROV describes \emph{what was derived from what, by whom}, and a justification is none of those things. It is a property of an activity that no relation can express, which is why an extension vocabulary is needed rather than a modelling convention. This work sits in the \textbf{yProv} family, which instruments machine-learning runs (yProv4ML~\cite{yprov4ml}) and workflows (yProv4WFs) with content-addressed storage for large payloads; our demonstrator consumes real yProv4ML records, so the agents are exercised against provenance not written for them.
+\subsection{Rationale, explanation and accountability}\label{sec:2.3}
 
-Agent frameworks differ in their abstractions but converge on a recurring shape, which we take as the unit of instrumentation, in three phases: \emph{ingestion and scoping} (S1 receive, S2 plan), \emph{execution} (S3 act --- the model call, the tool call, the write), and \emph{governance and reflexion} (S4 observe, \textbf{S5 decide}, S6 respond). S5 is the step this paper is about, and the only one whose content an external observer cannot reconstruct.
+\noindent Interpretability research asks how a model reaches outputs~\cite{doshivelez2017}, and documentation practice --- model cards~\cite{modelcards}, datasheets~\cite{datasheets} --- records how artifacts were made. Two results bear directly on agents. A model's stated chain of thought is not necessarily faithful to the process that produced its answer~\cite{turpin2023,lanham2023}, so text a model emits is weak evidence of the rule an agent applied. And proposals for the oversight of deployed agents call for exactly the per-action visibility --- identifiers, activity logs, the basis of decisions --- that a provenance record could carry~\cite{chan2024}. Energy is the third concern of the field: reporting it for ML workloads is now expected~\cite{strubell2019,henderson2020}, usually through sampling tools such as CodeCarbon~\cite{codecarbon}, whose limits for short steps we revisit in Section~\ref{sec:5.3}.
 
-\textbf{PROV-AGENT~\cite{provagent}} (Souza et al.) is the closest prior work: it extends PROV for agentic systems and treats agents as first-class provenance subjects, but models data as untyped \texttt{DomainData} and carries no decision rationale --- it records a richer \emph{what}, and the \emph{why} remains outside the model. Work on post-hoc reasoning reconstruction (AER; Vispute et al.~\cite{aer}) formalises a result we rely on: \textbf{a reasoning trace cannot in general be identified from inputs and outputs alone}, because many distinct reasoning processes are consistent with the same observable behaviour. Where that literature treats this as a limit on explanation, we treat it as a design requirement. Meanwhile OpenTelemetry's GenAI conventions~\cite{otel-genai}, OpenLLMetry~\cite{openllmetry}, Langfuse~\cite{langfuse} and LangSmith~\cite{langsmith} have effectively solved automatic collection of the \emph{what}; none models W3C PROV and none captures rationale, because they are built for debugging and cost attribution. \textbf{Our position is to ride that layer rather than compete with it.} The planning/tool-use/reflection vocabulary of the applied agent literature supplies our lifecycle; we add nothing to it, we instrument it.
+\begin{table}[t]
+\centering\footnotesize
+\caption{The state of the technology. ``Decision rule'' means the reason an agent's code reached its verdict, as opposed to model text that may describe one. Our capture is automatic except for that one field.}\label{tab:1}
+\begin{tabularx}{\columnwidth}{Lcccc}
+\toprule
+Approach & W3C PROV & Automatic & Agent-aware & Decision rule \\
+\midrule
+Script, workflow and system capture & yes & yes & no & no \\
+ML lifecycle trackers & partly & yes & no & no \\
+LLM and agent observability & no & yes & yes & no \\
+PROV-AGENT & yes & yes & yes & no \\
+This work & yes & partly & yes & \textbf{yes} \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
-\section{The \texttt{yp:\allowbreak{}} vocabulary}\label{sec:3}
+\noindent \textbf{Our position is to ride the automatic layer rather than compete with it}: consume what it collects, and add the one thing it structurally cannot.
 
-Published as an OWL ontology (\texttt{vocab/\allowbreak{}yprov4agents.\allowbreak{}ttl}, 86 terms) with SHACL shapes (\texttt{vocab/\allowbreak{}shapes.\allowbreak{}ttl}, 16 named constraints). Two rules governed its contents. \textbf{Only terms the system emits}: the inventory was taken from frozen archives of actual runs rather than from design documents, and a test enforces it in both directions, with terms the library offers but the demonstrator does not exercise enumerated explicitly rather than left for a reader to discover. \textbf{Standard terms wherever one exists}: all six lineage relations are PROV's, and \texttt{yp:\allowbreak{}} adds exactly two things PROV has no term for --- the typed steps of a decision lifecycle, and the reasoning behind a decision. Eleven lifecycle activity classes specialise \texttt{prov:\allowbreak{}Activity}, including \textbf{\texttt{Decision}} and two governance subclasses; five entity classes specialise \texttt{prov:\allowbreak{}Entity}, including \texttt{QualityEntity}, the outcome of a check made an entity rather than a flag so a decision can declare it was \emph{derived from} the finding it rests on.
+\section{Vocabulary and Instrumentation}\label{sec:3}
 
-\textbf{\texttt{yp:\allowbreak{}justification}} is one \texttt{owl:\allowbreak{}DatatypeProperty} with \texttt{rdfs:\allowbreak{}domain yp:\allowbreak{}DecisionActivity}. Alongside it sit \texttt{yp:\allowbreak{}verdict}, \texttt{yp:\allowbreak{}confidence\_\allowbreak{}score}, and \texttt{yp:\allowbreak{}escalation\_\allowbreak{}reason}. The asymmetry between verdict and justification is worth stating, because our own measurements surfaced it. A verdict is a short token from a fixed vocabulary, and a determined observer can sometimes recover one: our baseline recovers 24 of 24 by scraping the labels developers wrote them into. A justification combines evidence by a rule the step never returned to anyone, and no labelling convention exposes the rule. \textbf{The conclusion is sometimes recoverable, and often the facts are; the rule that joined them is not.}
+\noindent \textbf{The \texttt{yp:\allowbreak{}} vocabulary} is published as an OWL ontology (86 terms) with SHACL~\cite{shacl} shapes (16 named constraints). It emits only terms the system uses, checked in both directions by a test, and uses PROV's own term wherever one exists --- all lineage relations are PROV's. It adds two things PROV lacks: a typed decision lifecycle --- Receive, Plan, Act, Observe, \textbf{Decide}, Respond, as subclasses of \texttt{prov:\allowbreak{}Activity} --- and \texttt{yp:\allowbreak{}justification}, with \texttt{rdfs:\allowbreak{}domain yp:\allowbreak{}DecisionActivity}, beside \texttt{yp:\allowbreak{}verdict} and \texttt{yp:\allowbreak{}escalation\_\allowbreak{}reason}. The shapes declare the standard: every decision is justified and concluded; every step is typed, dated, ended and attributed; every agent decides something; every \texttt{yp:\allowbreak{}pid} carries a \texttt{sha256:\allowbreak{}} hash. An agent's own runtime check is tested against the shapes rather than trusted to match them, which has found four disagreements, each fixed.
 
-\textbf{Shapes: declaring the standard.} A compliance agent that enforces a structural standard in hand-written predicates has made that standard a property of one implementation. \texttt{vocab/\allowbreak{}shapes.\allowbreak{}ttl} declares it instead: every \texttt{yp:\allowbreak{}DecisionActivity} carries a non-empty justification and a verdict; every lifecycle activity is dated, ended and attributed; every \texttt{yp:\allowbreak{}pid} is accompanied by a \texttt{sha256:\allowbreak{}} hash; every record declares its granularity and persistence; and every agent decides something --- a constraint we lacked until deleting a record's decision left it conforming, since a shape targeting a class is silent when no node of the class exists. A consumer can validate with any SHACL engine without running our agent, and the agent's runtime check, a second implementation of the standard, is tested \emph{against} the declaration. That test has found them disagreeing on whitespace justifications (plain, and as PROV-JSON typed literals), untyped or mistyped steps, and the deleted decision. \textbf{The standard is declared once, and each implementation is tested against it rather than trusted to match it.} One difference is deliberate and pinned: the agent requires a decision to state its type, which the shapes infer from \texttt{rdfs:\allowbreak{}domain}. The shapes are themselves tested for falsifiability: twelve mutations of a conforming record each produce the objection the corresponding shape exists to produce.
-
-\section{Instrumentation: two layers}\label{sec:4}
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/f1_two_layers.pdf}
-\caption{The two layers: what an external observer can collect automatically, and what it structurally cannot.}\label{fig:1}
-\end{figure*}
-
-Behavioural provenance splits cleanly in two, and the split follows from what an observer can see rather than from an effort budget. \textbf{Layer 1, what happened and when}: activities, timings, tool and model calls, token counts, dataflow --- a framework callback receives run trees with inputs, outputs and parents, from which all of it follows mechanically, so \emph{this layer can be automated and the ecosystem has already automated it.} \textbf{Layer 2, why it happened}: the verdict, the confidence, the justification. \emph{This layer cannot be automated}, for the reason in Section~\ref{sec:1}. Our position follows: \textbf{consume Layer 1 where it exists, own Layer 2.} The vocabulary is framework-independent and only a thin adapter binds the lifecycle to a framework's events; the demonstrator is the bare-daemon case, with no agent framework at all, which is the strongest available evidence that the library is not welded to one runtime.
+\noindent \textbf{Two layers.} \emph{Layer 1, what happened} --- activities, timings, model calls, dataflow --- follows mechanically from what a framework callback receives, and the ecosystem of Section~\ref{sec:2.2} already collects it. \emph{Layer 2, why} --- the verdict and its justification --- cannot be automated. The library automates the first and leaves one call hand-written:
 
 \begin{lstlisting}[language=Python]
-tracker = ProvTracker(sid=session, agent_label="NL_Summarizer", sink=publish)
-
 with tracker.activity("ToolCallActivity", "write the summary") as prov:
     prov.consumes(task)
     summary = llm.complete(ACT_SYSTEM, facts)
     prov.produces("ResponseEntity", summary.text, pid=pointer, derived_from=task)
-    prov.note(**summary.provenance())          # model, prompt hash, tokens, latency
+    prov.note(**summary.provenance())        # model, prompt hash, tokens
 
-tracker.decide(                                 # the hand-written line
-    verdict="REVISE",
-    justification="Figures 4096 and 512 appear in the summary but not in the graph's "
-                  "counts, so the text asserts something the record does not support.",
-)
-tracker.emit()
+tracker.decide(verdict="REVISE",             # the hand-written line
+    justification="Figures 4096 and 512 appear in the summary but not in the graph.")
 \end{lstlisting}
 
-The wrappers supply exactly what is observable: type, label, start instant, measured duration, attribution, sequence position, and the failure case --- a step that raises is recorded as having run and failed, because a gap in a record is indistinguishable from a step that never ran. What must be declared is what is not observable. A wrapper sees that a function ran; it does not see which of the values in scope that function treated as its input, so lineage is stated through the scope and never inferred. We learned this the hard way: an earlier tracker inferred derivations from registration order, producing 74 confident and wrong edges out of 250. \texttt{wasInformedBy} is the one relation that \emph{is} automatic, because PROV defines it as derivable.
+\noindent \texttt{decide()} raises on a blank justification. Lineage is declared, never inferred --- an early tracker that inferred derivations from registration order produced 74 confident, wrong edges of 250 --- except \texttt{wasInformedBy}, which PROV defines as derivable. Durations come from a monotonic counter: on our host the wall clock advances in 15.6 ms steps, and before this fix 96 of 96 activities recorded zero duration.
 
-\textbf{\texttt{decide()} raises on a blank justification.} Every other field can be filled in by machinery; this one cannot, so the API refuses to let a caller skip it --- at the call site, where the reasoning still exists as a value. This has a consequence we did not anticipate (Section~\ref{sec:6.6}).
+\section{The Demonstrator}\label{sec:4}
 
-\textbf{Timing is measured, not merely stamped.} PROV records an activity as two instants, which invites reading both from the wall clock. That loses short steps: our host's clock advances in steps of roughly 15.6 ms, so two readings either side of a sub-millisecond operation return the \emph{same} value. Before we corrected this, \textbf{96 of 96 activities recorded a zero duration} --- a timeline from which nothing about where a run spent its time can be recovered. The start instant now comes from the wall clock, where it must be to compare across processes; the duration from a monotonic counter.
-
-\section{The demonstrator}\label{sec:5}
-
-A message bus, a producer replaying real yProv4ML records, four operational agents that do work and emit typed PROV about themselves, and two meta agents that consume \emph{that} and emit PROV in turn. There is \textbf{no agent framework}; the agents are bare asyncio daemons.
+\noindent A producer replays real yProv4ML records over a NATS bus to four operational agents, which do work and emit typed PROV about themselves; two meta agents consume \emph{that} and emit PROV in turn. There is no agent framework: the agents are bare asyncio daemons, the strongest evidence that the library is not tied to one runtime.
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{The six agents. All are domain-agnostic: every computation derives from PROV itself --- types, roles, timestamps, relations --- never from an ML-specific schema.}\label{tab:1}
-\begin{tabular}{llll}
+\caption{The six agents. All are domain-agnostic: they compute from PROV itself.}\label{tab:2}
+\begin{tabularx}{\columnwidth}{Lll}
 \toprule
- & Agent & What it does & Kind \\
+Agent & Work & Verdicts \\
 \midrule
-CA1 & StorageAgent & hashes, stores, mints a \texttt{yp:\allowbreak{}pid}, verifies the round trip & deterministic \\
-CAx & NL\_Summarizer & summarises a graph in natural language & LLM, computed fallback \\
-CA2 & Metrics\_Visualizer & renders a chart from the graph's measurements & deterministic \\
-CA3 & Analytics\_Agent & five algorithms over any PROV graph & heuristic \\
-MC1 & ComplianceChecker & enforces the declared shapes over other agents' records & deterministic \\
-MC3 & AuditabilityAgent & reconstructs a who-did-what-when trail & deterministic \\
+CAx Summariser & LLM summary, figures checked against the graph & ACCEPT/REVISE \\
+CA2 Metrics & renders a chart of the run & ACCEPT/REVISE \\
+CA3 Analytics & five mining algorithms over any PROV graph & OK/ANOMALY \\
+CA1 Storage & persists only after consumers used the record & ACCEPT/ESCALATE \\
+MC1 Compliance & checks records against the shapes & PASS/FAIL \\
+MC3 Audit & rebuilds the who-did-what-when trail & COMPLETE/PARTIAL \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
-The operational agents instantiate all six lifecycle steps; the meta agents instantiate a three-step subset, because they neither plan an approach nor answer a caller. We therefore phrase C3 as \textbf{a template with declared subsets}, not as uniform instantiation.
+\noindent CA1 writes through the store's API, never the bus, which carries only a receipt (a \texttt{yp:\allowbreak{}pid} and a SHA-256). It persists \emph{after} consumption --- at a quorum of consumer acknowledgements, with a timeout guard so a crashed consumer cannot lose a record --- and its \texttt{yp:\allowbreak{}escalation\_\allowbreak{}reason} separates three conditions demanding different responses: \emph{integrity}, \emph{incomplete-input} and \emph{consumption-unconfirmed}. Envelopes on the bus are numbered, and an agent that finds a gap records an \texttt{INCOMPLETE} decision rather than a well-formed record of a truncated input.
 
-Two design decisions are visible in the provenance, and worth stating because the record is what makes them checkable. The store sits \emph{behind} the persist agent rather than on the bus: CA1 writes through the store's own API, and the bus carries a storage receipt --- a \texttt{yp:\allowbreak{}pid} and a content hash --- never a payload. And persistence happens \emph{after} consumption: CA1 holds each record, counts acknowledgements from three named consumers, and persists at quorum, with a timeout guard so a crashed subscriber cannot lose a record. The agent must say which path it took, and \texttt{yp:\allowbreak{}escalation\_\allowbreak{}reason} separates three: \emph{integrity}, \emph{incomplete-input} and \emph{consumption-unconfirmed} --- conditions that demand different operator responses. Every envelope on the bus is numbered, and an agent that finds a gap records an \texttt{INCOMPLETE} decision naming the missing envelopes rather than a well-formed record of a truncated input.
+\noindent \textbf{Reflexivity is one level deep, by construction.} Meta agents publish to a subject prefix nothing subscribes to, so governance cannot re-trigger itself. Within that bound the meta agents are fully instrumented, and MC1 satisfies the standard it enforces. One container image serves all roles; CI runs both the containerised NATS path and an in-process path and holds each to the same lineage comparison.
 
-\subsection{Reflexivity, and the depth we claim}\label{sec:5.1}
+\section{Evaluation}\label{sec:5}
 
-Meta agents subscribe to \texttt{agent.\allowbreak{}lifecycle.\allowbreak{}>} and publish to \texttt{governance.\allowbreak{}<role>.\allowbreak{}<session>}. Nothing subscribes to \texttt{governance.\allowbreak{}*}, so the governance layer cannot re-trigger itself and \textbf{reflexivity in a run is one level deep}: the operational agents are governed; the governance layer is not.
+\noindent The reference run is two input records through six agents: \textbf{24 PROV documents}, 96 activities, 324 relations (\texttt{experiments/\allowbreak{}audit-reference}). Every figure is regenerated by code from archives frozen from clean commits, with per-file hashes; 246 tests run on Linux and Windows.
 
-That bound is a termination property rather than an oversight --- an agent that governs governance output emits a record which is itself governance output, and nothing in the subject structure stops the next pass. Publishing to a prefix nobody subscribes to makes the recursion impossible by construction, which is worth more than a depth counter someone can forget to check, and it is enforced as a test rather than documented as a caveat. Two things hold at that depth, both stronger than a governance table: the meta agents are fully instrumented, and \textbf{MC1 satisfies its own standard} --- applying MC1 to MC1's own output \textbf{failed} when first run, because the checker could not satisfy its own rule. It now passes, as does MC1 applied to MC3.
+\subsection{Conformance}\label{sec:5.1}
 
-One container image serves all six roles and is rootless-friendly, so it converts cleanly to Apptainer for HPC. A second path runs the same agents over an in-process bus; CI runs both on every commit and holds each to the same structural comparison against the reference archive. They are not the same evidence --- the in-process bus awaits each handler inline in subscription order, exercising none of the distributed path's concurrency --- so we use it for isolation in measurement, never as evidence about ordering or throughput.
+\noindent All 24 documents are accepted by the reference \texttt{prov} parser, and all 24 conform to the published shapes under \texttt{pyshacl}~\cite{pyshacl} --- an external judge of an external rule. The relation total is the wrong number to quote: 126 relations are observed, 72 derived, 30 declared and 96 are one-per-activity attributions, so the structural claim is 228. Applied to its input, CA3 found real gaps in yProv4ML's records: 8 of 9 activities declare a start and no end.
 
-\section{Evaluation}\label{sec:6}
+\subsection{Capture, not retrieve}\label{sec:5.2}
 
-Every figure is regenerated from frozen archives under \texttt{experiments/\allowbreak{}} by \texttt{uv run python run\_\allowbreak{}local.\allowbreak{}py \&\& uv run python -m eval.\allowbreak{}evaluate}; none is transcribed by hand. Each archive carries per-file hashes and the commit it was frozen from, and refuses to freeze from a working tree with uncommitted changes. A CI matrix (Linux and Windows, Python 3.11 and 3.12) re-runs the pipeline and fails if any lineage edge of the emitted provenance changes without the change being declared; 239 tests pass. The reference run (\texttt{experiments/\allowbreak{}audit-reference}) is two input records through six agents, producing \textbf{24 PROV documents}.
-
-\subsection{Conformance, coverage, and a declared standard}\label{sec:6.1}
-
-Interoperability with W3C PROV is judged by an independent implementation. A single non-standard key at the document root made the reference \texttt{prov} parser reject \textbf{every one of 24 documents} whole --- the interoperability claim had been \emph{inverted}, not merely weak --- and after the fix all 24 are accepted and all 8 \texttt{yp:\allowbreak{}pid} pointers dereference from a fresh process. The run produces 96 activities and 324 relations, and the total is the wrong number to quote: \textbf{126 observed}, \textbf{72 derived} from PROV's definition of \texttt{wasInformedBy}, \textbf{30 declared}, and \textbf{96 attributed}, one per activity. That last category counts how many steps ran rather than how they were connected, so \textbf{the structural claim is 228, not 324.}
-
-Two further measurements are easy to confuse, and only the second is a result. \textbf{Coverage: 24 of 24 decisions carry a justification} --- a conformance check on our own instrumentation, since the code that counts decision activities is the code that justifies them, so no run could report another number and the figure says nothing about whether a justification is \emph{informative}. \textbf{Conformance: 24 of 24 records satisfy the published shapes}, including the constraint that each agent decided something --- and this has an external judge, \texttt{pyshacl}~\cite{pyshacl} over RDF converted by the reference \texttt{prov} library. Neither the rule nor the engine is ours.
-
-Applied to its own input rather than to our output, CA3 found \textbf{real completeness gaps in yProv4ML's published records}: 8 of 9 activities declare a start time with no end time, and entity typing coverage is 82.1\%.
-
-\subsection{Capture, not retrieve}\label{sec:6.2}
-
-Strategy A is a callback-level baseline we built ourselves, fed the 96 step events a framework callback handler receives --- node name, timings, input and output payloads, errors --- from the \emph{same run} as Strategy B.
+\noindent Strategy A is a callback-level baseline we built ourselves from the \emph{same run}, fed every step event a framework handler receives. It is an upper bound: its events carry the structural facts the explicit instrumentation declared.
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{Strategy A against Strategy B, signal by signal.}\label{tab:2}
-\begin{tabular}{lrrr}
+\caption{Callback baseline (A, with a ten-rule type map) against explicit capture (B).}\label{tab:3}
+\begin{tabularx}{\columnwidth}{Lrr}
 \toprule
-Signal & A, zero config & A, with type map & B \\
+Signal & A & B \\
 \midrule
-Documents emitted & 24 & 24 & 24 \\
-Activities & 96 & 96 & 96 \\
-\ldots{}of them typed & 0 & 96 & 96 \\
-Entities & 54 & 54 & 78 \\
-\ldots{}of them typed & 0 & 0 & 78 \\
-\ldots{}carrying a resolvable pointer & 0 & 0 & 8 \\
-Relations, total & 324 & 324 & 324 \\
-Decisions carrying \texttt{yp:\allowbreak{}verdict} & 0 & \textbf{24} & 24 \\
-Decisions carrying \textbf{\texttt{yp:\allowbreak{}justification}} & \textbf{0} & \textbf{0} & \textbf{24} \\
-Accepted by the reference \texttt{prov} parser & 24 & 24 & 24 \\
+Activities, typed & 96 & 96 \\
+Entities, typed & 0 of 54 & 78 of 78 \\
+Relations & 324 & 324 \\
+Verdicts & 24 & 24 \\
+Justifications & 0 & 24 \\
+Accepted by the PROV parser & 24 & 24 \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
-\textbf{\emph{A is an upper bound, deliberately.}} Its event stream is built from the declarations the explicit instrumentation made. A real handler receives a node's whole input payload and must guess which part mattered, so it would over-report \texttt{used}. Conceding A every structural fact B declared turns the last row into a statement about the \textbf{ceiling}: even granted everything explicit instrumentation declares, the rationale is unreachable.
-
-\textbf{\emph{Structure is recoverable, and the baseline recovers all of it}} --- 96 activities and all 324 relations, identical to B. An earlier version of this table claimed four zeros down the A column and three were false, including the claim that a callback reconstruction produces no conformant PROV-JSON. Syntax was never the differentiator.
-
-\textbf{\emph{Types and identity are where the structural gap is.}} A types nothing with no configuration and everything with ten hand-written label patterns, so the types exist as a per-system artifact someone maintains, and only because these labels happen to be descriptive. A is handed payloads rather than references, so it mints identity from content, types none of the 54 entities, and carries no pointer.
-
-\textbf{\emph{The verdict is often recoverable.}} A recovers 24 of 24 verdicts, which we report as fragile rather than impressive: it scrapes a developer-chosen node label, and a graph whose decision node is named \texttt{decide} yields none.
-
-\textbf{\emph{The facts are often recoverable; the rule is not.}} Searching everything the handler could read, 222 strings and 12,425 characters, finds no justification verbatim. We report that and do not rest on it, because a sentence assembled at run time almost never survives intact anywhere. The harder test splits each justification into the facts it cites (figures, hashes, names, files, agent roles) and searches for each as a whole token:
+\noindent Structure is recoverable, and the verdicts are too --- scraped from node labels, which a graph naming its decision node \texttt{decide} would defeat. No justification appears verbatim in the 12,425 characters A observed, but a run-time sentence rarely survives verbatim, so we test facts:
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{The rationale, fact by fact (\texttt{python -m eval.\allowbreak{}baseline} over the reference archive). Seeing a fact over-counts knowing it: a role name in the stream is not knowledge that the role acknowledged.}\label{tab:3}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrrrrr}
+\caption{Each justification's facts (figures, hashes, names, roles) searched for in everything A saw. Seeing a fact over-counts knowing it.}\label{tab:4}
+\begin{tabularx}{\columnwidth}{Lrrrr}
 \toprule
-Decisions & Count & Verbatim & Facts cited & Seen by A & Every fact seen \\
+Decisions & Count & Facts & Seen by A & All seen \\
 \midrule
-Operational (CA1, CA2, CA3, CAx) & 8 & 0 & 49 & 30 (61\%) & 2 \\
-Meta (MC1, MC3) & 16 & 0 & 16 & 16 (100\%) & 16 \\
+Operational & 8 & 49 & 30 (61\%) & 2 \\
+Meta & 16 & 16 & 16 (100\%) & 16 \\
 \bottomrule
-\end{tabular}}
+\end{tabularx}
 \end{table}
 
-The 19 facts A never saw are those the agents \emph{computed in order to decide}: a record's byte count, a timing gap and its share of the run, a summary's length, the threshold its figures were checked against. Where A saw every fact, it still lacks the rule: CA2 cites only figures and a file name A observed, but not that finding no numeric \texttt{prov:\allowbreak{}value} sent it to a fallback chart, nor that the fallback is why it said REVISE. The meta-agent justifications restate structure A reconstructs in full, so they do not count toward the claim. \textbf{The inputs to a decision may be observable; the rule that combined them is not.}
+\noindent The 19 facts A never saw are those the agents \emph{computed in order to decide}: a record's byte count, a timing gap and its share of the run, a summary's length, a threshold. Where A saw every fact, it still lacks the rule: CA2's facts were all visible, but not that finding no numeric values sent it to a fallback chart, nor that the fallback is why it said REVISE. Meta-agent justifications restate structure A already has, and are not counted. \textbf{The inputs to a decision may be observable; the rule that combined them is not.}
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/f4_two_escalations.pdf}
-\caption{One verdict, two causes: the integrity path and the timeout path through the same code, with both justifications quoted as the record carries them.}\label{fig:2}
+\caption{One verdict, two causes: CA1's integrity and timeout escalations, with both justifications quoted as the record carries them.}\label{fig:1}
 \end{figure*}
 
-What the gap costs is visible in one agent (Fig.~\ref{fig:2}). CA1 says ESCALATE for three reasons, and its justification differs by which one held. On an integrity failure it cites the two content hashes that did not match; on a timeout, \emph{``Persisted WITHOUT confirmed consumption \ldots{} still waiting on [ca2, ca3, cax] when the record was archived anyway to avoid losing it''}; on a lost envelope, \emph{``Envelope(s) 3 of the record never arrived, so what was stored is partial.''} A recovers one fact about each decision, the verdict. B records the trigger, the quorum, the reason, the integrity check that \emph{passed} on the timeout path, and the choice to archive anyway rather than lose the record. So A cannot tell \emph{``storage is corrupting records''} from \emph{``ca3 is not running''}, and the two call for opposite responses.
+\noindent Fig.~\ref{fig:1} shows the cost. CA1 says ESCALATE for three reasons; A recovers the verdict, never the reason --- so it cannot tell \emph{``storage is corrupting records''} from \emph{``a consumer is down''}.
 
-\subsection{Energy: what can be measured, and what a record must disclose}\label{sec:6.3}
+\subsection{Energy}\label{sec:5.3}
 
-Energy is a first-class concern for the infrastructure this work targets, so the capture API carries a sampling backend (codecarbon~\cite{codecarbon}), opt-in. Measured where energy \emph{can} be measured, over whole sessions, provenance makes no difference we can resolve; and getting there produced two results about what an energy figure in a record has to say about itself.
-
-\textbf{Over whole sessions, the energy cost does not resolve.} We ran all six agents on a real record, 97 sessions to a window, under each condition, plus an idle window, in 12 interleaved rounds with the order rotated and a warm-up round excluded (\texttt{experiments/\allowbreak{}energy-session}):
+\noindent On our host the CPU is measured --- the Windows Energy Meter Interface reads the package counter, tracking load from 5 W idle to 31 W saturated --- while memory is a flat 10 W model. A record must say so per component: a sum of the two is labelled \texttt{partly-measured}, never \texttt{measured}. We first concluded the counter was broken; it reads zero until its first sample.
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{Measured CPU energy (Windows EMI package counter, 1 s sampling); RAM, modelled at a flat 10 W, is reported separately and excluded. No difference reaches 3$\times$ its dispersion, gross or above the 3.2 W idle draw.}\label{tab:4}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrrrr}
+\caption{Measured CPU energy per six-agent session, 12 interleaved rounds with idle windows (\texttt{experiments/\allowbreak{}energy-session}). No difference reaches 3x its spread.}\label{tab:5}
+\begin{tabularx}{\columnwidth}{Lrrr}
 \toprule
-CPU energy per session & OFF & A & B-TRANS & B \\
+CPU energy per session & OFF & B-TRANS & B \\
 \midrule
-gross & 1.43 J & 1.47 J & 1.50 J & 1.72 J \\
-vs OFF (margin) & --- & +2.7\% (0.5$\times$) & +5.3\% (0.9$\times$) & +20.3\% (2.3$\times$) \\
-time per session & 104 ms & 105 ms & 105 ms & 114 ms \\
+joules & 1.43 & 1.50 & 1.72 \\
+vs OFF (margin) & --- & +5\% (0.9x) & +20\% (2.3x) \\
 \bottomrule
-\end{tabular}}
+\end{tabularx}
 \end{table}
 
-No condition is a result, but the medians point where the timing study does: building the record (B-TRANS) moves a session's energy by 5\%, and building and writing it (B) by 20\%, alongside 9\% more time. A pilot run, kept in the archive and excluded because its procedure differed, agrees.
+\noindent Per step, energy cannot be attributed at all: at a 15 s sampling period a step that did nothing was charged ten times the step that rendered a chart. Each figure therefore carries \texttt{yp:\allowbreak{}energy\_\allowbreak{}sampling\_\allowbreak{}period\_\allowbreak{}s} and \texttt{yp:\allowbreak{}energy\_\allowbreak{}attributable}, and \textbf{energy belongs at session granularity}, where Table~\ref{tab:5} measures it.
 
-\textbf{A record must say which components it measured.} codecarbon reports processor and memory separately, and on this host only the processor is observed: the Windows Energy Meter Interface reads the package counter (5 W idle, 21 W with one core busy, 31 W with all eight), while memory is a flat 10 W per installed capacity, 40\% of a summed figure and a function of nothing but elapsed time. A sum of the two is neither measured nor modelled, so the record says \texttt{partly-measured}, and the vocabulary's shape rejects any other label on an energy figure. We got this wrong twice before it held. A first calibration concluded the counter was broken because it read zero, when it had been read before its first sample; and a labelling check that tested the \emph{total} for a non-zero reading tested nothing, because the memory model makes the total non-zero whatever the processor counter does. \emph{A provenance system cannot tell a measured watt from a modelled one unless it asks the backend, component by component, and records the answer.}
+\subsection{Model provenance}\label{sec:5.4}
 
-\textbf{A sampling backend cannot attribute energy to a step shorter than its period.} At codecarbon's default 15 s, with steps lasting milliseconds, a delta lands on whichever step reads after a tick:
+\noindent Every model-bearing step records the model, sampling parameters, prompt identity, version and hash, token counts, latency and a response hash (\texttt{experiments/\allowbreak{}audit-llm}: four calls, 2,071 prompt and 480 completion tokens). The model a caller names is not the one that answers: the record carries the alias \texttt{gpt-4o}, the snapshot \texttt{gpt-4o-2024-08-06} and the provider's fingerprint --- and the four calls of one run returned three fingerprints.
 
-\begin{table}[t]
-\centering\footnotesize
-\caption{Two steps of one record under a 15-second sampling period: the step that did the work was charged a tenth of what the step that did nothing was. \emph{(A development run recorded in \texttt{docs/\allowbreak{}phases/\allowbreak{}PHASE\_\allowbreak{}4.\allowbreak{}md}, with modelled power --- the only figures in this paper not from a hashed archive. The result is about sampling, not power, and holds either way.)}}\label{tab:5}
-\begin{tabular}{lrr}
-\toprule
-Step & Energy charged & Step duration \\
-\midrule
-choose what to plot & 46.9 \textmu{}Wh & 0.000 s \\
-render chart (matplotlib) & 4.6 \textmu{}Wh & 1.328 s \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Overhead}\label{sec:5.5}
 
-The record therefore carries each energy figure with \texttt{yp:\allowbreak{}energy\_\allowbreak{}sampling\_\allowbreak{}period\_\allowbreak{}s}, \texttt{yp:\allowbreak{}energy\_\allowbreak{}source} and \texttt{yp:\allowbreak{}energy\_\allowbreak{}attributable}, so it states its period, what was observed, and that the figure is \textbf{not} an attribution to the step it is attached to. \textbf{Energy belongs at session granularity}, which is where Table~\ref{tab:4} measures it. \emph{A record that reports an energy figure without its sampling period and its source is reporting when the sampler last ticked, and how it guessed.}
+\noindent Each agent's step was timed 30 times per condition, interleaved: provenance off, built but not written (B-TRANS), and built and written (B); a difference counts only at 3x its spread. On two occasions, \textbf{building the record was inside every operational agent's run-to-run variance} (margins 0.0--0.5x). Writing it resolves for some agents, and there it dominates: for the worst case, MC1, a 109 \textmu{}s step gains 38 \textmu{}s to build the record and 1,485 \textmu{}s to write it (+1,394\%, 98\% of it the write). Transient mode removes 89\% of the time cost; metadata mode 38\% of the bytes, keeping every justification. Recording a justification costs 54 ns against a $\pm$726 ns spread, and justifications are 6.5\% of the records' bytes. Cost is linear (fitted exponents 1.09 and 1.13 to 10,000 activities). Across occasions, two agents' verdicts flipped between resolved and not, so we quote the verdicts that held, the bytes and the complexity class, not the timings.
 
-\subsection{Model provenance}\label{sec:6.4}
+\subsection{Verdict reachability}\label{sec:5.6}
 
-Before this work the graph named no model, no sampling parameters, no prompt and no token counts, so the one step in the pipeline that was not deterministic was the one step the record could not account for. Every model-bearing step now carries the model, temperature, token limit, prompt identity, version and content hash, token counts, latency, finish reason, and a hash of the response (\texttt{experiments/\allowbreak{}audit-llm}: four calls, 2,071 prompt and 480 completion tokens). Three details generalise. \emph{The model a caller names is not the model that answers}: the record carries the requested alias \texttt{gpt-4o}, the snapshot that answered, \texttt{gpt-4o-2024-08-06}, and the provider's \texttt{system\_\allowbreak{}fingerprint} --- and the four calls of one run returned three distinct fingerprints. \emph{A prompt is apparatus and had to be routed like one}: a prompt registry with versions and hashes already existed and nothing imported it, because both LLM agents built prompts as inline f-strings; the fix was making the call site take a prompt object rather than a string, so a prompt cannot reach a model without its identity reaching the record. And \emph{an absence is recorded as an absence}: the computed fallback path stamps no model attributes at all, rather than zeros, because a zero token count is a measurement and on that path none was made.
+\noindent The ordinary run reaches six of twelve two-valued verdicts; nine injected scenarios reach the rest, each of CA1's three escalations, and \texttt{INCOMPLETE} --- all thirteen are observed. Three scenarios are not faults: CA2 says REVISE on the bundled data because yProv4ML records carry no numeric values, a finding about the input. \texttt{mc1:\allowbreak{}FAIL} is unreachable from this library's own records, because \texttt{decide()} refuses a blank justification; it is reached by a third-party record, which is what a compliance checker is for.
 
-\subsection{What the instrumentation costs}\label{sec:6.5}
+\section{Limitations}\label{sec:6}
 
-Absolute timings are machine-specific --- a four-core laptop, CPython 3.11, with other processes on it. The transferable results are the ratios, the byte counts and the complexity class. A difference is reported as a result only if it reaches \textbf{3$\times$ the dispersion of its own samples}.
+\noindent \textbf{We show that justifications exist and that the decision rule is unrecoverable, not that they are good}; whether they improve an operator's decisions needs a human study. The fact-level measure is coarse in both directions. A model-bearing step is repeatable from its record, not reproducible: three fingerprints in one run is a backend changing under a caller that changed nothing. The bus is at-most-once: numbered envelopes expose a partial loss, but a stream lost whole is silent. The evaluation uses two input records, one producer and one machine, and we built the baseline ourselves --- mitigated by granting it every declared structural fact.
 
-Figures are from \texttt{experiments/\allowbreak{}audit-reference/\allowbreak{}bench}, with a second occasion in \texttt{bench-previous}.
+\section{Conclusion}\label{sec:7}
 
-\textbf{Building the record is inside the noise; writing it is not always.} Each agent's step was timed 30 times per condition, interleaved, with provenance off, built but not written, and built and written. For all four operational agents, \emph{building} a complete typed record moved the step by less than its own run-to-run variance on both occasions (margins 0.0--0.5$\times$). Whether \emph{writing} it did depends on the agent and, for two of them, on the day.
+\noindent Provenance can describe what an agentic system did; with automatic capture alone it cannot describe why, because the rule behind a decision never leaves the agent. We made that measurable against a generous baseline, discharged it with a vocabulary and an API whose one hand-written call records the decision, and found the cost to be storage rather than speed --- \emph{storage for explainability, not speed for explainability}. Next: an OpenTelemetry bridge for the automatic half, bounded second-level reflexivity, meta agents that act on their verdicts, and a study of whether justifications improve operators' decisions.
 
-\textbf{The field this paper argues for costs nothing we can resolve in time.} Over 40 interleaved rounds of 1,000 calls, the paired difference between recording an activity with and without a justification is \textbf{54 ns against a round-to-round spread of $\pm$726 ns}. In storage it costs bytes: 240--738 per justification in the reference records, \textbf{6.5\% of their serialised size}. The trade is \textbf{storage for explainability, not speed for explainability}.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/f9_where_the_overhead_is.pdf}
-\caption{Where the overhead actually is: each agent's own work, building the record, and writing it, as shares of one end-to-end record.}\label{fig:3}
-\end{figure*}
-
-\textbf{Where overhead resolves, it is the write} (Fig.~\ref{fig:3}). We lead with the worst case:
-
-\begin{table}[t]
-\centering\footnotesize
-\caption{The worst ratio in the system, decomposed. 98\% of it is one file write; for every agent whose overhead resolves, the write is at least 90\%.}\label{tab:6}
-\begin{tabular}{lr}
-\toprule
- & MC1 ComplianceChecker, the worst case in the system \\
-\midrule
-the agent's own work & 109 \textmu{}s \\
-\ldots{}plus building a complete typed PROV record & \textbf{+38 \textmu{}s} \\
-\ldots{}plus writing it to disk & \textbf{+1,485 \textmu{}s} \\
-total overhead & \textbf{+1,394\%} (margin 11.5$\times$) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Read the decomposition before believing the ratio. Explicit instrumentation is not expensive to \emph{compute}; persisting its output is, and persistence is a deployment decision. Both knobs are exposed and measured: transient mode is \textbf{$-$89\% of the time cost} for a byte-identical record, and metadata granularity \textbf{$-$37.6\% of the bytes} while retaining every justification. A mode that shed justifications would be a different product, not a cheaper one.
-
-Two further results transfer. \textbf{The dominant per-step cost is rendering an instant as text} --- of a 4.97 \textmu{}s tracked step, 2.59 \textmu{}s is the timestamp, and formatting the value costs 1.8$\times$ reading the clock. And \textbf{the cost is linear, but was not when first measured}: the first sweep fitted an exponent of 1.468 because a duplicate check on declared derivations scanned a list, and a 10,000-activity record went from 1.72 s to 88 ms once that became an O(1) set; the exponents are now 1.09 for building a record and 1.13 for serialising it. That defect was invisible at the six activities every test uses and would have reached this paper as an unqualified linear claim.
-
-\textbf{Which figures transfer.} Across two occasions the headline timings moved by 6--11\%, byte counts were identical, and exponents agreed within 2.1\%. Not every verdict held: for CA3 and CAx, building and writing went from 2.9$\times$ the dispersion to 5.0$\times$ and 4.6$\times$, resolved on one occasion and not the other, which is a result in neither direction. \textbf{Quote the bytes, the complexity class, the verdicts that held and the decomposition; quote the timings as orders of magnitude.} The 3$\times$ criterion is stricter than the one we began with, \emph{larger than the noise}, which treats any consistent bias as a finding, and a loaded machine supplies plenty. The project's own guard test caught it --- on a shared CI runner, timing the \textbf{same function twice} produced a 147.5 ns difference against 61.0 ns of dispersion and called it real. \textbf{Write the guard test that fails when your harness reports noise as a result.}
-
-\subsection{Verdict reachability}\label{sec:6.6}
-
-A verdict that only ever takes one value carries no information, so what has to be established is that the alternatives are \textbf{reachable}. The six agents have two verdicts each; the ordinary run reaches six of those twelve. Nine injected scenarios (\texttt{experiments/\allowbreak{}audit-reference/\allowbreak{}faults}) reach the other six, CA1's ESCALATE by each of its three reasons, and \texttt{INCOMPLETE}, which any stream-consuming agent records when an envelope goes missing. \textbf{All thirteen verdicts are observed.} Three of the scenarios are not faults at all, and that matters: CA2's ACCEPT, CAx's REVISE and CA3's OK are unreachable from the bundled sample data because the real records carry no numeric values to plot and declare start times without end times. So \emph{``CA2 always says REVISE''} was a finding about the \textbf{input}, not about CA2.
-
-One row is a property rather than a result. \textbf{\texttt{mc1:\allowbreak{}FAIL} is unreachable from records this library produces}, because \texttt{decide()} refuses a blank justification at the call site. FAIL is reachable for records the library did not write --- exactly the case a compliance checker exists for, since it is pointed at agents you do not control. \emph{The instrumentation makes the violation unrepresentable, and the governance layer catches it in input that was not instrumented.} Every fault is injected into the input or the environment, \textbf{never into the check being tested}, so a verdict advertised and never observed fails the build.
-
-\section{Discussion and limitations}\label{sec:7}
-
-\textbf{We measure that justifications exist and that their decision rule is externally unrecoverable; we do not measure whether they are \emph{good}.} This is the most significant limitation of the evaluation. Section~\ref{sec:6.1}'s coverage figure is a self-report by construction, and Section~\ref{sec:6.2} establishes unrecoverability, not quality. Section~\ref{sec:6.2}'s fact-level measure is also coarse in both directions: it counts a fact as seen wherever the same token appears, and it cannot see a rule that cites no checkable fact at all. Whether an operator handed one of these justifications acts correctly more often is an empirical question requiring a human study, and we have not run one. Fig.~\ref{fig:2} is an argument, not evidence.
-
-\textbf{Reflexivity is one level deep}, and self-application is demonstrated as a property rather than as a running loop, so C2 carries that qualifier.
-
-\textbf{A provenance system can over-report as easily as under-report.} An earlier version of our tracker asserted derivation from registration order and informed-by from recording order, producing exactly \emph{n}$-$1 edges for \emph{n} items regardless of what the agent did. The relations were corrected to declared-or-derived, and the correction changed the graph's \emph{topology} rather than only its size: the old chain asserted a single dependency spine where the real dataflow is a tree. We disclose this because it is what makes the counts in Section~\ref{sec:6.1} trustworthy, and because \textbf{relation counts are the easiest place in a provenance system for over-reporting to go unnoticed.}
-
-\textbf{A model-bearing step is repeatable from its record, not bitwise reproducible.} The record carries what an auditor needs to re-run a call and what catches a forgotten version bump, but it cannot make a hosted model deterministic. Recording the resolved snapshot and fingerprint narrows the gap without closing it: three fingerprints in four calls of one run is a backend changing underneath a caller that changed nothing.
-
-\textbf{Identifiers, transport, and resource bounds.} The \texttt{21.\allowbreak{}T11999} prefix is not registered and nothing resolves it globally, and identical payloads collapse to one identifier, so a pointer identifies \emph{content} rather than a storage event. NATS~\cite{nats} core is at-most-once with JetStream unconfigured, so a subscriber not running when a record is published never sees it --- a provenance bus that can lose provenance deserves a sentence in a provenance paper. Numbered envelopes turn a \emph{partial} loss into an \texttt{INCOMPLETE} record; a stream lost whole is still silent. And a tracker holds its whole record in memory until it emits (\textasciitilde{}1.3 KiB per activity), which is why a metadata-only granularity exists.
-
-\textbf{Energy, on one machine.} The CPU counter covers the whole processor package, so background load reaches every window; interleaving shares it and the idle windows subtract it, but neither removes it. Memory energy is a model on this host and is excluded from the comparison rather than measured.
-
-\textbf{Scale, a single producer, and our own baseline.} Two input records, 24 emitted documents, one producer; nothing in the agents is ML-specific, but that generality is argued from the code rather than demonstrated against a second producer. And we built Strategy A, so we could in principle have built it badly --- the mitigation is to grant it every structural fact the explicit instrumentation declares and report it as an upper bound, which is why Table~\ref{tab:2} concedes A everything except the one row the paper is about.
-
-\section{Conclusion and future work}\label{sec:8}
-
-The provenance community can describe what an agentic system did. With the automatic-capture tooling that dominates agent observability it cannot describe why --- and this is a structural property rather than a tooling deficiency. The facts a decision used may cross a step boundary; the rule that combined them is a local computation at the moment of decision, and no callback, span, or post-hoc query can retrieve what was never captured.
-
-We made that argument measurable by building the strongest callback-level baseline we could and granting it every structural advantage: it reconstructs 96 of 96 activities, all 324 relations and 24 of 24 verdicts, and serialises to conformant W3C PROV-JSON. It sees 61\% of the facts the operational justifications cite, none of the values the agents computed in order to decide, and not one decision rule. We discharged the argument with a small explicit instrumentation layer --- a published \texttt{yp:\allowbreak{}} vocabulary with SHACL shapes, and an API whose decision call refuses a blank justification --- and demonstrated it across six heterogeneous agents in a running reflexive system, including the agents that govern the others. We measured the cost: building the record is inside every operational agent's run-to-run variance, the justifications are 6.5\% of the records' bytes, and where overhead resolves at all, at least 90\% of it is the write to disk. Measured over whole sessions, the energy cost does not resolve either; and per step it cannot be measured at all, which constrains how this community should record energy, and what a record must say about where its figure came from.
-
-The honest summary of the trade is one sentence: \textbf{storage for explainability, not speed for explainability.}
-
-Four extensions follow directly. \textbf{Actuation} is the largest: the meta layer today observes, judges and gates, and making it \emph{reconfigure} or \emph{activate} an operational agent requires a control-channel design with its own provenance --- an action taken on the basis of a justification should be derivable from it. \textbf{Bounded second-level reflexivity}, with the depth carried in the subject so recursion remains impossible by construction, would lift the one-level qualifier on C2. \textbf{A Layer-1 OpenTelemetry bridge} would let the automatic half of the record come from instrumentation a deployment already runs, leaving only the irreducible explicit part to the developer. And \textbf{a justification-quality study} is the missing evaluation: we have shown that a decision rule can only be captured and never retrieved, and not yet that capturing it makes an operator's decisions better.
-
-\textbf{Artifact availability.} \emph{(To be completed: the library, the vocabulary and SHACL shapes, the frozen experiment archives and the benchmark harness are all in the project repository; a citable archive is pending a decision on public release.)}
-
-\bibliographystyle{IEEEtran}
-\bibliography{refs}
+\begin{thebibliography}{30}
+\bibitem{provdm} L.~Moreau and P.~Missier, Eds., ``PROV-DM: The PROV data model,'' W3C Recommendation, Apr. 2013.
+\bibitem{euaiact} European Parliament and Council, ``Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (Artificial Intelligence Act),'' \emph{Official Journal of the European Union}, 2024.
+\bibitem{provo} T.~Lebo, S.~Sahoo, and D.~McGuinness, Eds., ``PROV-O: The PROV ontology,'' W3C Recommendation, Apr. 2013.
+\bibitem{noworkflow} J.~F. Pimentel, L.~Murta, V.~Braganholo, and J.~Freire, ``noWorkflow: A tool for collecting, analyzing, and managing provenance from Python scripts,'' \emph{Proc. VLDB Endowment}, vol.~10, no.~12, pp. 1841--1844, 2017.
+\bibitem{yesworkflow} T.~McPhillips \emph{et al.}, ``YesWorkflow: A user-oriented, language-independent tool for recovering workflow information from scripts,'' \emph{Int. J. Digital Curation}, vol.~10, no.~1, pp. 298--313, 2015.
+\bibitem{spade} A.~Gehani and D.~Tariq, ``SPADE: Support for provenance auditing in distributed environments,'' in \emph{Proc. ACM/IFIP/USENIX Middleware}, 2012, pp. 101--120.
+\bibitem{camflow} T.~Pasquier \emph{et al.}, ``Practical whole-system provenance capture,'' in \emph{Proc. ACM Symp. Cloud Computing (SoCC)}, 2017, pp. 405--418.
+\bibitem{mlflow} M.~Zaharia \emph{et al.}, ``Accelerating the machine learning lifecycle with MLflow,'' \emph{IEEE Data Eng. Bull.}, vol.~41, no.~4, pp. 39--45, 2018.
+\bibitem{yprov4ml} G.~Padovani, V.~Anantharaj, and S.~Fiore, ``yProv4ML: Effortless provenance tracking for machine learning systems,'' arXiv preprint, 2025.  % VERIFY
+\bibitem{freire2008} J.~Freire, D.~Koop, E.~Santos, and C.~T. Silva, ``Provenance for computational tasks: A survey,'' \emph{Computing in Science \& Engineering}, vol.~10, no.~3, pp. 11--21, 2008.
+\bibitem{herschel2017} M.~Herschel, R.~Diestelk\"{a}mper, and H.~Ben~Lahmar, ``A survey on provenance: What for? What form? What from?'' \emph{The VLDB Journal}, vol.~26, no.~6, pp. 881--906, 2017.
+\bibitem{react} S.~Yao \emph{et al.}, ``ReAct: Synergizing reasoning and acting in language models,'' in \emph{Proc. Int. Conf. Learning Representations (ICLR)}, 2023.
+\bibitem{autogen} Q.~Wu \emph{et al.}, ``AutoGen: Enabling next-gen LLM applications via multi-agent conversation,'' arXiv:2308.08155, 2023.
+\bibitem{langgraph} LangChain, ``LangGraph,'' 2024. [Online]. Available: \url{https://github.com/langchain-ai/langgraph}
+\bibitem{otelgenai} OpenTelemetry, ``Semantic conventions for generative AI systems,'' 2025. [Online]. Available: \url{https://opentelemetry.io/docs/specs/semconv/gen-ai/}
+\bibitem{openllmetry} Traceloop, ``OpenLLMetry,'' 2025. [Online]. Available: \url{https://github.com/traceloop/openllmetry}
+\bibitem{langfuse} Langfuse, ``Langfuse: Open-source LLM engineering platform,'' 2025. [Online]. Available: \url{https://langfuse.com}
+\bibitem{langsmith} LangChain, ``LangSmith,'' 2025. [Online]. Available: \url{https://www.langchain.com/langsmith}
+\bibitem{provagent} R.~Souza \emph{et al.}, ``PROV-AGENT: Unified provenance for tracking AI agent interactions in agentic workflows,'' arXiv preprint, 2025.  % VERIFY
+\bibitem{doshivelez2017} F.~Doshi-Velez and B.~Kim, ``Towards a rigorous science of interpretable machine learning,'' arXiv:1702.08608, 2017.
+\bibitem{modelcards} M.~Mitchell \emph{et al.}, ``Model cards for model reporting,'' in \emph{Proc. Conf. Fairness, Accountability, and Transparency (FAT*)}, 2019, pp. 220--229.
+\bibitem{datasheets} T.~Gebru \emph{et al.}, ``Datasheets for datasets,'' \emph{Commun. ACM}, vol.~64, no.~12, pp. 86--92, 2021.
+\bibitem{turpin2023} M.~Turpin, J.~Michael, E.~Perez, and S.~R. Bowman, ``Language models don't always say what they think: Unfaithful explanations in chain-of-thought prompting,'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2023.
+\bibitem{lanham2023} T.~Lanham \emph{et al.}, ``Measuring faithfulness in chain-of-thought reasoning,'' arXiv:2307.13702, 2023.
+\bibitem{chan2024} A.~Chan \emph{et al.}, ``Visibility into AI agents,'' in \emph{Proc. ACM Conf. Fairness, Accountability, and Transparency (FAccT)}, 2024.
+\bibitem{strubell2019} E.~Strubell, A.~Ganesh, and A.~McCallum, ``Energy and policy considerations for deep learning in NLP,'' in \emph{Proc. ACL}, 2019, pp. 3645--3650.
+\bibitem{henderson2020} P.~Henderson \emph{et al.}, ``Towards the systematic reporting of the energy and carbon footprints of machine learning,'' \emph{J. Mach. Learn. Res.}, vol.~21, no.~248, pp. 1--43, 2020.
+\bibitem{codecarbon} CodeCarbon contributors, ``CodeCarbon,'' version 3.3.1, 2025. [Online]. Available: \url{https://github.com/mlco2/codecarbon}  % VERIFY preferred citation
+\bibitem{shacl} H.~Knublauch and D.~Kontokostas, Eds., ``Shapes Constraint Language (SHACL),'' W3C Recommendation, Jul. 2017.
+\bibitem{pyshacl} RDFLib contributors, ``pySHACL,'' 2025. [Online]. Available: \url{https://github.com/RDFLib/pySHACL}
+\end{thebibliography}
 
 \end{document}

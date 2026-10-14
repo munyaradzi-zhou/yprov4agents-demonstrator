@@ -28,30 +28,88 @@ PAPER = Path(__file__).resolve().parent
 DRAFT = PAPER / "DRAFT.md"
 OUT = PAPER / "tex"
 
-#: Figure number in the draft -> rendered file. All are drawn ~6.8 in wide, so all span both
-#: columns: scaled to one column, their text would be unreadable at print size.
+#: Figure number in the draft -> rendered file. Drawn ~6.8 in wide, so it spans both
+#: columns: scaled to one column, its text would be unreadable at print size.
 FIGURES = {
-    "1": "f1_two_layers",
-    "2": "f4_two_escalations",
-    "3": "f9_where_the_overhead_is",
+    "1": "f4_two_escalations",
 }
 
-#: Where a name in the draft should carry a citation, cited at its first mention only.
-CITATIONS = (
-    ("W3C PROV", "prov-dm"),
-    ("yProv4ML", "yprov4ml"),
-    ("PROV-AGENT", "provagent"),
-    ("AER; Vispute et al.", "aer"),
-    ("OpenTelemetry's GenAI conventions", "otel-genai"),
-    ("OpenLLMetry", "openllmetry"),
-    ("Langfuse", "langfuse"),
-    ("LangSmith", "langsmith"),
-    ("EU AI Act", "euaiact"),
-    ("SHACL", "shacl"),
-    ("codecarbon", "codecarbon"),
-    ("NATS", "nats"),
-    ("`pyshacl`", "pyshacl"),
-)
+#: The reference list, keyed as the draft cites it (``[@key]``). Written into ``main.tex``
+#: itself rather than a separate ``.bib``, so a pasted ``main.tex`` compiles with its
+#: references on its own; entries are numbered in order of first citation, as IEEE requires.
+#: Entries marked ``% VERIFY`` name the right work but have a field not yet checked.
+REFERENCES = {
+    "provdm": r"L.~Moreau and P.~Missier, Eds., ``PROV-DM: The PROV data model,'' W3C "
+    r"Recommendation, Apr. 2013.",
+    "provo": r"T.~Lebo, S.~Sahoo, and D.~McGuinness, Eds., ``PROV-O: The PROV ontology,'' "
+    r"W3C Recommendation, Apr. 2013.",
+    "euaiact": r"European Parliament and Council, ``Regulation (EU) 2024/1689 laying down "
+    r"harmonised rules on artificial intelligence (Artificial Intelligence Act),'' "
+    r"\emph{Official Journal of the European Union}, 2024.",
+    "noworkflow": r"J.~F. Pimentel, L.~Murta, V.~Braganholo, and J.~Freire, ``noWorkflow: A "
+    r"tool for collecting, analyzing, and managing provenance from Python scripts,'' "
+    r"\emph{Proc. VLDB Endowment}, vol.~10, no.~12, pp. 1841--1844, 2017.",
+    "yesworkflow": r"T.~McPhillips \emph{et al.}, ``YesWorkflow: A user-oriented, "
+    r"language-independent tool for recovering workflow information from scripts,'' "
+    r"\emph{Int. J. Digital Curation}, vol.~10, no.~1, pp. 298--313, 2015.",
+    "spade": r"A.~Gehani and D.~Tariq, ``SPADE: Support for provenance auditing in "
+    r"distributed environments,'' in \emph{Proc. ACM/IFIP/USENIX Middleware}, 2012, "
+    r"pp. 101--120.",
+    "camflow": r"T.~Pasquier \emph{et al.}, ``Practical whole-system provenance capture,'' "
+    r"in \emph{Proc. ACM Symp. Cloud Computing (SoCC)}, 2017, pp. 405--418.",
+    "mlflow": r"M.~Zaharia \emph{et al.}, ``Accelerating the machine learning lifecycle "
+    r"with MLflow,'' \emph{IEEE Data Eng. Bull.}, vol.~41, no.~4, pp. 39--45, 2018.",
+    "yprov4ml": r"G.~Padovani, V.~Anantharaj, and S.~Fiore, ``yProv4ML: Effortless "
+    r"provenance tracking for machine learning systems,'' arXiv preprint, 2025.  % VERIFY",
+    "freire2008": r"J.~Freire, D.~Koop, E.~Santos, and C.~T. Silva, ``Provenance for "
+    r"computational tasks: A survey,'' \emph{Computing in Science \& Engineering}, vol.~10, "
+    r"no.~3, pp. 11--21, 2008.",
+    "herschel2017": r"M.~Herschel, R.~Diestelk\"{a}mper, and H.~Ben~Lahmar, ``A survey on "
+    r"provenance: What for? What form? What from?'' \emph{The VLDB Journal}, vol.~26, "
+    r"no.~6, pp. 881--906, 2017.",
+    "react": r"S.~Yao \emph{et al.}, ``ReAct: Synergizing reasoning and acting in language "
+    r"models,'' in \emph{Proc. Int. Conf. Learning Representations (ICLR)}, 2023.",
+    "autogen": r"Q.~Wu \emph{et al.}, ``AutoGen: Enabling next-gen LLM applications via "
+    r"multi-agent conversation,'' arXiv:2308.08155, 2023.",
+    "langgraph": r"LangChain, ``LangGraph,'' 2024. [Online]. Available: "
+    r"\url{https://github.com/langchain-ai/langgraph}",
+    "otelgenai": r"OpenTelemetry, ``Semantic conventions for generative AI systems,'' 2025. "
+    r"[Online]. Available: \url{https://opentelemetry.io/docs/specs/semconv/gen-ai/}",
+    "openllmetry": r"Traceloop, ``OpenLLMetry,'' 2025. [Online]. Available: "
+    r"\url{https://github.com/traceloop/openllmetry}",
+    "langfuse": r"Langfuse, ``Langfuse: Open-source LLM engineering platform,'' 2025. "
+    r"[Online]. Available: \url{https://langfuse.com}",
+    "langsmith": r"LangChain, ``LangSmith,'' 2025. [Online]. Available: "
+    r"\url{https://www.langchain.com/langsmith}",
+    "provagent": r"R.~Souza \emph{et al.}, ``PROV-AGENT: Unified provenance for tracking AI "
+    r"agent interactions in agentic workflows,'' arXiv preprint, 2025.  % VERIFY",
+    "doshivelez2017": r"F.~Doshi-Velez and B.~Kim, ``Towards a rigorous science of "
+    r"interpretable machine learning,'' arXiv:1702.08608, 2017.",
+    "modelcards": r"M.~Mitchell \emph{et al.}, ``Model cards for model reporting,'' in "
+    r"\emph{Proc. Conf. Fairness, Accountability, and Transparency (FAT*)}, 2019, "
+    r"pp. 220--229.",
+    "datasheets": r"T.~Gebru \emph{et al.}, ``Datasheets for datasets,'' \emph{Commun. ACM}, "
+    r"vol.~64, no.~12, pp. 86--92, 2021.",
+    "turpin2023": r"M.~Turpin, J.~Michael, E.~Perez, and S.~R. Bowman, ``Language models "
+    r"don't always say what they think: Unfaithful explanations in chain-of-thought "
+    r"prompting,'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, "
+    r"2023.",
+    "lanham2023": r"T.~Lanham \emph{et al.}, ``Measuring faithfulness in chain-of-thought "
+    r"reasoning,'' arXiv:2307.13702, 2023.",
+    "chan2024": r"A.~Chan \emph{et al.}, ``Visibility into AI agents,'' in \emph{Proc. ACM "
+    r"Conf. Fairness, Accountability, and Transparency (FAccT)}, 2024.",
+    "strubell2019": r"E.~Strubell, A.~Ganesh, and A.~McCallum, ``Energy and policy "
+    r"considerations for deep learning in NLP,'' in \emph{Proc. ACL}, 2019, pp. 3645--3650.",
+    "henderson2020": r"P.~Henderson \emph{et al.}, ``Towards the systematic reporting of the "
+    r"energy and carbon footprints of machine learning,'' \emph{J. Mach. Learn. Res.}, "
+    r"vol.~21, no.~248, pp. 1--43, 2020.",
+    "codecarbon": r"CodeCarbon contributors, ``CodeCarbon,'' version 3.3.1, 2025. [Online]. "
+    r"Available: \url{https://github.com/mlco2/codecarbon}  % VERIFY preferred citation",
+    "shacl": r"H.~Knublauch and D.~Kontokostas, Eds., ``Shapes Constraint Language "
+    r"(SHACL),'' W3C Recommendation, Jul. 2017.",
+    "pyshacl": r"RDFLib contributors, ``pySHACL,'' 2025. [Online]. Available: "
+    r"\url{https://github.com/RDFLib/pySHACL}",
+}
 
 UNICODE = {
     "—": "---",
@@ -74,12 +132,16 @@ FRONT_MATTER = r"""\documentclass[conference]{IEEEtran}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{tabularx}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
 \lstset{basicstyle=\ttfamily\scriptsize, columns=fullflexible, keepspaces=true,
   frame=tb, aboveskip=4pt, belowskip=4pt, showstringspaces=false,
-  commentstyle=\color{gray}}
+  commentstyle=\color{gray}, breaklines=true, breakatwhitespace=true}
+% Tables are exactly one column wide: the first column wraps, the others size to content.
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\setlength{\tabcolsep}{3pt}
 
 \begin{document}
 
@@ -117,9 +179,6 @@ provenance, W3C PROV, agentic AI, explainability, multi-agent systems, SHACL
 """
 
 BACK_MATTER = r"""
-\bibliographystyle{IEEEtran}
-\bibliography{refs}
-
 \end{document}
 """
 
@@ -159,6 +218,17 @@ def inline(text: str) -> str:
         return f"\x00{len(spans) - 1}\x00"
 
     text = re.sub(r"`([^`]+)`", hold, text)
+    cites: list[str] = []
+
+    def cite(match: re.Match[str]) -> str:
+        keys = [key.strip().lstrip("@") for key in match.group(1).split(";")]
+        missing = [key for key in keys if key not in REFERENCES]
+        if missing:
+            raise ValueError(f"no reference entry for {missing}")
+        cites.append("~\\cite{" + ",".join(keys) + "}")
+        return f"\x02{len(cites) - 1}\x02"
+
+    text = re.sub(r"\s*\[@([^\]]+)\]", cite, text)
     text = _escape(text)
     text = re.sub(r"\*\*\*(.+?)\*\*\*", r"\\textbf{\\emph{\1}}", text)
     text = re.sub(r"\*\*(.+?)\*\*", r"\\textbf{\1}", text)
@@ -167,9 +237,11 @@ def inline(text: str) -> str:
     text = re.sub(r"\(Table (\d)\)", r"(Table~\\ref{tab:\1})", text)
     text = re.sub(r"\bTable (\d)\b(?!\.)", r"Table~\\ref{tab:\1}", text)
     text = re.sub(r"\bFigure (\d)\b", r"Fig.~\\ref{fig:\1}", text)
+    text = re.sub(r"\bSection (\d(?:\.\d)?)\b", r"Section~\\ref{sec:\1}", text)
     text = re.sub(r'"([^"]+)"', r"``\1''", text)
     if "*" in text.replace(r"\*", ""):
         raise ValueError(f"unconverted emphasis marker in: {text[:80]}")
+    text = re.sub("\x02(\\d+)\x02", lambda m: cites[int(m.group(1))], text)
     return re.sub("\x00(\\d+)\x00", lambda m: spans[int(m.group(1))], text)
 
 
@@ -208,24 +280,30 @@ def _table(rows: list[str], caption: str) -> str:
     """A pipe table and its caption, as a float. Captions go above tables in IEEE style."""
     cells = [[cell.strip() for cell in row.strip().strip("|").split("|")] for row in rows]
     header, rule, body = cells[0], cells[1], cells[2:]
-    spec = "".join("r" if align.endswith(":") else "l" for align in rule)
+
+    def align(marker: str) -> str:
+        if marker.startswith(":") and marker.endswith(":"):
+            return "c"
+        return "r" if marker.endswith(":") else "l"
+
+    # The first column wraps (L = ragged-right X) and absorbs the width, so every table is
+    # exactly \columnwidth and never spills into the neighbouring column.
+    spec = "L" + "".join(align(marker) for marker in rule[1:])
     number = re.match(r"\*\*Table (\d)\.\*\*", caption)
     if not number:
         raise ValueError(f"a table must be followed by its caption: {caption[:60]}")
     text = caption[number.end() :].strip()
-    wide = len(header) >= 5
     lines = [
         r"\begin{table}[t]",
         r"\centering\footnotesize",
         f"\\caption{{{inline(text)}}}\\label{{tab:{number.group(1)}}}",
-        r"\resizebox{\columnwidth}{!}{%" if wide else "",
-        f"\\begin{{tabular}}{{{spec}}}",
+        f"\\begin{{tabularx}}{{\\columnwidth}}{{{spec}}}",
         r"\toprule",
         " & ".join(inline(cell) for cell in header) + r" \\",
         r"\midrule",
         *(" & ".join(inline(cell) for cell in row) + r" \\" for row in body),
         r"\bottomrule",
-        r"\end{tabular}" + ("}" if wide else ""),
+        r"\end{tabularx}",
         r"\end{table}",
     ]
     return "\n".join(line for line in lines if line)
@@ -251,10 +329,6 @@ def _figure(lines: list[str]) -> str:
 def convert(markdown: str) -> str:
     """The draft's body, from its first numbered section, as LaTeX."""
     body = markdown[markdown.index("## 1. ") :]
-    for phrase, key in CITATIONS:
-        if phrase not in body:
-            raise ValueError(f"citation anchor not found in the draft: {phrase!r}")
-        body = body.replace(phrase, f"{phrase}\x01{key}\x01", 1)
 
     out: list[str] = []
     blocks = _blocks(body)
@@ -266,7 +340,7 @@ def convert(markdown: str) -> str:
             out.append(_heading(first))
             rest = block[1:]
             if rest:
-                out.append(inline(" ".join(rest)))
+                out.append("\\noindent " + inline(" ".join(rest)))
         elif first == "---":
             pass
         elif first.startswith("```"):
@@ -284,11 +358,31 @@ def convert(markdown: str) -> str:
         elif re.match(r"^(\d+\.|-) ", first):
             raise ValueError(f"lists are not handled; the draft has one at: {first[:60]}")
         else:
-            out.append(inline(" ".join(line.strip() for line in block)))
+            out.append("\\noindent " + inline(" ".join(line.strip() for line in block)))
         index += 1
 
     tex = "\n\n".join(out)
-    return re.sub("\x01([\\w-]+)\x01", lambda m: f"~\\cite{{{m.group(1)}}}", tex)
+    return tex + "\n\n" + bibliography(tex)
+
+
+def bibliography(tex: str) -> str:
+    """The reference list, in order of first citation, as a ``thebibliography`` block."""
+    order: list[str] = []
+    for group in re.findall(r"\\cite\{([^}]+)\}", tex):
+        for key in group.split(","):
+            if key not in order:
+                order.append(key)
+    unused = sorted(set(REFERENCES) - set(order))
+    if unused:
+        print(f"[tex] note: reference entries not cited: {unused}")
+    items = "\n".join(f"\\bibitem{{{key}}} {REFERENCES[key]}" for key in order)
+    return (
+        "\\begin{thebibliography}{"
+        + str(len(order))
+        + "}\n"
+        + items
+        + "\n\\end{thebibliography}"
+    )
 
 
 def main() -> int:
