@@ -141,18 +141,22 @@ FRONT_MATTER = r"""\documentclass[conference]{IEEEtran}
   commentstyle=\color{gray}, breaklines=true, breakatwhitespace=true}
 % Tables are exactly one column wide: the first column wraps, the others size to content.
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{6pt}
+% No word is split across a line end: hyphenation off, with \sloppy spacing absorbing
+% the lines that would otherwise overrun.
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\sloppy
 
 \begin{document}
 
 \title{Capture, Not Retrieve:\\ Behavioural Provenance for Agentic AI}
 
-% TODO(authors): names, affiliations and e-mail addresses.
-\author{\IEEEauthorblockN{Author One}
-\IEEEauthorblockA{Affiliation\\ email@example.org}
+\author{\IEEEauthorblockN{Munyaradzi Zhou}
+\IEEEauthorblockA{University of Trento\\ Trento, Italy\\ munyaradzizhou11@gmail.com}
 \and
-\IEEEauthorblockN{Author Two}
-\IEEEauthorblockA{Affiliation\\ email@example.org}}
+\IEEEauthorblockN{Sandro Fiore}
+\IEEEauthorblockA{University of Trento\\ Trento, Italy\\ sandro.fiore@unitn.it}}
 
 \maketitle
 
@@ -163,8 +167,8 @@ Provenance tooling can record what an agentic AI system did; it cannot record wh
 that this gap is structural: the facts a decision used may cross a step boundary, but the rule
 that combined them into a verdict is a local computation, and no callback, span or post-hoc
 query can retrieve what was never captured. We make the argument measurable with a reflexive
-multi-agent demonstrator --- four operational agents emitting typed W3C PROV about themselves
-and two meta agents governing that output --- and a deliberately generous callback-level
+multi-agent demonstrator (four operational agents emitting typed W3C PROV about themselves
+and two meta agents governing that output) and a deliberately generous callback-level
 baseline over the same run. The baseline reconstructs every activity, all 324 relations and
 every verdict, and sees 61\% of the facts the operational justifications cite, but none of the
 values the agents computed in order to decide. We publish the \texttt{yp:} vocabulary as an
@@ -286,9 +290,12 @@ def _table(rows: list[str], caption: str) -> str:
             return "c"
         return "r" if marker.endswith(":") else "l"
 
-    # The first column wraps (L = ragged-right X) and absorbs the width, so every table is
-    # exactly \columnwidth and never spills into the neighbouring column.
-    spec = "L" + "".join(align(marker) for marker in rule[1:])
+    # One column wraps (L = ragged-right X) and absorbs the spare width, so every table is
+    # exactly \columnwidth and never spills into the neighbouring column. It is the column
+    # with the most text: wrapping a column of short names instead crams the long one.
+    text_columns = [i for i, marker in enumerate(rule) if align(marker) == "l"] or [0]
+    widest = max(text_columns, key=lambda i: sum(len(row[i]) for row in [header, *body]))
+    spec = "".join("L" if i == widest else align(marker) for i, marker in enumerate(rule))
     number = re.match(r"\*\*Table (\d)\.\*\*", caption)
     if not number:
         raise ValueError(f"a table must be followed by its caption: {caption[:60]}")
