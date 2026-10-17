@@ -72,17 +72,42 @@ with tracker.activity("ToolCallActivity", "write the summary") as prov:
     prov.note(**{"yp:model": model_id})
 
 # S5 — THE hand-written line. `justification` is mandatory; a blank one raises.
+# The rule and the values it read make the decision replayable from the record.
+from yprov4agenticai.rules import Rule
+
+CONSISTENCY_RULE = Rule(
+    "summariser.consistency/v1",
+    lambda e: {"yp:verdict": "ACCEPT" if e["self_consistency"] >= 0.70 else "REVISE"},
+)
+evidence = {"self_consistency": 0.41}
 tracker.decide(
-    verdict="REVISE",
+    verdict=CONSISTENCY_RULE.apply(evidence)["yp:verdict"],
     confidence=0.41,
     justification="Self-consistency 0.41 < 0.70 threshold; the drafted efficiency claim "
                   "contradicts recorded execution times for activity Training. Regenerating.",
+    rule=CONSISTENCY_RULE,
+    evidence=evidence,
 )
 
 tracker.emit()                                    # → PROV-JSON → the sink → the bus
 ```
 
 Everything except `decide(...)` can be generated. `decide(...)` cannot, and that is the point.
+
+**Rules and replay.** `rule` and `evidence` are optional, and come together or not at all.
+Given them, `decide()` applies the rule to the evidence and refuses a verdict (or
+`yp:escalation_reason`) the rule does not give; the record then carries `yp:rule` and
+`yp:rule_inputs`, and `python -m eval.replay --prov-dir <dir>` re-derives every verdict from
+the record. A justification is prose, and prose can say anything; a verdict that replays
+cannot. A rule's name carries its version, and a rule whose logic changes takes a new name.
+
+**When a model decides.** The rule is the code that reads the model's answer: ask for a
+fixed JSON form, parse it into the evidence, and let the rule turn it into the verdict,
+failing closed on an answer it cannot read. Replay then shows the verdict follows from what
+the model said; it cannot re-run the model. CAx works this way under `CAX_VERDICT=model`, and
+records the deterministic check's verdict beside the model's as `yp:code_verdict`. Note that
+the model's answer is a step output, so a callback handler sees it too: for a model's stated
+reason, capture adds accountability rather than visibility.
 
 ### What is automatic, and what has to be declared
 
@@ -93,7 +118,7 @@ The split is not a matter of effort budget. It follows from what a wrapper can s
 | **Activity** | type, label, start instant, duration, ordering, agent, exception on failure | — |
 | **Entity** | — | that it exists, its type, its pointer |
 | **Lineage** | `wasInformedBy` (*derived* from declared dataflow) | `used`, `wasGeneratedBy`, `wasDerivedFrom` |
-| **Decision** | — | verdict, confidence, **`yp:justification`** |
+| **Decision** | — | verdict, confidence, **`yp:justification`**, `yp:rule`, `yp:rule_inputs` |
 
 A wrapper sees that a function ran. It does not see which of the values in scope that
 function treated as its input — so lineage is stated through the scope, never guessed. An
@@ -209,7 +234,12 @@ per activity); the first three are the structural claim, and quoting the total i
 coverage, not a quality result — the code that counts decisions is the code that justifies
 them, so no run of this system could report another number. What a callback-level approach
 structurally cannot reach is the decision rule: it may see the facts a decision used, but not
-how they were combined into the verdict (`eval.baseline`, E3b).
+how they were combined into the verdict. Measured against the values the rules themselves
+read, the callback baseline saw 2 of 36 (24 of 432 over 24 real training runs), all input
+fields; a line tracer, LangChain's own handler on a LangGraph port, and gpt-4o reading the
+trace did no better on reasons computed in code; and operators named a decision's cause from
+the baseline's record in 53% of trials against 100% from the explicit one (`eval.replay`,
+`eval.line_tracer`, `eval.framework_baseline`, `eval.reconstruct`, `eval.diagnose`).
 
 Layer 1 (the OTel bridge) is **not built**; it is the scouting target and the natural next
 increment. Nothing in the architecture has to change to accept it: the bridge feeds the
@@ -225,7 +255,7 @@ same tracker.
 > decision points, because the rationale behind a decision is a local variable at the moment
 > of decision, and no callback, span, or post-hoc query can retrieve what was never
 > captured. The API is a decorator, a context manager, and one `decide(verdict,
-> justification=…)` call; it is framework-agnostic through thin adapters over a shared
+> justification=…, rule=…, evidence=…)` call, whose verdict replays from the record; it is framework-agnostic through thin adapters over a shared
 > PROV-O + `yp:` vocabulary, and it emits W3C PROV-JSON onto the bus. Strategically: ride
 > OTel for collection, own the PROV and justification layer — that is the part the
 > observability tools structurally cannot provide, and the part the EU AI Act asks for.

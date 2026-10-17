@@ -108,7 +108,9 @@ Rootless-friendly, so the same image converts cleanly to Apptainer for HPC later
 | — | Capture API | ✅ | `step` / `activity` / `decide` / `emit`; all six agents use it |
 | — | Strategy A baseline | ✅ | one callback logger, shared by E3 and E6's `A` condition |
 | — | `yp:` vocabulary + SHACL | ✅ | `vocab/`; the compliance agent's standard, declared |
-| — | Overhead study | ✅ | `eval/bench_*.py`; results in `E6_RESULTS.md` |
+| — | Overhead study | ✅ | `eval/bench_*.py`; results in `E6_RESULTS.md`; bounds in `eval/equivalence.py` |
+| — | Replayable decisions | ✅ **Phase 8** | every verdict from a named rule; `yprov4agenticai/rules.py`, `eval/replay.py` |
+| — | Review studies | ✅ **Phase 8** | corpus, line tracer, LangGraph baseline, model reconstruction, operator panel, model-decided CAx; see `docs/phases/PHASE_8.md` |
 
 ### Verified results (two records, six agents, 24 PROV documents)
 
@@ -122,6 +124,7 @@ Rootless-friendly, so the same image converts cleanly to Apptainer for HPC later
 | Decisions carrying `yp:verdict` | 24 | 24 |
 | Decisions carrying **`yp:justification`** | **0** | **24** |
 | Records conforming to `vocab/shapes.ttl` | — | 24 |
+| Values the decision rules read, seen (Phase 8) | 2 of 36 | 36 of 36, replayable |
 
 **This table used to read 0 / 78 / 44 / 250 down the Strategy A column, and four of those
 figures were wrong.** A callback handler sees every node, times it, reconstructs the whole

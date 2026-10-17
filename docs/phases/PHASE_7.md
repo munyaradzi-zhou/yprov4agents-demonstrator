@@ -64,6 +64,12 @@ checks the processor's own reading.
 
 ## What it found
 
+> **Corrected in Phase 8.** The table below judges each condition by comparing medians
+> against their spread, and nothing resolves. Pairing each condition with OFF *in the same
+> round* removes the drift a round shares, and on the same archived data it resolves the
+> write: B costs **+16%** per session (95% interval +9 to +22%), while building alone is
+> +3% (−5 to +9%). See [`PHASE_8.md`](PHASE_8.md) and `eval/equivalence.py`.
+
 | Processor energy per session | OFF | A | B-TRANS | B |
 |---|--:|--:|--:|--:|
 | joules | 1.43 | 1.47 | 1.50 | 1.72 |

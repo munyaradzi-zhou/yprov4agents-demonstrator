@@ -670,3 +670,32 @@ it was.
       The ranking that survives: the **disputed** claims (B2, C1–C3) are more urgent than the
       **missing** one (E6), and E6 gets better the later it runs. Full reconciliation in
       [`PLAN.md`](PLAN.md) Part 1.
+
+---
+
+## K. The paper review (Phase 8, 2026-10-17)
+
+A reviewer-style critique of the paper, recorded in [`paperfeedback.md`](paperfeedback.md)
+with what was done about each point; walkthrough in
+[`docs/phases/PHASE_8.md`](docs/phases/PHASE_8.md).
+
+- [x] **K1 — the thesis was true by construction.** Restated as Proposition 1, scoped to
+      boundary observers, and tested against a line tracer, a real framework's handler and
+      gpt-4o reconstruction.
+- [x] **K2 — justifications were unchecked prose.** Every decision now names a versioned rule
+      and records its inputs; `decide()` refuses a verdict the rule does not give, and every
+      decision in every archive replays.
+- [x] **K3 — the fact measure rested on a regex.** Replaced by the rule inputs the code
+      declares, with a chance control (the same value searched for in an unrelated run).
+- [x] **K4 — two records, our own agents, no framework.** 24 real training runs; a LangGraph
+      port observed by LangChain's own handler.
+- [x] **K5 — no verdict chosen by a model.** `CAX_VERDICT=model`, with the code check recorded
+      beside the model's verdict.
+- [x] **K6 — no evidence the record helps anyone.** An operator panel of two models: 53% right
+      from the baseline's record, 100% from ours. A study with people remains open.
+- [x] **K7 — "not resolvable" is not "no cost".** TOST against a 1 ms margin; energy paired by
+      round, which corrected Phase 7: the write costs +16% CPU energy per session.
+- [x] **K8 — CAx read digits inside identifiers as figures.** Found by the corpus: half the
+      runs said REVISE because `corpus_17_GR0_17` contains 17. A figure must now stand alone.
+- [x] **K9 — two traps for paid runs.** `run_local.py` loads `.env`, so the key must be set to
+      empty, not unset; `SSLKEYLOGFILE` crashes Python's TLS on Windows.

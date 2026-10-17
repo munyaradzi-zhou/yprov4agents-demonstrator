@@ -1,3 +1,7 @@
+> **Status (2026-10-17).** The plan below was the paper's starting point. The paper as it
+> stands is `paper/DRAFT.md`; what changed after the review, and why, is in `paperfeedback.md`
+> and `docs/phases/PHASE_8.md`.
+
 # Paper — outline and results slots
 
 > **Working title:** *Reflexive Provenance for Agentic AI: Capturing Why, Not Only What*

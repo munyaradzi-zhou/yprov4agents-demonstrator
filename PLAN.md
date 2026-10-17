@@ -297,6 +297,28 @@ the wrong reason.
       Strategy A zeros; README's verdict table had two errors; `INSTRUMENTATION.md` §5 was
       corrected in Phase 2
 
+### Phase 7 — Energy at session granularity ✅ *complete 2026-10-10*
+
+- [x] CPU energy per six-agent session over 12 interleaved rounds (`experiments/energy-session`);
+      see [`docs/phases/PHASE_7.md`](docs/phases/PHASE_7.md)
+
+### Phase 8 — The paper review ✅ *complete 2026-10-17*
+
+A reviewer-style critique of the paper ([`paperfeedback.md`](paperfeedback.md)) and every
+point acted on; see [`docs/phases/PHASE_8.md`](docs/phases/PHASE_8.md).
+
+- [x] Thesis stated as Proposition 1, scoped to observers at the step's boundary
+- [x] Replayable decisions: `yp:rule` + `yp:rule_inputs`; `decide()` refuses a verdict its rule
+      does not give; `eval.replay` in CI; `experiments/decision-replay` is the new gate
+- [x] A 24-run corpus of real yProv4ML records (`corpus/`, `experiments/corpus-24`)
+- [x] Stronger observers: a line tracer, LangChain's handler on LangGraph, gpt-4o
+      reconstruction; an operator panel (`experiments/line-tracer`, `framework-baseline`,
+      `model-studies`)
+- [x] Model-decided verdicts for CAx with the code check recorded beside them
+      (`experiments/model-verdict`, `model-verdict-studies`)
+- [x] Equivalence tests for time, paired intervals for energy (`experiments/overhead-samples`)
+- [x] Related work, references verified, figures redrawn at one column
+
 ---
 
 ## Part 3 — Critical path and what to cut

@@ -1,11 +1,20 @@
 # yProv4Agents Demonstrator — System Architecture, Information Model & Ontology
 
-**Document Version**: 1.0
-**Last Updated**: 11 October 2026
+**Document Version**: 2.0
+**Last Updated**: 17 October 2026
 **System**: Reflexive behavioural provenance for multi-agent AI (W3C PROV + `yp:` vocabulary)
-**Repository state described**: branch `energy-benchmark` (stacked on `paper-audit-rewrite`);
-reference evidence in `experiments/audit-reference`, `experiments/audit-llm`,
-`experiments/energy-session`
+**Repository state described**: branch `paper-review` (stacked on `energy-benchmark`);
+reference evidence in `experiments/decision-replay`; the review studies in
+`experiments/corpus-24`, `line-tracer`, `framework-baseline`, `overhead-samples`,
+`model-studies`, `model-verdict`, `model-verdict-studies`; earlier evidence in
+`experiments/audit-reference`, `audit-llm`, `energy-session`
+
+> **What changed in 2.0.** Every decision now names a versioned rule and records the values
+> it read, so it replays from its own record (Phases 3, 5, 7; Information Model; Ontology).
+> CAx can let the model decide its verdict, with the code check recorded beside it (Phase 3).
+> Phase 7 gains the review studies: a 24-run corpus, a line tracer, a LangGraph baseline,
+> equivalence bounds, and two model-based studies. Performance figures now come from 100
+> paired rounds and are stated as bounds.
 
 > Every component, file, field and figure in this document is taken from the code or from a
 > frozen archive under `experiments/`. Where a number is quoted, its archive is named beside
@@ -77,9 +86,14 @@ cannot reconstruct ("capture, not retrieve").
   `yp:` subclasses of `prov:Activity`.
 - **Decision rationale as a first-class field**: `yp:justification`, refused at the call site
   if blank (`ProvTracker.decide` raises `ValueError`).
+- **Replayable decisions**: each verdict is the output of a named, versioned rule
+  (`yp:rule`) applied to the values it read (`yp:rule_inputs`); `decide()` refuses a verdict
+  its rule does not give, and `eval.replay` re-derives every verdict from the record.
+- **Model-chosen verdicts, with a second opinion**: with `CAX_VERDICT=model`, the model
+  decides CAx's verdict and the code check is recorded beside it (`yp:code_verdict`).
 - **Reflexive**: the meta agents govern the operational agents' records and are themselves
   fully instrumented; reflexivity is bounded to one level by subject design.
-- **Declared standard**: an OWL ontology (88 terms) and SHACL shapes (18 named constraints)
+- **Declared standard**: an OWL ontology (90 terms) and SHACL shapes (18 named constraints)
   under `vocab/`, applied by an independent engine (`pyshacl`).
 - **Pointers, not payloads**: heavy outputs go to a content-addressed store; the record
   carries `yp:pid` + `yp:contentHash` (SHA-256).
@@ -100,11 +114,12 @@ cannot reconstruct ("capture, not retrieve").
 | Vocabulary | OWL (`vocab/yprov4agents.ttl`), SHACL (`vocab/shapes.ttl`) |
 | Validation | `prov` (reference PROV parser), `rdflib`, `pyshacl` (`eval` extra) |
 | Message bus | NATS 2.10 via `nats-py` (containers), or `LocalBus` (in-process) |
-| LLM (optional) | OpenAI chat completions, default `gpt-4o`, temperature 0.2, 400 max tokens |
+| LLM (optional) | OpenAI chat completions, default `gpt-4o`, temperature 0.2, 400 max tokens; the studies pin `gpt-4o-2024-08-06` and `gpt-4o-mini-2024-07-18` |
+| Agent framework (evaluation only) | LangGraph (`frameworks` extra), for the framework baseline |
 | Charts | `matplotlib` (Agg backend) |
 | Energy (optional) | `codecarbon` 3.3.1 (`energy` extra), offline tracker with a declared country |
 | Containers | one image (`deploy/Dockerfile`), seven services (`deploy/docker-compose.yml`) |
-| Quality gates | `ruff` (line length 96), `mypy`, `pytest` (246 tests), GitHub Actions |
+| Quality gates | `ruff` (line length 96), `mypy`, `pytest` (301 tests), GitHub Actions |
 
 ### Repository Map
 
@@ -114,6 +129,8 @@ yprov4agents-demonstrator/
 │   ├── tracker.py            ProvTracker: buffer + capture API + PROV-JSON serialiser
 │   ├── api.py                ActivityScope (what a step declares), Span (two-clock timing)
 │   ├── null.py               NullTracker / NullScope: provenance switched off, same interface
+│   ├── rules.py              Rule (named, versioned decision function), canonical(),
+│   │                         check(), replay(): decisions that re-derive from the record
 │   ├── observer.py           StepEvent + Layer-1 observation hook (feeds Strategy A)
 │   ├── store.py              LightweightStore: content-addressed put/resolve, yp:pid
 │   ├── energy.py             EnergyTracker, CodeCarbonBackend, NullBackend, EnergyDelta
@@ -134,7 +151,18 @@ yprov4agents-demonstrator/
 │   ├── baseline.py           Strategy A: callback-level reconstruction; fact-level recovery
 │   ├── compare.py            structural diff gate (lineage edges), --strict
 │   ├── validate_shapes.py    SHACL validation via pyshacl
-│   ├── fault_injection.py    nine scenarios that provoke every alternative verdict
+│   ├── replay.py             re-derive every verdict; rule inputs against what A saw
+│   ├── fault_injection.py    nine scenarios that provoke every alternative verdict;
+│   │                         --inputs repeats the environment faults over a corpus
+│   ├── line_tracer.py        Strategy T: a sys.settrace observer inside the step
+│   ├── framework_baseline.py the agents as LangGraph nodes, LangChain's callback handler
+│   ├── equivalence.py        paired bootstrap bounds and TOST for time and energy
+│   ├── llm_calls.py          pinned, cached, accountable model calls for the studies
+│   ├── cases.py              decisions paired with the baseline's view of them
+│   ├── reconstruct.py        can gpt-4o rebuild a decision's reason from the trace?
+│   ├── diagnose.py           can an operator panel name the cause from each record?
+│   ├── review_faults.py      planted fabrications for the model-decided reviewer
+│   ├── model_verdict.py      model against code over model-decided verdicts
 │   ├── bench_overhead.py     E6: micro / agent / modes / scaling / pipeline timing
 │   ├── bench_energy.py       E7: energy per session over interleaved windows
 │   ├── bench_report.py       renders E6/E7 results; judges every difference (3× rule)
@@ -142,11 +170,12 @@ yprov4agents-demonstrator/
 │   └── archive.py            freeze / verify hash-manifested experiment archives
 ├── vocab/                    yprov4agents.ttl (ontology), shapes.ttl (SHACL)
 ├── data/yprov4ml/            real yProv4ML input records (example_0, example_2)
+├── corpus/                   make_records.py + 24 yProv4ML records from real training runs
 ├── experiments/              frozen archives (MANIFEST.json + files + hashes)
 ├── deploy/                   Dockerfile, docker-compose.yml
 ├── paper/                    DRAFT.md, figures.py, build_tex.py, tex/
 ├── docs/                     AUDIT.md, DESIGN.md, INSTRUMENTATION.md, E6_*.md, phases/
-└── tests/                    246 tests, including the PROV conformance suite
+└── tests/                    301 tests, including the PROV conformance suite
 ```
 
 ---
@@ -436,10 +465,11 @@ operational agent, follows the same lifecycle on a different trigger; see Phase 
                                                                (pid + contentHash)
   S4 ObservationActivity   check the output                  → QualityEntity
   S5 DecisionActivity ★    verdict + yp:justification        (consumes the finding or
-                                                               output it judges)
+                           + yp:rule + yp:rule_inputs          output it judges)
   S6 ResponseActivity      hand the result on                (consumes the output)
 
-  ★ the only step whose content no external observer can reconstruct
+  ★ the only step whose content no external observer can reconstruct: the rule it applied
+    and the values it computed in order to decide (Proposition 1 in the paper)
   Meta agents use a declared subset: S1, S3 (governance activity), S5.
 ```
 
@@ -475,10 +505,24 @@ operational agent, follows the same lifecycle on a different trigger; see Phase 
 │               summary must equal a count from the graph          │
 │               → QualityEntity "<n> ungrounded figure(s)"         │
 │               note yp:grounding_check, yp:ungrounded_figure_count│
-│  S5 Decide    ACCEPT  if grounded and not truncated              │
-│               REVISE  otherwise                                  │
-│               justification: summary length, path, graph size,   │
-│               what the grounding check established, truncation   │
+│  S4b Review   only with CAX_VERDICT=model and a model:           │
+│               llm.complete(REVIEW_SYSTEM, facts + record + summary)│
+│               → ObservationActivity "model reviews the summary"   │
+│                 with the call's provenance; the answer (JSON:     │
+│                 verdict, issue, evidence, searched) as an entity  │
+│  S5 Decide    code decides (default): rule cax.summary/v1        │
+│                 inputs {ungrounded_figures, truncated}            │
+│                 ACCEPT if 0 ungrounded and not truncated          │
+│               model decides: rule cax.review/v1                  │
+│                 inputs {review_parsed, model_verdict,             │
+│                         model_issue, model_evidence, truncated}   │
+│                 the model's verdict; REVISE if its answer cannot  │
+│                 be read or the summary was cut off (fails closed) │
+│                 + yp:verdict_source = model                       │
+│                 + yp:code_verdict = what cax.summary/v1 gave      │
+│               justification: path, graph size, what the checks   │
+│               found (and, in model mode, whether model and code  │
+│               agree)                                             │
 │  S6 Respond   consumes the ResponseEntity                        │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -499,7 +543,9 @@ operational agent, follows the same lifecycle on a different trigger; see Phase 
 │               path (kind="chart") → ToolResultEntity (pid, hash) │
 │  S4 Observe   confirm the file exists and is non-empty           │
 │               note yp:rendered_bytes                             │
-│  S5 Decide    ACCEPT  if rendered_bytes > 0 and subject is       │
+│  S5 Decide    rule ca2.chart/v1, inputs {rendered_bytes,         │
+│                                         chart_subject}           │
+│               ACCEPT  if rendered_bytes > 0 and subject is       │
 │                       numeric-metrics                            │
 │               REVISE  otherwise (a valid chart of the record's   │
 │                       shape, not of the run's measurements)      │
@@ -540,7 +586,11 @@ operational agent, follows the same lifecycle on a different trigger; see Phase 
 │                 yp:report_mode                                   │
 │  S4 Observe   → QualityEntity "<a> invariant(s) breached,        │
 │                                <c> completeness gap(s)"          │
-│  S5 Decide    ANOMALY if any invariant breached, else OK         │
+│  S5 Decide    rule ca3.timing-outlier/v1, inputs {gap_count,     │
+│               largest_gap_s, median_gap_s, scale_s, wall_clock_s}│
+│               ANOMALY if the largest gap is an outlier, else OK  │
+│               (every outlier test rises with the gap, so the     │
+│               largest gap is an outlier exactly when any is)     │
 │               attributes yp:anomaly_count,                       │
 │                          yp:completeness_gap_count               │
 │  S6 Respond                                                      │
@@ -559,7 +609,22 @@ operational agent, follows the same lifecycle on a different trigger; see Phase 
 | MC3 | `MC3Audit` | AuditabilityAgent | `AuditActivity` | COMPLETE / PARTIAL | — |
 | any streaming agent but CA1 | (base class) | — | — | INCOMPLETE | — |
 
-### What the Reference Run Decided (`experiments/audit-reference`)
+**Decision rules.** Every verdict is the output of one of these pure functions, registered
+by name in `yprov4agenticai.rules` when its agent module is imported. A rule whose logic
+changes takes a new version rather than an edited body.
+
+| Rule | Agent | Reads (`yp:rule_inputs`) | Decides |
+|---|---|---|---|
+| `ca1.persist/v1` | CA1 | `integrity_ok`, `envelopes_missing`, `final_envelope_seen`, `persist_trigger` | verdict and `yp:escalation_reason` |
+| `cax.summary/v1` | CAx | `ungrounded_figures`, `truncated` | ACCEPT / REVISE |
+| `cax.review/v1` | CAx, model mode | `review_parsed`, `model_verdict`, `model_issue`, `model_evidence`, `truncated` | the model's verdict, failing closed |
+| `ca2.chart/v1` | CA2 | `rendered_bytes`, `chart_subject` | ACCEPT / REVISE |
+| `ca3.timing-outlier/v1` | CA3 | `gap_count`, `largest_gap_s`, `median_gap_s`, `scale_s`, `wall_clock_s` | OK / ANOMALY |
+| `mc1.compliance/v1` | MC1 | `failed_checks` | PASS / FAIL |
+| `mc3.trail/v1` | MC3 | `trail_gaps` | COMPLETE / PARTIAL |
+| `stream.incomplete/v1` | any streaming agent | `envelopes_expected`, `envelopes_missing` | INCOMPLETE |
+
+### What the Reference Run Decided (`experiments/decision-replay`)
 
 | Agent:verdict | Count | Why |
 |---|--:|---|
@@ -569,6 +634,11 @@ operational agent, follows the same lifecycle on a different trigger; see Phase 
 | `ca3:ANOMALY` | 2 | timing gaps of 5.0 s / 102.9 s breach the MAD invariant |
 | `mc1:PASS` | 8 | every operational record meets the structural standard |
 | `mc3:COMPLETE` | 8 | every operational lifecycle is ordered and timed |
+
+All 24 replay from their records. On the 24-run corpus (`experiments/corpus-24`, 288
+decisions) the verdicts are the same per agent and all 288 replay; there CA3's ANOMALY is a
+1.0 s stall before the first epoch of every run, 74–87% of its wall clock, which is yProv4ML's
+doing rather than the agent's.
 
 ---
 
@@ -716,9 +786,14 @@ that writes it to the output volume.
 │                                        edFrom    │ order, failure│
 │      prov.note(**attrs)              → yp: attrs ┘ (yp:outcome)  │
 │                                                                  │
-│  tracker.decide(verdict, justification, consumed=, attributes=)  │
-│      → yp:DecisionActivity with yp:verdict, yp:justification     │
-│      → raises ValueError if the justification is blank           │
+│  tracker.decide(verdict, justification, consumed=, attributes=,  │
+│                 rule=, evidence=)                                │
+│      → yp:DecisionActivity with yp:verdict, yp:justification,    │
+│        yp:rule (name/vN), yp:rule_inputs (canonical JSON)        │
+│      → raises ValueError if the justification is blank, if rule  │
+│        and evidence are not given together, or if the rule       │
+│        applied to the evidence does not give the verdict (and    │
+│        escalation reason) being recorded                         │
 │                                                                  │
 │  Span: start = wall clock (comparable across processes);         │
 │        end   = start + perf_counter() elapsed (resolves sub-ms   │
@@ -822,7 +897,7 @@ satisfy the standard they enforce.
 │     notes yp:target_agent, yp:checks_applied,                    │
 │           yp:standard = vocab/shapes.ttl,                        │
 │           yp:activities_examined, yp:decisions_examined          │
-│  S5 Decide           PASS if no failures, else FAIL              │
+│  S5 Decide           rule mc1.compliance/v1: PASS if no failures │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -836,8 +911,8 @@ satisfy the standard they enforce.
 │               notes yp:audited_agent, yp:step_count,             │
 │                     yp:justified_step_count,                     │
 │                     yp:orderable_step_count                      │
-│  S5 Decide    COMPLETE if every step is ordered and timed,       │
-│               PARTIAL otherwise (names the gaps)                 │
+│  S5 Decide    rule mc3.trail/v1: COMPLETE if every step is       │
+│               ordered and timed, PARTIAL otherwise (names gaps)  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -887,7 +962,7 @@ against a frozen reference, and archived with per-file hashes and the commit it 
 │ eval.evaluate   │ │ eval.baseline   │ │ eval.compare    │ │ eval.validate_   │
 │ E1 coverage     │ │ Strategy A vs B │ │ --before        │ │ shapes           │
 │ E1b relation    │ │ (same run)      │ │ experiments/    │ │ pyshacl over RDF │
-│   provenance    │ │ verbatim search │ │ audit-reference │ │ from the `prov`  │
+│   provenance    │ │ verbatim search │ │ decision-replay │ │ from the `prov`  │
 │ E2 justification│ │ + fact-level    │ │ --strict:       │ │ library, with    │
 │   coverage,     │ │ recovery (E3b)  │ │ lineage EDGES,  │ │ RDFS inference   │
 │   bytes share   │ │                 │ │ not counts      │ │ over the ontology│
@@ -897,6 +972,15 @@ against a frozen reference, and archived with per-file hashes and the commit it 
          │                   │                   │                     │
          └───────────────────┴─────────┬─────────┴─────────────────────┘
                                        ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  REPLAY   python -m eval.replay --prov-dir out                   │
+│  re-applies each decision's yp:rule to its yp:rule_inputs and    │
+│  compares with the recorded outputs; reports, per agent, the     │
+│  values the rules read, how many the baseline saw in its own     │
+│  session, how many match by chance in another session, and how   │
+│  many the justification states                                   │
+└────────────────────────────┬────────────────────────────────────┘
+                             ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  FAULT INJECTION   python -m eval.fault_injection --all          │
 │  nine scenarios; the fault goes into the input or environment,   │
@@ -936,6 +1020,36 @@ against a frozen reference, and archived with per-file hashes and the commit it 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+### The Review Studies
+
+Added to answer a reviewer-style critique of the paper (`paperfeedback.md`). Each is a module
+under `eval/`, each result a frozen archive.
+
+| Study | Command | What it measures | Archive |
+|---|---|---|---|
+| Corpus | `corpus/make_records.py` (own venv), then `run_local.py --data-dir corpus/yprov4ml` | the demonstrator over 24 real yProv4ML training runs | `corpus-24` |
+| Line tracer (Strategy T) | `eval.line_tracer` | what a `sys.settrace` observer inside the step holds, and its cost | `line-tracer` |
+| Real framework | `eval.framework_baseline` (`frameworks` extra) | the agents as LangGraph nodes, observed by LangChain's own handler | `framework-baseline` |
+| Equivalence | `eval.bench_overhead --level agent --repetitions 100`, then `eval.equivalence` | TOST against a 1 ms margin; paired bootstrap intervals for time and energy | `overhead-samples` |
+| Reconstruction | `eval.reconstruct` | can gpt-4o rebuild the reason from the trace (and the code, and the input)? | `model-studies` |
+| Operator diagnosis | `eval.diagnose` | can an operator panel name the cause from A's record and from B's? | `model-studies` |
+| Model decides | `CAX_VERDICT=model`, `eval.review_faults`, `eval.model_verdict` | model against code on faithful and planted summaries; the two studies again | `model-verdict`, `model-verdict-studies` |
+
+The model studies cache every request and response; extracting the archived `cache.tar.gz`
+and passing `--offline` reproduces every number with no key, at the archive's commit (the
+reconstruction prompts include the agents' source).
+
+```
+            what crosses the step's boundary          what stays inside
+            ─────────────────────────────────         ─────────────────
+  code      inputs x, the verdict v, the step's        values computed z,
+  decides   outputs  ── seen by callbacks              the rule r
+                                                        ── captured only by
+                                                           decide(rule=, evidence=)
+  model     inputs, the verdict, AND the model's       the binding of verdict
+  decides   answer (a step output) ── seen             to answer, replayable
+```
+
 ### Continuous Integration (`.github/workflows/ci.yml`)
 
 | Job | What it runs | Fails when |
@@ -943,8 +1057,8 @@ against a frozen reference, and archived with per-file hashes and the commit it 
 | Lint and format | `ruff check`, `ruff format --check` | any style or lint finding |
 | Type check (3.11, 3.12) | `mypy yprov4agenticai runtime eval tests run_local.py` | any type error |
 | Tests (Linux/Windows × 3.11/3.12) | `pytest` with coverage; `eval.archive verify` for every archive | a test fails or an archive no longer matches its manifest |
-| End-to-end pipeline | `run_local.py --baseline` → evaluate → baseline test → `compare --strict` vs `audit-reference` → fault injection → conformance suite → shapes | any lineage edge changes undeclared, a verdict becomes unreachable, a record stops conforming |
-| Distributed pipeline | `docker compose up` (NATS + 6 agents + producer), wait for 24 records → `compare --strict` → shapes | the container path diverges from the reference |
+| End-to-end pipeline | `run_local.py --baseline` → evaluate → baseline test → `compare --strict` vs `decision-replay` → fault injection → replay of the run and every fault scenario → conformance suite → shapes | any lineage edge changes undeclared, a verdict becomes unreachable or stops following from its rule, a record stops conforming |
+| Distributed pipeline | `docker compose up` (NATS + 6 agents + producer), wait for 24 records → `compare --strict` vs `decision-replay` → shapes | the container path diverges from the reference |
 | Container image | build the image; import every role's agent class | the image cannot run an agent it claims to contain |
 
 Every action is pinned to a commit SHA and the base images to a digest.
@@ -1107,7 +1221,14 @@ independent of how it is serialised. Section 13 maps the provenance part of it o
                │ │ Decision │ │ StorePointer │──────►│ StoredPayload│
                │ │ verdict, │ │ yp:pid,      │resolves│ bytes +     │
                │ │ justific.│ │ contentHash  │       │ sidecar meta │
-               │ └──────────┘ └──────────────┘       └─────────────┘
+               │ │ inputs   │ └──────────────┘       └─────────────┘
+               │ └────┬─────┘
+               │      │ n..1  names
+               │      ▼
+               │ ┌──────────────┐
+               │ │ DecisionRule │  name/vN, a pure function in code;
+               │ │              │  replay re-applies it to the inputs
+               │ └──────────────┘
                │ 0..1
                ▼
         ┌──────────────┐        ┌──────────────┐ 1   n ┌──────────────┐
@@ -1133,7 +1254,8 @@ independent of how it is serialised. Section 13 maps the provenance part of it o
 | **Envelope** | one message of a stream | `sequence_no`, `event_type`, `payload`, `timestamp`, `envelope_id` | `envelope_id` (UUID4) | transient |
 | **AgentRecord** | the PROV-JSON an agent emits about its own work on one session | agent, activities, entities, relations, bundle | file `<session>__<role>_prov.json` | persistent |
 | **Activity** | one typed lifecycle step | type, label, start, end, `yp:` notes | `yp:<Kind>_<sid>_<nn>` | in its record |
-| **Decision** | the activity that concludes | `yp:verdict`, `yp:justification`, optional reason/trigger/counts | as Activity | in its record |
+| **Decision** | the activity that concludes | `yp:verdict`, `yp:justification`, `yp:rule`, `yp:rule_inputs`, optional reason/trigger/counts; in model mode `yp:verdict_source`, `yp:code_verdict` | as Activity | in its record |
+| **DecisionRule** | the named, versioned function that produced a verdict | name (`<agent>.<rule>/v<n>`), the function | the name | in the code; registered when its agent module is imported |
 | **Entity** | a typed value a step consumed or produced | type, `prov:value`, optional pointer | `yp:<Kind>_<sid>` | in its record |
 | **Bundle descriptor** | the record describing itself | granularity, persistence, emitted_by, library_version | `yp:bundle_<sid>` | in its record |
 | **ModelCall** | the provenance of one LLM call (attributes on a ToolCall/Analysis activity) | model, resolved snapshot, fingerprint, temperature, max tokens, prompt id/version/sha, tokens, finish reason, latency, response sha | the activity | in its record |
@@ -1152,6 +1274,7 @@ independent of how it is serialised. Section 13 maps the provenance part of it o
 | AgentRecord → Activity | 1 : 3..6 | operational 6; meta 3; INCOMPLETE 2 |
 | AgentRecord → Decision | 1 : ≥1 | enforced by `yp:AgentDecidedShape` and MC1 `decision-present` |
 | Decision → justification | 1 : 1 | non-blank; enforced at the call site and by `yp:DecisionShape` |
+| Decision → DecisionRule | n : 0..1 | if named, versioned and recorded with its inputs (`decision-rule-versioned`, `decision-inputs-object`, both-or-neither); every decision in this system names one |
 | Activity → Agent | n : 1 | exactly one `wasAssociatedWith` per activity |
 | Entity → StorePointer | 1 : 0..1 | `yp:pid` always with a `sha256:` `yp:contentHash` |
 | StorePointer → StoredPayload | n : 1 | content-addressed: identical payloads share a pointer |
@@ -1183,6 +1306,8 @@ independent of how it is serialised. Section 13 maps the provenance part of it o
 6. An input with a missing envelope is never processed as if complete.
 7. An energy figure always states its source and sampling period, and a sum of a measured
    and a modelled component is labelled `partly-measured`.
+8. A recorded verdict follows from its rule: `decide()` refuses one that does not, and
+   `eval.replay` detects an edited verdict or input afterwards.
 
 ---
 
@@ -1195,10 +1320,10 @@ independent of how it is serialised. Section 13 maps the provenance part of it o
 | Ontology IRI | `http://hpci-lab.org/yProv4Agents` |
 | Namespace | `yp:` = `http://hpci-lab.org/yProv4Agents#` |
 | Title | yProv4Agents: behavioural provenance for agentic AI |
-| Version | 0.6.0 (`owl:versionInfo`) |
+| Version | 0.7.0 (`owl:versionInfo`) |
 | Imports | PROV-O (`http://www.w3.org/ns/prov-o#`) |
 | Files | `vocab/yprov4agents.ttl` (ontology), `vocab/shapes.ttl` (SHACL) |
-| Size | **88 terms**: 19 classes + 69 datatype properties; **18** named SHACL constraints in 8 shapes |
+| Size | **90 terms**: 19 classes + 71 datatype properties; **18** named SHACL constraints in 8 shapes |
 | Design rules | (1) only terms the system emits, enforced by a test in both directions; (2) PROV's term wherever one exists — all lineage relations are PROV's |
 
 ### Class Hierarchy
@@ -1232,7 +1357,7 @@ prov:Entity
 
 ### Properties by Group
 
-All 67 are `owl:DatatypeProperty`. Domains are as declared; properties marked *evidence* are
+All 71 are `owl:DatatypeProperty`. Domains are as declared; properties marked *evidence* are
 `rdfs:subPropertyOf yp:evidence` (domain `prov:Activity`) — facts a step recorded about its own
 work.
 
@@ -1242,6 +1367,10 @@ work.
 |---|---|---|
 | `yp:justification` | `xsd:string` | why the verdict follows, from the evidence — **the field PROV has no term for** |
 | `yp:verdict` | `xsd:string` | the outcome token (see value sets below) |
+| `yp:rule` | `xsd:string` | the rule that produced the verdict, `<agent>.<rule>/v<n>` |
+| `yp:rule_inputs` | `xsd:string` | the values the rule read, as canonical JSON (sorted keys, scalars) |
+| `yp:verdict_source` | `xsd:string` | `model` when a model chose the verdict; absent when code did |
+| `yp:code_verdict` | `xsd:string` | what the code check gave, recorded beside a model-chosen verdict |
 | `yp:confidence_score` | `xsd:decimal` | optional score behind the verdict |
 | `yp:escalation_reason` | `xsd:string` | `integrity` \| `incomplete-input` \| `consumption-unconfirmed` |
 | `yp:persist_trigger` | `xsd:string` | `quorum` \| `timeout` |
@@ -1249,7 +1378,7 @@ work.
 | `yp:envelopes_expected` | `xsd:integer` | stream length an incomplete input declared |
 | `yp:envelopes_missing` | `xsd:string` | comma-separated missing sequence numbers |
 
-**Model call** (domain `yp:ToolCallActivity`)
+**Model call** (domain `yp:ToolCallActivity`; also on CAx's review step in model mode)
 
 | Property | Range | Meaning |
 |---|---|---|
@@ -1329,6 +1458,9 @@ work.
 | `yp:DecisionShape` | `yp:DecisionActivity` | `decision-justified` | one `yp:justification`, string, pattern `\S` |
 | | | `decision-concluded` | one `yp:verdict`, string, pattern `\S` |
 | | | `decision-dated` | has `prov:startedAtTime` |
+| | | `decision-rule-versioned` | at most one `yp:rule`, matching `/v[0-9]+$` |
+| | | `decision-inputs-object` | at most one `yp:rule_inputs`, a JSON object |
+| | | (unnamed `sh:or`) | a `yp:rule` comes with its `yp:rule_inputs` |
 | `yp:RecordShape` | `prov:Bundle` | `granularity-declared` | one of DATA, METADATA |
 | | | `persistence-declared` | one of PERSISTENT, TRANSIENT |
 | | | `emitter-identified` | `yp:library_version` present |
@@ -1343,7 +1475,7 @@ carrying `yp:justification` is inferred to be a `yp:DecisionActivity` by the pro
 
 ### Example: one decision in Turtle
 
-The CA2 decision from `experiments/audit-reference/example_0__ca2_prov.json`, as the
+The CA2 decision from `experiments/decision-replay/example_0__ca2_prov.json`, as the
 reference `prov` library converts it:
 
 ```turtle
@@ -1353,13 +1485,15 @@ reference `prov` library converts it:
 yp:DecisionActivity_example_0_04
     a                     prov:Activity, yp:DecisionActivity ;
     rdfs:label            "Metrics: revise chart" ;
-    prov:startedAtTime    "2026-10-09T17:50:30.144788+00:00"^^xsd:dateTime ;
-    prov:endedAtTime      "2026-10-09T17:50:30.144804+00:00"^^xsd:dateTime ;
+    prov:startedAtTime    "2026-10-17T14:10:28.232236+00:00"^^xsd:dateTime ;
+    prov:endedAtTime      "2026-10-17T14:10:28.232240+00:00"^^xsd:dateTime ;
     prov:wasAssociatedWith yp:agent_example_0 ;
     prov:used             yp:ToolResultEntity_example_0 ;  # the chart it judges
     yp:verdict            "REVISE" ;
     yp:chart_subject      "graph-composition" ;
     yp:series_plotted     3 ;
+    yp:rule               "ca2.chart/v1" ;
+    yp:rule_inputs        "{\"chart_subject\":\"graph-composition\",\"rendered_bytes\":12683}" ;
     yp:justification      "The graph carries no numeric prov:value entities, so no
         measurement could be plotted; fell back to graph composition (9 activities /
         39 entities / 55 relations), which describes the record rather than the run it
@@ -1393,7 +1527,7 @@ classDiagram
         +derivations: list
         +activity(kind, label) ActivityScope
         +step(kind, label, produces) decorator
-        +decide(verdict, justification, consumed, attributes)
+        +decide(verdict, justification, consumed, attributes, rule, evidence)
         +emit(sink) dict
         +to_prov_json() dict
         +register_entity(kind, value, pid, content_hash, derived_from) str
@@ -1491,6 +1625,18 @@ classDiagram
         +provenance() dict
     }
 
+    class Rule {
+        +name: str
+        +apply: Callable
+    }
+    class Replay {
+        +activity: str
+        +rule: str
+        +verdict: str
+        +status: str
+        +detail: str
+    }
+
     ProvTracker "1" o-- "0..1" EnergyTracker : energy
     ProvTracker ..> ActivityScope : creates per step
     ProvTracker ..> Span : times each step
@@ -1502,6 +1648,8 @@ classDiagram
     EnergyTracker ..> EnergyDelta : returns
     NullTracker ..> NullScope : creates
     NullTracker ..|> ProvTracker : same interface (duck-typed)
+    ProvTracker ..> Rule : checks verdict against
+    Rule ..> Replay : replay() yields per decision
 ```
 
 ### 14.2 Class Diagram — the Runtime (`runtime`)
@@ -1585,6 +1733,7 @@ classDiagram
         +store: LightweightStore
         -_summarise(doc, counts) tuple
         -_check_grounding(summary, doc, counts)$ tuple
+        -_review(tracker, response, summary, doc, counts, quality) tuple
     }
     class CA2Metrics {
         agent_label Metrics_Visualizer
@@ -1851,7 +2000,7 @@ STREAM_END of an agent output that recorded an incomplete input:
 }
 ```
 
-### 3. Agent Record (PROV-JSON, excerpt of `experiments/audit-reference/example_0__ca2_prov.json`)
+### 3. Agent Record (PROV-JSON, excerpt of `experiments/decision-replay/example_0__ca2_prov.json`)
 
 ```json
 {
@@ -1873,7 +2022,9 @@ STREAM_END of an agent output that recorded an incomplete input:
       "yp:verdict": "REVISE",
       "yp:justification": "The graph carries no numeric prov:value entities, so no measurement could be plotted; …",
       "yp:chart_subject": "graph-composition",
-      "yp:series_plotted": 3 }
+      "yp:series_plotted": 3,
+      "yp:rule": "ca2.chart/v1",
+      "yp:rule_inputs": "{\"chart_subject\":\"graph-composition\",\"rendered_bytes\":12683}" }
   },
   "entity": {
     "yp:bundle_example_0": {
@@ -1983,6 +2134,11 @@ out/
 | `OPENAI_API_KEY` | — | `runtime.llm` | enables the model path for CAx and CA3 |
 | `OPENAI_MODEL` | `gpt-4o` | `runtime.llm` | model alias requested |
 | `LLM_REQUIRED` | — | `runtime.llm` | `1` forbids falling back to the computed path |
+| `CAX_VERDICT` | `code` | CAx | `model` lets the model decide CAx's verdict (needs a key); the code check is recorded beside it |
+
+`run_local.py` reads a `.env` beside it with `setdefault`, so a key in `.env` is used unless
+the environment sets `OPENAI_API_KEY` to empty; unsetting it is not enough to force the
+keyless path.
 
 ---
 
@@ -2009,20 +2165,33 @@ magnitude** — the same timings moved 6–11% between two occasions on this mac
 | `store.put()` — SHA-256 + file write | 1.96 ms |
 | `store.resolve()` — read + verify | 531 µs |
 
-### Per-Agent Cost (E6b, 30 interleaved repetitions)
+### Per-Agent Cost (E6b, 100 paired rounds, `experiments/overhead-samples`)
 
-| Agent | OFF | B (built + written) | Building alone | Building + writing |
-|---|--:|--:|--:|--:|
-| CA3 Analytics | 2.45 ms | 3.92 ms | in noise (0.5×) | +60% (5.0×) |
-| CA2 Metrics | 109.70 ms | 108.62 ms | in noise (0.4×) | in noise (0.1×) |
-| CAx Summariser (computed) | 4.73 ms | 7.94 ms | in noise (0.1×) | +68% (4.6×) |
-| MC1 Compliance | 109.30 µs | 1.63 ms | +34% (5.0×) | +1394% (11.5×) |
-| MC3 Audit | 166.35 µs | 2.16 ms | in noise (1.9×) | +1199% (11.9×) |
-| CA1 Storage (persist path) | 5.37 ms | 7.36 ms | in noise (0.1×) | in noise (1.5×) |
+Medians of round-wise differences against OFF, with 95% bootstrap intervals; *equivalent*
+means the 90% interval lies inside ±1 ms (two one-sided tests at 5%). One millisecond is
+0.06% of the fastest model call recorded.
 
-A difference is reported only at ≥ 3× the larger dispersion. Where overhead resolves, the
-file write is at least 90% of it. On the earlier occasion CA3 and CAx were in noise (2.9×),
-so their verdict is not stable.
+| Agent | OFF | B (built + written) | Building (B-TRANS) | Equivalent | Building + writing |
+|---|--:|--:|--:|:-:|--:|
+| CA3 Analytics | 2.42 ms | 3.77 ms | +76 µs [+34, +124] | yes | +1,278 µs [+1,164, +1,391] |
+| CA2 Metrics | 94.71 ms | 97.17 ms | −193 µs [−1,522, +1,358] | no (jitter) | +746 µs [+73, +1,276] |
+| CAx Summariser (computed) | 2.67 ms | 3.86 ms | +81 µs [+38, +161] | yes | +1,158 µs [+1,084, +1,230] |
+| MC1 Compliance | 79 µs | 1.05 ms | +53 µs [+53, +54] | yes | +964 µs [+959, +986] |
+| MC3 Audit | 78 µs | 1.08 ms | +56 µs [+55, +56] | yes | +997 µs [+982, +1,025] |
+| CA1 Storage (persist path) | 3.79 ms | 4.96 ms | +48 µs [−20, +106] | yes | +1,178 µs [+1,057, +1,260] |
+
+Building the record is equivalent to no provenance for five of six agents; CA2's chart
+render jitters by more than the margin. The write is the cost, about a millisecond. The
+earlier 30-repetition occasions are in `experiments/audit-reference/bench`.
+
+### Observers, compared
+
+| Observer | Values the rules read that it held | Cost | Archive |
+|---|---|---|---|
+| Callback baseline | 2 of 36 (reference), 24 of 432 (corpus), all input fields | the handler only | `decision-replay`, `corpus-24` |
+| Line tracer | 7 of 12, among 15–116 distinct values per step | 2–13× the step's time | `line-tracer` |
+| LangChain handler on LangGraph | 110 of 240 matched, 106 also in an unrelated run | 45× the bytes of the baseline | `framework-baseline` |
+| gpt-4o from the trace | the reason for 1 of 143 decisions | ~3.3M input tokens over three conditions | `model-studies` |
 
 ### Model Calls (`experiments/audit-llm`, gpt-4o → `gpt-4o-2024-08-06`)
 
@@ -2046,7 +2215,8 @@ four calls returned three distinct `system_fingerprint`s.
 | TRANSIENT | −89.3% | ±0 (not written) |
 | no justification | −5.6% | −21.7% (all six steps justified in this synthetic record) |
 
-In the records the agents actually emit, justifications are **6.5%** of the bytes (240–738 B each).
+In the records the agents actually emit, justifications are **6.4%** of the bytes (240–738 B
+each) and a decision's rule and inputs **1.7%**.
 
 ### Scaling (E6d)
 
@@ -2073,11 +2243,14 @@ Dominated by a fixed persist window and process start-up; the instrumentation is
 | CPU energy per six-agent session | OFF | A | B-TRANS | B |
 |---|--:|--:|--:|--:|
 | joules (measured, Windows EMI counter) | 1.43 | 1.47 | 1.50 | 1.72 |
-| vs OFF (margin) | — | +2.7% (0.5×) | +5.3% (0.9×) | +20.3% (2.3×) |
+| vs OFF, paired by round | — | +8% | +3% | **+16%** |
+| 95% interval | — | 0 to +15% | −5 to +9% | +9 to +22% |
 | time per session | 104 ms | 105 ms | 105 ms | 114 ms |
 
 Idle CPU draw 3.2 W; working ~13.7–15.0 W. RAM is modelled (flat 10 W) and excluded from the
-comparison. No condition resolves against OFF.
+comparison. Comparing medians against their spread resolved nothing; pairing each condition
+with OFF in the same round (`eval.equivalence`) resolves the write's cost, while building the
+record alone is indistinguishable from not.
 
 ---
 
@@ -2087,15 +2260,20 @@ comparison. No condition resolves against OFF.
 
 - A callback-level baseline built from the same run reconstructs **96/96 activities, all 324
   relations and 24/24 verdicts**, and serialises to conformant PROV-JSON.
-- It sees 61% of the facts the eight operational justifications cite — and **none of the 19
-  values the agents computed in order to decide**, nor the rule that combined them.
+- Of the values the decision rules read, it saw **2 of 36** (24 of 432 on the corpus), each a
+  field of the input record; every computed value was invisible, and so was the rule.
+- A line tracer, a real framework's handler and gpt-4o reading the trace did no better on
+  reasons computed in code; operators reading the baseline's record named the cause in 53% of
+  trials, against 100% from the explicit record.
 - So the API automates everything observable and makes exactly one call hand-written:
-  `decide(verdict, justification)`, which refuses a blank justification.
+  `decide(verdict, justification, rule=, evidence=)`, which refuses a blank justification
+  and a verdict its rule does not give.
 
 ### 2. Building a record is cheap; writing it is the cost
 
-- Building is inside every operational agent's run-to-run variance on both occasions.
-- Where overhead resolves at all, ≥ 90% is one file write — a deployment choice
+- Building is equivalent to no provenance within 1 ms for five of six agents (100 paired
+  rounds), and indistinguishable in energy.
+- Writing it is about a millisecond and +16% CPU energy per session — a deployment choice
   (`TRANSIENT`, `METADATA`), not a property of the instrumentation.
 
 ### 3. Lineage is declared or derived, never guessed
@@ -2124,6 +2302,16 @@ comparison. No condition resolves against OFF.
 - Meta output goes to `governance.*`, which nothing subscribes to: one level, provably, with a
   test rather than a depth counter.
 
+### 7. When a model decides, the boundary moves
+
+- With CAx's verdict chosen by gpt-4o, the model caught every planted fabrication (72 of 72);
+  the code check caught only invented large figures (24). Recording both keeps the 48
+  disagreements in the record.
+- The model's answer is a step output, so a callback sees it: the reason was rebuilt from the
+  trace for all 72 REVISE verdicts. A reason that crosses the boundary is retrievable whoever
+  wrote it; capture matters most for reasons computed in code, and for a model's reason it
+  adds accountability (a verdict bound to the answer by a rule that replays), not visibility.
+
 ---
 
 ## Troubleshooting Guide
@@ -2139,6 +2327,10 @@ comparison. No condition resolves against OFF.
 | **`freeze --require-clean` refuses** | RuntimeError: working tree dirty | uncommitted changes | commit first; an archive must name the commit that produced it |
 | **Model path not taken** | `yp:summary_mode = computed` | no `OPENAI_API_KEY`, or the call failed | set the key; `LLM_REQUIRED=1` to make a failure fatal |
 | **`ValueError` from `decide`** | "verdict … was given no justification" | blank justification | state the evidence that produced the verdict — by design |
+| **`ValueError`: decision disagrees with its rule** | names the rule and both values | the verdict passed is not what the rule gives for the evidence passed | compute the verdict with `rule.apply(evidence)`; a rule whose logic changed needs a new version |
+| **`eval.replay` reports `mismatch` or `unknown-rule`** | non-zero exit | a stored verdict or input was edited, or the rule's module was not imported | never edit records; import the agent module that registers the rule |
+| **Paid calls on a run meant to be keyless** | `yp:model_resolved` in the records | `run_local.py` loads `.env` | set `OPENAI_API_KEY=` (empty), not unset |
+| **`OPENSSL_Uplink … no OPENSSL_Applink`** | the process aborts at the first TLS call (Windows) | `SSLKEYLOGFILE` is set in the environment | unset `SSLKEYLOGFILE` for the run |
 | **Energy reads 0 at the start** | first window or step shows 0 J | the counter is read before its first sample | warm up first; `bench_energy` discards a warm-up round |
 | **Docker storage goes read-only** | `read-only file system` from the daemon | host disk full | free disk space and restart Docker Desktop |
 
@@ -2147,4 +2339,4 @@ comparison. No condition resolves against OFF.
 **End of System Layout Document**
 
 **Document Status**: Complete
-**Version**: 1.0
+**Version**: 2.0

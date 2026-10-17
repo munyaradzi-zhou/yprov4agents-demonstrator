@@ -40,7 +40,7 @@
         observable from outside the function that formed it."""@en ;
     owl:imports      <http://www.w3.org/ns/prov-o#> ;
     dcterms:created  "2026-10-09"^^xsd:date ;
-    owl:versionInfo  "0.6.0" .
+    owl:versionInfo  "0.7.0" .
 
 
 # ═════════════════════════════════════════════════════════════════════════════════

@@ -8,6 +8,10 @@
 > re-checked once it is fixed.
 > **Parked:** energy (PR #11), by decision.
 
+> **Later work.** The paper review that followed (Phase 8, `paperfeedback.md`) replaced the
+> reference archive with `experiments/decision-replay` and corrected one claim made here:
+> paired by round, the energy study does resolve the write's cost (+16% CPU per session).
+
 ---
 
 ## The picture in one diagram

@@ -1,3 +1,8 @@
+> **Superseded.** The current paper is `paper/DRAFT.md` (typeset by `paper/build_tex.py`),
+> revised after the Phase 8 review (`paperfeedback.md`). This long draft predates replayable
+> decisions, the corpus, the review studies and the corrected energy result, and is kept only
+> as a reservoir of text.
+
 # Capture, Not Retrieve: Behavioural Provenance for Agentic AI
 
 > **6,733 words, 3 figures, 6 tables** — measured with `wc -w` over this file, not estimated;

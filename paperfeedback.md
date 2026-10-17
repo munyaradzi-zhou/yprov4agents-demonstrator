@@ -158,12 +158,18 @@ Branch `paper-review`. Every number below is in a frozen archive under `experime
 | 1 | done | Thesis is now Proposition 1, scoped to boundary observers; identifiability argument | §1 |
 | 2 | done | Decisions name a versioned `yp:rule` and record `yp:rule_inputs`; `decide()` refuses a verdict its rule does not give; 33 of 33 reference and fault decisions and 288 of 288 corpus decisions replay; rule inputs replace the regex as ground truth (A saw 2 of 36; prose states 10) | `yprov4agenticai/rules.py`, `eval/replay.py`, `experiments/decision-replay`, §3, §5.2 |
 | 3 | done | Line tracer: holds 7 of 12 rule inputs among 15 to 116 values per step, at 2 to 13x the step time. gpt-4o given what the baseline observed reconstructs the reason for 1 of 143 decisions; with the source, 30 (23 of them CA2's single-cause REVISE); with the input record too, 0; CA1's cause right 9 of 27, chance | `eval/line_tracer.py`, `eval/reconstruct.py`, `experiments/line-tracer`, `experiments/model-studies`, §5.2 |
-| 4 | done | 24 real yProv4ML training runs (288 decisions; A saw 24 of 432); LangGraph port observed by LangChain's own handler (110 of 240 matched, 106 by chance); chance control added to every match; the corpus found and fixed a CAx false positive. Model-chosen verdicts discussed, not evaluated | `corpus/`, `eval/framework_baseline.py`, `experiments/corpus-24`, `experiments/framework-baseline`, §3, §5.2 |
+| 4 | done | 24 real yProv4ML training runs (288 decisions; A saw 24 of 432); LangGraph port observed by LangChain's own handler (110 of 240 matched, 106 by chance); chance control added to every match; the corpus found and fixed a CAx false positive. Model-decided verdicts built and measured for CAx (`CAX_VERDICT=model`): the model caught 72 of 72 planted fabrications, the code check 24, and the 48 disagreements are recorded; a model's stated reason is a step output, so the callback sees it (rebuilt for 72 of 72) | `corpus/`, `eval/framework_baseline.py`, `eval/review_faults.py`, `experiments/corpus-24`, `framework-baseline`, `model-verdict`, `model-verdict-studies`, §3, §5.2 |
 | 5 | done (model panel) | Operator panel (gpt-4o, gpt-4o-mini, 3 option orders) picks the cause of 71 decisions: 53% from the baseline's record, 100% from ours; CA1 escalation causes 20 of 162 from A, every wrong answer at confidence 0.8 or more; McNemar p < 1e-59. A study with people is still future work | `eval/diagnose.py`, `experiments/model-studies`, §5.3, Table 4 |
 | 6 | done | TOST against a 1 ms margin on 100 paired rounds: build equivalent to none for 5 of 6 agents; write about 1 ms. Energy paired by round: B +16% (9 to 22%), build +3% (−5 to +9%) | `eval/equivalence.py`, `experiments/overhead-samples`, §5.3, §5.5 |
 | 7 | done | Decision provenance, P-Plan, Explanation Ontology, explainable BDI; AI Act by article; Table 1 criteria defined and rows cited; yProv4ML and PROV-AGENT references verified | §2 |
 | 8 | done | TODO gone; 228 not 324; diary sentences cut; artifact paragraph; Table 4 has A; identifiers explained; A and B defined once; C2 tied to thesis (MC1 fails 24 of 24 baseline records) | throughout |
 
-Still open beyond the plan: two references keep a VERIFY marker (Explanation Ontology pages,
-CodeCarbon v3.3.1 DOI); figures are still full width; hyphenation is still off by request; the
-paper has grown and needs an Overleaf page count before the next cut (§5.6 first).
+Also done: the figures are redrawn at one column (the paper compiles to six pages of body,
+with the references on page seven), every reference is verified, and the documentation
+(README, `docs/SYSTEM_LAYOUT.md` v2.0, `docs/INSTRUMENTATION.md`, `docs/phases/PHASE_8.md`,
+`PLAN.md`, `todo.md` section K) describes the system as it now is.
+
+Still open: a study with people (item 5 uses a model panel); measured energy on a Linux host
+with RAPL; one producer by design (a demonstrator). Hyphenation stays off by request. If the
+venue counts references in the page limit, the cut order is §5.7, Table 2 as prose, §5.5,
+then four background references.
