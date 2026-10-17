@@ -151,13 +151,19 @@ Items 7 and 8 are text changes only. Items 1 and 2 are mostly writing plus a sma
 
 ## Progress
 
-| Item | Status | Where |
-|---|---|---|
-| 1 | open | |
-| 2 | open | |
-| 3 | open | |
-| 4 | open | |
-| 5 | open | |
-| 6 | open | |
-| 7 | open | |
-| 8 | open | |
+Branch `paper-review`. Every number below is in a frozen archive under `experiments/`.
+
+| Item | Status | What was done | Where |
+|---|---|---|---|
+| 1 | done | Thesis is now Proposition 1, scoped to boundary observers; identifiability argument | §1 |
+| 2 | done | Decisions name a versioned `yp:rule` and record `yp:rule_inputs`; `decide()` refuses a verdict its rule does not give; 33 of 33 reference and fault decisions and 288 of 288 corpus decisions replay; rule inputs replace the regex as ground truth (A saw 2 of 36; prose states 10) | `yprov4agenticai/rules.py`, `eval/replay.py`, `experiments/decision-replay`, §3, §5.2 |
+| 3 | half | Line tracer measured: holds 7 of 12 rule inputs among 15 to 116 values per step, at 2 to 13× the step time. **LLM reconstruction baseline not run: needs paid API calls** | `eval/line_tracer.py`, `experiments/line-tracer`, §5.2 |
+| 4 | done | 24 real yProv4ML training runs (288 decisions; A saw 24 of 432); LangGraph port observed by LangChain's own handler (110 of 240 matched, 106 by chance); chance control added to every match; the corpus found and fixed a CAx false positive. Model-chosen verdicts discussed, not evaluated | `corpus/`, `eval/framework_baseline.py`, `experiments/corpus-24`, `experiments/framework-baseline`, §3, §5.2 |
+| 5 | open | **Diagnosis task needs people or a paid LLM-judge panel** | |
+| 6 | done | TOST against a 1 ms margin on 100 paired rounds: build equivalent to none for 5 of 6 agents; write about 1 ms. Energy paired by round: B +16% (9 to 22%), build +3% (−5 to +9%) | `eval/equivalence.py`, `experiments/overhead-samples`, §5.3, §5.5 |
+| 7 | done | Decision provenance, P-Plan, Explanation Ontology, explainable BDI; AI Act by article; Table 1 criteria defined and rows cited; yProv4ML and PROV-AGENT references verified | §2 |
+| 8 | done | TODO gone; 228 not 324; diary sentences cut; artifact paragraph; Table 4 has A; identifiers explained; A and B defined once; C2 tied to thesis (MC1 fails 24 of 24 baseline records) | throughout |
+
+Still open beyond the plan: two references keep a VERIFY marker (Explanation Ontology pages,
+CodeCarbon v3.3.1 DOI); figures are still full width; hyphenation is still off by request; the
+paper has grown and needs an Overleaf page count before the next cut (§5.6 first).
