@@ -99,7 +99,31 @@ yp:DecisionShape
         sh:minCount 1 ;
         sh:name     "decision-dated" ;
         sh:message  "A decision must say when it was taken." ;
-    ] .
+    ] ;
+    sh:property [
+        sh:path      yp:rule ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:pattern   "/v[0-9]+$" ;
+        sh:name      "decision-rule-versioned" ;
+        sh:message   """A decision that names its rule must name one, with its version:
+            an unversioned name could refer to any body the rule has ever had.""" ;
+    ] ;
+    sh:property [
+        sh:path      yp:rule_inputs ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:pattern   "^[{].*[}]$" ;
+        sh:name      "decision-inputs-object" ;
+        sh:message   "A decision's rule inputs are one JSON object of the values its rule read." ;
+    ] ;
+    # A rule without its inputs cannot be replayed, and inputs without a rule say
+    # nothing about how it was used. Either both or neither: a decision whose verdict no
+    # code rule produced (a model's choice, say) still conforms, and says so by omission.
+    sh:or (
+        [ sh:path yp:rule ; sh:maxCount 0 ]
+        [ sh:path yp:rule_inputs ; sh:minCount 1 ]
+    ) .
 
 
 # ── Shapes that must fire when the thing they look for is absent ──────────────────

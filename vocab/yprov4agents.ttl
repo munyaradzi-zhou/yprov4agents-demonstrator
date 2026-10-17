@@ -221,6 +221,30 @@ yp:justification
         searching every payload a callback handler could observe for the justifications
         in the explicit record finds none of them."""@en .
 
+yp:rule
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "decision rule"@en ;
+    rdfs:comment        """The name and version of the rule that produced the verdict, such
+        as ca1.persist/v1. A rule is a pure function from yp:rule_inputs to the decision's
+        outputs; a rule whose logic changes takes a new version rather than an edited body,
+        so a record that names a rule names exactly one function. With its inputs, it
+        makes the decision replayable: the verdict can be re-derived from the record by
+        anyone holding the code at that version, and a verdict the rule does not produce
+        is refused at the call that would have recorded it."""@en .
+
+yp:rule_inputs
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "rule inputs"@en ;
+    rdfs:comment        """The values yp:rule read, as canonical JSON (sorted keys, no
+        whitespace, scalars only). These are the computed facts of the decision: the
+        integrity result, the gap statistics, the count of ungrounded figures. They exist
+        only inside the step, which is why a callback-level observer does not have them,
+        and they are what yp:justification states in prose."""@en .
+
 yp:verdict
     a                   owl:DatatypeProperty ;
     rdfs:domain         yp:DecisionActivity ;

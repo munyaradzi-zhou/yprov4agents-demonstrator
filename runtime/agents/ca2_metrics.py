@@ -23,13 +23,14 @@ uses ``activity()``, ``decide()`` and ``emit()``. Two things follow, and both ar
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, NamedTuple
 
 import matplotlib
 
 from yprov4agenticai import LightweightStore
+from yprov4agenticai.rules import Rule, Scalar
 
 from ..base_agent import StreamingAgent
 from ..net_bus import Bus
@@ -46,6 +47,16 @@ SUBJECT_COMPOSITION = "graph-composition"
 
 #: Most numeric metrics a single chart will carry, and the width of a label on its axis.
 _MAX_SERIES = 10
+
+
+def _chart_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
+    """ACCEPT a chart that reached disk and plots the run's metrics; a fallback is REVISE."""
+    rendered = int(evidence["rendered_bytes"] or 0) > 0
+    accept = rendered and evidence["chart_subject"] == SUBJECT_METRICS
+    return {"yp:verdict": "ACCEPT" if accept else "REVISE"}
+
+
+CHART_RULE = Rule("ca2.chart/v1", _chart_rule)
 _MAX_LABEL_CHARS = 18
 
 
@@ -206,14 +217,18 @@ class CA2Metrics(StreamingAgent):
             prov.note(**{"yp:rendered_bytes": rendered_bytes})
 
         # S5 Decide — the one step no observer could have written for this agent.
-        verdict = (
-            "ACCEPT" if rendered_bytes > 0 and spec.subject == SUBJECT_METRICS else "REVISE"
-        )
+        evidence: dict[str, Scalar] = {
+            "rendered_bytes": rendered_bytes,
+            "chart_subject": spec.subject,
+        }
+        verdict = CHART_RULE.apply(evidence)["yp:verdict"]
         tracker.decide(
             verdict,
             self._justify(verdict, spec, counts, png),
             label=f"Metrics: {verdict.lower()} chart",
             consumed=chart,
+            rule=CHART_RULE,
+            evidence=evidence,
             attributes={
                 "yp:chart_subject": spec.subject,
                 "yp:series_plotted": len(spec.values),

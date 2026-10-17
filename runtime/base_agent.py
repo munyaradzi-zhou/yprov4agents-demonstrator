@@ -22,7 +22,10 @@ to put a PROV-JSON document onto the bus as START → CHUNK(s) → END.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Mapping
 from typing import Any
+
+from yprov4agenticai.rules import Rule, Scalar
 
 from .envelope import ProvEventType, ProvRecordEnvelope
 from .net_bus import Bus
@@ -31,6 +34,14 @@ from .util import agent_tracker, energy_tracker
 #: The verdict an agent records when the stream it was handed has a gap. Not a judgement
 #: about the input's content — the agent never saw all of it — but about its delivery.
 VERDICT_INCOMPLETE = "INCOMPLETE"
+
+
+def _incomplete_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
+    """A stream with any envelope missing is not processed; its verdict says so."""
+    return {"yp:verdict": VERDICT_INCOMPLETE if evidence["envelopes_missing"] else ""}
+
+
+INCOMPLETE_RULE = Rule("stream.incomplete/v1", _incomplete_rule)
 
 #: Set on the STREAM_END of an agent's own output when that output records an INCOMPLETE
 #: input. CA1 counts a consumer's STREAM_END as "this consumer used the record"; a consumer
@@ -270,6 +281,8 @@ class StreamingAgent:
             f"agent did not fully receive. Verdict {VERDICT_INCOMPLETE}.",
             label=f"{self.role}: incomplete input",
             consumed=partial,
+            rule=INCOMPLETE_RULE,
+            evidence={"envelopes_expected": expected, "envelopes_missing": len(missing)},
             attributes={
                 "yp:envelopes_expected": expected,
                 "yp:envelopes_missing": ",".join(map(str, missing)),

@@ -115,8 +115,8 @@ supplies our lifecycle; we add nothing to it, we instrument it.
 
 ## 3. The `yp:` vocabulary
 
-Published as an OWL ontology (`vocab/yprov4agents.ttl`, 86 terms) with SHACL shapes
-(`vocab/shapes.ttl`, 16 named constraints). Two rules governed its contents. **Only terms the
+Published as an OWL ontology (`vocab/yprov4agents.ttl`, 88 terms) with SHACL shapes
+(`vocab/shapes.ttl`, 18 named constraints). Two rules governed its contents. **Only terms the
 system emits**: the inventory was taken from frozen archives of actual runs rather than from design
 documents, and a test enforces it in both directions, with terms the library offers but the demonstrator
 does not exercise enumerated explicitly rather than left for a reader to discover. **Standard terms wherever

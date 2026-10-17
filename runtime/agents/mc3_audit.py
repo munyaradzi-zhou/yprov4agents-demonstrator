@@ -10,11 +10,22 @@ Like MC1, it publishes to `governance.*` so it never re-triggers the meta layer.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any, NamedTuple
+
+from yprov4agenticai.rules import Rule, Scalar
 
 from ..base_agent import StreamingAgent
 from ..net_bus import Bus
 from ..util import agent_tracker
+
+
+def _trail_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
+    """COMPLETE only a trail with no gap that stops it being ordered, timed evidence."""
+    return {"yp:verdict": "COMPLETE" if evidence["trail_gaps"] == 0 else "PARTIAL"}
+
+
+TRAIL_RULE = Rule("mc3.trail/v1", _trail_rule)
 
 
 def _agent_label(doc: dict[str, Any]) -> str:
@@ -133,7 +144,8 @@ class MC3Audit(StreamingAgent):
         # enforces, and left an auditor that could never report a problem. The conditions
         # under which a reconstructed trail is not trustworthy evidence are in Trail.gaps.
         gaps = trail.gaps
-        verdict = "COMPLETE" if not gaps else "PARTIAL"
+        evidence: dict[str, Scalar] = {"trail_gaps": len(gaps)}
+        verdict = TRAIL_RULE.apply(evidence)["yp:verdict"]
         if verdict == "COMPLETE":
             finding = (
                 "Every step carries a start and end time, so the who-did-what-when trail "
@@ -148,6 +160,8 @@ class MC3Audit(StreamingAgent):
             f"{finding} Verdict {verdict}.",
             label=f"MC3: trail for {who} is {verdict.lower()}",
             consumed=report,
+            rule=TRAIL_RULE,
+            evidence=evidence,
             attributes={"yp:audited_agent": who},
         )
 

@@ -19,8 +19,10 @@ never re-triggers the meta layer. That bound is deliberate and is discussed unde
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from typing import Any
+
+from yprov4agenticai.rules import Rule, Scalar
 
 from ..base_agent import StreamingAgent
 from ..net_bus import Bus
@@ -53,6 +55,14 @@ CHECK_NAMES = (
 #: Where the full standard is declared. Cited in the emitted record so a reader of a
 #: verdict can find the shapes it was reached against.
 SHAPES_REFERENCE = "vocab/shapes.ttl"
+
+
+def _compliance_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
+    """PASS only a record that failed none of the structural checks."""
+    return {"yp:verdict": "PASS" if evidence["failed_checks"] == 0 else "FAIL"}
+
+
+COMPLIANCE_RULE = Rule("mc1.compliance/v1", _compliance_rule)
 
 #: The namespaces a record's two prefixes must be bound to. Checking only that the prefix
 #: *names* exist accepted a record whose ``yp`` was bound to some other vocabulary, in which
@@ -207,7 +217,8 @@ class MC1Compliance(StreamingAgent):
                 }
             )
 
-        verdict = "PASS" if not failures else "FAIL"
+        evidence: dict[str, Scalar] = {"failed_checks": len(failures)}
+        verdict = COMPLIANCE_RULE.apply(evidence)["yp:verdict"]
         reason = "all structural checks passed" if verdict == "PASS" else "; ".join(failures)
 
         # S5 Decide — the verdict, as a yp:DecisionActivity carrying the justification.
@@ -225,6 +236,8 @@ class MC1Compliance(StreamingAgent):
             f"decisions. {reason.capitalize()}. Verdict {verdict}.",
             label=f"MC1: {verdict.lower()} {src_role}",
             consumed=findings,
+            rule=COMPLIANCE_RULE,
+            evidence=evidence,
             attributes={"yp:target_agent": src_role},
         )
 

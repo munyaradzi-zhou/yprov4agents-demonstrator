@@ -227,7 +227,7 @@ Reproduce: `uv run python -m eval.bench_overhead --level all` and
 
 `vocab/yprov4agents.ttl` publishes the `yp:` terms as an OWL ontology over PROV-O — 19
 classes and 67 properties, every one of them emitted by the system or listed with a reason —
-and `vocab/shapes.ttl` declares the standard as 16 named SHACL constraints: every decision is
+and `vocab/shapes.ttl` declares the standard as 18 named SHACL constraints: every decision is
 justified and concluded, every step typed, dated and attributed, every agent decided
 something, every pointer carries a SHA-256. Any SHACL engine can apply it:
 

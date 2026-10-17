@@ -162,21 +162,21 @@ FRONT_MATTER = r"""\documentclass[conference]{IEEEtran}
 
 \maketitle
 
-% TODO(authors): this abstract was drafted for the typeset version and has not been
-% reviewed. Every figure in it is quoted from the body.
 \begin{abstract}
 Provenance tooling can record what an agentic AI system did; it cannot record why. We argue
-that this gap is structural: the facts a decision used may cross a step boundary, but the rule
-that combined them into a verdict is a local computation, and from outside the step it is not
-identifiable: no callback, span or post-hoc query can retrieve what was never captured. We make the argument measurable with a reflexive
-multi-agent demonstrator (four operational agents emitting typed W3C PROV about themselves
-and two meta agents governing that output) and a deliberately generous callback-level
-baseline over the same run. The baseline reconstructs every activity, all 324 relations and
-every verdict, and sees 61\% of the facts the operational justifications cite, but none of the
-values the agents computed in order to decide. We publish the \texttt{yp:} vocabulary as an
-OWL ontology with SHACL shapes, and measure the cost: building the record is inside every
-operational agent's run-to-run variance, justifications are 6.5\% of the records' bytes, and
-measured CPU energy per session shows no resolvable difference.
+that the gap is structural. A decision applies a rule to values it computed, and from outside
+the step neither is identifiable: no callback, span or post-hoc query can retrieve what was
+never captured. We make the argument measurable with a reflexive multi-agent demonstrator
+(four operational agents emitting typed W3C PROV about themselves, two meta agents governing
+that output) and a deliberately generous callback-level baseline over the same run. The
+baseline reconstructs every activity, lineage relation and verdict, yet of the 36 values the
+agents' decision rules read it saw 2, both fields of the input record. Our capture records
+each decision as a named, versioned rule applied to its inputs, so every decision in the
+reference run and nine fault scenarios replays from its own record, and an edited verdict
+does not. We publish the \texttt{yp:} vocabulary as an OWL ontology with SHACL shapes, and
+measure the cost: building the record is inside every operational agent's run-to-run
+variance, justifications are 6.4\% of the records' bytes, and measured CPU energy per
+session shows no resolvable difference.
 \end{abstract}
 
 \begin{IEEEkeywords}

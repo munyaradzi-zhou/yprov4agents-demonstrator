@@ -79,7 +79,7 @@ cannot reconstruct ("capture, not retrieve").
   if blank (`ProvTracker.decide` raises `ValueError`).
 - **Reflexive**: the meta agents govern the operational agents' records and are themselves
   fully instrumented; reflexivity is bounded to one level by subject design.
-- **Declared standard**: an OWL ontology (86 terms) and SHACL shapes (16 named constraints)
+- **Declared standard**: an OWL ontology (88 terms) and SHACL shapes (18 named constraints)
   under `vocab/`, applied by an independent engine (`pyshacl`).
 - **Pointers, not payloads**: heavy outputs go to a content-addressed store; the record
   carries `yp:pid` + `yp:contentHash` (SHA-256).
@@ -1198,7 +1198,7 @@ independent of how it is serialised. Section 13 maps the provenance part of it o
 | Version | 0.6.0 (`owl:versionInfo`) |
 | Imports | PROV-O (`http://www.w3.org/ns/prov-o#`) |
 | Files | `vocab/yprov4agents.ttl` (ontology), `vocab/shapes.ttl` (SHACL) |
-| Size | **86 terms**: 19 classes + 67 datatype properties; **16** named SHACL constraints in 8 shapes |
+| Size | **88 terms**: 19 classes + 69 datatype properties; **18** named SHACL constraints in 8 shapes |
 | Design rules | (1) only terms the system emits, enforced by a test in both directions; (2) PROV's term wherever one exists — all lineage relations are PROV's |
 
 ### Class Hierarchy

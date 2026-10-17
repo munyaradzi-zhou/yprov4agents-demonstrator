@@ -103,12 +103,13 @@ collects, and add the one thing it structurally cannot.
 
 ## 3. Vocabulary and Instrumentation
 
-**The `yp:` vocabulary** is published as an OWL ontology (86 terms) with SHACL [@shacl] shapes
-(16 named constraints). It emits only terms the system uses, checked in both directions by a test,
+**The `yp:` vocabulary** is published as an OWL ontology (88 terms) with SHACL [@shacl] shapes
+(18 named constraints). It emits only terms the system uses, checked in both directions by a test,
 and uses PROV's own term wherever one exists: all lineage relations are PROV's. It adds two
 things PROV lacks: a typed decision lifecycle (Receive, Plan, Act, Observe, **Decide**, Respond,
 as subclasses of `prov:Activity`) and `yp:justification`, with `rdfs:domain yp:DecisionActivity`,
-beside `yp:verdict` and `yp:escalation_reason`. The shapes declare the standard: every decision is
+beside `yp:verdict`, `yp:escalation_reason`, and the `yp:rule` and `yp:rule_inputs` that make a
+decision replayable. The shapes declare the standard: every decision is
 justified and concluded; every step is typed, dated, ended and attributed; every agent decides
 something; every `yp:pid` carries a `sha256:` hash. An agent's own runtime check is tested against
 the shapes rather than trusted to match them, which has found four disagreements, each fixed.
@@ -126,10 +127,18 @@ with tracker.activity("ToolCallActivity", "write the summary") as prov:
     prov.note(**summary.provenance())        # model, prompt hash, tokens
 
 tracker.decide(verdict="REVISE",             # the hand-written line
-    justification="Figures 4096 and 512 appear in the summary but not in the graph.")
+    justification="Figures 4096 and 512 appear in the summary but not in the graph.",
+    rule=SUMMARY_RULE,                       # cax.summary/v1: a pure function
+    evidence={"ungrounded_figures": 2, "truncated": False})
 ```
 
-`decide()` raises on a blank justification. Lineage is declared, never inferred, except
+`decide()` raises on a blank justification, and on a verdict its own rule does not give. A rule
+is a pure function from named values to the decision's outputs, versioned in its name, so a
+record naming `cax.summary/v1` names one function. Applied at the call and recorded with its
+inputs, it makes the decision replayable: anyone holding the code can re-derive the verdict
+from the record. The justification stays prose for a reader; the rule is what makes the record
+checkable against the code, which a sentence, written by a developer or a model [@turpin2023],
+is not. Lineage is declared, never inferred, except
 `wasInformedBy`, which PROV defines as derivable; an early tracker that inferred derivations from
 registration order produced 74 confident, wrong edges of 250. Durations come from a monotonic
 counter: on our host the wall clock advances in 15.6 ms steps, and before this fix 96 of 96
@@ -196,22 +205,37 @@ the explicit instrumentation declared. Figure 2 compares the two over the 24 rec
 
 Structure is recoverable, and so are the verdicts, scraped from node labels, which a graph
 naming its decision node `decide` would defeat. No justification appears verbatim in the 12,425
-characters A observed, but a run-time sentence rarely survives verbatim, so we test facts:
+characters A observed, but a run-time sentence rarely survives verbatim, so we ask instead about
+the values each decision's rule read, which the record names (Table 3).
 
-| Decisions | Count | Facts | Seen by A | All seen |
-|---|--:|--:|--:|--:|
-| Operational | 8 | 49 | 30 (61%) | 2 |
-| Meta | 16 | 16 | 16 (100%) | 16 |
+| Agent | Decisions | Values read | Checks | Seen by A | Stated in prose |
+|---|--:|--:|--:|--:|--:|
+| CA1 Storage | 2 | 4 | 4 | 0 | 2 |
+| CA2 Metrics | 2 | 4 | 0 | 0 | 0 |
+| CA3 Analytics | 2 | 10 | 0 | 2 | 8 |
+| CAx Summariser | 2 | 2 | 2 | 0 | 0 |
+| MC1 and MC3 | 16 | 16 | 0 | 0 | 0 |
+| All | 24 | 36 | 6 | 2 | 10 |
 
-**Table 3.** Each justification's facts (figures, hashes, names, roles) searched for in
-everything A saw. Seeing a fact over-counts knowing it.
+**Table 3.** The values each decision's rule read (`yp:rule_inputs`), searched for in everything
+A saw and in the decision's own justification. Checks are booleans, the outcome of a test inside
+the step, which a text search cannot attribute, so they are counted apart. A number counts as
+seen at any rounding within 5%.
 
-The 19 facts A never saw are those the agents *computed in order to decide*: a record's byte
-count, a timing gap and its share of the run, a summary's length, a threshold. Where A saw every
-fact, it still lacks the rule: CA2's facts were all visible, but not that finding no numeric
-values sent it to a fallback chart, nor that the fallback is why it said REVISE. Meta-agent
-justifications restate structure A already has, and are not counted. **The inputs to a decision
-may be observable; the rule that combined them is not.**
+A saw 2 of the 36: the wall clock span of each input run, a field of the yProv4ML record that
+crossed the boundary as part of $x$. Every computed value (gap statistics, byte counts, failed
+checks, ungrounded figures) was invisible, as Proposition 1 predicts. A looser test, extracting
+facts from the justification prose, finds 30 of the operational agents' 49 facts (61%) visible,
+and the gap between the measures is the point: every fact in CA2's prose is visible to A, and
+neither value its rule read is. **The inputs to a decision may be observable; the values it
+computed, and the rule that combined them, are not.**
+
+**Replay.** All 24 decisions replay, and so do the nine of the fault scenarios, which between
+them reach every verdict and each of CA1's escalation reasons: the named rule, applied to the
+recorded inputs, gives the recorded outputs. Editing a stored verdict or input makes replay
+fail. The prose is the weaker record: it states 10 of the 36 values its rules read, and
+paraphrases the rest ("all supported" for zero ungrounded figures) or omits them (a chart's byte
+count).
 
 The cost is visible in one agent. CA1 says ESCALATE for three reasons; A recovers the verdict,
 never the reason, so it cannot tell *"storage is corrupting records"* from *"a consumer is down"*.
@@ -253,7 +277,8 @@ occasions, **building the record was inside every operational agent's run-to-run
 case, MC1, a 109 µs step gains 38 µs to build the record and 1,485 µs to write it (+1,394%, 98%
 of it the write). Transient mode removes 89% of the time cost; metadata mode 38% of the bytes,
 keeping every justification. Recording a justification costs 54 ns against a ±726 ns spread, and
-justifications are 6.5% of the records' bytes. Cost is linear (fitted exponents 1.09 and 1.13 to
+justifications are 6.4% of the records' bytes, and a decision's rule and inputs 1.7% (added after the timing
+study, which predates them). Cost is linear (fitted exponents 1.09 and 1.13 to
 10,000 activities). Across occasions, two agents' verdicts flipped between resolved and not, so
 we quote the verdicts that held, the bytes and the complexity class, not the timings.
 

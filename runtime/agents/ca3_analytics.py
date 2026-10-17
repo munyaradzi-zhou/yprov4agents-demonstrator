@@ -32,11 +32,13 @@ from __future__ import annotations
 
 import re
 import statistics
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import Any
 
 from yprov4agenticai import LightweightStore
 from yprov4agenticai.prompts import NARRATE_FINDINGS
+from yprov4agenticai.rules import Rule, Scalar
 
 from ..base_agent import StreamingAgent
 from ..llm import Completion, get_llm, llm_is_required
@@ -63,6 +65,68 @@ _MIN_GAPS_FOR_OUTLIERS = 5
 #: explodes and sub-second noise is reported beside a genuine multi-second stall.
 _MATERIAL_SHARE = 0.05
 _MIN_MATERIAL_GAP_S = 0.5
+
+
+def _gap_scale(gaps: list[float]) -> tuple[float, float] | None:
+    """The median gap and the scale an outlier is measured in, or None if there is none.
+
+    The median absolute deviation is the robust default, but it is exactly zero whenever
+    more than half the gaps are identical, which is the common case here: a producer logs
+    most of its activities at a fixed cadence and then stalls once. A zero scale would
+    reject the very outlier the check exists to find, so fall back to the mean absolute
+    deviation, which is less robust but non-zero as soon as any gap differs at all.
+    """
+    if len(gaps) < _MIN_GAPS_FOR_OUTLIERS:
+        return None
+    median = statistics.median(gaps)
+    deviations = [abs(g - median) for g in gaps]
+    scale = statistics.median(deviations)
+    if scale <= 0:
+        scale = statistics.fmean(deviations)
+    if scale <= 0:
+        return None  # every gap is identical: nothing is unusual relative to anything else
+    return median, scale
+
+
+def _is_outlier(gap: float, median: float, scale: float, wall_clock: float) -> bool:
+    """Unusual for this run *and* large enough to matter in it.
+
+    Producers log their setup activities within the same millisecond, so the median gap is
+    often near zero and the MAD with it, which makes the normalised score explode and flags
+    a 0.098 s gap at 11 MAD alongside a genuine 103 s stall.
+    """
+    material_floor = max(_MIN_MATERIAL_GAP_S, _MATERIAL_SHARE * wall_clock)
+    return gap > median and gap >= material_floor and (gap - median) / scale > _MAD_THRESHOLD
+
+
+def _timing_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
+    """ANOMALY if the run's largest gap is an outlier. Every test in :func:`_is_outlier`
+    rises with the gap, so the largest gap is an outlier exactly when any gap is."""
+    values = [
+        evidence[key] for key in ("largest_gap_s", "median_gap_s", "scale_s", "wall_clock_s")
+    ]
+    if evidence["scale_s"] is None:
+        return {"yp:verdict": "OK"}
+    gap, median, scale, wall_clock = (float(v) for v in values if isinstance(v, int | float))
+    outlier = _is_outlier(gap, median, scale, wall_clock)
+    return {"yp:verdict": "ANOMALY" if outlier else "OK"}
+
+
+TIMING_RULE = Rule("ca3.timing-outlier/v1", _timing_rule)
+
+
+def timing_evidence(timing: dict[str, Any]) -> dict[str, Scalar]:
+    """What :data:`TIMING_RULE` reads: the gap statistics, not the thresholds it holds."""
+    gaps = [g for _, g in timing["gaps"]]
+    fitted = _gap_scale(gaps)
+    return {
+        "gap_count": len(gaps),
+        "largest_gap_s": max(gaps) if gaps else None,
+        "median_gap_s": fitted[0] if fitted else None,
+        "scale_s": fitted[1] if fitted else None,
+        "wall_clock_s": float(timing["wall_clock_s"]),
+    }
+
 
 #: The mining algorithms this agent applies, in the order the module docstring lists them.
 #: Named once so the figure in the justification and the ``yp:algorithms`` attribute on the
@@ -231,38 +295,15 @@ class CA3Analytics(StreamingAgent):
         MAD is also robust to the outlier itself, which a standard deviation is not: one
         large gap inflates sigma enough to hide its own significance.
         """
-        gaps = [g for _, g in timing["gaps"]]
-        if len(gaps) < _MIN_GAPS_FOR_OUTLIERS:
+        fitted = _gap_scale([g for _, g in timing["gaps"]])
+        if fitted is None:
             return []
-        median = statistics.median(gaps)
-        deviations = [abs(g - median) for g in gaps]
-
-        # Scale estimate. The median absolute deviation is the robust default, but it is
-        # exactly zero whenever more than half the gaps are identical — which is the
-        # common case here, since a producer logs most of its activities at a fixed
-        # cadence and then stalls once. A zero scale would reject the very outlier the
-        # check exists to find, so fall back to the mean absolute deviation, which is less
-        # robust but non-zero as soon as any gap differs at all.
-        scale = statistics.median(deviations)
-        if scale <= 0:
-            scale = statistics.fmean(deviations)
-        if scale <= 0:
-            # Every gap is identical: nothing is unusual relative to anything else.
-            return []
-
-        # Statistical unusualness alone is not enough to report. Producers log their setup
-        # activities within the same millisecond, so the median gap is often near zero and
-        # the MAD with it — which makes the normalised score explode and flags a 0.098s
-        # gap at 11 MAD alongside a genuine 103s stall. A finding has to be both unusual
-        # for this run and large enough to matter in it.
+        median, scale = fitted
         wall_clock = float(timing["wall_clock_s"])
-        material_floor = max(_MIN_MATERIAL_GAP_S, _MATERIAL_SHARE * wall_clock)
 
         found = []
         for aid, gap in timing["gaps"]:
-            if gap <= median or gap < material_floor:
-                continue
-            if abs(gap - median) / scale <= _MAD_THRESHOLD:
+            if not _is_outlier(gap, median, scale, wall_clock):
                 continue
             share = 100.0 * gap / wall_clock if wall_clock > 0 else 0.0
             found.append(
@@ -495,12 +536,15 @@ class CA3Analytics(StreamingAgent):
             )
 
         # S5 Decide — OK, or name the invariant that broke.
-        verdict = "ANOMALY" if anomalies else "OK"
+        evidence = timing_evidence(timing)
+        verdict = TIMING_RULE.apply(evidence)["yp:verdict"]
         tracker.decide(
             verdict,
             self._justify(verdict, struct, timing, anomalies, completeness),
             label=f"CA3: {verdict}",
             consumed=quality,
+            rule=TIMING_RULE,
+            evidence=evidence,
             attributes={
                 "yp:anomaly_count": len(anomalies),
                 "yp:completeness_gap_count": len(completeness),

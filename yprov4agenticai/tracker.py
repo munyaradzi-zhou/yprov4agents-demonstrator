@@ -24,13 +24,14 @@ from __future__ import annotations
 import datetime
 import functools
 import inspect
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from typing import Any, TypeVar
 
 from .api import SCOPE_PARAMETER, ActivityScope, Span
 from .energy import EnergyTracker
 from .observer import Observer
+from .rules import Rule, Scalar, canonical, check
 
 YP_NAMESPACE = "http://hpci-lab.org/yProv4Agents#"
 
@@ -471,6 +472,8 @@ class ProvTracker:
         generated: str | None = None,
         attributes: dict[str, Any] | None = None,
         started_at: str | None = None,
+        rule: Rule | None = None,
+        evidence: Mapping[str, Scalar] | None = None,
     ) -> None:
         """Record a decision: the verdict, and the reasoning that produced it.
 
@@ -491,6 +494,11 @@ class ProvTracker:
             Why that verdict, in terms of the evidence that produced it.
         confidence
             Optional score behind the verdict, recorded as ``yp:confidence_score``.
+        rule, evidence
+            The named rule that produced the verdict and the values it read. Recorded as
+            ``yp:rule`` and ``yp:rule_inputs``, so the decision can be replayed from its
+            record; the call raises if the rule, applied to the evidence, does not give
+            the verdict (and escalation reason) being recorded.
         started_at
             When the deliberation began. Defaults to now, making the decision
             instantaneous in the record — right for a threshold comparison, wrong for a
@@ -508,6 +516,17 @@ class ProvTracker:
                 f"with an empty rationale cannot be told apart from an unexplained "
                 f"decision; state the evidence that produced the verdict."
             )
+        attributes = dict(attributes or {})
+        if (rule is None) != (evidence is None):
+            raise ValueError("rule and evidence are recorded together or not at all")
+        if rule is not None and evidence is not None:
+            problems = check(rule, evidence, {**attributes, "yp:verdict": verdict})
+            if problems:
+                # The record would claim a verdict its own rule did not reach. Refused here,
+                # where the caller can still see which branch it took.
+                raise ValueError("decision disagrees with its rule: " + "; ".join(problems))
+            attributes["yp:rule"] = rule.name
+            attributes["yp:rule_inputs"] = canonical(evidence)
         # Routed through an ActivityScope like every other step, for two reasons. The
         # extent is measured rather than being one wall-clock reading taken twice (the
         # work of *reaching* the verdict happens in the caller; pass ``started_at`` to
@@ -523,7 +542,7 @@ class ProvTracker:
         scope.justification = justification
         scope.verdict = verdict
         scope.confidence = confidence
-        scope.attributes = dict(attributes or {})
+        scope.attributes = attributes
         # Read the energy here too. Skipping it would not merely omit a decision's own
         # consumption, it would fold that consumption into the next step's delta — and a
         # misattributed measurement is worse than a missing one.

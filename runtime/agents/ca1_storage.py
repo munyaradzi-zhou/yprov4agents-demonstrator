@@ -32,9 +32,11 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+from collections.abc import Mapping
 from typing import Any
 
 from yprov4agenticai import LightweightStore
+from yprov4agenticai.rules import Rule, Scalar
 
 from ..base_agent import (
     INPUT_COMPLETE,
@@ -62,6 +64,20 @@ PERSIST_TRIGGER_TIMEOUT = "timeout"
 ESCALATION_INTEGRITY = "integrity"
 ESCALATION_INCOMPLETE = "incomplete-input"
 ESCALATION_UNCONFIRMED = "consumption-unconfirmed"
+
+
+def _persist_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
+    """ACCEPT a stored record, or ESCALATE naming the first condition that failed."""
+    if not evidence["integrity_ok"]:
+        return {"yp:verdict": "ESCALATE", "yp:escalation_reason": ESCALATION_INTEGRITY}
+    if evidence["envelopes_missing"] or not evidence["final_envelope_seen"]:
+        return {"yp:verdict": "ESCALATE", "yp:escalation_reason": ESCALATION_INCOMPLETE}
+    if evidence["persist_trigger"] != PERSIST_TRIGGER_QUORUM:
+        return {"yp:verdict": "ESCALATE", "yp:escalation_reason": ESCALATION_UNCONFIRMED}
+    return {"yp:verdict": "ACCEPT"}
+
+
+PERSIST_RULE = Rule("ca1.persist/v1", _persist_rule)
 
 
 class CA1Storage(StreamingAgent):
@@ -377,14 +393,14 @@ class CA1Storage(StreamingAgent):
             )
         else:
             completeness = ""
-        if not integrity_ok:
-            verdict, escalation = "ESCALATE", ESCALATION_INTEGRITY
-        elif incomplete:
-            verdict, escalation = "ESCALATE", ESCALATION_INCOMPLETE
-        elif trigger != PERSIST_TRIGGER_QUORUM:
-            verdict, escalation = "ESCALATE", ESCALATION_UNCONFIRMED
-        else:
-            verdict, escalation = "ACCEPT", ""
+        evidence: dict[str, Scalar] = {
+            "integrity_ok": integrity_ok,
+            "envelopes_missing": len(lost),
+            "final_envelope_seen": ended,
+            "persist_trigger": trigger,
+        }
+        outcome = PERSIST_RULE.apply(evidence)
+        verdict, escalation = outcome["yp:verdict"], outcome.get("yp:escalation_reason", "")
         tracker.decide(
             verdict,
             self._justify(
@@ -400,6 +416,8 @@ class CA1Storage(StreamingAgent):
             ),
             label=f"CA1: {verdict.lower()} the stored record",
             consumed=stored,
+            rule=PERSIST_RULE,
+            evidence=evidence,
             attributes={
                 "yp:persist_trigger": trigger,
                 "yp:consumers_required": len(PERSIST_AFTER),

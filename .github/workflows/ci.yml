@@ -147,6 +147,14 @@ jobs:
       - name: Provoke every alternative verdict
         run: uv run python -m eval.fault_injection --all --out-dir out/faults
 
+      # A justification is prose; the verdict beside it is the output of a named rule. Each
+      # decision is re-derived from its own yp:rule and yp:rule_inputs, on the reference run
+      # and on every fault scenario, so a verdict the code did not reach fails here.
+      - name: Replay every decision from its own record
+        run: |
+          uv run python -m eval.replay --prov-dir out --baseline-dir out/baseline
+          for scenario in out/faults/*/; do uv run python -m eval.replay --prov-dir "$scenario"; done
+
       - name: Run the conformance suite against freshly emitted provenance
         run: uv run pytest -v -m conformance --prov-dir out
 

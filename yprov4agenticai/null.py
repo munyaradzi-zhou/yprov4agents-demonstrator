@@ -37,11 +37,12 @@ per step, which is a fair account of what a callback-level integration costs in 
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from typing import Any, TypeVar
 
 from .observer import StepEvent, get_default_observer
+from .rules import Rule, Scalar
 
 _R = TypeVar("_R")
 
@@ -233,6 +234,8 @@ class NullTracker:
         generated: str | None = None,
         attributes: dict[str, Any] | None = None,
         started_at: str | None = None,
+        rule: Rule | None = None,
+        evidence: Mapping[str, Scalar] | None = None,
     ) -> None:
         if not justification.strip():
             raise ValueError(f"verdict {verdict!r} was given no justification.")

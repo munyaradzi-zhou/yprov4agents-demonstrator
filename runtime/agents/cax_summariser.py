@@ -20,10 +20,12 @@ account for (review findings F1 and F2).
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from typing import Any
 
 from yprov4agenticai import LightweightStore
 from yprov4agenticai.prompts import ACT_SYSTEM
+from yprov4agenticai.rules import Rule, Scalar
 
 from ..base_agent import StreamingAgent
 from ..llm import Completion, get_llm, llm_is_required
@@ -41,6 +43,15 @@ _NUMERAL = re.compile(r"\d[\d,]*(?:\.\d+)?")
 #: How many activity names the facts message carries. A ceiling, not a target: the point is
 #: to give the model something concrete to name, not to pass it the whole graph.
 _FACT_ACTIVITIES = 6
+
+
+def _summary_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
+    """ACCEPT a summary that asserts no figure the graph lacks and was not cut off."""
+    accept = evidence["ungrounded_figures"] == 0 and not evidence["truncated"]
+    return {"yp:verdict": "ACCEPT" if accept else "REVISE"}
+
+
+SUMMARY_RULE = Rule("cax.summary/v1", _summary_rule)
 
 
 class CAxSummariser(StreamingAgent):
@@ -218,7 +229,7 @@ class CAxSummariser(StreamingAgent):
             "ObservationActivity", "CAx: check the summary's figures against the graph"
         ) as prov:
             prov.consumes(response)
-            grounded, ungrounded = self._check_grounding(summary, doc, counts)
+            _, ungrounded = self._check_grounding(summary, doc, counts)
             prov.produces(
                 "QualityEntity",
                 f"{len(ungrounded)} ungrounded figure(s)"
@@ -241,12 +252,18 @@ class CAxSummariser(StreamingAgent):
         # budget mid-sentence, the second asserted something the graph does not support, and
         # only the second is a faithfulness problem.
         truncated = completion is not None and completion.truncated
-        verdict = "ACCEPT" if grounded and not truncated else "REVISE"
+        evidence: dict[str, Scalar] = {
+            "ungrounded_figures": len(ungrounded),
+            "truncated": truncated,
+        }
+        verdict = SUMMARY_RULE.apply(evidence)["yp:verdict"]
         tracker.decide(
             verdict,
             self._justify(verdict, summary, mode, counts, ungrounded, truncated=truncated),
             label=f"CAx: {verdict.lower()} summary",
             consumed=quality,
+            rule=SUMMARY_RULE,
+            evidence=evidence,
             attributes={"yp:summary_mode": mode},
         )
 
