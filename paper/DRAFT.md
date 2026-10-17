@@ -240,6 +240,16 @@ names as asserted figures and said REVISE on half the runs, and CA3 found a 1.0 
 the first epoch of every run, 74 to 87% of its wall clock. The first was a defect, now fixed;
 the second is a finding about the producer.
 
+**A real framework.** A handler we wrote might see less than a real one, so we ran the four
+operational agents unmodified as nodes of a LangGraph graph [@langgraph] over the same corpus,
+observed by a subclass of LangChain's own callback handler (`experiments/framework-baseline`).
+The framework hands its handler the whole graph state at every node: 45 times the bytes our
+handler saw. Of the 240 values the rules read, 110 match somewhere in it, and 106 of those
+match just as well in an unrelated run's observations: zeros, small counts, and two labels the
+agents print in their one-line results (CA1's trigger, CA2's chart subject). Four match only
+in their own run. A real framework shows its observer more of the input, and no more of the
+decision.
+
 **Replay.** All 24 decisions replay, as do all 288 on the corpus and the nine of the fault scenarios, which between
 them reach every verdict and each of CA1's escalation reasons: the named rule, applied to the
 recorded inputs, gives the recorded outputs. Editing a stored verdict or input makes replay
@@ -323,8 +333,9 @@ are good**; whether they improve an operator's decisions needs a human study. Th
 measure is coarse in both directions. A model-bearing step is repeatable from its record, not
 reproducible: three fingerprints in one run is a backend changing under a caller that changed
 nothing. The bus is at-most-once: numbered envelopes expose a partial loss, but a stream lost
-whole is silent. The evaluation uses one producer (24 real records and two bundled ones) and one machine, and
-we built the baseline ourselves, mitigated by granting it every declared structural fact.
+whole is silent. The evaluation uses one producer (24 real records and two bundled ones) and one machine. We
+built the main baseline ourselves, granted it every declared structural fact, and checked it
+against a real framework's handler, which saw more bytes and no more of the decisions.
 
 ## 7. Conclusion
 

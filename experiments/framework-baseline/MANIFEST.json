@@ -1,0 +1,38 @@
+{
+  "schema": "yprov4agents/experiment-manifest/2",
+  "name": "framework-baseline",
+  "note": "Strategy A through a real framework: the four operational agents as LangGraph nodes over the 24-run corpus, observed by a subclass of LangChain's BaseCallbackHandler. framework.json: per agent, rule inputs seen in the handler's observations of the same run, and seen in another run's (chance). The agent records and charts are not kept: they are the same agents on the same records as experiments/corpus-24.",
+  "created_at": "2026-10-17T14:43:58.128959+00:00",
+  "source": "out/framework-archive",
+  "git": {
+    "commit": "48db837a3ee710c99dced9cfba0d1644a00088cb",
+    "branch": "HEAD",
+    "describe": "v1.1.0-verdicts-43-g48db837",
+    "dirty": false,
+    "changes": []
+  },
+  "environment": {
+    "python": "3.12.10",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840
+  },
+  "file_count": 2,
+  "total_bytes": 1423,
+  "files": [
+    {
+      "path": "framework.json",
+      "size_bytes": 932,
+      "content_hash": "sha256:4239c848f924f1f476eb3d0573bf1df5730c6690cdd66f8835b4def1655e3b24"
+    },
+    {
+      "path": "FRAMEWORK.md",
+      "size_bytes": 491,
+      "content_hash": "sha256:d3af30ce3557f25be3fddd4fdc50383672e3a1bfecfe9cfa5685650390d16e14"
+    }
+  ]
+}

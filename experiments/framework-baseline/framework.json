@@ -1,0 +1,48 @@
+{
+  "records": 24,
+  "decisions": 96,
+  "callback_events": 240,
+  "payload_chars": 7089466,
+  "inputs": {
+    "ca1": {
+      "decisions": 24,
+      "inputs": 96,
+      "tests": 48,
+      "unset": 0,
+      "searchable": 48,
+      "seen_by_a": 48,
+      "seen_by_chance": 48,
+      "stated": 24
+    },
+    "ca2": {
+      "decisions": 24,
+      "inputs": 48,
+      "tests": 0,
+      "unset": 0,
+      "searchable": 48,
+      "seen_by_a": 24,
+      "seen_by_chance": 24,
+      "stated": 0
+    },
+    "ca3": {
+      "decisions": 24,
+      "inputs": 120,
+      "tests": 0,
+      "unset": 0,
+      "searchable": 120,
+      "seen_by_a": 14,
+      "seen_by_chance": 10,
+      "stated": 102
+    },
+    "cax": {
+      "decisions": 24,
+      "inputs": 48,
+      "tests": 24,
+      "unset": 0,
+      "searchable": 24,
+      "seen_by_a": 24,
+      "seen_by_chance": 24,
+      "stated": 0
+    }
+  }
+}
