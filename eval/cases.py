@@ -93,9 +93,11 @@ def load_faults(faults_dir: Path) -> list[Case]:
         events = scenario / "baseline" / EVENTS_FILE
         if events.is_file():
             for case in load(scenario, events, "fault"):
-                cases.append(
-                    Case(**{**case.__dict__, "case_id": f"fault/{scenario.name}/{case.role}"})
-                )
+                # One session per scenario keeps its historical id; a directory holding
+                # several runs (eval.review_faults) names each run.
+                run = "" if case.session == "fault" else f"{case.session}/"
+                case_id = f"fault/{scenario.name}/{run}{case.role}"
+                cases.append(Case(**{**case.__dict__, "case_id": case_id}))
     return cases
 
 

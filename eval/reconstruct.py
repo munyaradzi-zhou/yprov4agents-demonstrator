@@ -175,7 +175,7 @@ def run(
         searchable = {
             k: v
             for k, v in case.rule_inputs.items()
-            if not isinstance(v, bool) and v is not None
+            if not isinstance(v, bool) and v is not None and v != ""
         }
         reason = str(data.get("reason") or "")
         judged = ask(

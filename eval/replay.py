@@ -133,7 +133,8 @@ def input_visibility(
                 tally.inputs += 1
                 if isinstance(value, bool):
                     tally.tests += 1
-                elif value is None:
+                elif value is None or value == "":
+                    # Nothing to search for: an empty string matches everywhere.
                     tally.unset += 1
                 else:
                     tally.searchable += 1
