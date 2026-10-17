@@ -580,6 +580,10 @@ def _summarise_agent(
         "write_cost_ns": medians["B"] - medians["B-TRANS"],
         "output_bytes": output_bytes,
         "repetitions": repetitions,
+        # Every sample, in round order. Conditions were interleaved, so sample i of each
+        # condition comes from the same round, which is what lets eval.equivalence pair
+        # them and bound a difference rather than only failing to resolve one.
+        "samples_ns": samples,
         **extra,
     }
 
