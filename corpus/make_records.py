@@ -120,12 +120,16 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     _portable_identity()
-    if args.out.exists():
-        shutil.rmtree(args.out)
+    out = args.out.resolve()
+    if out.exists():
+        shutil.rmtree(out)
+    out.mkdir(parents=True)
+    # yProv4ML writes model copies and a requirements.txt into the working directory.
+    os.chdir(out)
     rng = random.Random(args.seed)
     for run in range(args.runs):
         started = time.perf_counter()
-        run_dir = _train(run, rng, args.out)
+        run_dir = _train(run, rng, out)
         print(f"[corpus] run {run:02d} -> {run_dir} ({time.perf_counter() - started:.1f}s)")
     return 0
 
