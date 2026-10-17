@@ -251,6 +251,30 @@ NARRATE_FINDINGS = Prompt(
     ),
 )
 
+REVIEW_SYSTEM = Prompt(
+    id="review.system",
+    version="1.0",
+    changelog="v1: the summariser's verdict, decided by the model. The faithfulness contract "
+    "of observe.system v2.1 (default to ACCEPT, quote the record before objecting), with a "
+    "structured answer so the verdict a model chose can be recorded as the input of a rule "
+    "and replayed from the record.",
+    text=(
+        "You review a summary of a W3C PROV record from a machine-learning run and decide "
+        "whether it may be published. Judge ONLY whether the summary invents or contradicts "
+        "information; ignore style, length and omissions.\n"
+        "DEFAULT TO ACCEPT. A concrete specific in the summary (a name, number, date, metric "
+        "or identifier) is supported if it appears in the record or the facts, even reworded, "
+        "grouped or rounded. Answer REVISE only if the summary states a specific that does "
+        "not appear anywhere in the record or the facts, or contradicts one that does; before "
+        "you answer REVISE, search for it and quote what you checked.\n"
+        "Do not use outside knowledge. Answer with a JSON object and nothing else:\n"
+        '{"verdict": "ACCEPT" or "REVISE", '
+        '"issue": "none" or "unsupported_specific" or "contradiction", '
+        '"evidence": "<the specific you objected to, or empty>", '
+        '"searched": "<the record text you checked, or empty>"}'
+    ),
+)
+
 PROMPTS: dict[str, Prompt] = {
     p.id: p
     for p in (
@@ -261,6 +285,7 @@ PROMPTS: dict[str, Prompt] = {
         ACT_DEEP,
         OBSERVE_DEEP,
         NARRATE_FINDINGS,
+        REVIEW_SYSTEM,
     )
 }
 

@@ -86,7 +86,9 @@ def load(prov_dir: Path, events_path: Path, source: str) -> list[Case]:
 
 def load_faults(faults_dir: Path) -> list[Case]:
     """The fault scenarios run with ``--baseline``: one directory per scenario."""
-    cases = []
+    cases: list[Case] = []
+    if not faults_dir.is_dir():
+        return cases
     for scenario in sorted(p for p in faults_dir.iterdir() if p.is_dir()):
         events = scenario / "baseline" / EVENTS_FILE
         if events.is_file():

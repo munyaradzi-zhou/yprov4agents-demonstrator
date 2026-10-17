@@ -170,6 +170,10 @@ def test_the_vocabulary_defines_nothing_the_demonstrator_cannot_emit(
         # only on a step that raised
         "yp:outcome",
         "yp:error_type",
+        # only when the model decides CAx's verdict (CAX_VERDICT=model) —
+        # experiments/model-verdict
+        "yp:verdict_source",
+        "yp:code_verdict",
     }
     #: Defined, and emitted by nothing in the demonstrator.
     library_only = {

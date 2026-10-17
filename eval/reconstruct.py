@@ -273,10 +273,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out-dir", type=Path, default=Path("out/study"))
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--offline", action="store_true", help="answer only from the cache")
+    parser.add_argument("--roles", default="ca1,ca2,ca3,cax", help="agents to include")
     parser.add_argument("--dry-run", action="store_true", help="count prompts and tokens only")
     args = parser.parse_args(argv)
 
-    cases = gather(args.reference, args.corpus, args.faults)
+    roles = {r.strip() for r in args.roles.split(",")}
+    cases = [c for c in gather(args.reference, args.corpus, args.faults) if c.role in roles]
     if args.dry_run:
         chars: dict[str, int] = defaultdict(int)
         calls: dict[str, int] = defaultdict(int)

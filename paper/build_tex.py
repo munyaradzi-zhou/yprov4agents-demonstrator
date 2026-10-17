@@ -187,8 +187,9 @@ and LangChain's own callback handler on a LangGraph port. Over 24 real yProv4ML 
 the baseline reconstructs every activity, lineage relation and verdict, yet of the 432 values
 the agents' decision rules read it saw 24, each a field of the input record. Our capture
 records each decision as a named, versioned rule applied to its inputs, so every decision
-replays from its own record and an edited verdict does not. Given what the baseline observed, gpt-4o reconstructed
-the reason for 1 of 143 decisions; an operator panel chose the cause of a decision right in
+replays from its own record and an edited verdict does not. Given what the baseline
+observed, gpt-4o reconstructed the reason for 1 of 143 decisions; an operator panel chose
+the cause of a decision right in
 53\% of trials from the baseline's record and 100\% from ours. We publish the \texttt{yp:}
 vocabulary as an OWL ontology with SHACL shapes, and bound the cost: building the record is
 equivalent to no provenance within 1\,ms, while writing it adds about a millisecond per

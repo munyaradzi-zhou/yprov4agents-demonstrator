@@ -15,16 +15,26 @@ the prompt's id, version and content hash come from the registry in
 come from ``runtime.llm``. Before Phase 4 the emitted graph named none of them, so the one
 step in the pipeline that was not deterministic was the one step the record could not
 account for (review findings F1 and F2).
+
+Who decides the verdict is a choice. By default code does: the summary's figures are checked
+against the graph (``cax.summary/v1``). With ``CAX_VERDICT=model`` and a model available, the
+model decides: it reviews the summary against the producer's record under the registered
+``review.system`` prompt and answers in a fixed JSON form, and ``cax.review/v1`` turns that
+answer into the verdict. The code check still runs and is recorded beside it as a second
+opinion (``yp:code_verdict``), so the record shows where the two disagree. Replay re-applies
+the rule to the model's recorded answer; it cannot re-run the model, and does not claim to.
 """
 
 from __future__ import annotations
 
+import json
+import os
 import re
 from collections.abc import Mapping
 from typing import Any
 
 from yprov4agenticai import LightweightStore
-from yprov4agenticai.prompts import ACT_SYSTEM
+from yprov4agenticai.prompts import ACT_SYSTEM, REVIEW_SYSTEM
 from yprov4agenticai.rules import Rule, Scalar
 
 from ..base_agent import StreamingAgent
@@ -56,6 +66,54 @@ def _summary_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
 
 
 SUMMARY_RULE = Rule("cax.summary/v1", _summary_rule)
+
+#: The issues a review may name. Anything else is an answer the rule cannot read.
+REVIEW_ISSUES = ("none", "unsupported_specific", "contradiction")
+
+#: Longest piece of a model's answer kept as a rule input. The full answer is an entity.
+_EVIDENCE_CHARS = 200
+
+
+def _review_rule(evidence: Mapping[str, Scalar]) -> dict[str, str]:
+    """The model's verdict, where the model gave a readable one; otherwise REVISE.
+
+    Fails closed: an answer that does not parse, or names a verdict or issue outside the
+    contract, cannot be acted on, and a summary nobody could review is not accepted. A
+    summary cut off by its token budget is not accepted whatever the model said of it.
+    """
+    readable = bool(evidence["review_parsed"]) and evidence["model_verdict"] in (
+        "ACCEPT",
+        "REVISE",
+    )
+    if not readable or evidence["model_issue"] not in REVIEW_ISSUES or evidence["truncated"]:
+        return {"yp:verdict": "REVISE"}
+    return {"yp:verdict": str(evidence["model_verdict"])}
+
+
+REVIEW_RULE = Rule("cax.review/v1", _review_rule)
+
+
+def verdict_by_model() -> bool:
+    """Whether the deployment asked for the model to decide (``CAX_VERDICT=model``)."""
+    return os.environ.get("CAX_VERDICT", "code").strip().lower() == "model"
+
+
+def parse_review(text: str) -> dict[str, Scalar]:
+    """The model's answer as rule inputs: what it decided, why, and whether it was readable."""
+    try:
+        start, end = text.index("{"), text.rindex("}") + 1
+        answer = json.loads(text[start:end])
+        parsed = isinstance(answer, dict)
+    except ValueError:
+        answer, parsed = {}, False
+    if not parsed:
+        answer = {}
+    return {
+        "review_parsed": parsed,
+        "model_verdict": str(answer.get("verdict", "")).strip().upper(),
+        "model_issue": str(answer.get("issue", "")).strip().lower(),
+        "model_evidence": str(answer.get("evidence", ""))[:_EVIDENCE_CHARS],
+    }
 
 
 class CAxSummariser(StreamingAgent):
@@ -193,6 +251,64 @@ class CAxSummariser(StreamingAgent):
             f"{finding}{cut} Verdict {verdict}."
         )
 
+    def _review(
+        self,
+        tracker: Any,
+        response: str,
+        summary: str,
+        doc: dict[str, Any],
+        counts: dict[str, int],
+        quality: str | None,
+    ) -> tuple[dict[str, Scalar] | None, str | None]:
+        """Ask the model for the verdict. Returns its parsed answer and the entity it made.
+
+        Without a model, the code's verdict stands and the record says nothing of a review
+        that never happened; with ``LLM_REQUIRED`` set, that is an error instead.
+        """
+        if not self.llm:
+            if llm_is_required():
+                raise RuntimeError("CAX_VERDICT=model and LLM_REQUIRED are set, but no model")
+            print("[cax] CAX_VERDICT=model but no model; the code check decides", flush=True)
+            return None, quality
+        user = (
+            f"FACTS\n{self._facts(doc, counts)}\n\n"
+            f"RECORD\n{json.dumps(doc, ensure_ascii=False, separators=(',', ':'))}\n\n"
+            f"SUMMARY\n{summary}"
+        )
+        with tracker.activity("ObservationActivity", "CAx: model reviews the summary") as prov:
+            prov.consumes(response)
+            completion = self.llm.complete(REVIEW_SYSTEM, user)
+            review = parse_review(completion.text)
+            produced = prov.produces("QualityEntity", completion.text, derived_from=response)
+            prov.note(**completion.provenance())
+        return review, produced
+
+    @staticmethod
+    def _justify_review(
+        verdict: str, inputs: Mapping[str, Scalar], code_verdict: str, ungrounded: list[str]
+    ) -> str:
+        """The model's decision in its own terms, beside what the code check found."""
+        if not inputs["review_parsed"]:
+            said = "gave an answer that could not be read, so the summary is not accepted"
+        else:
+            said = f"answered {inputs['model_verdict']} (issue: {inputs['model_issue']}"
+            said += (
+                f"; evidence: {inputs['model_evidence']})" if inputs["model_evidence"] else ")"
+            )
+        code = (
+            f"found figure(s) {', '.join(ungrounded)} unsupported"
+            if ungrounded
+            else "found no unsupported figure"
+        )
+        agreement = "agree" if code_verdict == verdict else "disagree"
+        cut = " The summary was cut off by its token budget." if inputs["truncated"] else ""
+        return (
+            f"The model reviewed the summary against the producer's record under "
+            f"{REVIEW_SYSTEM.id} v{REVIEW_SYSTEM.version} and {said}.{cut} The code check "
+            f"{code}, verdict {code_verdict}; the two {agreement}. Verdict {verdict}, as the "
+            f"model decided."
+        )
+
     def process(
         self, session_id: str, doc: dict[str, Any], source_subject: str
     ) -> tuple[dict[str, Any], str]:
@@ -249,6 +365,13 @@ class CAxSummariser(StreamingAgent):
             )
             quality = prov.generated
 
+        # S4b Review — when the deployment asks the model to decide, it reviews the summary
+        # against the producer's record. Recorded as its own step with the call's provenance,
+        # and its answer as an entity, so the decision consumes what the model said.
+        review: dict[str, Scalar] | None = None
+        if verdict_by_model():
+            review, quality = self._review(tracker, response, summary, doc, counts, quality)
+
         # S5 Decide — accept the summary, or say what is wrong with it.
         #
         # Two independent faults, so the verdict names which one applies. A truncated
@@ -260,16 +383,34 @@ class CAxSummariser(StreamingAgent):
             "ungrounded_figures": len(ungrounded),
             "truncated": truncated,
         }
-        verdict = SUMMARY_RULE.apply(evidence)["yp:verdict"]
-        tracker.decide(
-            verdict,
-            self._justify(verdict, summary, mode, counts, ungrounded, truncated=truncated),
-            label=f"CAx: {verdict.lower()} summary",
-            consumed=quality,
-            rule=SUMMARY_RULE,
-            evidence=evidence,
-            attributes={"yp:summary_mode": mode},
-        )
+        code_verdict = SUMMARY_RULE.apply(evidence)["yp:verdict"]
+        if review is None:
+            verdict = code_verdict
+            tracker.decide(
+                verdict,
+                self._justify(verdict, summary, mode, counts, ungrounded, truncated=truncated),
+                label=f"CAx: {verdict.lower()} summary",
+                consumed=quality,
+                rule=SUMMARY_RULE,
+                evidence=evidence,
+                attributes={"yp:summary_mode": mode},
+            )
+        else:
+            inputs: dict[str, Scalar] = {**review, "truncated": truncated}
+            verdict = REVIEW_RULE.apply(inputs)["yp:verdict"]
+            tracker.decide(
+                verdict,
+                self._justify_review(verdict, inputs, code_verdict, ungrounded),
+                label=f"CAx: {verdict.lower()} summary",
+                consumed=quality,
+                rule=REVIEW_RULE,
+                evidence=inputs,
+                attributes={
+                    "yp:summary_mode": mode,
+                    "yp:verdict_source": "model",
+                    "yp:code_verdict": code_verdict,
+                },
+            )
 
         # S6 Respond — hand the summary on.
         with tracker.activity("ResponseActivity", "CAx: respond") as prov:

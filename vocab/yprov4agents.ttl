@@ -245,6 +245,24 @@ yp:rule_inputs
         only inside the step, which is why a callback-level observer does not have them,
         and they are what yp:justification states in prose."""@en .
 
+yp:verdict_source
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "verdict source"@en ;
+    rdfs:comment        """Who chose the verdict, where it was not code alone: "model" when a
+        model decided and yp:rule only reads its answer. Absent when code decided, which is
+        the default and needs no saying."""@en .
+
+yp:code_verdict
+    a                   owl:DatatypeProperty ;
+    rdfs:domain         yp:DecisionActivity ;
+    rdfs:range          xsd:string ;
+    rdfs:label          "code verdict"@en ;
+    rdfs:comment        """The verdict the deterministic check would have reached, recorded
+        beside a verdict a model chose, so that a disagreement between the two is in the
+        record rather than lost."""@en .
+
 yp:verdict
     a                   owl:DatatypeProperty ;
     rdfs:domain         yp:DecisionActivity ;

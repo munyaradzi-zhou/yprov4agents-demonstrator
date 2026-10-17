@@ -100,6 +100,11 @@ def cause(case: Case) -> str:
         return "incomplete"
     if case.role == "ca1":
         return case.escalation_reason or "none"
+    if case.role == "cax" and case.rule == "cax.review/v1":
+        # The model decided: the cause is what the model objected to, read by the rule.
+        if inputs.get("truncated"):
+            return "truncated"
+        return "none" if case.verdict == "ACCEPT" else "ungrounded"
     if case.role == "cax":
         if inputs.get("ungrounded_figures"):
             return "ungrounded"
@@ -286,10 +291,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--faults", type=Path, default=Path("out/study/faults"))
     parser.add_argument("--out-dir", type=Path, default=Path("out/study"))
     parser.add_argument("--offline", action="store_true")
+    parser.add_argument("--roles", default="ca1,ca2,ca3,cax", help="agents to include")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
-    cases = gather(args.reference, args.corpus, args.faults)
+    roles = {r.strip() for r in args.roles.split(",")}
+    cases = [c for c in gather(args.reference, args.corpus, args.faults) if c.role in roles]
     if args.dry_run:
         chars = sum(
             len(_user(r, _order(c, 0), c.role)) + len(SYSTEM)
