@@ -168,15 +168,15 @@ that the gap is structural. A decision applies a rule to values it computed, and
 the step neither is identifiable: no callback, span or post-hoc query can retrieve what was
 never captured. We make the argument measurable with a reflexive multi-agent demonstrator
 (four operational agents emitting typed W3C PROV about themselves, two meta agents governing
-that output) and a deliberately generous callback-level baseline over the same run. The
-baseline reconstructs every activity, lineage relation and verdict, yet of the 36 values the
-agents' decision rules read it saw 2, both fields of the input record. Our capture records
-each decision as a named, versioned rule applied to its inputs, so every decision in the
-reference run and nine fault scenarios replays from its own record, and an edited verdict
-does not. We publish the \texttt{yp:} vocabulary as an OWL ontology with SHACL shapes, and
-measure the cost: building the record is inside every operational agent's run-to-run
-variance, justifications are 6.4\% of the records' bytes, and measured CPU energy per
-session shows no resolvable difference.
+that output), a deliberately generous callback-level baseline, a line tracer inside the step,
+and LangChain's own callback handler on a LangGraph port. Over 24 real yProv4ML training runs,
+the baseline reconstructs every activity, lineage relation and verdict, yet of the 432 values
+the agents' decision rules read it saw 24, each a field of the input record. Our capture
+records each decision as a named, versioned rule applied to its inputs, so every decision
+replays from its own record and an edited verdict does not. We publish the \texttt{yp:}
+vocabulary as an OWL ontology with SHACL shapes, and bound the cost: building the record is
+equivalent to no provenance within 1\,ms, while writing it adds about a millisecond per
+record and 16\% CPU energy per session.
 \end{abstract}
 
 \begin{IEEEkeywords}

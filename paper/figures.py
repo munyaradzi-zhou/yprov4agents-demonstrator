@@ -44,6 +44,9 @@ REFERENCE = ARCHIVES / "audit-reference"
 FAULTS = REFERENCE / "faults"
 #: Benchmark results, carried inside the reference archive.
 BENCH = REFERENCE / "bench"
+#: The agent-level study the paper's overhead claims rest on: 100 paired rounds, every
+#: sample kept, which is what lets those claims be equivalence bounds.
+OVERHEAD = ARCHIVES / "overhead-samples"
 
 #: A restrained palette that survives greyscale printing: the two emphasis colours differ
 #: in lightness as well as hue, so a reader with a monochrome printout still sees the
@@ -417,7 +420,7 @@ def figure_nine() -> None:
     """
     from eval.bench_support import RESOLVE_MULTIPLE
 
-    agents = _read(BENCH / "agent.json")["agents"]
+    agents = _read(OVERHEAD / "agent.json")["agents"]
     order = [
         label
         for label in (
@@ -443,7 +446,7 @@ def figure_nine() -> None:
         shares.append((100 * own / total, 100 * build / total, 100 * write / total))
         # The printed total is the measured median, not the sum of the segments: a build
         # cost inside the noise can measure slightly negative and is drawn as zero, so the
-        # sum would overstate the step by that amount (CAx: 7.99 ms summed, 7.94 measured).
+        # sum would overstate the step by that amount.
         totals.append(medians["B"] / 1e6)
 
         noise = row["vs_off"]["noise_ns"]

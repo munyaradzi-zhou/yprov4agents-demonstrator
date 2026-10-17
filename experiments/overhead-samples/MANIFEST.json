@@ -1,0 +1,43 @@
+{
+  "schema": "yprov4agents/experiment-manifest/2",
+  "name": "overhead-samples",
+  "note": "The agent-level overhead study at 100 interleaved repetitions per condition, every sample kept in round order (agent.json samples_ns). equivalence.json and EQUIVALENCE.md: eval.equivalence over it and over experiments/energy-session, a seeded percentile bootstrap (10,000 resamples) of the median paired difference, TOST against a 1 ms time margin.",
+  "created_at": "2026-10-17T14:49:09.061409+00:00",
+  "source": "out/overhead",
+  "git": {
+    "commit": "97ad3952a2a117a0a101c8c00bdfa077b574f14e",
+    "branch": "HEAD",
+    "describe": "v1.1.0-verdicts-45-g97ad395",
+    "dirty": false,
+    "changes": []
+  },
+  "environment": {
+    "python": "3.12.10",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840
+  },
+  "file_count": 3,
+  "total_bytes": 67094,
+  "files": [
+    {
+      "path": "agent.json",
+      "size_bytes": 58955,
+      "content_hash": "sha256:19150ed152cc5ec603d83d8bc02892072fd13e64abb1d7af76b1574fc862b1e3"
+    },
+    {
+      "path": "equivalence.json",
+      "size_bytes": 7102,
+      "content_hash": "sha256:4a504e346aab1efea68b9f7525d09a8fc2cfca831a5f2a1c63123090b7680a6d"
+    },
+    {
+      "path": "EQUIVALENCE.md",
+      "size_bytes": 1037,
+      "content_hash": "sha256:4b3d5e10f0712c1327596de8603702e5a835231f310f379a48d8319c0256a34a"
+    }
+  ]
+}

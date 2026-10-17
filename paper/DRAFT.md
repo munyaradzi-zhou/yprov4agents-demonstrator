@@ -114,6 +114,12 @@ justified and concluded; every step is typed, dated, ended and attributed; every
 something; every `yp:pid` carries a `sha256:` hash. An agent's own runtime check is tested against
 the shapes rather than trusted to match them, which has found four disagreements, each fixed.
 
+When a model chooses the verdict, the step's rule is the model call and the code that parses
+its answer: the record names the prompt by identity and hash (Section 5.4) and the parsed
+fields as inputs, replay checks the parse, and the call itself is repeatable from its record
+rather than reproducible. Every verdict evaluated here is reached in code; a model-chosen
+verdict is where this design reaches least far.
+
 **Two layers.** *Layer 1, what happened* (activities, timings, model calls, dataflow) follows
 mechanically from what a framework callback receives, and the ecosystem of Section 2.2 already
 collects it. *Layer 2, why* (the verdict and its justification) cannot be automated. The
@@ -275,21 +281,25 @@ never the reason, so it cannot tell *"storage is corrupting records"* from *"a c
 
 On our host the CPU is measured (the Windows Energy Meter Interface reads the package counter,
 tracking load from 5 W idle to 31 W saturated), while memory is a flat 10 W model. A record must
-say so per component: a sum of the two is labelled `partly-measured`, never `measured`. We first
-concluded the counter was broken; it reads zero until its first sample.
+say so per component: a sum of the two is labelled `partly-measured`, never `measured`.
 
-| CPU energy per session | OFF | B-TRANS | B |
-|---|--:|--:|--:|
-| joules | 1.43 | 1.50 | 1.72 |
-| vs OFF (margin) | baseline | +5% (0.9x) | +20% (2.3x) |
+| CPU energy per session | OFF | A | B-TRANS | B |
+|---|--:|--:|--:|--:|
+| joules (median) | 1.43 | 1.47 | 1.50 | 1.72 |
+| vs OFF, paired | | +8% | +3% | +16% |
+| 95% interval | | 0 to +15% | -5 to +9% | +9 to +22% |
 
-**Table 4.** Measured CPU energy per six-agent session, 12 interleaved rounds with idle windows
-(`experiments/energy-session`). No difference reaches 3x its spread.
+**Table 4.** Measured CPU energy per six-agent session over 12 interleaved rounds
+(`experiments/energy-session`). Differences are medians of round-wise differences, with
+percentile bootstrap intervals.
 
-Per step, energy cannot be attributed at all: at a 15 s sampling period a step that did nothing
-was charged ten times the step that rendered a chart. Each figure therefore carries
-`yp:energy_sampling_period_s` and `yp:energy_attributable`, and **energy belongs at session
-granularity**, where Table 4 measures it.
+Pairing each condition with OFF in the same round removes the drift a round shares, and resolves
+what comparing medians against their spread could not: **writing the record costs energy**, +16%
+per session, while building it is indistinguishable from not (+3%, interval -5 to +9%). The
+callback baseline costs +8% itself. Per step, energy cannot be attributed at all: at a 15 s
+sampling period a step that did nothing was charged ten times the step that rendered a chart.
+Each figure therefore carries `yp:energy_sampling_period_s` and `yp:energy_attributable`, and
+**energy belongs at session granularity**, where Table 4 measures it.
 
 ### 5.4 Model provenance
 
@@ -301,21 +311,25 @@ fingerprint, and the four calls of one run returned three fingerprints.
 
 ### 5.5 Overhead
 
-Each agent's step was timed 30 times per condition, interleaved: provenance off, built but not
-written (B-TRANS), and built and written (B); a difference counts only at 3x its spread. On two
-occasions, **building the record was inside every operational agent's run-to-run variance**
-(margins 0.0 to 0.5x). Writing it resolves for some agents, and there it dominates (Figure 3): for the worst
-case, MC1, a 109 µs step gains 38 µs to build the record and 1,485 µs to write it (+1,394%, 98%
-of it the write). Transient mode removes 89% of the time cost; metadata mode 38% of the bytes,
-keeping every justification. Recording a justification costs 54 ns against a ±726 ns spread, and
-justifications are 6.4% of the records' bytes, and a decision's rule and inputs 1.7% (added after the timing
-study, which predates them). Cost is linear (fitted exponents 1.09 and 1.13 to
-10,000 activities). Across occasions, two agents' verdicts flipped between resolved and not, so
-we quote the verdicts that held, the bytes and the complexity class, not the timings.
+Each agent's step was timed in 100 interleaved rounds under four conditions: provenance off,
+the callback baseline (A), built but not written (B-TRANS), and built and written (B)
+(`experiments/overhead-samples`). Failing to resolve a difference is not evidence of none, so
+we test equivalence: two one-sided tests at 5% against a 1 ms margin, 0.06% of the fastest
+model call in our run. **Building the record is equivalent to no provenance** for five of the
+six agents, at 48 to 81 µs; CA2's 95 ms chart render jitters by more than the margin (interval
+-1.5 to +1.4 ms), so for it equivalence can be shown neither way. **Writing the record is the
+cost**: built and written, a record adds 0.75 to 1.3 ms, and the write dominates every resolved
+overhead (Figure 3): MC1's
+79 µs step takes 1.05 ms with provenance, +1,232%, 94% of it the write. Beside a model call of
+1.7 to 4.3 s, that write is under 0.1%. Transient mode removes 89% of the time cost; metadata
+mode 38% of the bytes, keeping every justification. Justifications are 6.4% of the records'
+bytes and a decision's rule and inputs 1.7%, and cost is linear (fitted exponents 1.09 and 1.13
+to 10,000 activities).
 
 > **Figure 3.** Where the overhead is: each agent's own work, building the PROV record, and
-> writing it to disk, as shares of one record's end-to-end time, with the measured total and
-> the overhead against no provenance (CA2, inside the noise, is omitted).
+> writing it to disk, as shares of one record's end-to-end time, with the measured median and
+> the overhead against no provenance, over 100 paired rounds (CA2, inside its own jitter, is
+> omitted).
 
 ### 5.6 Verdict reachability
 
@@ -341,8 +355,9 @@ against a real framework's handler, which saw more bytes and no more of the deci
 
 Provenance can describe what an agentic system did; with automatic capture alone it cannot
 describe why, because the rule behind a decision never leaves the agent. We made that measurable
-against a generous baseline, discharged it with a vocabulary and an API whose one hand-written
-call records the decision, and found the cost to be storage rather than speed: *storage for
-explainability, not speed for explainability*. Next: an OpenTelemetry bridge for the automatic
+against a generous baseline, a line tracer and a real framework's handler; discharged it with a
+vocabulary and an API whose one hand-written call records a decision that replays from its own
+record; and found the cost to be the write, in time and in energy, while building the record is
+equivalent to not: *storage for explainability, not speed for explainability*. Next: an OpenTelemetry bridge for the automatic
 half, bounded second-level reflexivity, meta agents that act on their verdicts, and a study of
 whether justifications improve operators' decisions.
