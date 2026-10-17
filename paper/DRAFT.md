@@ -287,7 +287,7 @@ say so per component: a sum of the two is labelled `partly-measured`, never `mea
 |---|--:|--:|--:|--:|
 | joules (median) | 1.43 | 1.47 | 1.50 | 1.72 |
 | vs OFF, paired | | +8% | +3% | +16% |
-| 95% interval | | 0 to +15% | -5 to +9% | +9 to +22% |
+| 95% interval | | 0 to +15% | −5 to +9% | +9 to +22% |
 
 **Table 4.** Measured CPU energy per six-agent session over 12 interleaved rounds
 (`experiments/energy-session`). Differences are medians of round-wise differences, with
@@ -295,7 +295,7 @@ percentile bootstrap intervals.
 
 Pairing each condition with OFF in the same round removes the drift a round shares, and resolves
 what comparing medians against their spread could not: **writing the record costs energy**, +16%
-per session, while building it is indistinguishable from not (+3%, interval -5 to +9%). The
+per session, while building it is indistinguishable from not (+3%, interval −5 to +9%). The
 callback baseline costs +8% itself. Per step, energy cannot be attributed at all: at a 15 s
 sampling period a step that did nothing was charged ten times the step that rendered a chart.
 Each figure therefore carries `yp:energy_sampling_period_s` and `yp:energy_attributable`, and
@@ -317,7 +317,7 @@ the callback baseline (A), built but not written (B-TRANS), and built and writte
 we test equivalence: two one-sided tests at 5% against a 1 ms margin, 0.06% of the fastest
 model call in our run. **Building the record is equivalent to no provenance** for five of the
 six agents, at 48 to 81 µs; CA2's 95 ms chart render jitters by more than the margin (interval
--1.5 to +1.4 ms), so for it equivalence can be shown neither way. **Writing the record is the
+−1.5 to +1.4 ms), so for it equivalence can be shown neither way. **Writing the record is the
 cost**: built and written, a record adds 0.75 to 1.3 ms, and the write dominates every resolved
 overhead (Figure 3): MC1's
 79 µs step takes 1.05 ms with provenance, +1,232%, 94% of it the write. Beside a model call of
