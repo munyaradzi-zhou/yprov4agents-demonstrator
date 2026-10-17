@@ -40,9 +40,12 @@ the same run, which recovers every activity, relation and verdict, we show that 
 agent *computed* in order to decide, and the rule that combined them, are unrecoverable from
 outside the step.
 **C2: a reflexive multi-agent architecture.** Four operational agents emit typed PROV about
-themselves; two meta agents govern that output, to a depth bounded by design.
-**C3: the `yp:` vocabulary**, published as an OWL ontology with SHACL shapes, and an API whose
-one hand-written call records the decision. We also measure the cost, in time and in energy.
+themselves; two meta agents govern that output, to a depth bounded by design. Governance is
+where capture pays first: a compliance agent can check that every decision is justified and
+replayable only because the record says why, and over the baseline's record it has nothing to
+check. **C3: the `yp:` vocabulary**, published as an OWL ontology with SHACL shapes, and an API
+whose one hand-written call records a decision that replays from its own record. We bound the
+cost, in time and in energy.
 
 ## 2. Background and State of the Art
 
