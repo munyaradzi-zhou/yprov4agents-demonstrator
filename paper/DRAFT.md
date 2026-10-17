@@ -42,8 +42,8 @@ outside the step.
 **C2: a reflexive multi-agent architecture.** Four operational agents emit typed PROV about
 themselves; two meta agents govern that output, to a depth bounded by design. Governance is
 where capture pays first: a compliance agent can check that every decision is justified and
-replayable only because the record says why, and over the baseline's record it has nothing to
-check. **C3: the `yp:` vocabulary**, published as an OWL ontology with SHACL shapes, and an API
+replayable only because the record says why; run over the baseline's 24 records, it fails all
+24. **C3: the `yp:` vocabulary**, published as an OWL ontology with SHACL shapes, and an API
 whose one hand-written call records a decision that replays from its own record. We bound the
 cost, in time and in energy.
 
