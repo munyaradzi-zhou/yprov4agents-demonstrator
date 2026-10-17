@@ -128,11 +128,11 @@ tracker.decide(verdict="REVISE",             # the hand-written line
 
 \noindent A producer replays real yProv4ML records over a provenance bus (NATS) to four operational agents, which do work and emit typed PROV about themselves; two meta agents consume \emph{that} and emit PROV in turn. There is no agent framework: the agents are bare asyncio daemons, the strongest evidence that the library is not tied to one runtime. Fig.~\ref{fig:1} shows the architecture.
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/da_architecture_wide.pdf}
+\includegraphics[width=\columnwidth]{figures/db_architecture_column.pdf}
 \caption{The demonstrator. A producer replays yProv4ML records onto the provenance bus; four operational agents do the work and emit their own PROV, which two meta agents govern. CA1 writes to yProvStore through the store's API, never over the bus.}\label{fig:1}
-\end{figure*}
+\end{figure}
 
 \begin{table}[t]
 \centering\footnotesize
@@ -167,11 +167,11 @@ MC3 Audit & rebuilds the who-did-what-when trail & COMPLETE/PARTIAL \\
 
 \noindent We compare two records of the \emph{same run}. The callback baseline (A) is a handler we built, fed every step event a framework handler receives; it is an upper bound, because its events carry the structural facts the explicit instrumentation declared. Explicit capture (B) is our record. Fig.~\ref{fig:2} compares the two over the 24 records.
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/f5_a_versus_b.pdf}
+\includegraphics[width=\columnwidth]{figures/f5_a_versus_b.pdf}
 \caption{Callback baseline (A, with a ten-rule type map) against explicit capture (B), signal by signal over the 24 records. A recovers every activity, relation and verdict; it types no entity, carries no pointer and recovers no justification.}\label{fig:2}
-\end{figure*}
+\end{figure}
 
 \noindent Structure is recoverable, and so are the verdicts, scraped from node labels, which a graph naming its decision node \texttt{decide} would defeat. No justification appears verbatim in the 12,425 characters A observed, but a run-time sentence rarely survives verbatim, so we ask instead about the values each decision's rule read, which the record names (Table~\ref{tab:3}).
 
@@ -262,11 +262,11 @@ vs OFF, paired &  & +8\% & +3\% & +16\% \\
 
 \noindent Each agent's step was timed in 100 interleaved rounds under four conditions: provenance off, the callback baseline (A), built but not written (B-TRANS), and built and written (B) (\texttt{experiments/\allowbreak{}overhead-samples}). Failing to resolve a difference is not evidence of none, so we test equivalence: two one-sided tests at 5\% against a 1 ms margin, 0.06\% of the fastest model call in our run. \textbf{Building the record is equivalent to no provenance} for five of the six agents, at 48 to 81 \textmu{}s; CA2's 95 ms chart render jitters by more than the margin (interval $-$1.5 to +1.4 ms), so for it equivalence can be shown neither way. \textbf{Writing the record is the cost}: built and written, a record adds 0.75 to 1.3 ms, and the write dominates every resolved overhead (Fig.~\ref{fig:3}): MC1's 79 \textmu{}s step takes 1.05 ms with provenance, +1,232\%, 94\% of it the write. Beside a model call of 1.7 to 4.3 s, that write is under 0.1\%. Transient mode removes 89\% of the time cost; metadata mode 38\% of the bytes, keeping every justification. Justifications are 6.4\% of the records' bytes and a decision's rule and inputs 1.7\%, and cost is linear (fitted exponents 1.09 and 1.13 to 10,000 activities).
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/f9_where_the_overhead_is.pdf}
+\includegraphics[width=\columnwidth]{figures/f9_where_the_overhead_is.pdf}
 \caption{Where the overhead is: each agent's own work, building the PROV record, and writing it to disk, as shares of one record's end-to-end time, with the measured median and the overhead against no provenance, over 100 paired rounds (CA2, inside its own jitter, is omitted).}\label{fig:3}
-\end{figure*}
+\end{figure}
 
 \subsection{Verdict reachability}\label{sec:5.7}
 

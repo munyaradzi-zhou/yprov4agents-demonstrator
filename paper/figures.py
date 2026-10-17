@@ -339,66 +339,76 @@ def figure_five() -> None:
     b_values = [b.get(key, 0) for key, _, _ in rows]
     highlight = [flag for _, _, flag in rows]
 
-    fig, ax = plt.subplots(figsize=(6.6, 3.1))
-    positions = range(len(rows))
-    width = 0.38
-    ax.bar(
-        [p - width / 2 for p in positions],
+    # One IEEE column (3.5 in). Horizontal, so the seven labels read without rotation,
+    # with the counts at the bar ends and the one row that matters in colour.
+    fig, ax = plt.subplots(figsize=(3.45, 2.75))
+    positions = list(range(len(rows)))
+    height = 0.38
+    ax.barh(
+        [p - height / 2 for p in positions],
         a_values,
-        width,
-        label="Strategy A: callback handler",
+        height,
+        label="A: callback handler",
         color=LIGHT,
         edgecolor=MUTED,
-        linewidth=0.8,
+        linewidth=0.7,
     )
-    ax.bar(
-        [p + width / 2 for p in positions],
+    ax.barh(
+        [p + height / 2 for p in positions],
         b_values,
-        width,
-        label="Strategy B: explicit capture",
+        height,
+        label="B: explicit capture",
         color=[ACCENT if flag else "#aab6e4" for flag in highlight],
         edgecolor=ACCENT,
-        linewidth=0.8,
+        linewidth=0.7,
     )
+    span = max(b_values)
     for position, (value_a, value_b, flag) in enumerate(
         zip(a_values, b_values, highlight, strict=True)
     ):
         ax.text(
-            position - width / 2,
-            value_a + 6,
+            value_a + span * 0.015,
+            position - height / 2,
             str(value_a),
-            ha="center",
-            fontsize=7.5,
+            va="center",
+            fontsize=6.8,
             color=WARN if flag else MUTED,
             weight="bold" if flag else "normal",
         )
         ax.text(
-            position + width / 2,
-            value_b + 6,
+            value_b + span * 0.015,
+            position + height / 2,
             str(value_b),
-            ha="center",
-            fontsize=7.5,
+            va="center",
+            fontsize=6.8,
             color=ACCENT,
         )
-
-    ax.set_xticks(list(positions))
-    ax.set_xticklabels(labels, rotation=18, ha="right")
-    ax.set_ylabel("count across 24 emitted records")
-    ax.set_ylim(0, max(b_values) * 1.18)
-    ax.spines[["top", "right"]].set_visible(False)
-    ax.legend(frameon=False, loc="upper right")
-
-    # The cliff, named where it happens.
-    ax.annotate(
-        f"0 of {b['justifications']}\nno justification recovered",
-        xy=(len(rows) - 1 - width / 2, 4),
-        xytext=(len(rows) - 2.5, max(b_values) * 0.42),
-        fontsize=8,
-        color=WARN,
-        ha="center",
-        arrowprops={"arrowstyle": "-|>", "color": WARN, "linewidth": 1.0},
+    ax.set_yticks(positions)
+    ax.set_yticklabels(labels, fontsize=7.5)
+    ax.invert_yaxis()
+    ax.set_xlim(0, span * 1.16)
+    ax.set_xlabel("count across 24 emitted records", fontsize=7.5)
+    ax.tick_params(axis="x", labelsize=7)
+    ax.tick_params(axis="y", length=0)
+    ax.spines[["top", "right", "left"]].set_visible(False)
+    ax.legend(
+        frameon=False,
+        fontsize=7,
+        loc="upper center",
+        bbox_to_anchor=(0.42, -0.2),
+        ncol=2,
+        handlelength=1.2,
+        columnspacing=1.0,
     )
-    ax.set_title("A recovers the structure; it cannot recover the reasoning", pad=8, color=INK)
+    ax.annotate(
+        f"0 of {b['justifications']}: no reason recovered",
+        xy=(span * 0.02, len(rows) - 1 - height / 2),
+        xytext=(span * 0.30, len(rows) - 1.75),
+        fontsize=7,
+        color=WARN,
+        va="center",
+        arrowprops={"arrowstyle": "-|>", "color": WARN, "linewidth": 0.9},
+    )
     _save(fig, "f5_a_versus_b")
 
 
@@ -459,28 +469,23 @@ def figure_nine() -> None:
             )
         )
 
-    fig, ax = plt.subplots(figsize=(6.8, 2.9))
+    # One IEEE column (3.5 in). The measured total and the overhead move into each row's
+    # label, which leaves the full width to the bars.
+    fig, ax = plt.subplots(figsize=(3.45, 2.35))
     positions = list(range(len(order)))
     own_s = [s[0] for s in shares]
     build_s = [s[1] for s in shares]
     write_s = [s[2] for s in shares]
 
-    ax.barh(
-        positions,
-        own_s,
-        color=LIGHT,
-        edgecolor=MUTED,
-        linewidth=0.8,
-        label="the agent's own work",
-    )
+    ax.barh(positions, own_s, color=LIGHT, edgecolor=MUTED, linewidth=0.7, label="own work")
     ax.barh(
         positions,
         build_s,
         left=own_s,
         color="#aab6e4",
         edgecolor=ACCENT,
-        linewidth=0.8,
-        label="building the PROV record",
+        linewidth=0.7,
+        label="building the record",
     )
     ax.barh(
         positions,
@@ -488,46 +493,29 @@ def figure_nine() -> None:
         left=[o + b for o, b in zip(own_s, build_s, strict=True)],
         color=WARN,
         edgecolor=WARN,
-        linewidth=0.8,
-        label="writing it to disk",
+        linewidth=0.7,
+        label="writing it",
     )
-
-    for position, (total, (note, resolved)) in enumerate(zip(totals, notes, strict=True)):
-        ax.text(
-            102,
-            position,
-            f"{total:.2f} ms      {note}",
-            va="center",
-            fontsize=7.8,
-            color=INK if resolved else MUTED,
-            weight="bold" if resolved else "normal",
-        )
-
+    labels = [
+        f"{label.split(' (')[0]}\n{total:.2f} ms, {note}"
+        for label, total, (note, _) in zip(order, totals, notes, strict=True)
+    ]
     ax.set_yticks(positions)
-    ax.set_yticklabels([label.split(" (")[0] for label in order])
+    ax.set_yticklabels(labels, fontsize=6.8, linespacing=1.15)
     ax.invert_yaxis()
     ax.set_xlim(0, 100)
-    ax.set_xlabel("share of the time one record takes, end to end (%)")
-    ax.spines[["top", "right", "left"]].set_visible(False)
+    ax.set_xlabel("share of one record's end-to-end time (%)", fontsize=7.5)
+    ax.tick_params(axis="x", labelsize=7)
     ax.tick_params(axis="y", length=0)
+    ax.spines[["top", "right", "left"]].set_visible(False)
     ax.legend(
         frameon=False,
-        fontsize=7.8,
+        fontsize=7,
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.32),
+        bbox_to_anchor=(0.36, -0.24),
         ncol=3,
-    )
-    # The title states only what held on every occasion measured. It used to add "and for
-    # every agent that does real work it is unresolvable" — typed in, not read from the
-    # data — and a later occasion drew CA3 and CAx resolved directly beneath it: they sit
-    # at the 3x threshold and fall on either side of it between occasions. Per-agent
-    # verdicts belong in the annotations, which are computed.
-    ax.set_title(
-        "building the record is a sliver of every bar; the cost is writing it to disk",
-        pad=10,
-        fontsize=9,
-        color=INK,
-        loc="left",
+        handlelength=1.2,
+        columnspacing=0.9,
     )
     _save(fig, "f9_where_the_overhead_is")
 

@@ -28,10 +28,10 @@ PAPER = Path(__file__).resolve().parent
 DRAFT = PAPER / "DRAFT.md"
 OUT = PAPER / "tex"
 
-#: Figure number in the draft -> rendered file. Drawn ~6.8 in wide, so it spans both
-#: columns: scaled to one column, its text would be unreadable at print size.
+#: Figure number in the draft -> rendered file. Each is drawn at one IEEE column (about
+#: 3.45 in), so it sits in a column at its natural size and its text stays readable.
 FIGURES = {
-    "1": "da_architecture_wide",
+    "1": "db_architecture_column",
     "2": "f5_a_versus_b",
     "3": "f9_where_the_overhead_is",
 }
@@ -350,11 +350,11 @@ def _figure(lines: list[str]) -> str:
     number, caption = match.groups()
     return "\n".join(
         [
-            r"\begin{figure*}[t]",
+            r"\begin{figure}[t]",
             r"\centering",
-            f"\\includegraphics[width=\\textwidth]{{figures/{FIGURES[number]}.pdf}}",
+            f"\\includegraphics[width=\\columnwidth]{{figures/{FIGURES[number]}.pdf}}",
             f"\\caption{{{inline(caption)}}}\\label{{fig:{number}}}",
-            r"\end{figure*}",
+            r"\end{figure}",
         ]
     )
 
