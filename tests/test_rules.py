@@ -16,7 +16,7 @@ from typing import Any
 
 import pytest
 
-from eval.replay import input_visibility, renderings
+from eval.replay import input_visibility, renderings, session_of
 from runtime.agents.ca1_storage import PERSIST_RULE
 from runtime.agents.ca3_analytics import TIMING_RULE, CA3Analytics, timing_evidence
 from yprov4agenticai import ProvTracker
@@ -144,9 +144,17 @@ def test_input_visibility_separates_checks_unset_values_and_searchable_ones() ->
     act = _decision(doc)
     act["yp:rule_inputs"] = canonical({"ok": False, "gap": 5.049196, "median": None, "n": 12})
     act["yp:justification"] = "gap 5.049s"
-    tally = input_visibility([(Path("x__ca3_prov.json"), doc)], ["wall clock 12 s"])["ca3"]
+    haystacks = {"x": "wall clock 12 s", "y": "a different run, 12 epochs"}
+    tally = input_visibility([(Path("x__ca3_prov.json"), doc)], haystacks)["ca3"]
     assert (tally.inputs, tally.tests, tally.unset, tally.searchable) == (4, 1, 1, 2)
     assert (tally.seen_by_a, tally.stated) == (1, 1)
+    # The 12 is also in a run it has nothing to do with: a match a search makes by chance.
+    assert tally.seen_by_chance == 1
+
+
+def test_sessions_are_named_as_the_handler_names_them() -> None:
+    assert session_of(Path("example_0__ca3_prov.json")) == "example_0"
+    assert session_of(Path("example_0__ca3__mc1_prov.json")) == "example_0::ca3-mc1"
 
 
 # ── the run ───────────────────────────────────────────────────────────────────────

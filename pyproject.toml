@@ -41,6 +41,12 @@ eval = [
 energy = [
     "codecarbon>=2.5,<4",
 ]
+# A real agent framework, for the baseline that observes the agents the way a deployment
+# would: LangGraph nodes, observed through LangChain's own callback handler. Only the
+# framework-baseline experiment needs it, so nothing else pays for its dependency tree.
+frameworks = [
+    "langgraph>=0.6,<2",
+]
 dev = [
     "pytest>=8.2,<9",
     "pytest-cov>=5.0,<7",
@@ -134,6 +140,11 @@ show_error_codes = true
 [[tool.mypy.overrides]]
 # Third-party packages without bundled type information.
 module = ["nats.*", "prov.*", "matplotlib.*", "codecarbon.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Installed only with the `frameworks` extra, which the type-check job does not install.
+module = ["langgraph.*", "langchain_core.*"]
 ignore_missing_imports = true
 
 # ──────────────────────────────────────────────────────────────────────────────────

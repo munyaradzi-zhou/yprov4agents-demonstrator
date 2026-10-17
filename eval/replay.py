@@ -12,10 +12,16 @@ reason). A justification is a sentence and can say anything; a replayed verdict 
 *What did the decision read, and who could see it?* The fact-level measure in
 :mod:`eval.baseline` extracts facts from justification text with a regex, which makes the
 ground truth a matter of pattern design. Rule inputs are the ground truth the code itself
-declares. For each one, this asks whether the callback handler saw its value anywhere, and
-whether the justification states it. Booleans are reported apart: ``true`` is not a fact a
-text search can attribute to one test rather than another, so they are neither counted as
-seen nor as unseen.
+declares. For each one, this asks whether the callback handler saw its value in what it
+observed of the same session, and whether the justification states it. Booleans are reported
+apart: ``true`` is not a fact a text search can attribute to one test rather than another, so
+they are neither counted as seen nor as unseen.
+
+A text search matches by chance as well as by knowledge, and the larger the haystack the
+more it matches: a handler shown a whole input record sees a 0 or an 11 somewhere in it
+whatever the decision computed. So each value is also searched for in another session's
+observations, where it can only match by chance, and the difference is what the handler
+learned.
 """
 
 from __future__ import annotations
@@ -41,9 +47,7 @@ from yprov4agenticai.rules import replay
 
 from .baseline import (
     AGENT_ROLES,
-    DEFAULT_TYPE_MAP,
     EVENTS_FILE,
-    CallbackLogger,
     _visible,
     read_events,
     role_of,
@@ -60,6 +64,7 @@ class InputVisibility:
     unset: int = 0  # inputs with no value (a statistic that was not defined)
     searchable: int = 0
     seen_by_a: int = 0
+    seen_by_chance: int = 0  # found in another session's observations instead
     stated: int = 0  # searchable inputs the justification states
 
 
@@ -87,12 +92,37 @@ def _found(value: Any, haystack: str) -> bool:
     return any(_visible(form, haystack) for form in renderings(value))
 
 
+def session_of(path: Path) -> str:
+    """The observed session a record belongs to, as the handler names it.
+
+    ``example_0__ca3_prov.json`` is session ``example_0``; a meta agent's record of it,
+    ``example_0__ca3__mc1_prov.json``, is ``example_0::ca3-mc1``.
+    """
+    parts = path.name.removesuffix("_prov.json").split("__")
+    return parts[0] if len(parts) < 3 else f"{parts[0]}::{parts[1]}-{parts[2]}"
+
+
+def _controls(sessions: list[str]) -> dict[str, str]:
+    """Each session's control: the next session of the same kind, in a fixed order."""
+    controls = {}
+    for meta in (False, True):
+        kind = sorted(s for s in sessions if ("::" in s) == meta)
+        for index, session in enumerate(kind):
+            if len(kind) > 1:
+                controls[session] = kind[(index + 1) % len(kind)]
+    return controls
+
+
 def input_visibility(
-    named: Iterable[tuple[Path, dict[str, Any]]], payloads: list[str]
+    named: Iterable[tuple[Path, dict[str, Any]]], haystacks: dict[str, str]
 ) -> dict[str, InputVisibility]:
-    haystack = "\n".join(payloads)
+    """Per agent, the rule inputs its decisions read, against each session's observations."""
+    controls = _controls(list(haystacks))
     out: dict[str, InputVisibility] = defaultdict(InputVisibility)
     for path, doc in named:
+        session = session_of(path)
+        own = haystacks.get(session, "")
+        control = haystacks.get(controls.get(session, ""), "")
         for activity in (doc.get("activity") or {}).values():
             if not activity.get("yp:rule"):
                 continue
@@ -107,7 +137,8 @@ def input_visibility(
                     tally.unset += 1
                 else:
                     tally.searchable += 1
-                    tally.seen_by_a += _found(value, haystack)
+                    tally.seen_by_a += _found(value, own)
+                    tally.seen_by_chance += _found(value, control)
                     tally.stated += _found(value, justification)
     order = {role: index for index, role in enumerate(AGENT_ROLES)}
     return dict(sorted(out.items(), key=lambda item: (order.get(item[0], 99), item[0])))
@@ -128,13 +159,39 @@ def run(prov_dir: Path, baseline_dir: Path | None) -> dict[str, Any]:
     }
     events = (baseline_dir or prov_dir / "baseline") / EVENTS_FILE
     if events.is_file():
-        # The same visible world eval.baseline searches: the mapped handler's payloads.
-        logger = CallbackLogger.from_events(read_events(events), type_map=DEFAULT_TYPE_MAP)
-        payloads = logger.observed_payloads()
+        # The same visible world eval.baseline searches (every event's inputs, outputs and
+        # name), kept per session so a value is looked for where it could have been seen.
+        observed: dict[str, list[str]] = defaultdict(list)
+        for event in read_events(events):
+            observed[event.session] += [*event.inputs, *event.outputs, event.name]
+        haystacks = {session: "\n".join(texts) for session, texts in observed.items()}
         report["inputs"] = {
-            role: asdict(tally) for role, tally in input_visibility(named, payloads).items()
+            role: asdict(tally) for role, tally in input_visibility(named, haystacks).items()
         }
     return report
+
+
+def render_inputs(inputs: dict[str, dict[str, int]]) -> str:
+    """The rule-input table: per agent, what its rules read and who could see it."""
+    lines = [
+        "| Agent | Decisions | Rule inputs | Checks (bool) | Searchable | Seen by A "
+        "| By chance | Stated in justification |",
+        "|---|--:|--:|--:|--:|--:|--:|--:|",
+    ]
+    total = InputVisibility()
+    for role, tally in inputs.items():
+        lines.append(
+            f"| {role} | {tally['decisions']} | {tally['inputs']} | {tally['tests']} | "
+            f"{tally['searchable']} | {tally['seen_by_a']} | {tally['seen_by_chance']} | "
+            f"{tally['stated']} |"
+        )
+        for key, value in tally.items():
+            setattr(total, key, getattr(total, key) + value)
+    lines.append(
+        f"| **all** | {total.decisions} | {total.inputs} | {total.tests} | "
+        f"{total.searchable} | {total.seen_by_a} | {total.seen_by_chance} | {total.stated} |"
+    )
+    return "\n".join(lines)
 
 
 def render(report: dict[str, Any]) -> str:
@@ -144,26 +201,8 @@ def render(report: dict[str, Any]) -> str:
         f"from their own yp:rule and yp:rule_inputs "
         f"({', '.join(f'{k}: {v}' for k, v in sorted(report['replay'].items()))}).",
     ]
-    inputs = report.get("inputs")
-    if inputs:
-        lines += [
-            "",
-            "| Agent | Decisions | Rule inputs | Checks (bool) | Searchable | Seen by A "
-            "| Stated in justification |",
-            "|---|--:|--:|--:|--:|--:|--:|",
-        ]
-        total = InputVisibility()
-        for role, tally in inputs.items():
-            lines.append(
-                f"| {role} | {tally['decisions']} | {tally['inputs']} | {tally['tests']} | "
-                f"{tally['searchable']} | {tally['seen_by_a']} | {tally['stated']} |"
-            )
-            for key, value in tally.items():
-                setattr(total, key, getattr(total, key) + value)
-        lines.append(
-            f"| **all** | {total.decisions} | {total.inputs} | {total.tests} | "
-            f"{total.searchable} | {total.seen_by_a} | {total.stated} |"
-        )
+    if report.get("inputs"):
+        lines += ["", render_inputs(report["inputs"])]
     return "\n".join(lines)
 
 
