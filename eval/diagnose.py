@@ -274,13 +274,37 @@ def render(summary: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def gather(reference: Path, corpus: Path, faults: Path) -> list[Case]:
+def gather(
+    reference: Path, corpus: Path, faults: Path, per_scenario: int | None = None
+) -> list[Case]:
+    """The cases: the reference run, a fixed corpus sample, and the fault runs.
+
+    ``per_scenario`` keeps a fixed sample of that many runs from each fault directory that
+    holds several (eval.review_faults writes 24 per kind); None keeps them all.
+    """
+    fault_cases = load_faults(faults)
+    if per_scenario is not None:
+        by_scenario: dict[str, list[Case]] = defaultdict(list)
+        for case in fault_cases:
+            by_scenario[case.case_id.split("/")[1]].append(case)
+        rng = random.Random(SEED)
+        fault_cases = [
+            case
+            for name in sorted(by_scenario)
+            for case in sorted(
+                rng.sample(
+                    sorted(by_scenario[name], key=lambda c: c.case_id),
+                    min(per_scenario, len(by_scenario[name])),
+                ),
+                key=lambda c: c.case_id,
+            )
+        ]
     return (
         load(reference, reference / "baseline" / "_events.json", "reference")
         + stratified(
             load(corpus, corpus / "baseline" / "_events.json", "corpus"), CORPUS_PER_ROLE, SEED
         )
-        + load_faults(faults)
+        + fault_cases
     )
 
 
@@ -289,6 +313,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--reference", type=Path, default=Path("experiments/decision-replay"))
     parser.add_argument("--corpus", type=Path, default=Path("experiments/corpus-24"))
     parser.add_argument("--faults", type=Path, default=Path("out/study/faults"))
+    parser.add_argument(
+        "--per-scenario",
+        type=int,
+        default=None,
+        help="sample this many runs per fault directory",
+    )
     parser.add_argument("--out-dir", type=Path, default=Path("out/study"))
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--roles", default="ca1,ca2,ca3,cax", help="agents to include")
@@ -296,7 +326,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     roles = {r.strip() for r in args.roles.split(",")}
-    cases = [c for c in gather(args.reference, args.corpus, args.faults) if c.role in roles]
+    every = gather(args.reference, args.corpus, args.faults, args.per_scenario)
+    cases = [c for c in every if c.role in roles]
     if args.dry_run:
         chars = sum(
             len(_user(r, _order(c, 0), c.role)) + len(SYSTEM)
