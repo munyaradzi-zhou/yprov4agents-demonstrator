@@ -40,8 +40,8 @@
 \begin{abstract}
 Provenance tooling can record what an agentic AI system did; it cannot record why. We argue
 that this gap is structural: the facts a decision used may cross a step boundary, but the rule
-that combined them into a verdict is a local computation, and no callback, span or post-hoc
-query can retrieve what was never captured. We make the argument measurable with a reflexive
+that combined them into a verdict is a local computation, and from outside the step it is not
+identifiable: no callback, span or post-hoc query can retrieve what was never captured. We make the argument measurable with a reflexive
 multi-agent demonstrator (four operational agents emitting typed W3C PROV about themselves
 and two meta agents governing that output) and a deliberately generous callback-level
 baseline over the same run. The baseline reconstructs every activity, all 324 relations and
@@ -60,13 +60,11 @@ provenance, W3C PROV, agentic AI, explainability, multi-agent systems, SHACL
 
 \noindent Scientific computing infrastructure is acquiring autonomous agents: they summarise runs, judge results and decide what to archive, increasingly without a human in the loop. The provenance community has a mature answer to \emph{what} such a system did. W3C PROV~\cite{provdm} describes activities, entities and the lineage between them, and capturing that lineage automatically is routine. It has almost no answer to \emph{why}. When a storage agent declines to archive a record, an operator, an auditor and, under the EU AI Act~\cite{euaiact}, a regulator need the reason, not the outcome.
 
-\noindent We argue that this gap is \textbf{structural, not a matter of tooling}:
+\noindent We argue that this gap is \textbf{structural, not a matter of tooling}, and state it precisely. A decision step receives inputs $x$, computes intermediate values $z = g(x)$, and returns a verdict $v = r(x, z)$. We call $z$ the \emph{computed facts} and $r$ the \emph{decision rule}. A \emph{boundary observer} (a callback that fires after the step returns, a span that wraps it, a query that reads the store afterwards) sees only what crosses the step's interface: $x$ where it is passed, $v$, and whatever the step chooses to emit.
 
-\begin{quote}
-The rationale for a decision is a local computation at the moment of decision. A callback fires after the function returns; a span wraps the call; a query reads the store afterwards. Each may see the facts the decision used. None can retrieve the rule that combined them into a verdict, because that rule was never a value anything passed.
-\end{quote}
+\noindent \textbf{Proposition 1.} From a boundary observer's record, $z$ is recoverable only by re-running $g$, which the record does not contain, and $r$ is not identifiable: any rule $r'$ with $r'(x, g(x)) = v$ explains the observation equally well, and a two-valued verdict tells the observer one bit about $r$ per decision.
 
-\noindent We call this \textbf{capture, not retrieve}, and make three contributions. \textbf{C1: the argument, measured.} Against a deliberately generous callback-level baseline over the same run, which recovers every activity, relation and verdict, we show that the facts an agent \emph{computed} in order to decide, and the rule that combined them, are unrecoverable. \textbf{C2: a reflexive multi-agent architecture.} Four operational agents emit typed PROV about themselves; two meta agents govern that output, to a depth bounded by design. \textbf{C3: the \texttt{yp:\allowbreak{}} vocabulary}, published as an OWL ontology with SHACL shapes, and an API whose one hand-written call records the decision. We also measure the cost, in time and in energy.
+\noindent Retrieving the reason is therefore an identification problem without a unique answer, and only the step itself holds both $z$ and the branch of $r$ it took. An observer \emph{inside} the step, such as a line tracer, sees both, but that is capture by other means, not retrieval; Section~\ref{sec:5.2} measures what it recovers and costs. We call this \textbf{capture, not retrieve}, and make three contributions. \textbf{C1: the argument, measured.} Against a deliberately generous callback-level baseline over the same run, which recovers every activity, relation and verdict, we show that the facts an agent \emph{computed} in order to decide, and the rule that combined them, are unrecoverable from outside the step. \textbf{C2: a reflexive multi-agent architecture.} Four operational agents emit typed PROV about themselves; two meta agents govern that output, to a depth bounded by design. \textbf{C3: the \texttt{yp:\allowbreak{}} vocabulary}, published as an OWL ontology with SHACL shapes, and an API whose one hand-written call records the decision. We also measure the cost, in time and in energy.
 
 \section{Background and State of the Art}\label{sec:2}
 

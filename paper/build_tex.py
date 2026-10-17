@@ -167,8 +167,8 @@ FRONT_MATTER = r"""\documentclass[conference]{IEEEtran}
 \begin{abstract}
 Provenance tooling can record what an agentic AI system did; it cannot record why. We argue
 that this gap is structural: the facts a decision used may cross a step boundary, but the rule
-that combined them into a verdict is a local computation, and no callback, span or post-hoc
-query can retrieve what was never captured. We make the argument measurable with a reflexive
+that combined them into a verdict is a local computation, and from outside the step it is not
+identifiable: no callback, span or post-hoc query can retrieve what was never captured. We make the argument measurable with a reflexive
 multi-agent demonstrator (four operational agents emitting typed W3C PROV about themselves
 and two meta agents governing that output) and a deliberately generous callback-level
 baseline over the same run. The baseline reconstructs every activity, all 324 relations and
@@ -224,6 +224,13 @@ def inline(text: str) -> str:
         return f"\x00{len(spans) - 1}\x00"
 
     text = re.sub(r"`([^`]+)`", hold, text)
+
+    # Inline math passes through untouched, held like code so escaping cannot reach it.
+    def math(match: re.Match[str]) -> str:
+        spans.append(match.group(0))
+        return f"\x00{len(spans) - 1}\x00"
+
+    text = re.sub(r"\$[^$]+\$", math, text)
     cites: list[str] = []
 
     def cite(match: re.Match[str]) -> str:

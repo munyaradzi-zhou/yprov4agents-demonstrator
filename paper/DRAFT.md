@@ -18,17 +18,27 @@ routine. It has almost no answer to *why*. When a storage agent declines to arch
 operator, an auditor and, under the EU AI Act [@euaiact], a regulator need the reason, not the
 outcome.
 
-We argue that this gap is **structural, not a matter of tooling**:
+We argue that this gap is **structural, not a matter of tooling**, and state it precisely. A
+decision step receives inputs $x$, computes intermediate values $z = g(x)$, and returns a verdict
+$v = r(x, z)$. We call $z$ the *computed facts* and $r$ the *decision rule*. A *boundary
+observer* (a callback that fires after the step returns, a span that wraps it, a query that
+reads the store afterwards) sees only what crosses the step's interface: $x$ where it is passed,
+$v$, and whatever the step chooses to emit.
 
-> The rationale for a decision is a local computation at the moment of decision. A callback
-> fires after the function returns; a span wraps the call; a query reads the store afterwards.
-> Each may see the facts the decision used. None can retrieve the rule that combined them into a
-> verdict, because that rule was never a value anything passed.
+**Proposition 1.** From a boundary observer's record, $z$ is recoverable only by re-running $g$,
+which the record does not contain, and $r$ is not identifiable: any rule $r'$ with
+$r'(x, g(x)) = v$ explains the observation equally well, and a two-valued verdict tells the observer one bit
+about $r$ per decision.
 
-We call this **capture, not retrieve**, and make three contributions.
+Retrieving the reason is therefore an identification problem without a unique answer, and only
+the step itself holds both $z$ and the branch of $r$ it took. An observer *inside* the step, such
+as a line tracer, sees both, but that is capture by other means, not retrieval; Section 5.2
+measures what it recovers and costs. We call this **capture, not retrieve**, and make three
+contributions.
 **C1: the argument, measured.** Against a deliberately generous callback-level baseline over
 the same run, which recovers every activity, relation and verdict, we show that the facts an
-agent *computed* in order to decide, and the rule that combined them, are unrecoverable.
+agent *computed* in order to decide, and the rule that combined them, are unrecoverable from
+outside the step.
 **C2: a reflexive multi-agent architecture.** Four operational agents emit typed PROV about
 themselves; two meta agents govern that output, to a depth bounded by design.
 **C3: the `yp:` vocabulary**, published as an OWL ontology with SHACL shapes, and an API whose
