@@ -237,7 +237,7 @@ again an input run's wall clock, while the prose-fact measure rose to 75%: the m
 carries, the more of the prose an observer can match, and the less that says about the
 decision. The corpus also found what two records could not: CAx read the digits inside run
 names as asserted figures and said REVISE on half the runs, and CA3 found a 1.0 s stall before
-the first epoch of every run, 83 to 84% of its wall clock. The first was a defect, now fixed;
+the first epoch of every run, 74 to 87% of its wall clock. The first was a defect, now fixed;
 the second is a finding about the producer.
 
 **Replay.** All 24 decisions replay, as do all 288 on the corpus and the nine of the fault scenarios, which between
