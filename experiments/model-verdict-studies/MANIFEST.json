@@ -1,0 +1,53 @@
+{
+  "schema": "yprov4agents/experiment-manifest/2",
+  "name": "model-verdict-studies",
+  "note": "The reconstruction and operator studies over CAx's model-decided verdicts in experiments/model-verdict (reference, corpus, planted; --roles cax). Reconstruction: all 122 decisions, gpt-4o-2024-08-06. Operators: 32 cases (2 reference, 6 corpus, 6 per planted kind; --per-scenario 6), gpt-4o and gpt-4o-mini, 3 option orders. cache.tar.gz holds every request and response; extract to <out-dir>/cache and rerun with --offline against the experiments/model-verdict directories at this commit.",
+  "created_at": "2026-10-17T20:10:07.559553+00:00",
+  "source": "out/mvs",
+  "git": {
+    "commit": "2bec7608b94e31d5e4daa0063d6dc4f32a8bd528",
+    "branch": "HEAD",
+    "describe": "v1.1.0-verdicts-58-g2bec760",
+    "dirty": false,
+    "changes": []
+  },
+  "environment": {
+    "python": "3.12.10",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840
+  },
+  "file_count": 5,
+  "total_bytes": 2408741,
+  "files": [
+    {
+      "path": "cache.tar.gz",
+      "size_bytes": 1506703,
+      "content_hash": "sha256:79fece80baa638bca1493fefbc252f33bb3632a1518019009129a7daf9d0160c"
+    },
+    {
+      "path": "diagnose.json",
+      "size_bytes": 273194,
+      "content_hash": "sha256:dd676dc34fbd92c94a6aa90a897af0c8bd3d21f34867befbe2d4be9f3f2d6a0f"
+    },
+    {
+      "path": "DIAGNOSE.md",
+      "size_bytes": 767,
+      "content_hash": "sha256:fd464e975a7652cbb90eae000973240b5b374a1eb44509cbea383888ee2476d4"
+    },
+    {
+      "path": "reconstruct.json",
+      "size_bytes": 627741,
+      "content_hash": "sha256:490848ce4f6f440e4d93a447a2800ead1987b39d7895f67978fcbad158b2859b"
+    },
+    {
+      "path": "RECONSTRUCT.md",
+      "size_bytes": 336,
+      "content_hash": "sha256:e8e9e946a36dd127f08d28836f8080c8d05e33044a65c4d8ab4974711d29f9e5"
+    }
+  ]
+}

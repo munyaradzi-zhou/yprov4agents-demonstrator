@@ -302,6 +302,14 @@ invented small figure ("4 GPUs") or name ("trained on ImageNet"), which the code
 see, the model said REVISE and the code ACCEPT in all 48. Recording both is what makes that
 disagreement a fact in the record rather than a property of whichever check happened to run.
 
+Here the boundary moves, and it moves as Proposition 1 says it should. The model's answer is
+a message its step passes on, so the callback sees it: from the trace alone, gpt-4o rebuilt
+the reason for all 72 REVISE verdicts, and operators diagnosed model-decided verdicts as well
+from A as from B (192 of 192 trials each; `experiments/model-verdict-studies`). A reason that
+crosses the step's interface is retrievable, whoever wrote it. What capture adds there is
+not visibility but accountability: the verdict bound to the answer by a rule that replays,
+and a record that keeps the model's reason when no handler is attached.
+
 **Inside the step.** A line tracer is the observer Proposition 1 leaves out, so we built one:
 `sys.settrace` over the agents' own frames, keeping each change to a scalar local, on the same
 agents and producer record as the overhead study (`experiments/line-tracer`). It holds 7 of the
@@ -431,7 +439,9 @@ Provenance can describe what an agentic system did; with automatic capture alone
 describe why, because the rule behind a decision never leaves the agent. We made that measurable
 against a generous baseline, a line tracer and a real framework's handler; discharged it with a
 vocabulary and an API whose one hand-written call records a decision that replays from its own
-record; and found the cost to be the write, in time and in energy, while building the record is
+record; showed that a model's own stated reason crosses the boundary and is visible to a
+callback, so capture matters most for reasons computed in code; and found the cost to be the
+write, in time and in energy, while building the record is
 equivalent to not: *storage for explainability, not speed for explainability*. Next: an OpenTelemetry bridge for the automatic
 half, bounded second-level reflexivity, meta agents that act on their verdicts, and the
 operator study repeated with people.
