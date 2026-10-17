@@ -15,8 +15,8 @@ results and decide what to archive, increasingly without a human in the loop. Th
 community has a mature answer to *what* such a system did. W3C PROV [@provdm] describes
 activities, entities and the lineage between them, and capturing that lineage automatically is
 routine. It has almost no answer to *why*. When a storage agent declines to archive a record, an
-operator, an auditor and, under the EU AI Act [@euaiact], a regulator need the reason, not the
-outcome.
+operator, an auditor and, under the record-keeping and explanation duties of the EU AI Act
+(Articles 12 and 86) [@euaiact], a regulator need the reason, not the outcome.
 
 We argue that this gap is **structural, not a matter of tooling**, and state it precisely. A
 decision step receives inputs $x$, computes intermediate values $z = g(x)$, and returns a verdict
@@ -58,6 +58,8 @@ whole-system provenance from the operating system, CamFlow emitting W3C PROV-JSO
 schema, and the yProv family (yProv4ML [@yprov4ml] for training runs, yProv4WFs for workflows)
 in W3C PROV. Surveys of the field [@freire2008; @herschel2017] classify provenance by *what* it
 records and *how* it is captured; across all of them, what is recorded is an observable event.
+Plans enter PROV through P-Plan [@pplan], which links an execution to the plan that guided it,
+but a plan is a prescription made before the run, not a reason computed during it.
 Our demonstrator consumes real yProv4ML records, and every system above could, in principle,
 observe the agents we build. None could observe their reasoning.
 
@@ -70,14 +72,21 @@ OpenLLMetry [@openllmetry], Langfuse [@langfuse] and LangSmith [@langsmith], whi
 completions, tool calls, latencies and token counts. This layer is built for debugging and cost
 attribution. It does not model W3C PROV, and the only rationale it can hold is text a model
 happened to emit. PROV-AGENT [@provagent] is the closest prior work: it extends PROV to agentic
-workflows and makes agents and their model calls first-class provenance subjects: a richer
-*what*, with no field for the reason behind a decision.
+workflows and makes agents, their tool calls and their model interactions first-class provenance
+subjects, captured automatically through the Model Context Protocol: a richer *what*, with no
+term for the rule behind a decision.
 
 ### 2.3 Rationale, explanation and accountability
 
+Decision provenance [@singh2019] argues that accountability needs data flow traced across the
+systems that feed and act on an automated decision; it frames the need, and our record is one
+way to meet it inside the decision itself. Explanation has been modelled as a resource in its
+own right, notably by the Explanation Ontology [@chari2020], and agent research has explained
+belief-desire-intention agents by the beliefs, goals and values behind an action [@winikoff2022].
+Both describe what an explanation should contain; neither records it at the moment of decision.
 Interpretability research asks how a model reaches outputs [@doshivelez2017], and documentation
-practice, such as model cards [@modelcards] and datasheets [@datasheets], records how artifacts were made.
-Two results bear directly on agents. A model's stated chain of thought is not necessarily
+practice, such as model cards [@modelcards] and datasheets [@datasheets], records how artifacts
+were made. Two results bear directly on agents. A model's stated chain of thought is not necessarily
 faithful to the process that produced its answer [@turpin2023; @lanham2023], so text a model emits
 is weak evidence of the rule an agent applied. And proposals for the oversight of deployed agents
 call for exactly the per-action visibility (identifiers, activity logs, the basis of
@@ -88,15 +97,17 @@ in Section 5.3.
 
 | Approach | W3C PROV | Automatic | Agent-aware | Decision rule |
 |---|:-:|:-:|:-:|:-:|
-| Script, workflow and system capture | yes | yes | no | no |
-| ML lifecycle trackers | partly | yes | no | no |
-| LLM and agent observability | no | yes | yes | no |
-| PROV-AGENT | yes | yes | yes | no |
-| This work | yes | partly | yes | **yes** |
+| Script and system capture [@noworkflow; @spade; @camflow] | CamFlow | yes | no | no |
+| ML trackers [@mlflow; @yprov4ml] | yProv4ML | yes | no | no |
+| LLM observability [@otelgenai; @langsmith] | no | yes | yes | no |
+| PROV-AGENT [@provagent] | yes | yes | yes | no |
+| This work | yes | but one call | yes | **replayable** |
 
-**Table 1.** The state of the technology. "Decision rule" means the reason an agent's code reached
-its verdict, as opposed to model text that may describe one. Our capture is automatic except for
-that one field.
+**Table 1.** The state of the technology. *W3C PROV*: emits PROV (where only some members of a
+class do, the column names them). *Automatic*: recorded without code written for the purpose.
+*Agent-aware*: models agents and their steps as such. *Decision rule*: records the rule and the
+values an agent's code applied to reach its verdict, as opposed to model text that may describe
+one. Our capture is automatic except for the one call that records the decision.
 
 **Our position is to ride the automatic layer rather than compete with it**: consume what it
 collects, and add the one thing it structurally cannot.

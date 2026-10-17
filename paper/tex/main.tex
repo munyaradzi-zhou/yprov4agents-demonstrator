@@ -58,7 +58,7 @@ provenance, W3C PROV, agentic AI, explainability, multi-agent systems, SHACL
 
 \section{Introduction}\label{sec:1}
 
-\noindent Scientific computing infrastructure is acquiring autonomous agents: they summarise runs, judge results and decide what to archive, increasingly without a human in the loop. The provenance community has a mature answer to \emph{what} such a system did. W3C PROV~\cite{provdm} describes activities, entities and the lineage between them, and capturing that lineage automatically is routine. It has almost no answer to \emph{why}. When a storage agent declines to archive a record, an operator, an auditor and, under the EU AI Act~\cite{euaiact}, a regulator need the reason, not the outcome.
+\noindent Scientific computing infrastructure is acquiring autonomous agents: they summarise runs, judge results and decide what to archive, increasingly without a human in the loop. The provenance community has a mature answer to \emph{what} such a system did. W3C PROV~\cite{provdm} describes activities, entities and the lineage between them, and capturing that lineage automatically is routine. It has almost no answer to \emph{why}. When a storage agent declines to archive a record, an operator, an auditor and, under the record-keeping and explanation duties of the EU AI Act (Articles 12 and 86)~\cite{euaiact}, a regulator need the reason, not the outcome.
 
 \noindent We argue that this gap is \textbf{structural, not a matter of tooling}, and state it precisely. A decision step receives inputs $x$, computes intermediate values $z = g(x)$, and returns a verdict $v = r(x, z)$. We call $z$ the \emph{computed facts} and $r$ the \emph{decision rule}. A \emph{boundary observer} (a callback that fires after the step returns, a span that wraps it, a query that reads the store afterwards) sees only what crosses the step's interface: $x$ where it is passed, $v$, and whatever the step chooses to emit.
 
@@ -70,28 +70,28 @@ provenance, W3C PROV, agentic AI, explainability, multi-agent systems, SHACL
 
 \subsection{Provenance models and capture systems}\label{sec:2.1}
 
-\noindent W3C PROV~\cite{provdm,provo} models provenance as entities, activities and agents linked by a small set of relations; it is deliberately domain-neutral, and says nothing about rationale. Capture systems differ in where they observe. \emph{Script and workflow} tools (noWorkflow~\cite{noworkflow} for Python scripts, YesWorkflow~\cite{yesworkflow} for annotated workflows) recover lineage from code and execution. \emph{System-level} collectors such as SPADE~\cite{spade} and CamFlow~\cite{camflow} capture whole-system provenance from the operating system, CamFlow emitting W3C PROV-JSON directly. \emph{Machine-learning} trackers record runs, parameters and artifacts: MLflow~\cite{mlflow} with its own schema, and the yProv family (yProv4ML~\cite{yprov4ml} for training runs, yProv4WFs for workflows) in W3C PROV. Surveys of the field~\cite{freire2008,herschel2017} classify provenance by \emph{what} it records and \emph{how} it is captured; across all of them, what is recorded is an observable event. Our demonstrator consumes real yProv4ML records, and every system above could, in principle, observe the agents we build. None could observe their reasoning.
+\noindent W3C PROV~\cite{provdm,provo} models provenance as entities, activities and agents linked by a small set of relations; it is deliberately domain-neutral, and says nothing about rationale. Capture systems differ in where they observe. \emph{Script and workflow} tools (noWorkflow~\cite{noworkflow} for Python scripts, YesWorkflow~\cite{yesworkflow} for annotated workflows) recover lineage from code and execution. \emph{System-level} collectors such as SPADE~\cite{spade} and CamFlow~\cite{camflow} capture whole-system provenance from the operating system, CamFlow emitting W3C PROV-JSON directly. \emph{Machine-learning} trackers record runs, parameters and artifacts: MLflow~\cite{mlflow} with its own schema, and the yProv family (yProv4ML~\cite{yprov4ml} for training runs, yProv4WFs for workflows) in W3C PROV. Surveys of the field~\cite{freire2008,herschel2017} classify provenance by \emph{what} it records and \emph{how} it is captured; across all of them, what is recorded is an observable event. Plans enter PROV through P-Plan~\cite{pplan}, which links an execution to the plan that guided it, but a plan is a prescription made before the run, not a reason computed during it. Our demonstrator consumes real yProv4ML records, and every system above could, in principle, observe the agents we build. None could observe their reasoning.
 
 \subsection{Agents, and the observability built for them}\label{sec:2.2}
 
-\noindent Agent frameworks interleave reasoning and tool use~\cite{react} and compose agents into multi-agent systems~\cite{autogen,langgraph}. Their runs are observed by a fast-maturing layer: OpenTelemetry's semantic conventions for generative AI~\cite{otelgenai}, and tracing platforms such as OpenLLMetry~\cite{openllmetry}, Langfuse~\cite{langfuse} and LangSmith~\cite{langsmith}, which record prompts, completions, tool calls, latencies and token counts. This layer is built for debugging and cost attribution. It does not model W3C PROV, and the only rationale it can hold is text a model happened to emit. PROV-AGENT~\cite{provagent} is the closest prior work: it extends PROV to agentic workflows and makes agents and their model calls first-class provenance subjects: a richer \emph{what}, with no field for the reason behind a decision.
+\noindent Agent frameworks interleave reasoning and tool use~\cite{react} and compose agents into multi-agent systems~\cite{autogen,langgraph}. Their runs are observed by a fast-maturing layer: OpenTelemetry's semantic conventions for generative AI~\cite{otelgenai}, and tracing platforms such as OpenLLMetry~\cite{openllmetry}, Langfuse~\cite{langfuse} and LangSmith~\cite{langsmith}, which record prompts, completions, tool calls, latencies and token counts. This layer is built for debugging and cost attribution. It does not model W3C PROV, and the only rationale it can hold is text a model happened to emit. PROV-AGENT~\cite{provagent} is the closest prior work: it extends PROV to agentic workflows and makes agents, their tool calls and their model interactions first-class provenance subjects, captured automatically through the Model Context Protocol: a richer \emph{what}, with no term for the rule behind a decision.
 
 \subsection{Rationale, explanation and accountability}\label{sec:2.3}
 
-\noindent Interpretability research asks how a model reaches outputs~\cite{doshivelez2017}, and documentation practice, such as model cards~\cite{modelcards} and datasheets~\cite{datasheets}, records how artifacts were made. Two results bear directly on agents. A model's stated chain of thought is not necessarily faithful to the process that produced its answer~\cite{turpin2023,lanham2023}, so text a model emits is weak evidence of the rule an agent applied. And proposals for the oversight of deployed agents call for exactly the per-action visibility (identifiers, activity logs, the basis of decisions) that a provenance record could carry~\cite{chan2024}. Energy is the third concern of the field: reporting it for ML workloads is now expected~\cite{strubell2019,henderson2020}, usually through sampling tools such as CodeCarbon~\cite{codecarbon}, whose limits for short steps we revisit in Section~\ref{sec:5.3}.
+\noindent Decision provenance~\cite{singh2019} argues that accountability needs data flow traced across the systems that feed and act on an automated decision; it frames the need, and our record is one way to meet it inside the decision itself. Explanation has been modelled as a resource in its own right, notably by the Explanation Ontology~\cite{chari2020}, and agent research has explained belief-desire-intention agents by the beliefs, goals and values behind an action~\cite{winikoff2022}. Both describe what an explanation should contain; neither records it at the moment of decision. Interpretability research asks how a model reaches outputs~\cite{doshivelez2017}, and documentation practice, such as model cards~\cite{modelcards} and datasheets~\cite{datasheets}, records how artifacts were made. Two results bear directly on agents. A model's stated chain of thought is not necessarily faithful to the process that produced its answer~\cite{turpin2023,lanham2023}, so text a model emits is weak evidence of the rule an agent applied. And proposals for the oversight of deployed agents call for exactly the per-action visibility (identifiers, activity logs, the basis of decisions) that a provenance record could carry~\cite{chan2024}. Energy is the third concern of the field: reporting it for ML workloads is now expected~\cite{strubell2019,henderson2020}, usually through sampling tools such as CodeCarbon~\cite{codecarbon}, whose limits for short steps we revisit in Section~\ref{sec:5.3}.
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{The state of the technology. ``Decision rule'' means the reason an agent's code reached its verdict, as opposed to model text that may describe one. Our capture is automatic except for that one field.}\label{tab:1}
+\caption{The state of the technology. \emph{W3C PROV}: emits PROV (where only some members of a class do, the column names them). \emph{Automatic}: recorded without code written for the purpose. \emph{Agent-aware}: models agents and their steps as such. \emph{Decision rule}: records the rule and the values an agent's code applied to reach its verdict, as opposed to model text that may describe one. Our capture is automatic except for the one call that records the decision.}\label{tab:1}
 \begin{tabularx}{\columnwidth}{Lcccc}
 \toprule
 Approach & W3C PROV & Automatic & Agent-aware & Decision rule \\
 \midrule
-Script, workflow and system capture & yes & yes & no & no \\
-ML lifecycle trackers & partly & yes & no & no \\
-LLM and agent observability & no & yes & yes & no \\
-PROV-AGENT & yes & yes & yes & no \\
-This work & yes & partly & yes & \textbf{yes} \\
+Script and system capture~\cite{noworkflow,spade,camflow} & CamFlow & yes & no & no \\
+ML trackers~\cite{mlflow,yprov4ml} & yProv4ML & yes & no & no \\
+LLM observability~\cite{otelgenai,langsmith} & no & yes & yes & no \\
+PROV-AGENT~\cite{provagent} & yes & yes & yes & no \\
+This work & yes & but one call & yes & \textbf{replayable} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -247,7 +247,7 @@ vs OFF, paired &  & +8\% & +3\% & +16\% \\
 
 \noindent Provenance can describe what an agentic system did; with automatic capture alone it cannot describe why, because the rule behind a decision never leaves the agent. We made that measurable against a generous baseline, a line tracer and a real framework's handler; discharged it with a vocabulary and an API whose one hand-written call records a decision that replays from its own record; and found the cost to be the write, in time and in energy, while building the record is equivalent to not: \emph{storage for explainability, not speed for explainability}. Next: an OpenTelemetry bridge for the automatic half, bounded second-level reflexivity, meta agents that act on their verdicts, and a study of whether justifications improve operators' decisions.
 
-\begin{thebibliography}{30}
+\begin{thebibliography}{34}
 \bibitem{provdm} L.~Moreau and P.~Missier, Eds., ``PROV-DM: The PROV data model,'' W3C Recommendation, Apr. 2013.
 \bibitem{euaiact} European Parliament and Council, ``Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (Artificial Intelligence Act),'' \emph{Official Journal of the European Union}, 2024.
 \bibitem{provo} T.~Lebo, S.~Sahoo, and D.~McGuinness, Eds., ``PROV-O: The PROV ontology,'' W3C Recommendation, Apr. 2013.
@@ -256,9 +256,10 @@ vs OFF, paired &  & +8\% & +3\% & +16\% \\
 \bibitem{spade} A.~Gehani and D.~Tariq, ``SPADE: Support for provenance auditing in distributed environments,'' in \emph{Proc. ACM/IFIP/USENIX Middleware}, 2012, pp. 101--120.
 \bibitem{camflow} T.~Pasquier \emph{et al.}, ``Practical whole-system provenance capture,'' in \emph{Proc. ACM Symp. Cloud Computing (SoCC)}, 2017, pp. 405--418.
 \bibitem{mlflow} M.~Zaharia \emph{et al.}, ``Accelerating the machine learning lifecycle with MLflow,'' \emph{IEEE Data Eng. Bull.}, vol.~41, no.~4, pp. 39--45, 2018.
-\bibitem{yprov4ml} G.~Padovani, V.~Anantharaj, and S.~Fiore, ``yProv4ML: Effortless provenance tracking for machine learning systems,'' arXiv preprint, 2025.  % VERIFY
+\bibitem{yprov4ml} G.~Padovani, V.~Anantharaj, and S.~Fiore, ``yProv4ML: Effortless provenance tracking for machine learning systems,'' \emph{SoftwareX}, vol.~31, art.~102298, 2025.
 \bibitem{freire2008} J.~Freire, D.~Koop, E.~Santos, and C.~T. Silva, ``Provenance for computational tasks: A survey,'' \emph{Computing in Science \& Engineering}, vol.~10, no.~3, pp. 11--21, 2008.
 \bibitem{herschel2017} M.~Herschel, R.~Diestelk\"{a}mper, and H.~Ben~Lahmar, ``A survey on provenance: What for? What form? What from?'' \emph{The VLDB Journal}, vol.~26, no.~6, pp. 881--906, 2017.
+\bibitem{pplan} D.~Garijo and Y.~Gil, ``Augmenting PROV with plans in P-PLAN: Scientific processes as linked data,'' in \emph{Proc. 2nd Int. Workshop Linked Science (LISC)}, CEUR Workshop Proceedings, vol.~951, 2012.
 \bibitem{react} S.~Yao \emph{et al.}, ``ReAct: Synergizing reasoning and acting in language models,'' in \emph{Proc. Int. Conf. Learning Representations (ICLR)}, 2023.
 \bibitem{autogen} Q.~Wu \emph{et al.}, ``AutoGen: Enabling next-gen LLM applications via multi-agent conversation,'' arXiv:2308.08155, 2023.
 \bibitem{langgraph} LangChain, ``LangGraph,'' 2024. [Online]. Available: \url{https://github.com/langchain-ai/langgraph}
@@ -266,7 +267,10 @@ vs OFF, paired &  & +8\% & +3\% & +16\% \\
 \bibitem{openllmetry} Traceloop, ``OpenLLMetry,'' 2025. [Online]. Available: \url{https://github.com/traceloop/openllmetry}
 \bibitem{langfuse} Langfuse, ``Langfuse: Open-source LLM engineering platform,'' 2025. [Online]. Available: \url{https://langfuse.com}
 \bibitem{langsmith} LangChain, ``LangSmith,'' 2025. [Online]. Available: \url{https://www.langchain.com/langsmith}
-\bibitem{provagent} R.~Souza \emph{et al.}, ``PROV-AGENT: Unified provenance for tracking AI agent interactions in agentic workflows,'' arXiv preprint, 2025.  % VERIFY
+\bibitem{provagent} R.~Souza \emph{et al.}, ``PROV-AGENT: Unified provenance for tracking AI agent interactions in agentic workflows,'' in \emph{Proc. IEEE 21st Int. Conf. e-Science}, 2025, pp. 467--473.
+\bibitem{singh2019} J.~Singh, J.~Cobbe, and C.~Norval, ``Decision provenance: Harnessing data flow for accountable systems,'' \emph{IEEE Access}, vol.~7, pp. 6562--6574, 2019.
+\bibitem{chari2020} S.~Chari \emph{et al.}, ``Explanation ontology: A model of explanations for user-centered AI,'' in \emph{Proc. Int. Semantic Web Conf. (ISWC)}, LNCS, vol.~12507, 2020, pp. 228--243.  % VERIFY pages
+\bibitem{winikoff2022} M.~Winikoff, G.~Sidorenko, V.~Dignum, and F.~Dignum, ``Why bad coffee? Explaining BDI agent behaviour with valuings (extended abstract),'' in \emph{Proc. Int. Joint Conf. Artificial Intelligence (IJCAI)}, 2022, pp. 5782--5786.
 \bibitem{doshivelez2017} F.~Doshi-Velez and B.~Kim, ``Towards a rigorous science of interpretable machine learning,'' arXiv:1702.08608, 2017.
 \bibitem{modelcards} M.~Mitchell \emph{et al.}, ``Model cards for model reporting,'' in \emph{Proc. Conf. Fairness, Accountability, and Transparency (FAT*)}, 2019, pp. 220--229.
 \bibitem{datasheets} T.~Gebru \emph{et al.}, ``Datasheets for datasets,'' \emph{Commun. ACM}, vol.~64, no.~12, pp. 86--92, 2021.
@@ -275,7 +279,7 @@ vs OFF, paired &  & +8\% & +3\% & +16\% \\
 \bibitem{chan2024} A.~Chan \emph{et al.}, ``Visibility into AI agents,'' in \emph{Proc. ACM Conf. Fairness, Accountability, and Transparency (FAccT)}, 2024.
 \bibitem{strubell2019} E.~Strubell, A.~Ganesh, and A.~McCallum, ``Energy and policy considerations for deep learning in NLP,'' in \emph{Proc. ACL}, 2019, pp. 3645--3650.
 \bibitem{henderson2020} P.~Henderson \emph{et al.}, ``Towards the systematic reporting of the energy and carbon footprints of machine learning,'' \emph{J. Mach. Learn. Res.}, vol.~21, no.~248, pp. 1--43, 2020.
-\bibitem{codecarbon} CodeCarbon contributors, ``CodeCarbon,'' version 3.3.1, 2025. [Online]. Available: \url{https://github.com/mlco2/codecarbon}  % VERIFY preferred citation
+\bibitem{codecarbon} B.~Courty, V.~Schmidt, S.~Luccioni \emph{et al.}, ``mlco2/codecarbon,'' version 3.3.1, Zenodo, 2025. [Online]. Available: \url{https://github.com/mlco2/codecarbon}  % VERIFY the v3.3.1 Zenodo DOI
 \bibitem{shacl} H.~Knublauch and D.~Kontokostas, Eds., ``Shapes Constraint Language (SHACL),'' W3C Recommendation, Jul. 2017.
 \bibitem{pyshacl} RDFLib contributors, ``pySHACL,'' 2025. [Online]. Available: \url{https://github.com/RDFLib/pySHACL}
 \end{thebibliography}

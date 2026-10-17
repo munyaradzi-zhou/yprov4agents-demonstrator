@@ -62,7 +62,8 @@ REFERENCES = {
     "mlflow": r"M.~Zaharia \emph{et al.}, ``Accelerating the machine learning lifecycle "
     r"with MLflow,'' \emph{IEEE Data Eng. Bull.}, vol.~41, no.~4, pp. 39--45, 2018.",
     "yprov4ml": r"G.~Padovani, V.~Anantharaj, and S.~Fiore, ``yProv4ML: Effortless "
-    r"provenance tracking for machine learning systems,'' arXiv preprint, 2025.  % VERIFY",
+    r"provenance tracking for machine learning systems,'' \emph{SoftwareX}, vol.~31, "
+    r"art.~102298, 2025.",
     "freire2008": r"J.~Freire, D.~Koop, E.~Santos, and C.~T. Silva, ``Provenance for "
     r"computational tasks: A survey,'' \emph{Computing in Science \& Engineering}, vol.~10, "
     r"no.~3, pp. 11--21, 2008.",
@@ -84,7 +85,19 @@ REFERENCES = {
     "langsmith": r"LangChain, ``LangSmith,'' 2025. [Online]. Available: "
     r"\url{https://www.langchain.com/langsmith}",
     "provagent": r"R.~Souza \emph{et al.}, ``PROV-AGENT: Unified provenance for tracking AI "
-    r"agent interactions in agentic workflows,'' arXiv preprint, 2025.  % VERIFY",
+    r"agent interactions in agentic workflows,'' in \emph{Proc. IEEE 21st Int. Conf. "
+    r"e-Science}, 2025, pp. 467--473.",
+    "pplan": r"D.~Garijo and Y.~Gil, ``Augmenting PROV with plans in P-PLAN: Scientific "
+    r"processes as linked data,'' in \emph{Proc. 2nd Int. Workshop Linked Science (LISC)}, "
+    r"CEUR Workshop Proceedings, vol.~951, 2012.",
+    "singh2019": r"J.~Singh, J.~Cobbe, and C.~Norval, ``Decision provenance: Harnessing data "
+    r"flow for accountable systems,'' \emph{IEEE Access}, vol.~7, pp. 6562--6574, 2019.",
+    "chari2020": r"S.~Chari \emph{et al.}, ``Explanation ontology: A model of explanations "
+    r"for user-centered AI,'' in \emph{Proc. Int. Semantic Web Conf. (ISWC)}, LNCS, "
+    r"vol.~12507, 2020, pp. 228--243.  % VERIFY pages",
+    "winikoff2022": r"M.~Winikoff, G.~Sidorenko, V.~Dignum, and F.~Dignum, ``Why bad coffee? "
+    r"Explaining BDI agent behaviour with valuings (extended abstract),'' in \emph{Proc. "
+    r"Int. Joint Conf. Artificial Intelligence (IJCAI)}, 2022, pp. 5782--5786.",
     "doshivelez2017": r"F.~Doshi-Velez and B.~Kim, ``Towards a rigorous science of "
     r"interpretable machine learning,'' arXiv:1702.08608, 2017.",
     "modelcards": r"M.~Mitchell \emph{et al.}, ``Model cards for model reporting,'' in "
@@ -105,8 +118,9 @@ REFERENCES = {
     "henderson2020": r"P.~Henderson \emph{et al.}, ``Towards the systematic reporting of the "
     r"energy and carbon footprints of machine learning,'' \emph{J. Mach. Learn. Res.}, "
     r"vol.~21, no.~248, pp. 1--43, 2020.",
-    "codecarbon": r"CodeCarbon contributors, ``CodeCarbon,'' version 3.3.1, 2025. [Online]. "
-    r"Available: \url{https://github.com/mlco2/codecarbon}  % VERIFY preferred citation",
+    "codecarbon": r"B.~Courty, V.~Schmidt, S.~Luccioni \emph{et al.}, ``mlco2/codecarbon,'' "
+    r"version 3.3.1, Zenodo, 2025. [Online]. Available: "
+    r"\url{https://github.com/mlco2/codecarbon}  % VERIFY the v3.3.1 Zenodo DOI",
     "shacl": r"H.~Knublauch and D.~Kontokostas, Eds., ``Shapes Constraint Language "
     r"(SHACL),'' W3C Recommendation, Jul. 2017.",
     "pyshacl": r"RDFLib contributors, ``pySHACL,'' 2025. [Online]. Available: "
