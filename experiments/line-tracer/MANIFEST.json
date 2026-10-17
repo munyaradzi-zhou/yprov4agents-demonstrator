@@ -1,0 +1,38 @@
+{
+  "schema": "yprov4agents/experiment-manifest/2",
+  "name": "line-tracer",
+  "note": "Strategy T: a sys.settrace line tracer over the agents' own frames, on the producer record the overhead study uses, 30 interleaved repetitions per condition (OFF, TRACE). tracer.json holds, per agent, the rule inputs found in the trace by value and type, the distinct values traced, the trace and record sizes, and the timings. TRACER.md is the rendered table.",
+  "created_at": "2026-10-17T14:15:38.483334+00:00",
+  "source": "out/tracer",
+  "git": {
+    "commit": "f34f4f3d33734d985017204fe89a56739541e0df",
+    "branch": "HEAD",
+    "describe": "v1.1.0-verdicts-37-gf34f4f3",
+    "dirty": false,
+    "changes": []
+  },
+  "environment": {
+    "python": "3.12.10",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840
+  },
+  "file_count": 2,
+  "total_bytes": 4561,
+  "files": [
+    {
+      "path": "tracer.json",
+      "size_bytes": 4120,
+      "content_hash": "sha256:cd5cfced7e33e6c0940ddae8d268ef507d5a38b13061ab12719bc730a49300bd"
+    },
+    {
+      "path": "TRACER.md",
+      "size_bytes": 441,
+      "content_hash": "sha256:977acfdf069bcc37d06c7f256af19eb171746c36ef19b1d3fc99f051e7116987"
+    }
+  ]
+}

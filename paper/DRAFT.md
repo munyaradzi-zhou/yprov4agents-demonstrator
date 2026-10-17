@@ -237,6 +237,17 @@ fail. The prose is the weaker record: it states 10 of the 36 values its rules re
 paraphrases the rest ("all supported" for zero ungrounded figures) or omits them (a chart's byte
 count).
 
+**Inside the step.** A line tracer is the observer Proposition 1 leaves out, so we built one:
+`sys.settrace` over the agents' own frames, keeping each change to a scalar local, on the same
+agents and producer record as the overhead study (`experiments/line-tracer`). It holds 7 of the
+12 values the six rules read: CA3's five gap statistics, CA2's byte count and CA1's trigger.
+The other five (counts of failed checks, ungrounded figures and missing envelopes) were computed
+inside an expression and never assigned, so no tracer of locals sees them. The seven are among
+15 to 116 distinct values per step, with nothing to mark them as the decision's inputs or to say
+what was done with them, and tracing multiplies the step's time by 2 to 13 where building our
+record is inside the noise. Seeing inside the step yields values, not the rule, and costs more
+than recording the rule.
+
 The cost is visible in one agent. CA1 says ESCALATE for three reasons; A recovers the verdict,
 never the reason, so it cannot tell *"storage is corrupting records"* from *"a consumer is down"*.
 

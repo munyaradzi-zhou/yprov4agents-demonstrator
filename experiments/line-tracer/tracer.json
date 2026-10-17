@@ -1,0 +1,166 @@
+{
+  "level": "line-tracer",
+  "environment": {
+    "captured_at": "2026-10-17T14:15:26.675628+00:00",
+    "python": "3.12.10",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840,
+    "git_commit": "f34f4f3d33734d985017204fe89a56739541e0df",
+    "git_dirty": false,
+    "llm_involved": false,
+    "energy_backend": "off",
+    "notes": {
+      "interpreter_clean": true
+    }
+  },
+  "repetitions": 30,
+  "agents": {
+    "CA3 Analytics": {
+      "rule_inputs": 5,
+      "searchable": 5,
+      "found_in_trace": 5,
+      "found": [
+        "gap_count",
+        "largest_gap_s",
+        "median_gap_s",
+        "scale_s",
+        "wall_clock_s"
+      ],
+      "distinct_values_traced": 116,
+      "lines_traced": 1614,
+      "trace_events": 445,
+      "trace_bytes": 23790,
+      "record_bytes": 6420,
+      "median_ns": {
+        "OFF": 2952500.0,
+        "TRACE": 18624550.0
+      },
+      "dispersion_ns": {
+        "OFF": 172650.0,
+        "TRACE": 631450.0
+      },
+      "overhead_pct": 530.8060965283657,
+      "resolvable": true,
+      "repetitions": 30
+    },
+    "CA2 Metrics": {
+      "rule_inputs": 2,
+      "searchable": 2,
+      "found_in_trace": 1,
+      "found": [
+        "rendered_bytes"
+      ],
+      "distinct_values_traced": 53,
+      "lines_traced": 294,
+      "trace_events": 98,
+      "trace_bytes": 6675,
+      "record_bytes": 5248,
+      "median_ns": {
+        "OFF": 100850800.0,
+        "TRACE": 241791200.0
+      },
+      "dispersion_ns": {
+        "OFF": 4612300.0,
+        "TRACE": 14810550.0
+      },
+      "overhead_pct": 139.751395130232,
+      "resolvable": true,
+      "repetitions": 30
+    },
+    "CAx Summariser": {
+      "rule_inputs": 2,
+      "searchable": 1,
+      "found_in_trace": 0,
+      "found": [],
+      "distinct_values_traced": 36,
+      "lines_traced": 155,
+      "trace_events": 42,
+      "trace_bytes": 2160,
+      "record_bytes": 5732,
+      "median_ns": {
+        "OFF": 2582950.0,
+        "TRACE": 5248750.0
+      },
+      "dispersion_ns": {
+        "OFF": 114550.0,
+        "TRACE": 253400.0
+      },
+      "overhead_pct": 103.20757273659963,
+      "resolvable": true,
+      "repetitions": 30
+    },
+    "CA1 Storage": {
+      "rule_inputs": 4,
+      "searchable": 2,
+      "found_in_trace": 1,
+      "found": [
+        "persist_trigger"
+      ],
+      "distinct_values_traced": 15,
+      "lines_traced": 120,
+      "trace_events": 12,
+      "trace_bytes": 937,
+      "record_bytes": 5714,
+      "median_ns": {
+        "OFF": 3359950.0,
+        "TRACE": 6723200.0
+      },
+      "dispersion_ns": {
+        "OFF": 118000.0,
+        "TRACE": 185550.0
+      },
+      "overhead_pct": 100.09821574725814,
+      "resolvable": true,
+      "repetitions": 30
+    },
+    "MC1 Compliance": {
+      "rule_inputs": 1,
+      "searchable": 1,
+      "found_in_trace": 0,
+      "found": [],
+      "distinct_values_traced": 17,
+      "lines_traced": 167,
+      "trace_events": 51,
+      "trace_bytes": 2369,
+      "record_bytes": 3520,
+      "median_ns": {
+        "OFF": 95700.0,
+        "TRACE": 1268550.0
+      },
+      "dispersion_ns": {
+        "OFF": 900.0,
+        "TRACE": 5650.0
+      },
+      "overhead_pct": 1225.5485893416928,
+      "resolvable": true,
+      "repetitions": 30
+    },
+    "MC3 Audit": {
+      "rule_inputs": 1,
+      "searchable": 1,
+      "found_in_trace": 0,
+      "found": [],
+      "distinct_values_traced": 18,
+      "lines_traced": 143,
+      "trace_events": 52,
+      "trace_bytes": 2576,
+      "record_bytes": 3593,
+      "median_ns": {
+        "OFF": 94700.0,
+        "TRACE": 1088500.0
+      },
+      "dispersion_ns": {
+        "OFF": 800.0,
+        "TRACE": 7600.0
+      },
+      "overhead_pct": 1049.4192185850052,
+      "resolvable": true,
+      "repetitions": 30
+    }
+  }
+}
