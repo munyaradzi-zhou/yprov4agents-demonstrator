@@ -1,0 +1,84 @@
+[
+  {
+    "session": "fault",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T15:15:35.515502+00:00",
+    "ended_at": "2026-10-17T15:15:35.515516+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.fault"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T15:15:35.515502+00:00",
+    "ended_at": "2026-10-17T15:15:35.515506+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.fault"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T15:15:35.515502+00:00",
+    "ended_at": "2026-10-17T15:15:35.517818+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.fault"
+    ],
+    "outputs": [
+      "This run logged 4096 training steps across 512 epochs."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T15:15:35.518055+00:00",
+    "ended_at": "2026-10-17T15:15:35.518096+00:00",
+    "inputs": [
+      "This run logged 4096 training steps across 512 epochs."
+    ],
+    "outputs": [
+      "2 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T15:15:35.518055+00:00",
+    "ended_at": "2026-10-17T15:15:35.518061+00:00",
+    "inputs": [
+      "2 ungrounded figure(s)"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T15:15:35.518055+00:00",
+    "ended_at": "2026-10-17T15:15:35.518058+00:00",
+    "inputs": [
+      "This run logged 4096 training steps across 512 epochs."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]

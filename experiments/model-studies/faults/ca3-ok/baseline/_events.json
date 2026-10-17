@@ -1,0 +1,84 @@
+[
+  {
+    "session": "fault",
+    "agent": "Analytics_Agent",
+    "name": "CA3: receive provenance graph",
+    "started_at": "2026-10-17T15:15:35.531056+00:00",
+    "ended_at": "2026-10-17T15:15:35.531065+00:00",
+    "inputs": [],
+    "outputs": [
+      "provenance graph from producer.yprov4ml.fault"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Analytics_Agent",
+    "name": "CA3: select analytics algorithms",
+    "started_at": "2026-10-17T15:15:35.531056+00:00",
+    "ended_at": "2026-10-17T15:15:35.531063+00:00",
+    "inputs": [
+      "provenance graph from producer.yprov4ml.fault"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Analytics_Agent",
+    "name": "CA3: mine the provenance graph",
+    "started_at": "2026-10-17T15:15:35.531056+00:00",
+    "ended_at": "2026-10-17T15:15:35.533740+00:00",
+    "inputs": [
+      "provenance graph from producer.yprov4ml.fault"
+    ],
+    "outputs": [
+      "Provenance analytics for 'fault': 8 activities and 6 entities (100.0% typed), 0 derivations, 0 terminal entities. Wall-clock span 70.0s across 8 ordered activities. Energy streams: 2; resource streams: 2. Anomalies: 0; completeness findings: 0."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Analytics_Agent",
+    "name": "CA3: validate findings against invariants",
+    "started_at": "2026-10-17T15:15:35.532562+00:00",
+    "ended_at": "2026-10-17T15:15:35.532573+00:00",
+    "inputs": [
+      "Provenance analytics for 'fault': 8 activities and 6 entities (100.0% typed), 0 derivations, 0 terminal entities. Wall-clock span 70.0s across 8 ordered activities. Energy streams: 2; resource streams: 2. Anomalies: 0; completeness findings: 0."
+    ],
+    "outputs": [
+      "all invariants held, no completeness gaps"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Analytics_Agent",
+    "name": "CA3: OK",
+    "started_at": "2026-10-17T15:15:35.532562+00:00",
+    "ended_at": "2026-10-17T15:15:35.532568+00:00",
+    "inputs": [
+      "all invariants held, no completeness gaps"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Analytics_Agent",
+    "name": "CA3: publish analytics report",
+    "started_at": "2026-10-17T15:15:35.534110+00:00",
+    "ended_at": "2026-10-17T15:15:35.534114+00:00",
+    "inputs": [
+      "Provenance analytics for 'fault': 8 activities and 6 entities (100.0% typed), 0 derivations, 0 terminal entities. Wall-clock span 70.0s across 8 ordered activities. Energy streams: 2; resource streams: 2. Anomalies: 0; completeness findings: 0."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]

@@ -1,0 +1,1 @@
+This run logged 4096 training steps across 512 epochs.

@@ -1,0 +1,12 @@
+{
+  "log": "visualised fault -> fault_metrics.png (numeric-metrics, 6 series) [ACCEPT], PID 21.T11999/yprovstore-e432f282997d",
+  "verdict": "ACCEPT",
+  "escalation_reason": null,
+  "justification": "Plotted 6 numeric metric series read from the graph's prov:value entities. Wrote a non-empty png file to fault_metrics.png with matplotlib; deterministic, no model involved. Verdict ACCEPT.",
+  "scenario": "ca2-accept",
+  "agent": "ca2",
+  "expected": "ACCEPT",
+  "condition": "numeric-metrics",
+  "how": "a producer record that actually carries measurements, so no fallback is needed",
+  "as_expected": true
+}

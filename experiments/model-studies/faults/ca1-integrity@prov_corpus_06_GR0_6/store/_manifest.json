@@ -1,0 +1,10 @@
+{
+  "21.T11999/yprovstore-c5e2828dc006": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/study/faults/ca1-integrity%40prov_corpus_06_GR0_6/store/c5e2828dc006.txt",
+    "yp:contentHash": "sha256:c5e2828dc006e4bf3c369c1821074e43a97e19d475957ec957c8f268335838ae",
+    "size_bytes": 40127,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:57.578376\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:57.595280…",
+    "created_at": "2026-10-17T15:17:34.316890+00:00"
+  }
+}

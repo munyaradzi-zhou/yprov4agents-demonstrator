@@ -1,0 +1,12 @@
+{
+  "log": "persisted 'fault' -> 21.T11999/yprovstore-900713166a70 [ESCALATE] via timeout, acked by (none)",
+  "verdict": "ESCALATE",
+  "escalation_reason": "consumption-unconfirmed",
+  "justification": "Persisted WITHOUT confirmed consumption: timeout after 3.0s; no acknowledgement from ['ca2', 'ca3', 'cax']. Acknowledged by [none]; still waiting on [ca2, ca3, cax] when the record was archived anyway to avoid losing it. The persist-after-consume ordering was not satisfied, so this record is archived but its consumption is unconfirmed. Record carries 14 activities / 97 entities / 114 relations, 48592 bytes. Integrity: round-trip read verified; sha-256 matched. Verdict ESCALATE.",
+  "scenario": "ca1-timeout@prov_corpus_09_GR0_9",
+  "agent": "ca1",
+  "expected": "ESCALATE",
+  "condition": "consumption-unconfirmed",
+  "how": "no consumer acknowledged; the record is archived anyway, ordering forfeited",
+  "as_expected": true
+}

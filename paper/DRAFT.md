@@ -96,7 +96,7 @@ call for exactly the per-action visibility (identifiers, activity logs, the basi
 decisions) that a provenance record could carry [@chan2024]. Energy is the third concern of the
 field: reporting it for ML workloads is now expected [@strubell2019; @henderson2020], usually
 through sampling tools such as CodeCarbon [@codecarbon], whose limits for short steps we revisit
-in Section 5.3.
+in Section 5.4.
 
 | Approach | W3C PROV | Automatic | Agent-aware | Decision rule |
 |---|:-:|:-:|:-:|:-:|
@@ -129,7 +129,7 @@ something; every `yp:pid` carries a `sha256:` hash. An agent's own runtime check
 the shapes rather than trusted to match them, which has found four disagreements, each fixed.
 
 When a model chooses the verdict, the step's rule is the model call and the code that parses
-its answer: the record names the prompt by identity and hash (Section 5.4) and the parsed
+its answer: the record names the prompt by identity and hash (Section 5.5) and the parsed
 fields as inputs, replay checks the parse, and the call itself is repeatable from its record
 rather than reproducible. Every verdict evaluated here is reached in code; a model-chosen
 verdict is where this design reaches least far.
@@ -281,6 +281,18 @@ fail. The prose is the weaker record: it states 10 of the 36 values its rules re
 paraphrases the rest ("all supported" for zero ungrounded figures) or omits them (a chart's byte
 count).
 
+**A model as the observer.** The strongest retrieval is a model, so we gave gpt-4o what the
+baseline observed of 143 operational decisions from the reference, corpus and fault runs, and
+asked for the verdict, its cause and the values it depended on (`experiments/model-studies`).
+It named the verdict in 115, from the step labels, and reconstructed the recorded reason, as
+graded by a separate call, in 1. Given the agent's source code as well, it reached 30, 23 of
+them CA2's, whose REVISE has a single cause in the code. Where a verdict has several causes it
+picked one and kept it: under each condition it gave one cause for all 27 of CA1's escalations,
+right in 9, which is chance. Given the input record too, so that it could re-run the
+computation, it reconstructed none. Of the 338 values the rules read, it named 103 with the
+code, and 100 of those matched another case's reconstruction as well: constants read off the
+source.
+
 **Inside the step.** A line tracer is the observer Proposition 1 leaves out, so we built one:
 `sys.settrace` over the agents' own frames, keeping each change to a scalar local, on the same
 agents and producer record as the overhead study (`experiments/line-tracer`). It holds 7 of the
@@ -295,7 +307,40 @@ than recording the rule.
 The cost is visible in one agent. CA1 says ESCALATE for three reasons; A recovers the verdict,
 never the reason, so it cannot tell *"storage is corrupting records"* from *"a consumer is down"*.
 
-### 5.3 Energy
+### 5.3 Does the record help an operator?
+
+Whether a record helps a person needs people; whether it holds what a person would need does
+not. We asked a panel of operators, gpt-4o and gpt-4o-mini, to choose the cause of each of 71
+decisions from four statements, each implying a different response, shown either the
+baseline's record of the run (A) or ours (B), with three option orders per case. The right
+answer comes from each decision's rule and inputs. The 71 include CA1's three escalations
+nine times each, from fault scenarios repeated over the corpus.
+
+| Cause (trials per record) | A | B |
+|---|--:|--:|
+| CA1: the stored copy is corrupt (54) | 24% | 100% |
+| CA1: part of the record was lost (54) | 0% | 100% |
+| CA1: a consumer is down (54) | 13% | 100% |
+| CA2: no metrics, fallback chart (48) | 0% | 100% |
+| CA3: the run stalled (48) | 81% | 100% |
+| No fault, or an incomplete input (168) | 100% | 100% |
+| All (426) | 53% | 100% |
+
+**Table 4.** Operators choosing the cause of a decision from four, from the baseline's record
+(A) or the explicit one (B): gpt-4o and gpt-4o-mini, three option orders each
+(`experiments/model-studies`). Paired by case, model and order, B was right where A was wrong
+199 times and the reverse never (exact McNemar $p < 10^{-59}$).
+
+A's record suffices when the verdict says everything: no fault, an incomplete input, an
+ungrounded summary. Where one verdict has several causes it does not. Reading A, operators
+chose the right one of CA1's three escalation causes in 20 of 162 trials, below the one in
+three a guess would get, and every wrong answer in A, 199 of them, came with a confidence of
+0.8 or more. Reading B, they were right in all 426. B's advantage is unsurprising, since its
+justification states the cause; what the study shows is that A's record does not, and that an
+operator reading it guesses rather than says so. A panel of models is not a user study: it
+measures whether the record holds what an operator needs, not how a person would use it.
+
+### 5.4 Energy
 
 On our host the CPU is measured (the Windows Energy Meter Interface reads the package counter,
 tracking load from 5 W idle to 31 W saturated), while memory is a flat 10 W model. A record must
@@ -307,7 +352,7 @@ say so per component: a sum of the two is labelled `partly-measured`, never `mea
 | vs OFF, paired | | +8% | +3% | +16% |
 | 95% interval | | 0 to +15% | −5 to +9% | +9 to +22% |
 
-**Table 4.** Measured CPU energy per six-agent session over 12 interleaved rounds
+**Table 5.** Measured CPU energy per six-agent session over 12 interleaved rounds
 (`experiments/energy-session`). Differences are medians of round-wise differences, with
 percentile bootstrap intervals.
 
@@ -317,9 +362,9 @@ per session, while building it is indistinguishable from not (+3%, interval −5
 callback baseline costs +8% itself. Per step, energy cannot be attributed at all: at a 15 s
 sampling period a step that did nothing was charged ten times the step that rendered a chart.
 Each figure therefore carries `yp:energy_sampling_period_s` and `yp:energy_attributable`, and
-**energy belongs at session granularity**, where Table 4 measures it.
+**energy belongs at session granularity**, where Table 5 measures it.
 
-### 5.4 Model provenance
+### 5.5 Model provenance
 
 Every model-bearing step records the model, sampling parameters, prompt identity, version and
 hash, token counts, latency and a response hash (`experiments/audit-llm`: four calls, 2,071
@@ -327,7 +372,7 @@ prompt and 480 completion tokens). The model a caller names is not the one that 
 record carries the alias `gpt-4o`, the snapshot `gpt-4o-2024-08-06` and the provider's
 fingerprint, and the four calls of one run returned three fingerprints.
 
-### 5.5 Overhead
+### 5.6 Overhead
 
 Each agent's step was timed in 100 interleaved rounds under four conditions: provenance off,
 the callback baseline (A), built but not written (B-TRANS), and built and written (B)
@@ -349,7 +394,7 @@ to 10,000 activities).
 > the overhead against no provenance, over 100 paired rounds (CA2, inside its own jitter, is
 > omitted).
 
-### 5.6 Verdict reachability
+### 5.7 Verdict reachability
 
 The ordinary run reaches six of twelve two-valued verdicts; nine injected scenarios reach the
 rest, each of CA1's three escalations, and `INCOMPLETE`: all thirteen are observed. Three
@@ -360,8 +405,9 @@ which is what a compliance checker is for.
 
 ## 6. Limitations
 
-**We show that justifications exist and that the decision rule is unrecoverable, not that they
-are good**; whether they improve an operator's decisions needs a human study. The fact-level
+**We show that the decision rule is unrecoverable and that the record holds what an operator
+needs, not how people use it**: the operator study is a panel of models, and a study with
+people is the next step. The fact-level
 measure is coarse in both directions. A model-bearing step is repeatable from its record, not
 reproducible: three fingerprints in one run is a backend changing under a caller that changed
 nothing. The bus is at-most-once: numbered envelopes expose a partial loss, but a stream lost
@@ -377,5 +423,5 @@ against a generous baseline, a line tracer and a real framework's handler; disch
 vocabulary and an API whose one hand-written call records a decision that replays from its own
 record; and found the cost to be the write, in time and in energy, while building the record is
 equivalent to not: *storage for explainability, not speed for explainability*. Next: an OpenTelemetry bridge for the automatic
-half, bounded second-level reflexivity, meta agents that act on their verdicts, and a study of
-whether justifications improve operators' decisions.
+half, bounded second-level reflexivity, meta agents that act on their verdicts, and the
+operator study repeated with people.

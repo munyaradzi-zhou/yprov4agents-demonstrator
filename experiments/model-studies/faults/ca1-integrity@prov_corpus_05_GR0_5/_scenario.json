@@ -1,0 +1,12 @@
+{
+  "log": "persisted 'fault' -> 21.T11999/yprovstore-4b10c333a717 [ESCALATE] via quorum, acked by ['ca2', 'ca3', 'cax']",
+  "verdict": "ESCALATE",
+  "escalation_reason": "integrity",
+  "justification": "Persisted at quorum: all consumers acked; acknowledged by [ca2, ca3, cax], the full set required. Record carries 12 activities / 80 entities / 95 relations, 40134 bytes. Integrity: integrity check FAILED: content-hash mismatch for 21.T11999/yprovstore-4b10c333a717: sha256:150e43d664339d67b7fc710202f48637243032cffb0ea65040c1c869f1ec7d97 != sha256:4b10c333a71791095c763351a8b479c34013f9033e93ba781cf5cc58653a1d5a. Verdict ESCALATE.",
+  "scenario": "ca1-integrity@prov_corpus_05_GR0_5",
+  "agent": "ca1",
+  "expected": "ESCALATE",
+  "condition": "integrity",
+  "how": "the store writes bytes it did not hash; the round-trip read catches it",
+  "as_expected": true
+}

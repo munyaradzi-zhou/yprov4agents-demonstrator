@@ -1,0 +1,12 @@
+{
+  "log": "persisted 'fault' -> 21.T11999/yprovstore-e07172922f4f [ESCALATE] via quorum, acked by ['ca2', 'ca3', 'cax']",
+  "verdict": "ESCALATE",
+  "escalation_reason": "incomplete-input",
+  "justification": "Persisted at quorum: all consumers acked; acknowledged by [ca2, ca3, cax], the full set required. Envelope(s) 3 of the record never arrived, so what was stored is partial. Record carries 16 activities / 114 entities / 133 relations, 57234 bytes. Integrity: round-trip read verified; sha-256 matched. Verdict ESCALATE.",
+  "scenario": "ca1-incomplete@prov_corpus_23_GR0_23",
+  "agent": "ca1",
+  "expected": "ESCALATE",
+  "condition": "incomplete-input",
+  "how": "CA1's own copy lost an envelope; what arrived is stored and said to be partial",
+  "as_expected": true
+}

@@ -1,0 +1,10 @@
+{
+  "21.T11999/yprovstore-d12d1a5c6fef": {
+    "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/study/faults/ca1-incomplete%40prov_corpus_22_GR0_22/store/d12d1a5c6fef.txt",
+    "yp:contentHash": "sha256:d12d1a5c6fef6d4d9c293155208b5d3e647abcda43885187e29d37962b3bb70a",
+    "size_bytes": 56307,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:17.407069\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:17.419127…",
+    "created_at": "2026-10-17T15:17:34.578430+00:00"
+  }
+}

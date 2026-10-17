@@ -1,0 +1,82 @@
+[
+  {
+    "session": "fault",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: receive producer record",
+    "started_at": "2026-10-17T15:15:35.268585+00:00",
+    "ended_at": "2026-10-17T15:15:35.268610+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.fault"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: choose what to plot",
+    "started_at": "2026-10-17T15:15:35.268585+00:00",
+    "ended_at": "2026-10-17T15:15:35.268630+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.fault"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: render chart (matplotlib)",
+    "started_at": "2026-10-17T15:15:35.269147+00:00",
+    "ended_at": "2026-10-17T15:15:35.509698+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.fault"
+    ],
+    "outputs": [
+      "fault_metrics.png"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: confirm the chart reached disk",
+    "started_at": "2026-10-17T15:15:35.508997+00:00",
+    "ended_at": "2026-10-17T15:15:35.509128+00:00",
+    "inputs": [
+      "fault_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: accept chart",
+    "started_at": "2026-10-17T15:15:35.509998+00:00",
+    "ended_at": "2026-10-17T15:15:35.510004+00:00",
+    "inputs": [
+      "fault_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "Metrics_Visualizer",
+    "name": "Metrics: respond",
+    "started_at": "2026-10-17T15:15:35.509998+00:00",
+    "ended_at": "2026-10-17T15:15:35.510002+00:00",
+    "inputs": [
+      "fault_metrics.png"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]

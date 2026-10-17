@@ -1,0 +1,28 @@
+[
+  {
+    "session": "fault",
+    "agent": "NL_Summarizer",
+    "name": "cax: receive producer.yprov4ml.fault",
+    "started_at": "2026-10-17T15:17:34.690571+00:00",
+    "ended_at": "2026-10-17T15:17:34.690591+00:00",
+    "inputs": [],
+    "outputs": [
+      "partial stream: 5 of 6 envelopes"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "NL_Summarizer",
+    "name": "cax: incomplete input",
+    "started_at": "2026-10-17T15:17:34.690571+00:00",
+    "ended_at": "2026-10-17T15:17:34.690576+00:00",
+    "inputs": [
+      "partial stream: 5 of 6 envelopes"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]

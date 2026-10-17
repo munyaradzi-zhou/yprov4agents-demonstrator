@@ -1,0 +1,12 @@
+{
+  "log": "withheld envelope 3 of 6",
+  "verdict": "INCOMPLETE",
+  "escalation_reason": null,
+  "justification": "The input stream on producer.yprov4ml.fault declared 6 envelopes and 1 never arrived (sequence 3). The document was not processed: any output would describe an input this agent did not fully receive. Verdict INCOMPLETE.",
+  "scenario": "stream-gap@prov_corpus_05_GR0_5",
+  "agent": "cax",
+  "expected": "INCOMPLETE",
+  "condition": "envelope-lost",
+  "how": "one envelope of the input stream is lost in transport; the agent records the gap instead of processing a partial document",
+  "as_expected": true
+}

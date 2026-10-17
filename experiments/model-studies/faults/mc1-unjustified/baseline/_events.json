@@ -1,0 +1,43 @@
+[
+  {
+    "session": "fault-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: receive agent PROV",
+    "started_at": "2026-10-17T15:15:33.993714+00:00",
+    "ended_at": "2026-10-17T15:15:33.993722+00:00",
+    "inputs": [],
+    "outputs": [
+      "rogue PROV under review (fault)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: check rogue compliance",
+    "started_at": "2026-10-17T15:15:33.993714+00:00",
+    "ended_at": "2026-10-17T15:15:33.994115+00:00",
+    "inputs": [
+      "rogue PROV under review (fault)"
+    ],
+    "outputs": [
+      "1 structural failure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault-mc1",
+    "agent": "ComplianceChecker",
+    "name": "MC1: fail rogue",
+    "started_at": "2026-10-17T15:15:33.993714+00:00",
+    "ended_at": "2026-10-17T15:15:33.993720+00:00",
+    "inputs": [
+      "1 structural failure(s)"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]

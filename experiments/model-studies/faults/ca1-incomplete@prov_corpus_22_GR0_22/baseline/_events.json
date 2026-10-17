@@ -1,0 +1,84 @@
+[
+  {
+    "session": "fault",
+    "agent": "StorageAgent",
+    "name": "CA1: receive record from bus",
+    "started_at": "2026-10-17T15:17:34.576434+00:00",
+    "ended_at": "2026-10-17T15:17:34.576466+00:00",
+    "inputs": [],
+    "outputs": [
+      "provenance record 'fault' held for persistence"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "StorageAgent",
+    "name": "CA1: await consumers, plan store path",
+    "started_at": "2026-10-17T15:17:34.576434+00:00",
+    "ended_at": "2026-10-17T15:17:34.576470+00:00",
+    "inputs": [
+      "provenance record 'fault' held for persistence"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "StorageAgent",
+    "name": "CA1: write to store (backend API)",
+    "started_at": "2026-10-17T15:17:34.576434+00:00",
+    "ended_at": "2026-10-17T15:17:34.580699+00:00",
+    "inputs": [
+      "provenance record 'fault' held for persistence"
+    ],
+    "outputs": [
+      "stored provenance record for fault"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "StorageAgent",
+    "name": "CA1: verify round-trip integrity",
+    "started_at": "2026-10-17T15:17:34.580953+00:00",
+    "ended_at": "2026-10-17T15:17:34.582916+00:00",
+    "inputs": [
+      "stored provenance record for fault"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "StorageAgent",
+    "name": "CA1: escalate the stored record",
+    "started_at": "2026-10-17T15:17:34.583468+00:00",
+    "ended_at": "2026-10-17T15:17:34.583479+00:00",
+    "inputs": [
+      "stored provenance record for fault"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault",
+    "agent": "StorageAgent",
+    "name": "CA1: emit storage receipt",
+    "started_at": "2026-10-17T15:17:34.583468+00:00",
+    "ended_at": "2026-10-17T15:17:34.583481+00:00",
+    "inputs": [
+      "stored provenance record for fault"
+    ],
+    "outputs": [
+      "storage receipt 21.T11999/yprovstore-d12d1a5c6fef (sha256:d12d1a5c6fef...)"
+    ],
+    "error": null,
+    "metadata": {}
+  }
+]

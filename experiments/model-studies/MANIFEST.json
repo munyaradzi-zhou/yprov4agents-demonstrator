@@ -1,0 +1,1123 @@
+{
+  "schema": "yprov4agents/experiment-manifest/2",
+  "name": "model-studies",
+  "note": "Items 3b and 5 of paperfeedback.md, run with real gpt-4o-2024-08-06 and gpt-4o-mini-2024-07-18 calls. faults/: the fault scenarios with the baseline's events, the input-independent ones repeated over the corpus. reconstruct.json / RECONSTRUCT.md: gpt-4o reconstructs 143 operational decisions from what the callback baseline observed (trace; trace and source; trace, source and input record), scored against the record and graded by a separate judge call. diagnose.json / DIAGNOSE.md: an operator panel picks the cause of 71 decisions from the baseline's record (A) and the explicit one (B), 3 option orders x 2 models. cache.tar.gz: every request and full response (model, fingerprint, tokens); extract to out/study/cache and run either module with --offline to reproduce every number without a key.",
+  "created_at": "2026-10-17T17:05:16.172321+00:00",
+  "source": "out/study",
+  "git": {
+    "commit": "bfe51e5b79459d4c901854c0118d3995b7033d14",
+    "branch": "HEAD",
+    "describe": "v1.1.0-verdicts-53-gbfe51e5",
+    "dirty": false,
+    "changes": []
+  },
+  "environment": {
+    "python": "3.12.10",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_logical": 8,
+    "cpu_physical": 4,
+    "memory_bytes": 17015459840
+  },
+  "file_count": 219,
+  "total_bytes": 6175285,
+  "files": [
+    {
+      "path": "cache.tar.gz",
+      "size_bytes": 3008981,
+      "content_hash": "sha256:100fa99ead9c027cbc64096a51ea79dd0c214fbf4be04ce7d0470dcc50e82a72"
+    },
+    {
+      "path": "diagnose.json",
+      "size_bytes": 604813,
+      "content_hash": "sha256:8627bb847ab022fbfb5c8765a097f1608cbf31ecc917680fedf7b67b9a29362c"
+    },
+    {
+      "path": "DIAGNOSE.md",
+      "size_bytes": 1253,
+      "content_hash": "sha256:222dd06ed5eba70b5e2fc4b330ff9d10e621ffa236adf8c9ed2d342d7fd4deab"
+    },
+    {
+      "path": "faults/ca1-incomplete/_scenario.json",
+      "size_bytes": 766,
+      "content_hash": "sha256:78406fb3f50ac2fdf0bc73c9e0dfe0cfcece480f474c9839635c3771c164d35e"
+    },
+    {
+      "path": "faults/ca1-incomplete/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:c5aa2c10065b7f26590df5cbc6d2b40177dcbfe105999493c3593dd1eeb34d72"
+    },
+    {
+      "path": "faults/ca1-incomplete/fault__ca1_prov.json",
+      "size_bytes": 7320,
+      "content_hash": "sha256:37f0885af7525cf5e9310465d74d384c5d54723f8d84beed7458fe7f82638247"
+    },
+    {
+      "path": "faults/ca1-incomplete/store/_manifest.json",
+      "size_bytes": 563,
+      "content_hash": "sha256:28200bb9770f9546246b9bd26e2035f2b4e2a197b3946f2e98ab1f9aa86ed57e"
+    },
+    {
+      "path": "faults/ca1-incomplete/store/abfe4946dd38.meta.json",
+      "size_bytes": 554,
+      "content_hash": "sha256:31d467c1190c1fe0a623515c72661eab3c988a052778e0b9b336fb42ea401c4e"
+    },
+    {
+      "path": "faults/ca1-incomplete/store/abfe4946dd38.txt",
+      "size_bytes": 21634,
+      "content_hash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_16_GR0_16/_scenario.json",
+      "size_bytes": 791,
+      "content_hash": "sha256:a5b96d4537f18dbebf2dedd16727418db5cecbb711735568dac32b3daf8e7117"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_16_GR0_16/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:2bcd273d890a99cddbd9c4e59a4e9d3dc7d8e09e3841672f71055f506c756497"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_16_GR0_16/fault__ca1_prov.json",
+      "size_bytes": 7323,
+      "content_hash": "sha256:1b26e5d4a4ca1663d2a19359fbd3fc30328312d78949ca661cbe729bf10d75ca"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_16_GR0_16/store/749446894a2e.meta.json",
+      "size_bytes": 580,
+      "content_hash": "sha256:2e53422b0dc564856290983627f717b902584008cb2a3a5b4808ba44f2e48102"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_16_GR0_16/store/749446894a2e.txt",
+      "size_bytes": 57234,
+      "content_hash": "sha256:749446894a2e8cbb517184481bdfcec15022732b46f0ecc069260e0255989d78"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_16_GR0_16/store/_manifest.json",
+      "size_bytes": 589,
+      "content_hash": "sha256:efa05fa363ee3ab10f2fd3ae8fa839e2d5e8d3425688ca89ef90360d76c91bdd"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_17_GR0_17/_scenario.json",
+      "size_bytes": 791,
+      "content_hash": "sha256:879c6b68fddcedf120136334bee0afbab375fbe50df4af4138b23b69123df617"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_17_GR0_17/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:90fb2f3cf500a4ac3a6fe80d3d519b7f62350986ec3511514b0686893c6194e2"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_17_GR0_17/fault__ca1_prov.json",
+      "size_bytes": 7323,
+      "content_hash": "sha256:ad41c3d43689b93f8efad77f9f55fda564d2025e1f7e522aa70883096540bb8c"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_17_GR0_17/store/_manifest.json",
+      "size_bytes": 589,
+      "content_hash": "sha256:0df488ddb78d32146c40a5d7bdb9b08ddfbb4f2a6d29e724772665069ac2e5d9"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_17_GR0_17/store/b3a57ac2c246.meta.json",
+      "size_bytes": 580,
+      "content_hash": "sha256:21fc7150bf176297010a2e00ac66debe651735af4c69addf5f826dd0268f062c"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_17_GR0_17/store/b3a57ac2c246.txt",
+      "size_bytes": 57218,
+      "content_hash": "sha256:b3a57ac2c246a7183e10405160d8152a2b5bbc54cc444e61c48e410dfa2d93f5"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_18_GR0_18/_scenario.json",
+      "size_bytes": 791,
+      "content_hash": "sha256:cc3a8278b5163afad453375ad16821bc65f6533c0ffaaa5dd47255f978c0baab"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_18_GR0_18/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:cbe83df0eba2f81060246205576d46222f50231d3a204ebae6ded2803d5c81e6"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_18_GR0_18/fault__ca1_prov.json",
+      "size_bytes": 7323,
+      "content_hash": "sha256:de44e55d8b086e20d8a7d1cf661c5fe1de1efeb0d36ab2c1eb5c488fc5b56834"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_18_GR0_18/store/83d84f9b84ac.meta.json",
+      "size_bytes": 580,
+      "content_hash": "sha256:557c0aa4886c417f8909156cab13037a6be7e50de095c602013a5bb24fba4c58"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_18_GR0_18/store/83d84f9b84ac.txt",
+      "size_bytes": 57233,
+      "content_hash": "sha256:83d84f9b84acaaf4f5ff9ef203ddadea75319f12aabf0275ef4c4e6e13919f42"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_18_GR0_18/store/_manifest.json",
+      "size_bytes": 589,
+      "content_hash": "sha256:e8524314e73019751c3495fc569d0953729f035ab7d7614be70856e5d508617d"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_19_GR0_19/_scenario.json",
+      "size_bytes": 791,
+      "content_hash": "sha256:5c513138b471af8ccdf458ffe72439d035c3e5bda87c8f44f26523eb202a86b7"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_19_GR0_19/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:bdcbc44c449bc3f9f2f88d13bb76ba2a7bf82ca2ba899cd5ac4c7ae3e8b305bb"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_19_GR0_19/fault__ca1_prov.json",
+      "size_bytes": 7323,
+      "content_hash": "sha256:325bf9c13c064bf08929a28b74930f75168e53dbed0919b64bd1e71f585f0db8"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_19_GR0_19/store/7d81d246b992.meta.json",
+      "size_bytes": 580,
+      "content_hash": "sha256:6d3092a3bcc87acf0675b332f3601162cfb37ffee49c7f16c56dc72de89ae2a0"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_19_GR0_19/store/7d81d246b992.txt",
+      "size_bytes": 56309,
+      "content_hash": "sha256:7d81d246b9921e9e87abb714d41b9b615fdf4d436ba1c63e4990b3c18a88cdbd"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_19_GR0_19/store/_manifest.json",
+      "size_bytes": 589,
+      "content_hash": "sha256:b143aa8924b4a3234e23d0c69655bfd1018b01057e89c34eb556e681e94fdcfc"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_20_GR0_20/_scenario.json",
+      "size_bytes": 791,
+      "content_hash": "sha256:1658fe89dd8428d9c47df3421c7a9e363ac2e67825d0695a7e7fc1953e8b0765"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_20_GR0_20/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:578de826d6586118bd386ea2ea51e11ebaf857ea5ecf8621b0218404b98c3416"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_20_GR0_20/fault__ca1_prov.json",
+      "size_bytes": 7323,
+      "content_hash": "sha256:8c6583795bbb076e5d75a4ae13c707619a2d177f0aaa18962391355bfdfcaf14"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_20_GR0_20/store/6351ab2f5802.meta.json",
+      "size_bytes": 580,
+      "content_hash": "sha256:522593d703c4882dee13d8ab7ded3dc6ac8f7ca96138d0d456587286be3e0be6"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_20_GR0_20/store/6351ab2f5802.txt",
+      "size_bytes": 57226,
+      "content_hash": "sha256:6351ab2f58029c2670e2e6f3d2cc0f6598ea637d34a7c796c6a76580743660d5"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_20_GR0_20/store/_manifest.json",
+      "size_bytes": 589,
+      "content_hash": "sha256:9b46489403535c51ddfeafe7e41d105121d378428436a3996432c66637b0ee71"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_21_GR0_21/_scenario.json",
+      "size_bytes": 791,
+      "content_hash": "sha256:3261e7f31638d2374d66b7826c7174c57b87d47e6bb2b3f9cd15311e0bfe6bf7"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_21_GR0_21/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:ad9620c95aa44329524587324087fa14dce2eaba5529e3d6766edaaa17defdf8"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_21_GR0_21/fault__ca1_prov.json",
+      "size_bytes": 7323,
+      "content_hash": "sha256:b73e1030f3548c69407b9bf4c26f4a560409aa1850a989878238dde885d63494"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_21_GR0_21/store/_manifest.json",
+      "size_bytes": 589,
+      "content_hash": "sha256:c975760069932e1c7807042d9d2a8e451f9aa6e62a1484c4a1c2d1ee0e22d59c"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_21_GR0_21/store/bf1885625736.meta.json",
+      "size_bytes": 580,
+      "content_hash": "sha256:90b694d6d2afb62b1a4fc1145b3fcb4ab7401acdc613301bb170f609e1f463bd"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_21_GR0_21/store/bf1885625736.txt",
+      "size_bytes": 57219,
+      "content_hash": "sha256:bf18856257360b85fd8a3c277857de848a2845af908d1f8d0347c703baad3de4"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_22_GR0_22/_scenario.json",
+      "size_bytes": 791,
+      "content_hash": "sha256:1657b65cba45092b7f4c380246d136c7e07c3b3549388ef47e99241e7abae704"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_22_GR0_22/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:70e44669a9241e09040f75b1e7a4934211087dd360ee18564e85ca0dfa8b7eef"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_22_GR0_22/fault__ca1_prov.json",
+      "size_bytes": 7323,
+      "content_hash": "sha256:9c70edfade5332c08e712bc9a7b3bfee6a26b766ae0d789e44a9ddd1649a42ff"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_22_GR0_22/store/_manifest.json",
+      "size_bytes": 589,
+      "content_hash": "sha256:ed6184c11c385cb75b9dd8089f49f2fdd89c504b6016f15d497665732a8f6cf3"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_22_GR0_22/store/d12d1a5c6fef.meta.json",
+      "size_bytes": 580,
+      "content_hash": "sha256:9c048ea9d5e89d6c66d4f4b16c3789f9578fb5decf9c58c77414d64dcc5023fd"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_22_GR0_22/store/d12d1a5c6fef.txt",
+      "size_bytes": 56307,
+      "content_hash": "sha256:d12d1a5c6fef6d4d9c293155208b5d3e647abcda43885187e29d37962b3bb70a"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_23_GR0_23/_scenario.json",
+      "size_bytes": 791,
+      "content_hash": "sha256:7d007635acdc113457385803393f9d508811146b19bcd3ef16aba9f53deccf9a"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_23_GR0_23/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:cce1673514a038f102f8e5c4953c21f6be94e385dfe7061432e5fa617ea74886"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_23_GR0_23/fault__ca1_prov.json",
+      "size_bytes": 7323,
+      "content_hash": "sha256:41d97dea19ca3875627923f8ca214bff6fb7735fc6d4d04fdf16bab174528f44"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_23_GR0_23/store/_manifest.json",
+      "size_bytes": 589,
+      "content_hash": "sha256:279ce4e9b3dc35c42084b29106d2f873bdcb388c6a2882aa718e895a76d815b4"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_23_GR0_23/store/e07172922f4f.meta.json",
+      "size_bytes": 580,
+      "content_hash": "sha256:01f198a9e44a41252f29e65fd3d5cc8248c07580f90616746f093fc241cf5662"
+    },
+    {
+      "path": "faults/ca1-incomplete@prov_corpus_23_GR0_23/store/e07172922f4f.txt",
+      "size_bytes": 57234,
+      "content_hash": "sha256:e07172922f4f8d0ab3ac2a50ab814d72717b181049d61b436cff4cbd79576ac1"
+    },
+    {
+      "path": "faults/ca1-integrity/_scenario.json",
+      "size_bytes": 859,
+      "content_hash": "sha256:6ddc1ebf7501286f811a86deb6e946261d94f86cead2fd1a0f94a7293f640a75"
+    },
+    {
+      "path": "faults/ca1-integrity/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:47829e2af6858c54883a3b8fa0f0559f84001e2a9b9ec7357e0e83921e987448"
+    },
+    {
+      "path": "faults/ca1-integrity/fault__ca1_prov.json",
+      "size_bytes": 7394,
+      "content_hash": "sha256:33b31a9c1ecf880cedec70b1018b1aa5e603a657e90a1c1b5bfb6db5aefe9c3a"
+    },
+    {
+      "path": "faults/ca1-integrity/store/_manifest.json",
+      "size_bytes": 562,
+      "content_hash": "sha256:5921b379f635eabb994ee3e42a482b8ca8b4b3cc6476fccf762282317492ef31"
+    },
+    {
+      "path": "faults/ca1-integrity/store/abfe4946dd38.meta.json",
+      "size_bytes": 553,
+      "content_hash": "sha256:f0b69be6c785f2609a0429e0392ea52221638b0ce98280926a66fa5de3d7764c"
+    },
+    {
+      "path": "faults/ca1-integrity/store/abfe4946dd38.txt",
+      "size_bytes": 21634,
+      "content_hash": "sha256:bb77672282a80c0f74858e80e820c4eed8199ddfd1b3918f9d561a19a9035d1c"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_00_GR0_0/_scenario.json",
+      "size_bytes": 881,
+      "content_hash": "sha256:c16657b8ec506436804ecb98fc97c4fcb6ee244348623d929cf882287b91635a"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_00_GR0_0/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:60689280d9ef8c0924a98e2be91da93b8d298af574bb04175c117cc3deeb4381"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_00_GR0_0/fault__ca1_prov.json",
+      "size_bytes": 7395,
+      "content_hash": "sha256:faf2c4fdb37319f8214391069a43c746c7327c803f28cac920e5771145b3ad61"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_00_GR0_0/store/6e6549413e40.meta.json",
+      "size_bytes": 578,
+      "content_hash": "sha256:658aa57656a540047d16c4450b95b93fbb516d586a7498e8f7c3e9f55a11402b"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_00_GR0_0/store/6e6549413e40.txt",
+      "size_bytes": 30774,
+      "content_hash": "sha256:98d59d4fb68fd9bf618c4d436bbb0a48514a99be7fcd4c4703007711978c1999"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_00_GR0_0/store/_manifest.json",
+      "size_bytes": 587,
+      "content_hash": "sha256:a0ca3c95fd3977efeebdbf23940d63d318abe48d7e632c5aff430834f04bc404"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_01_GR0_1/_scenario.json",
+      "size_bytes": 881,
+      "content_hash": "sha256:44ae850ea93ff8a371c6a9550683260a499d5fb7b683e2e89a1091cc3db21f1d"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_01_GR0_1/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:ead4555d9f7c722994bddc5938cb6ba24b16d07f9f7babdb82defdab3f1a05b3"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_01_GR0_1/fault__ca1_prov.json",
+      "size_bytes": 7395,
+      "content_hash": "sha256:f6162339c4062d122a8cae7e0fde39a42b94a84e48be35b1dcfd9df1c387f3ad"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_01_GR0_1/store/_manifest.json",
+      "size_bytes": 587,
+      "content_hash": "sha256:0f45b370f3f9ee74602d2baaddc3f46413c6816d059e56013a726800b0952b6f"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_01_GR0_1/store/cbb542a28986.meta.json",
+      "size_bytes": 578,
+      "content_hash": "sha256:4007b0e67f711b5259e9d3f526103d58385e1cca6e797757fdefd94fd152924a"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_01_GR0_1/store/cbb542a28986.txt",
+      "size_bytes": 31678,
+      "content_hash": "sha256:01210c298206d32302f847df957ea6c2b16c9f527e5e829b2c3e70816387f0b4"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_02_GR0_2/_scenario.json",
+      "size_bytes": 881,
+      "content_hash": "sha256:fdb08a6716328bebd6e46639d15e08fe8f428f6b07f892879029cbffafdd084b"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_02_GR0_2/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:6280e116fb3e968c190d7b027a18140024c3e23d87f6172b941c75e3706844c2"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_02_GR0_2/fault__ca1_prov.json",
+      "size_bytes": 7395,
+      "content_hash": "sha256:e2f24c3068307d38250c7035f69748c3d750ea5b44944fa12ecafb66fd8b9a80"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_02_GR0_2/store/63b3f4291b30.meta.json",
+      "size_bytes": 578,
+      "content_hash": "sha256:49fe3140472a15cbf852bad2af664957f97ef13953d6b03967c62a9268c3a0f0"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_02_GR0_2/store/63b3f4291b30.txt",
+      "size_bytes": 31679,
+      "content_hash": "sha256:ceaf398a1c905f4c3b077cf2850e51ba58e93e43ed7cb9218b8fad51d1f8d0a1"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_02_GR0_2/store/_manifest.json",
+      "size_bytes": 587,
+      "content_hash": "sha256:645c4fe0f6f76c770a097087170976c8b6fb9f589ee3e302a1a9ed6f838f0f6b"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_03_GR0_3/_scenario.json",
+      "size_bytes": 881,
+      "content_hash": "sha256:0259e39a5ffada082f823376b2c96f381b443ddfb4f901372ed91aaf5ed56c24"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_03_GR0_3/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:8589c3951d8aa808eee770e5ba47d41eb26728ce53c5cd9fb247001c114a2f00"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_03_GR0_3/fault__ca1_prov.json",
+      "size_bytes": 7395,
+      "content_hash": "sha256:020745c366e67024ff7fb910a7ee9af5ae00f6c0c88cd0402a24efbcff6c198c"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_03_GR0_3/store/00a29c891c95.meta.json",
+      "size_bytes": 578,
+      "content_hash": "sha256:3f663d5fd2bc26c1a425273398a0d79ccc912f48a14ca1d799376b23322f93d6"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_03_GR0_3/store/00a29c891c95.txt",
+      "size_bytes": 31685,
+      "content_hash": "sha256:669c3264be5e2af1199d45ce731194fc12cfa73c884c494861019fc1169a5742"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_03_GR0_3/store/_manifest.json",
+      "size_bytes": 587,
+      "content_hash": "sha256:f2620d7ba2ab21c923a4df9abac7e0c24fb0b4c2ae67a5ca8710a4528ea731b9"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_04_GR0_4/_scenario.json",
+      "size_bytes": 881,
+      "content_hash": "sha256:4a81722d270a25202a2440be234e40d20dd747e01900c2b35160f18acfa00dd8"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_04_GR0_4/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:b2200434400f448b6f3669d47c47aee2f5ab78122bf31069139873aeabc9aad3"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_04_GR0_4/fault__ca1_prov.json",
+      "size_bytes": 7395,
+      "content_hash": "sha256:a96d63117ae97649b4e80fe10d0bb987a463deca75043fb20c3b8db04b0c1103"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_04_GR0_4/store/1821d1f0c4d3.meta.json",
+      "size_bytes": 578,
+      "content_hash": "sha256:83a426c9ddd29b5163b8cf8effaf20730b14298820c651c5130b249e1f066cfc"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_04_GR0_4/store/1821d1f0c4d3.txt",
+      "size_bytes": 40128,
+      "content_hash": "sha256:490e3b8b6dad08791aecf56284036d964467cf6135b60936f0d452405dfb0536"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_04_GR0_4/store/_manifest.json",
+      "size_bytes": 587,
+      "content_hash": "sha256:6147490fa9a68a827974d2c2bf5eebd3ac9c95e612ab03beeef523fae3b0085e"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_05_GR0_5/_scenario.json",
+      "size_bytes": 881,
+      "content_hash": "sha256:18291a54b52a50268ff61f0c7561c5c1eff44f062178275daad2bb739a4b7982"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_05_GR0_5/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:0078355e74c25100feab28bdf7793b314eaaf53ae6690af4888f6d7a9f7e96fa"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_05_GR0_5/fault__ca1_prov.json",
+      "size_bytes": 7395,
+      "content_hash": "sha256:b469b390af3a0079dcb232cdcd8229f7e040a7f6eccce77d94d6abee0c4d0bc3"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_05_GR0_5/store/4b10c333a717.meta.json",
+      "size_bytes": 578,
+      "content_hash": "sha256:50c4ef2dcb756435123d101df5f19ab855d7ce55f7d1eed0faa4bf87daf3acea"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_05_GR0_5/store/4b10c333a717.txt",
+      "size_bytes": 40134,
+      "content_hash": "sha256:150e43d664339d67b7fc710202f48637243032cffb0ea65040c1c869f1ec7d97"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_05_GR0_5/store/_manifest.json",
+      "size_bytes": 587,
+      "content_hash": "sha256:6c7543c03e5f94072af247cac78a76b9f444c101f62efa4718a5775a257862d7"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_06_GR0_6/_scenario.json",
+      "size_bytes": 881,
+      "content_hash": "sha256:b1a0325c99830a17890c0a81ade940e1c28c48fe556d92ead4d09f7e43e42fea"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_06_GR0_6/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:c2814466fa4b4144cdf30afcbd1b582f04118f7f5d080bbf663929dae5d7a756"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_06_GR0_6/fault__ca1_prov.json",
+      "size_bytes": 7395,
+      "content_hash": "sha256:87832af18c6b1b34a39a66a41884331852ff184679ff97be44ab7797a8987aba"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_06_GR0_6/store/_manifest.json",
+      "size_bytes": 587,
+      "content_hash": "sha256:23cbdcc4bf6b3f1dbd339117aa5c5905f052e178574f0238b40db1cbd9a0894c"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_06_GR0_6/store/c5e2828dc006.meta.json",
+      "size_bytes": 578,
+      "content_hash": "sha256:6777f08f98611b4e25a9aa91e85c8881eea977b2c63090f360202c62ed0b8406"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_06_GR0_6/store/c5e2828dc006.txt",
+      "size_bytes": 40127,
+      "content_hash": "sha256:c0ce92e048d53025ecad8dd627e1ee89e7ff01642ec2de0a86c6ef4d87bc9789"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_07_GR0_7/_scenario.json",
+      "size_bytes": 882,
+      "content_hash": "sha256:87902cbc7405b021dba3df22c59018534a366330a89b60dd5667e94aae53e817"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_07_GR0_7/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:ec0ecfbc6da0d38619a345f66cd4274f1f645a8067c9fb68ba579fb6164f6ca2"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_07_GR0_7/fault__ca1_prov.json",
+      "size_bytes": 7396,
+      "content_hash": "sha256:d49905219eaa53311c528207e8f64942fd37ba3f2dd6966c5bd8955100d411a5"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_07_GR0_7/store/_manifest.json",
+      "size_bytes": 587,
+      "content_hash": "sha256:1524bf26b9bfe3fa8d69bdeae8ec14357b233959fb1261bfa5b65bd7c6391ee8"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_07_GR0_7/store/cc24f32ec451.meta.json",
+      "size_bytes": 578,
+      "content_hash": "sha256:5581aea1c64b9af21f334b676536ba6896a24db4378ad07d125f13ea4126eb34"
+    },
+    {
+      "path": "faults/ca1-integrity@prov_corpus_07_GR0_7/store/cc24f32ec451.txt",
+      "size_bytes": 48592,
+      "content_hash": "sha256:392de1533e3e0c3ceaf0951c88eb7f9813d017d49af51c45fa27f7c4d651504b"
+    },
+    {
+      "path": "faults/ca1-timeout/_scenario.json",
+      "size_bytes": 926,
+      "content_hash": "sha256:ccd55d3995d2904926c32a3a26a86ffa44f792c7c3b15040ecce9af2dedc4d83"
+    },
+    {
+      "path": "faults/ca1-timeout/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:c5646d837b53ce18d029f97076a727738733351fd5e3f080b4c116735253667a"
+    },
+    {
+      "path": "faults/ca1-timeout/fault__ca1_prov.json",
+      "size_bytes": 7454,
+      "content_hash": "sha256:d89e005a3df0155942668ef28425b453641b3ef1b97244547e41b70f2154bffa"
+    },
+    {
+      "path": "faults/ca1-timeout/store/_manifest.json",
+      "size_bytes": 560,
+      "content_hash": "sha256:20a503baa0deac3a6ca8b77fc0eb87529d483d9c78bb442c4cb337433ac1bcfb"
+    },
+    {
+      "path": "faults/ca1-timeout/store/abfe4946dd38.meta.json",
+      "size_bytes": 551,
+      "content_hash": "sha256:71d6509642403319404b58a1477721903377714391933fe84de580266d237e85"
+    },
+    {
+      "path": "faults/ca1-timeout/store/abfe4946dd38.txt",
+      "size_bytes": 21634,
+      "content_hash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_08_GR0_8/_scenario.json",
+      "size_bytes": 949,
+      "content_hash": "sha256:6fab7fee7adbbd37ebdbb98e642fbff9ae04504bc35a0fc783e2a2d8646fe1fc"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_08_GR0_8/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:63d5c59062585e186871527eaf0d835fde00bbd2f06acbc3cdea845652aa23af"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_08_GR0_8/fault__ca1_prov.json",
+      "size_bytes": 7456,
+      "content_hash": "sha256:da1595603b4260a98ad1c3eeb41302ba6c01d625be9f248a3996ca104cbcce74"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_08_GR0_8/store/_manifest.json",
+      "size_bytes": 585,
+      "content_hash": "sha256:4ea130ce960a9a88df9aeaaaaeacbe63b90a167003b0ccdc8a09b52e8862e38c"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_08_GR0_8/store/c25362c24044.meta.json",
+      "size_bytes": 576,
+      "content_hash": "sha256:7eb0decdb701f033e44945eef7d8b1459ec2867a5bd973158e92cc596886b8f7"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_08_GR0_8/store/c25362c24044.txt",
+      "size_bytes": 47684,
+      "content_hash": "sha256:c25362c24044eb1a999d3d10348b788d42088ca6d0f442b7cec3f333d7c6d4e7"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_09_GR0_9/_scenario.json",
+      "size_bytes": 949,
+      "content_hash": "sha256:fafd9ee58edc63ef98b24789f98ee65b158833fc721e6233779c2d14226a23a2"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_09_GR0_9/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:257032542eb734914cbba14b9eab30450bd93d46e9f6734296b2d27a2628c1ed"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_09_GR0_9/fault__ca1_prov.json",
+      "size_bytes": 7456,
+      "content_hash": "sha256:4fea7e6af5ea7cdc645b73759c2cd0f2d7bdc7ce060334efc6cc72dec7807884"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_09_GR0_9/store/900713166a70.meta.json",
+      "size_bytes": 576,
+      "content_hash": "sha256:965ebe1a21b26aeff439dd798389b30316321d5b004e0594b66b77a24d0207cf"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_09_GR0_9/store/900713166a70.txt",
+      "size_bytes": 48592,
+      "content_hash": "sha256:900713166a70d94cff52d39c162f77cfdaa2e603c71c733651dbf5584208726a"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_09_GR0_9/store/_manifest.json",
+      "size_bytes": 585,
+      "content_hash": "sha256:c580ef11e119ea7f5c41254b1b1eeb3472814fa2cffa9433daf00f92c0cdd131"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_10_GR0_10/_scenario.json",
+      "size_bytes": 950,
+      "content_hash": "sha256:d3314edaa1dc715bc576bab602c3bd6d3ae987647bfd631d815c6edf3f9b81c7"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_10_GR0_10/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:a5e00fb34483fe642710e44ce67c5b88f8be08c513868f9d02067f8d5da5cd0c"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_10_GR0_10/fault__ca1_prov.json",
+      "size_bytes": 7456,
+      "content_hash": "sha256:927ec02a458bb924e2e428dee824f1c4185a9a76bc8130859a962f6a29252d53"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_10_GR0_10/store/_manifest.json",
+      "size_bytes": 586,
+      "content_hash": "sha256:5236cf8f8ea28ef4805c3845b2ad226523b6b3dba58e745bd1e1823511cfb1f9"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_10_GR0_10/store/aea0aa01c1ab.meta.json",
+      "size_bytes": 577,
+      "content_hash": "sha256:a99d3bbb9553794a54602a7d4220c7a4cc6f4d46dd45796b4160a3a1ab5c811a"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_10_GR0_10/store/aea0aa01c1ab.txt",
+      "size_bytes": 47829,
+      "content_hash": "sha256:aea0aa01c1abd008cb41cd2b54639ffdae806420954eaf2d68d08a50141950fc"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_11_GR0_11/_scenario.json",
+      "size_bytes": 950,
+      "content_hash": "sha256:1d02491d3eeea04d1dd53458b0190095e2cebd5cdd128aa13b9fcfe97be4b7ab"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_11_GR0_11/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:6e7f2bd5a3816618279444bdf5646722af3992d284749831b5c85fcc2360402f"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_11_GR0_11/fault__ca1_prov.json",
+      "size_bytes": 7456,
+      "content_hash": "sha256:68ce494001788f62562a4a1d9a7a10a766be3f1bf616ec8697f98b96508eeade"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_11_GR0_11/store/_manifest.json",
+      "size_bytes": 586,
+      "content_hash": "sha256:79e00daec7bcb2af348fa886c81baa58d3786efcb190cc644364832c2564dc4e"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_11_GR0_11/store/ab1e7e90831f.meta.json",
+      "size_bytes": 577,
+      "content_hash": "sha256:b916b4a1db5b3dd6efbc21ab8ee234a64bb519a1e011440a6810ae9686a14e2c"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_11_GR0_11/store/ab1e7e90831f.txt",
+      "size_bytes": 47830,
+      "content_hash": "sha256:ab1e7e90831f25a60e2fb2b85f976c5110c9dd051a166b96102930c3cc7cb07d"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_12_GR0_12/_scenario.json",
+      "size_bytes": 951,
+      "content_hash": "sha256:eea5d18dad9e7db8472be99389ddc5b33a6da2cd46c45dd134d546114007c0c8"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_12_GR0_12/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:82008f2b29a22ca61f4c36faa235c331eb64b6f3f5dc2855c4e8185fa3eb00bf"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_12_GR0_12/fault__ca1_prov.json",
+      "size_bytes": 7457,
+      "content_hash": "sha256:6434f0f12b3e51047f87227c5631a5844ccf61bd673129e9273e6d4230daf8e3"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_12_GR0_12/store/_manifest.json",
+      "size_bytes": 586,
+      "content_hash": "sha256:cdb2f213ace9d7ca428810a2cfe02d46427363f62dd8938d30dbab5c33cda20e"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_12_GR0_12/store/ce2bf5bb6db4.meta.json",
+      "size_bytes": 577,
+      "content_hash": "sha256:16a69d92b5d4f57c7e7021c34c904c98ce922adb909d06ec4639f5ddcb250098"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_12_GR0_12/store/ce2bf5bb6db4.txt",
+      "size_bytes": 57204,
+      "content_hash": "sha256:ce2bf5bb6db4e9fa53197707291b1b000eb6774b01fb6759af9df645dd73e178"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_13_GR0_13/_scenario.json",
+      "size_bytes": 951,
+      "content_hash": "sha256:4bcdfa3f9ffbe36617308b3edc0d29dc759af4e7297c1118ce5b9fdfaa62bafe"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_13_GR0_13/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:5a48b51fac0eee75c048c57784f73f0e180aa2960658507d84f7800eb4e69ab1"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_13_GR0_13/fault__ca1_prov.json",
+      "size_bytes": 7457,
+      "content_hash": "sha256:29682323cd71b459ebdef77196d47624f328a62ed72e81264591a0ec49f9eb07"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_13_GR0_13/store/_manifest.json",
+      "size_bytes": 586,
+      "content_hash": "sha256:7ddf1e49f4c3dfd4d997648d239f23dfbc30474a1a08b3ccd905cfa7949749ac"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_13_GR0_13/store/b13d298c6ff8.meta.json",
+      "size_bytes": 577,
+      "content_hash": "sha256:a80e1d0fd6953f3299cf21d9ba0b737809bd211fcd7b8e513ae04329d5b3431f"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_13_GR0_13/store/b13d298c6ff8.txt",
+      "size_bytes": 56291,
+      "content_hash": "sha256:b13d298c6ff870065ae5cd144b85c7bad78cdcec7f112d86f2c5cdaa2ea51c75"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_14_GR0_14/_scenario.json",
+      "size_bytes": 951,
+      "content_hash": "sha256:e731ca4898d2d25e47cb9d5bc4249deb6491f3caf71f9f7d7e1b375e7bdb7f88"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_14_GR0_14/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:c3b177f2872728b10490cda5ee46c99802d9382c879577e666397249997ad8c9"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_14_GR0_14/fault__ca1_prov.json",
+      "size_bytes": 7457,
+      "content_hash": "sha256:fdf1dd2c4442a42759885a98e1556d70136b5e9b3794e604665599ce65851f22"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_14_GR0_14/store/81b26d73f8a5.meta.json",
+      "size_bytes": 577,
+      "content_hash": "sha256:daa98c44095deb6387ea96c141d2ab0919b384c6e29bdf2e7df10cc518349938"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_14_GR0_14/store/81b26d73f8a5.txt",
+      "size_bytes": 56300,
+      "content_hash": "sha256:81b26d73f8a50609ed16df089130f010efbd1abe2604eb3284bbeffe45cc38d4"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_14_GR0_14/store/_manifest.json",
+      "size_bytes": 586,
+      "content_hash": "sha256:4c1b489d593e41b2aa5979afe45a075edc94a50bf7606c3328b6df8dd387f966"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_15_GR0_15/_scenario.json",
+      "size_bytes": 951,
+      "content_hash": "sha256:8a9aa1ef807aca79b7531f8768944cd01d6ca3f4bb0b5fb01c1677054cf052cc"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_15_GR0_15/baseline/_events.json",
+      "size_bytes": 2285,
+      "content_hash": "sha256:ce9bc4def8bf40bc103cd7ea9bbd78a72c265cfd4c5f2987a89a698e823d0da3"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_15_GR0_15/fault__ca1_prov.json",
+      "size_bytes": 7457,
+      "content_hash": "sha256:fa7a91987caf62041632b0bcce874471fc433c4f9e1bcf82624acf8dca3940be"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_15_GR0_15/store/_manifest.json",
+      "size_bytes": 586,
+      "content_hash": "sha256:52ab2526be7f91cf92de5e6a3f76da639b0242f7e53ca42a78c1b7c1e8b12ddd"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_15_GR0_15/store/a964833ee1a7.meta.json",
+      "size_bytes": 577,
+      "content_hash": "sha256:5022c44e2e8fd44dd9b5e043111438c56715c85d74d531418cc26cca79fda50a"
+    },
+    {
+      "path": "faults/ca1-timeout@prov_corpus_15_GR0_15/store/a964833ee1a7.txt",
+      "size_bytes": 56308,
+      "content_hash": "sha256:a964833ee1a7e57567b9611aad2b0b426fbba92a9fc6c1a5022b31f263c38b0b"
+    },
+    {
+      "path": "faults/ca2-accept/_scenario.json",
+      "size_bytes": 623,
+      "content_hash": "sha256:e6ff8946df10217dbcd0c4c274dd75d3da8b8fedb9a3f7963a6be993c467c6e4"
+    },
+    {
+      "path": "faults/ca2-accept/baseline/_events.json",
+      "size_bytes": 2126,
+      "content_hash": "sha256:29689d56ad1ae3a1ce267b74477351a4d72e6e5302fc1fe26fb9284a66e4eb40"
+    },
+    {
+      "path": "faults/ca2-accept/charts/fault_metrics.png",
+      "size_bytes": 23788,
+      "content_hash": "sha256:00452eece986c06220fd281b2738a0383dc824e2be4b08e2fa2498ab90d78d01"
+    },
+    {
+      "path": "faults/ca2-accept/fault__ca2_prov.json",
+      "size_bytes": 6327,
+      "content_hash": "sha256:fc44611bf9ce48b2524c592acdabe43ea84c783d2d62b826d84d93d5a1480343"
+    },
+    {
+      "path": "faults/ca2-accept/store/_manifest.json",
+      "size_bytes": 488,
+      "content_hash": "sha256:6eb7461691cb916c075e9e9a62ca87321d545bf0c5eba1d064444fa34f45bc42"
+    },
+    {
+      "path": "faults/ca2-accept/store/e432f282997d.meta.json",
+      "size_bytes": 479,
+      "content_hash": "sha256:e2a9b92629c8bdb0a3e55733e34285433289a6d52775689ea79752579ca5ec77"
+    },
+    {
+      "path": "faults/ca2-accept/store/e432f282997d.txt",
+      "size_bytes": 98,
+      "content_hash": "sha256:e432f282997d524982d5daf0122568a255bd7eaa76a3da9b065a1bbff30ade72"
+    },
+    {
+      "path": "faults/ca3-ok/_scenario.json",
+      "size_bytes": 728,
+      "content_hash": "sha256:eb1ba70cce453802f36c9b6d6ba1cf9bb2063fbbcc2ca8045e51091241399f2d"
+    },
+    {
+      "path": "faults/ca3-ok/baseline/_events.json",
+      "size_bytes": 2886,
+      "content_hash": "sha256:ee2448a934f55d8400543c35c82e8ae64fb0d061ac0108cbff70fa3261e8b2d0"
+    },
+    {
+      "path": "faults/ca3-ok/fault__ca3_prov.json",
+      "size_bytes": 7422,
+      "content_hash": "sha256:40832b9393bd4251f3df35854bce585754f250d54b9ba7f7e10997c7d7eb8b7d"
+    },
+    {
+      "path": "faults/ca3-ok/store/8872c206e705.meta.json",
+      "size_bytes": 532,
+      "content_hash": "sha256:9eade15f75d362316ed8eab44d0aeac7abd6ade0007300a89533e56369f640d2"
+    },
+    {
+      "path": "faults/ca3-ok/store/8872c206e705.txt",
+      "size_bytes": 244,
+      "content_hash": "sha256:8872c206e705200bb733950e08338b3c577732f17d110c25d034e7829c26ebe7"
+    },
+    {
+      "path": "faults/ca3-ok/store/_manifest.json",
+      "size_bytes": 541,
+      "content_hash": "sha256:f54af005bfcbc3d50051a3c2ada4eda0611df587ad22a6b856173e9b6bbd6e22"
+    },
+    {
+      "path": "faults/cax-revise/_scenario.json",
+      "size_bytes": 622,
+      "content_hash": "sha256:0781ee6bba60fd4871f04281e768a0e034bb7cc4364c42e3f26f89109ae61f4b"
+    },
+    {
+      "path": "faults/cax-revise/baseline/_events.json",
+      "size_bytes": 2232,
+      "content_hash": "sha256:85616f5180bbaf12b403890c3d7e80d7a86e67fb3677d75d73c75b31799ffae3"
+    },
+    {
+      "path": "faults/cax-revise/fault__cax_prov.json",
+      "size_bytes": 7237,
+      "content_hash": "sha256:39c2e59c88e87060c518544971a3f6ee3c803b13f929f2bab510c62f49fc8213"
+    },
+    {
+      "path": "faults/cax-revise/store/_manifest.json",
+      "size_bytes": 446,
+      "content_hash": "sha256:6ea9cf5704b860b06822eb0d8fb261f5cc07a2ca3b6ca60970bff92d23e29c44"
+    },
+    {
+      "path": "faults/cax-revise/store/ed7a5d75f58f.meta.json",
+      "size_bytes": 437,
+      "content_hash": "sha256:5c3b0d16cca26b7ee42189a0341b452ff536d8abb0ef849d894cb4f635751697"
+    },
+    {
+      "path": "faults/cax-revise/store/ed7a5d75f58f.txt",
+      "size_bytes": 54,
+      "content_hash": "sha256:ed7a5d75f58f9a7e069cc4b5da4c08fddb8534896f0aeb597e85576862ef54c3"
+    },
+    {
+      "path": "faults/mc1-unjustified/_scenario.json",
+      "size_bytes": 603,
+      "content_hash": "sha256:7d25e3c831762a111faedf278ebdbb67604aee18c2b353e084e0e9b6dcc33602"
+    },
+    {
+      "path": "faults/mc1-unjustified/baseline/_events.json",
+      "size_bytes": 1077,
+      "content_hash": "sha256:4b3e97278e68f8aae873636b56563d38f900b9b0202e8746747dafc8c9650cf6"
+    },
+    {
+      "path": "faults/mc1-unjustified/fault__mc1_prov.json",
+      "size_bytes": 4325,
+      "content_hash": "sha256:e73e138ba23e45c2d4419046f3438b0ab7a81f1b36702f3d498c2c0b385d5356"
+    },
+    {
+      "path": "faults/mc3-untimed/_scenario.json",
+      "size_bytes": 584,
+      "content_hash": "sha256:d89318bd678c4506c28f7304a33656d2d07ea4ddd6c85836c3e7e54628850266"
+    },
+    {
+      "path": "faults/mc3-untimed/baseline/_events.json",
+      "size_bytes": 1194,
+      "content_hash": "sha256:a0aeb893a53ad2f1a380b55a35df1721972fd270d71a507dbdb2595f1aa587eb"
+    },
+    {
+      "path": "faults/mc3-untimed/fault__mc3_prov.json",
+      "size_bytes": 4198,
+      "content_hash": "sha256:cdc126fe4944d47c93004910fa11ed7a27cf82269298c9914a7cfdb323e68be4"
+    },
+    {
+      "path": "faults/stream-gap/_scenario.json",
+      "size_bytes": 613,
+      "content_hash": "sha256:126b8a7189c8f30b5aafd430648dafddccae45be6abc6ea0e9191b9ad8a3c2f4"
+    },
+    {
+      "path": "faults/stream-gap/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:0cd9e819248f82d2af5f9fa4f64ea08b002e78164cbb8750bd6a8a370ee7971b"
+    },
+    {
+      "path": "faults/stream-gap/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:03b30a3e6d825d042cb508e5c3ce2061b8d947df806c82384e042b42778ef191"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_00_GR0_0/_scenario.json",
+      "size_bytes": 634,
+      "content_hash": "sha256:502b567587636e70d43070a49eb8ca81ede9b1bd124f3a35d8d28451b17c5033"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_00_GR0_0/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:6d8af7c2bdb84ec839e9583c0416718fdfbc1b5c0dcf48daabfd708a2ce6fb0d"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_00_GR0_0/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:b7e0298b896c9d442cc1e3c34c84d118de61b9d55d16f3314b66619744905151"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_01_GR0_1/_scenario.json",
+      "size_bytes": 634,
+      "content_hash": "sha256:e0f23d51351c4a3818b52b394a584b32cbd9fa440f2fa906a8c7b633360dbe6b"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_01_GR0_1/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:f8f1ccb00a284587a6d86919601b5daf5c536257b70cd1b4e8933586b0754351"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_01_GR0_1/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:91e162010af67e9252f69359f638025ebce1ab046e8c0f24630cbfa2952bf12b"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_02_GR0_2/_scenario.json",
+      "size_bytes": 634,
+      "content_hash": "sha256:0708e4d92052055a87532c145003f91db15fcafe329c0c8fd08e91bd53e6ab8e"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_02_GR0_2/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:db72e276a57e9f304cc6b5c4c9ebe0f00d8c78fec7050f026e26f94cc68ea055"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_02_GR0_2/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:f2d2f4463ed766fc4eb3ef384952294eb85a74feb37a28dfdf49d453d9a80b8c"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_03_GR0_3/_scenario.json",
+      "size_bytes": 634,
+      "content_hash": "sha256:68be5367a75eb246367f6f8e2d016b2dbccfb3306ff193f60b57df907cf60e9e"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_03_GR0_3/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:85d2bc36486b726c651e3e51b6ca727dea4e502233052a57ed19368b0b6bfebd"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_03_GR0_3/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:4dfa9c748cc3dbfacd91d68d013f4430d80ea279dc6f4cd7805d6015d6b5f891"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_04_GR0_4/_scenario.json",
+      "size_bytes": 634,
+      "content_hash": "sha256:9943efee30528234b49610fb71254bd68206aa9046456f88ab41c65d447c0eb6"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_04_GR0_4/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:5f23aeaea29925b34431544301e18f1c927e505ceb388f551067fc708885c439"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_04_GR0_4/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:5dc64f7450f054c172486de30308103e6f20d464e00113ec1b8a51f97b0b0a3c"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_05_GR0_5/_scenario.json",
+      "size_bytes": 634,
+      "content_hash": "sha256:143e7d9275c711d32c6eb49759886e27383c47d00dfa54afe59cf33574f8571a"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_05_GR0_5/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:4b088b8af7dfe183b92f58347d43eac6b4077a005253546dc7701db62e9e1dad"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_05_GR0_5/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:9fdb18a7c26aea7bb8934fec8b956699f19a18d2cc36a15436f4c7b65a172d1c"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_06_GR0_6/_scenario.json",
+      "size_bytes": 634,
+      "content_hash": "sha256:2cceeff7dbf503d69ad9439ca2cdcf8f037e9522f2d10e9415b66cc0d8944c90"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_06_GR0_6/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:967356bb503e4b9056681101962c4980fe12fe8cf94b62e1be0c4907d3dfdba1"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_06_GR0_6/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:9b08cf799770ab7d481447695c0b9cff80e978ad4229390f45ae75b88798fed4"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_07_GR0_7/_scenario.json",
+      "size_bytes": 634,
+      "content_hash": "sha256:c1db527dab749425e5995f6d38509feef28f294203a5206b9a6de81a7c04d0a6"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_07_GR0_7/baseline/_events.json",
+      "size_bytes": 698,
+      "content_hash": "sha256:9443f8bdfaf77e81a86f9adcb24e3dcaa52b737e078f098ed2dfbac11cdd4677"
+    },
+    {
+      "path": "faults/stream-gap@prov_corpus_07_GR0_7/fault__cax_prov.json",
+      "size_bytes": 2842,
+      "content_hash": "sha256:af93a37d2c36e1935d405ccb9691980b4ce31006ddb3c93cfcef221669f44a77"
+    },
+    {
+      "path": "reconstruct.json",
+      "size_bytes": 903240,
+      "content_hash": "sha256:535c7832d5684c8e57b5df67e298d657c0fcdec03ea169ab51b3439464fef455"
+    },
+    {
+      "path": "RECONSTRUCT.md",
+      "size_bytes": 340,
+      "content_hash": "sha256:822c2c587cfac969e44b1a4ea094bebd748a698e84f2d99006fb03cd8bc2aef9"
+    }
+  ]
+}

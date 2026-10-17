@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-900713166a70",
+  "uri": "file:///C:/Users/HP/Desktop/yprov4agents-demonstrator/out/study/faults/ca1-timeout%40prov_corpus_09_GR0_9/store/900713166a70.txt",
+  "yp:contentHash": "sha256:900713166a70d94cff52d39c162f77cfdaa2e603c71c733651dbf5584208726a",
+  "size_bytes": 48592,
+  "kind": "provenance-record",
+  "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:01.230430\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:01.253120…",
+  "created_at": "2026-10-17T15:17:34.359095+00:00"
+}

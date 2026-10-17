@@ -1,0 +1,43 @@
+[
+  {
+    "session": "fault-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: receive agent PROV",
+    "started_at": "2026-10-17T15:15:33.999717+00:00",
+    "ended_at": "2026-10-17T15:15:33.999726+00:00",
+    "inputs": [],
+    "outputs": [
+      "Rogue_Agent PROV under audit (fault)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: audit Rogue_Agent",
+    "started_at": "2026-10-17T15:15:33.999717+00:00",
+    "ended_at": "2026-10-17T15:15:33.999744+00:00",
+    "inputs": [
+      "Rogue_Agent PROV under audit (fault)"
+    ],
+    "outputs": [
+      "agent=Rogue_Agent; steps=1; justifications=1; trail=DecisionActivity"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "fault-mc3",
+    "agent": "AuditabilityAgent",
+    "name": "MC3: trail for Rogue_Agent is partial",
+    "started_at": "2026-10-17T15:15:33.999717+00:00",
+    "ended_at": "2026-10-17T15:15:33.999722+00:00",
+    "inputs": [
+      "agent=Rogue_Agent; steps=1; justifications=1; trail=DecisionActivity"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]
