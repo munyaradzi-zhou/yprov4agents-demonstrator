@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-377895f2bbbd",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-replay/out/replay/store/377895f2bbbd.txt",
+  "yp:contentHash": "sha256:377895f2bbbd812727556946e2363f05dbdc872944699f1641d080e12c5fee9e",
+  "size_bytes": 39286,
+  "kind": "provenance-record",
+  "preview": "{\"activity\": {\"CrossEntropyLoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:02:45.935328^^xsd:dateTime\"}, \"Test\": {\"prov:startedAtTime\"…",
+  "created_at": "2026-10-17T14:10:28.383960+00:00"
+}

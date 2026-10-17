@@ -1,0 +1,12 @@
+{
+  "log": "compliance of rogue [fault]: FAIL (1 decision(s) without yp:justification)",
+  "verdict": "FAIL",
+  "escalation_reason": null,
+  "justification": "Applied 4 structural checks (namespace-declarations, typed-activities, decision-present, decision-justified) to rogue's emitted PROV: 1 activities, 1 of them decisions. 1 decision(s) without yp:justification. Verdict FAIL.",
+  "scenario": "mc1-unjustified",
+  "agent": "mc1",
+  "expected": "FAIL",
+  "condition": "decision-justified",
+  "how": "a third-party record whose decision carries no justification",
+  "as_expected": true
+}

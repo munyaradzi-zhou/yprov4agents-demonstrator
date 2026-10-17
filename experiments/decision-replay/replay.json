@@ -1,0 +1,72 @@
+{
+  "records": 24,
+  "decisions": 24,
+  "replay": {
+    "replayed": 24
+  },
+  "rules": {
+    "mc1.compliance/v1": 8,
+    "mc3.trail/v1": 8,
+    "ca1.persist/v1": 2,
+    "ca2.chart/v1": 2,
+    "ca3.timing-outlier/v1": 2,
+    "cax.summary/v1": 2
+  },
+  "mismatches": [],
+  "inputs": {
+    "ca1": {
+      "decisions": 2,
+      "inputs": 8,
+      "tests": 4,
+      "unset": 0,
+      "searchable": 4,
+      "seen_by_a": 0,
+      "stated": 2
+    },
+    "ca2": {
+      "decisions": 2,
+      "inputs": 4,
+      "tests": 0,
+      "unset": 0,
+      "searchable": 4,
+      "seen_by_a": 0,
+      "stated": 0
+    },
+    "ca3": {
+      "decisions": 2,
+      "inputs": 10,
+      "tests": 0,
+      "unset": 0,
+      "searchable": 10,
+      "seen_by_a": 2,
+      "stated": 8
+    },
+    "cax": {
+      "decisions": 2,
+      "inputs": 4,
+      "tests": 2,
+      "unset": 0,
+      "searchable": 2,
+      "seen_by_a": 0,
+      "stated": 0
+    },
+    "mc1": {
+      "decisions": 8,
+      "inputs": 8,
+      "tests": 0,
+      "unset": 0,
+      "searchable": 8,
+      "seen_by_a": 0,
+      "stated": 0
+    },
+    "mc3": {
+      "decisions": 8,
+      "inputs": 8,
+      "tests": 0,
+      "unset": 0,
+      "searchable": 8,
+      "seen_by_a": 0,
+      "stated": 0
+    }
+  }
+}

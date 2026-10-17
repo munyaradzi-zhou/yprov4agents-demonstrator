@@ -1,0 +1,12 @@
+{
+  "log": "audited Rogue_Agent [fault]: 1 steps, 1 justified -> PARTIAL",
+  "verdict": "PARTIAL",
+  "escalation_reason": null,
+  "justification": "Reconstructed the lifecycle of 'Rogue_Agent': 1 activities (1 justified) in order DecisionActivity. Trail is not fully reconstructible: 1 activity(ies) carry no end time, so have no duration. Verdict PARTIAL.",
+  "scenario": "mc3-untimed",
+  "agent": "mc3",
+  "expected": "PARTIAL",
+  "condition": "activity-ended",
+  "how": "a third-party record with an activity that was started and never closed",
+  "as_expected": true
+}

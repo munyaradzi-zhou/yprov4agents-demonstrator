@@ -130,12 +130,13 @@ jobs:
       # byte-identical before and after — which the gate is what establishes. Phase 6
       # adds exactly one declared attribute: MC1 cites the standard it checked against.
       # The audit fixes (docs/AUDIT.md) changed no record of the reference run, and the gate
-      # now compares lineage edges rather than relation counts; the reference is the archive
-      # frozen from a clean commit after them.
+      # now compares lineage edges rather than relation counts. Replayable decisions add
+      # exactly two declared attributes to every decision, yp:rule and yp:rule_inputs; the
+      # reference is the archive frozen from a clean commit after them.
       - name: Assert the provenance did not change unannounced
         run: |
           uv run python -m eval.compare \
-            --before experiments/audit-reference \
+            --before experiments/decision-replay \
             --after out \
             --strict
 
@@ -219,7 +220,7 @@ jobs:
       - name: Assert the distributed run emits the reference provenance
         run: |
           uv run python -m eval.compare \
-            --before experiments/audit-reference \
+            --before experiments/decision-replay \
             --after out-nats \
             --strict
 

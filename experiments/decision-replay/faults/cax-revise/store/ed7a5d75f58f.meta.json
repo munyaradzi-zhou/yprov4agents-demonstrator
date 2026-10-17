@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-ed7a5d75f58f",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-replay/out/replay/faults/cax-revise/store/ed7a5d75f58f.txt",
+  "yp:contentHash": "sha256:ed7a5d75f58f9a7e069cc4b5da4c08fddb8534896f0aeb597e85576862ef54c3",
+  "size_bytes": 54,
+  "kind": "summary",
+  "preview": "This run logged 4096 training steps across 512 epochs.",
+  "created_at": "2026-10-17T14:10:34.739874+00:00"
+}

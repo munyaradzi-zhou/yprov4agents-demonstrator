@@ -1,0 +1,10 @@
+{
+  "21.T11999/yprovstore-abfe4946dd38": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-replay/out/replay/faults/ca1-timeout/store/abfe4946dd38.txt",
+    "yp:contentHash": "sha256:abfe4946dd387821f67efcf9c38fd5173269803090dd589477f15c6e3ec1fd80",
+    "size_bytes": 21634,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"MSELoss/Training\": {\"prov:startedAtTime\": \"2026-05-20T10:10:12.815807^^xsd:dateTime\"}, \"MSELoss/Validation\": {\"prov:startedAt…",
+    "created_at": "2026-10-17T14:10:33.136809+00:00"
+  }
+}
