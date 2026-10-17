@@ -1,0 +1,1 @@
+The W3C PROV document details a machine learning run involving 16 activities, 114 entities, and 133 lineage relations. Key activities include the preparation of data with "corpus_12_GR0_12" and the training process across five epochs: "Epoch_0," "Epoch_1," "Epoch_2," "Epoch_3," and "Epoch_4." These activities likely represent stages in the model's training and data handling.

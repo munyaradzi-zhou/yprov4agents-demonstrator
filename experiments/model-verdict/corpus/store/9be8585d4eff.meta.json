@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-9be8585d4eff",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/9be8585d4eff.txt",
+  "yp:contentHash": "sha256:9be8585d4eff94c16684c5fab31ddef24774a99455bbffaf3215672af6ba7f7b",
+  "size_bytes": 465,
+  "kind": "summary",
+  "preview": "The W3C PROV document outlines a machine-learning run involving 16 activities, 114 entities, and 133 lineage relations. Key activities inclu…",
+  "created_at": "2026-10-17T19:38:11.364693+00:00"
+}

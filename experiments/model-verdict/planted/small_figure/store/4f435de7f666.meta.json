@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-4f435de7f666",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/planted/small_figure/store/4f435de7f666.txt",
+  "yp:contentHash": "sha256:4f435de7f666b894b2d0ac835be1d9264efd652069dc245a5e4a5308646097e7",
+  "size_bytes": 278,
+  "kind": "summary",
+  "preview": "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, E…",
+  "created_at": "2026-10-17T19:44:50.482349+00:00"
+}

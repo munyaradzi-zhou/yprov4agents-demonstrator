@@ -1,0 +1,2330 @@
+[
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:44:55.115452+00:00",
+    "ended_at": "2026-10-17T19:44:55.115486+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:44:55.115452+00:00",
+    "ended_at": "2026-10-17T19:44:55.115462+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:44:55.115452+00:00",
+    "ended_at": "2026-10-17T19:44:55.120605+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 10 activities and 61 entities linked by 73 lineage relations. Tracked steps include corpus_00_GR0_0, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:44:55.120220+00:00",
+    "ended_at": "2026-10-17T19:44:55.120319+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 61 entities linked by 73 lineage relations. Tracked steps include corpus_00_GR0_0, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:44:55.121222+00:00",
+    "ended_at": "2026-10-17T19:44:56.502027+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 61 entities linked by 73 lineage relations. Tracked steps include corpus_00_GR0_0, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text for any mention of 'ImageNet' or dataset information.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:44:56.501453+00:00",
+    "ended_at": "2026-10-17T19:44:56.501466+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text for any mention of 'ImageNet' or dataset information.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:44:56.501453+00:00",
+    "ended_at": "2026-10-17T19:44:56.501459+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 61 entities linked by 73 lineage relations. Tracked steps include corpus_00_GR0_0, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:44:57.542235+00:00",
+    "ended_at": "2026-10-17T19:44:57.542275+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:44:57.542235+00:00",
+    "ended_at": "2026-10-17T19:44:57.542248+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:44:57.542235+00:00",
+    "ended_at": "2026-10-17T19:44:57.548298+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:44:57.548245+00:00",
+    "ended_at": "2026-10-17T19:44:57.548353+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:44:57.549248+00:00",
+    "ended_at": "2026-10-17T19:44:59.123666+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of the ImageNet dataset, but it does not appear.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:44:59.123429+00:00",
+    "ended_at": "2026-10-17T19:44:59.123441+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of the ImageNet dataset, but it does not appear.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:44:59.124432+00:00",
+    "ended_at": "2026-10-17T19:44:59.124440+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:44:59.808287+00:00",
+    "ended_at": "2026-10-17T19:44:59.808315+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:44:59.808287+00:00",
+    "ended_at": "2026-10-17T19:44:59.808295+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:44:59.808287+00:00",
+    "ended_at": "2026-10-17T19:44:59.818886+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:44:59.818942+00:00",
+    "ended_at": "2026-10-17T19:44:59.818986+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:44:59.819943+00:00",
+    "ended_at": "2026-10-17T19:45:00.962927+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of the ImageNet dataset, but no such reference was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:00.962376+00:00",
+    "ended_at": "2026-10-17T19:45:00.962382+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of the ImageNet dataset, but no such reference was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:00.962376+00:00",
+    "ended_at": "2026-10-17T19:45:00.962381+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:01.557642+00:00",
+    "ended_at": "2026-10-17T19:45:01.557679+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:01.557642+00:00",
+    "ended_at": "2026-10-17T19:45:01.557653+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:01.557642+00:00",
+    "ended_at": "2026-10-17T19:45:01.567542+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:01.567254+00:00",
+    "ended_at": "2026-10-17T19:45:01.567358+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:01.568647+00:00",
+    "ended_at": "2026-10-17T19:45:02.856248+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention ImageNet or any specific dataset.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:02.856197+00:00",
+    "ended_at": "2026-10-17T19:45:02.856202+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention ImageNet or any specific dataset.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:02.856197+00:00",
+    "ended_at": "2026-10-17T19:45:02.856201+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:03.370549+00:00",
+    "ended_at": "2026-10-17T19:45:03.370568+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:03.370549+00:00",
+    "ended_at": "2026-10-17T19:45:03.370553+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:03.370549+00:00",
+    "ended_at": "2026-10-17T19:45:03.382264+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_04_GR0_4, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:03.382551+00:00",
+    "ended_at": "2026-10-17T19:45:03.382596+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_04_GR0_4, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:03.382551+00:00",
+    "ended_at": "2026-10-17T19:45:04.717984+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_04_GR0_4, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of 'ImageNet' or dataset details, but none were found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:04.719159+00:00",
+    "ended_at": "2026-10-17T19:45:04.719167+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of 'ImageNet' or dataset details, but none were found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:04.719159+00:00",
+    "ended_at": "2026-10-17T19:45:04.719169+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_04_GR0_4, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:05.308237+00:00",
+    "ended_at": "2026-10-17T19:45:05.308255+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:05.308237+00:00",
+    "ended_at": "2026-10-17T19:45:05.308241+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:05.308237+00:00",
+    "ended_at": "2026-10-17T19:45:05.313139+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:05.313236+00:00",
+    "ended_at": "2026-10-17T19:45:05.313281+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:05.313236+00:00",
+    "ended_at": "2026-10-17T19:45:06.616416+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was searched for 'ImageNet' and dataset references, but none were found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:06.615585+00:00",
+    "ended_at": "2026-10-17T19:45:06.615590+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was searched for 'ImageNet' and dataset references, but none were found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:06.617215+00:00",
+    "ended_at": "2026-10-17T19:45:06.617223+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:07.165172+00:00",
+    "ended_at": "2026-10-17T19:45:07.165193+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:07.165172+00:00",
+    "ended_at": "2026-10-17T19:45:07.165176+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:07.165172+00:00",
+    "ended_at": "2026-10-17T19:45:07.171475+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:07.171172+00:00",
+    "ended_at": "2026-10-17T19:45:07.171248+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:07.172173+00:00",
+    "ended_at": "2026-10-17T19:45:08.570987+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention ImageNet or any dataset name.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:08.570274+00:00",
+    "ended_at": "2026-10-17T19:45:08.570279+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention ImageNet or any dataset name.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:08.570274+00:00",
+    "ended_at": "2026-10-17T19:45:08.570278+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:09.086326+00:00",
+    "ended_at": "2026-10-17T19:45:09.086343+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:09.086326+00:00",
+    "ended_at": "2026-10-17T19:45:09.086330+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:09.086326+00:00",
+    "ended_at": "2026-10-17T19:45:09.093694+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_07_GR0_7, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:09.092767+00:00",
+    "ended_at": "2026-10-17T19:45:09.092807+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_07_GR0_7, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:09.094273+00:00",
+    "ended_at": "2026-10-17T19:45:10.363822+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_07_GR0_7, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention the ImageNet dataset.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:10.363923+00:00",
+    "ended_at": "2026-10-17T19:45:10.363934+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention the ImageNet dataset.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:10.363923+00:00",
+    "ended_at": "2026-10-17T19:45:10.363932+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_07_GR0_7, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:11.124343+00:00",
+    "ended_at": "2026-10-17T19:45:11.124415+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:11.124343+00:00",
+    "ended_at": "2026-10-17T19:45:11.124353+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:11.124343+00:00",
+    "ended_at": "2026-10-17T19:45:11.144771+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_08_GR0_8, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:11.144927+00:00",
+    "ended_at": "2026-10-17T19:45:11.145133+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_08_GR0_8, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:11.146907+00:00",
+    "ended_at": "2026-10-17T19:45:12.479795+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_08_GR0_8, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention ImageNet or any specific dataset.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:12.479525+00:00",
+    "ended_at": "2026-10-17T19:45:12.479530+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention ImageNet or any specific dataset.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:12.479525+00:00",
+    "ended_at": "2026-10-17T19:45:12.479529+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_08_GR0_8, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:13.289737+00:00",
+    "ended_at": "2026-10-17T19:45:13.289765+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:13.289737+00:00",
+    "ended_at": "2026-10-17T19:45:13.289744+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:13.289737+00:00",
+    "ended_at": "2026-10-17T19:45:13.301797+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_09_GR0_9, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:13.301773+00:00",
+    "ended_at": "2026-10-17T19:45:13.301827+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_09_GR0_9, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:13.302820+00:00",
+    "ended_at": "2026-10-17T19:45:14.549872+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_09_GR0_9, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention the ImageNet dataset.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:14.550135+00:00",
+    "ended_at": "2026-10-17T19:45:14.550139+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention the ImageNet dataset.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:14.550135+00:00",
+    "ended_at": "2026-10-17T19:45:14.550139+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_09_GR0_9, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:15.056478+00:00",
+    "ended_at": "2026-10-17T19:45:15.056494+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:15.056478+00:00",
+    "ended_at": "2026-10-17T19:45:15.056482+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:15.056478+00:00",
+    "ended_at": "2026-10-17T19:45:15.063647+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:15.063479+00:00",
+    "ended_at": "2026-10-17T19:45:15.063524+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:15.064480+00:00",
+    "ended_at": "2026-10-17T19:45:16.530470+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was searched for 'ImageNet' and related terms, but no mention of the dataset was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:16.529769+00:00",
+    "ended_at": "2026-10-17T19:45:16.529778+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was searched for 'ImageNet' and related terms, but no mention of the dataset was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:16.530819+00:00",
+    "ended_at": "2026-10-17T19:45:16.530828+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:17.257192+00:00",
+    "ended_at": "2026-10-17T19:45:17.257215+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:17.257192+00:00",
+    "ended_at": "2026-10-17T19:45:17.257203+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:17.257192+00:00",
+    "ended_at": "2026-10-17T19:45:17.266290+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:17.266192+00:00",
+    "ended_at": "2026-10-17T19:45:17.266242+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:17.267193+00:00",
+    "ended_at": "2026-10-17T19:45:19.137361+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text, which does not mention ImageNet.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:19.137327+00:00",
+    "ended_at": "2026-10-17T19:45:19.137331+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text, which does not mention ImageNet.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:19.137327+00:00",
+    "ended_at": "2026-10-17T19:45:19.137331+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:19.678136+00:00",
+    "ended_at": "2026-10-17T19:45:19.678165+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:19.678136+00:00",
+    "ended_at": "2026-10-17T19:45:19.678145+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:19.678136+00:00",
+    "ended_at": "2026-10-17T19:45:19.691797+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_12_GR0_12, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:19.691172+00:00",
+    "ended_at": "2026-10-17T19:45:19.691254+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_12_GR0_12, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:19.693082+00:00",
+    "ended_at": "2026-10-17T19:45:21.249542+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_12_GR0_12, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of the ImageNet dataset, but it was not found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:21.249728+00:00",
+    "ended_at": "2026-10-17T19:45:21.249740+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of the ImageNet dataset, but it was not found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:21.249728+00:00",
+    "ended_at": "2026-10-17T19:45:21.249738+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_12_GR0_12, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:21.972197+00:00",
+    "ended_at": "2026-10-17T19:45:21.972218+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:21.973712+00:00",
+    "ended_at": "2026-10-17T19:45:21.973721+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:21.973712+00:00",
+    "ended_at": "2026-10-17T19:45:21.985073+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_13_GR0_13, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:21.984736+00:00",
+    "ended_at": "2026-10-17T19:45:21.984785+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_13_GR0_13, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:21.985735+00:00",
+    "ended_at": "2026-10-17T19:45:23.508470+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_13_GR0_13, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of 'ImageNet' or dataset details, but none were found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:23.508379+00:00",
+    "ended_at": "2026-10-17T19:45:23.508387+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of 'ImageNet' or dataset details, but none were found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:23.508379+00:00",
+    "ended_at": "2026-10-17T19:45:23.508386+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_13_GR0_13, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:23.983914+00:00",
+    "ended_at": "2026-10-17T19:45:23.983929+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:23.983914+00:00",
+    "ended_at": "2026-10-17T19:45:23.983918+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:23.983914+00:00",
+    "ended_at": "2026-10-17T19:45:23.991542+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_14_GR0_14, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:23.990898+00:00",
+    "ended_at": "2026-10-17T19:45:23.990940+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_14_GR0_14, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:23.991901+00:00",
+    "ended_at": "2026-10-17T19:45:25.735526+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_14_GR0_14, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of 'ImageNet' or dataset information, but none was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:25.735205+00:00",
+    "ended_at": "2026-10-17T19:45:25.735214+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of 'ImageNet' or dataset information, but none was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:25.736206+00:00",
+    "ended_at": "2026-10-17T19:45:25.736212+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_14_GR0_14, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:26.211887+00:00",
+    "ended_at": "2026-10-17T19:45:26.211904+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:26.211887+00:00",
+    "ended_at": "2026-10-17T19:45:26.211891+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:26.211887+00:00",
+    "ended_at": "2026-10-17T19:45:26.225876+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_15_GR0_15, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:26.224941+00:00",
+    "ended_at": "2026-10-17T19:45:26.225073+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_15_GR0_15, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:26.227624+00:00",
+    "ended_at": "2026-10-17T19:45:27.528523+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_15_GR0_15, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text for any mention of 'ImageNet' or dataset information.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:27.528767+00:00",
+    "ended_at": "2026-10-17T19:45:27.528800+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text for any mention of 'ImageNet' or dataset information.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:27.529635+00:00",
+    "ended_at": "2026-10-17T19:45:27.529661+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_15_GR0_15, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:28.113421+00:00",
+    "ended_at": "2026-10-17T19:45:28.113437+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:28.113421+00:00",
+    "ended_at": "2026-10-17T19:45:28.113425+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:28.113421+00:00",
+    "ended_at": "2026-10-17T19:45:28.124598+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:28.124928+00:00",
+    "ended_at": "2026-10-17T19:45:28.124972+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:28.125960+00:00",
+    "ended_at": "2026-10-17T19:45:29.350970+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The provided record does not mention the ImageNet dataset.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:29.350470+00:00",
+    "ended_at": "2026-10-17T19:45:29.350478+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The provided record does not mention the ImageNet dataset.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:29.350470+00:00",
+    "ended_at": "2026-10-17T19:45:29.350478+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:29.889803+00:00",
+    "ended_at": "2026-10-17T19:45:29.889851+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:29.889803+00:00",
+    "ended_at": "2026-10-17T19:45:29.889811+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:29.889803+00:00",
+    "ended_at": "2026-10-17T19:45:29.903769+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_17_GR0_17, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:29.903816+00:00",
+    "ended_at": "2026-10-17T19:45:29.903869+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_17_GR0_17, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:29.904813+00:00",
+    "ended_at": "2026-10-17T19:45:31.380081+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_17_GR0_17, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of 'ImageNet' or dataset details, but none were found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:31.380788+00:00",
+    "ended_at": "2026-10-17T19:45:31.380793+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of 'ImageNet' or dataset details, but none were found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:31.380788+00:00",
+    "ended_at": "2026-10-17T19:45:31.380792+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_17_GR0_17, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:31.844095+00:00",
+    "ended_at": "2026-10-17T19:45:31.844111+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:31.844095+00:00",
+    "ended_at": "2026-10-17T19:45:31.844099+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:31.844095+00:00",
+    "ended_at": "2026-10-17T19:45:31.852811+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:31.852650+00:00",
+    "ended_at": "2026-10-17T19:45:31.852691+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:31.854318+00:00",
+    "ended_at": "2026-10-17T19:45:33.028690+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention the ImageNet dataset.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:33.028598+00:00",
+    "ended_at": "2026-10-17T19:45:33.028614+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The record does not mention the ImageNet dataset.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:33.028598+00:00",
+    "ended_at": "2026-10-17T19:45:33.028612+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:33.506421+00:00",
+    "ended_at": "2026-10-17T19:45:33.506438+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:33.506421+00:00",
+    "ended_at": "2026-10-17T19:45:33.506425+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:33.506421+00:00",
+    "ended_at": "2026-10-17T19:45:33.515942+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_19_GR0_19, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:33.515543+00:00",
+    "ended_at": "2026-10-17T19:45:33.515589+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_19_GR0_19, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:33.516543+00:00",
+    "ended_at": "2026-10-17T19:45:34.764646+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_19_GR0_19, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The provided record does not mention the ImageNet dataset.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:34.764730+00:00",
+    "ended_at": "2026-10-17T19:45:34.764735+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The provided record does not mention the ImageNet dataset.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:34.764730+00:00",
+    "ended_at": "2026-10-17T19:45:34.764734+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_19_GR0_19, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:35.232750+00:00",
+    "ended_at": "2026-10-17T19:45:35.232765+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:35.232750+00:00",
+    "ended_at": "2026-10-17T19:45:35.232754+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:35.232750+00:00",
+    "ended_at": "2026-10-17T19:45:35.242661+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_20_GR0_20, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:35.243060+00:00",
+    "ended_at": "2026-10-17T19:45:35.243100+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_20_GR0_20, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:35.244061+00:00",
+    "ended_at": "2026-10-17T19:45:36.689493+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_20_GR0_20, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire RECORD text was searched for any mention of 'ImageNet' or dataset information, but none was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:36.689176+00:00",
+    "ended_at": "2026-10-17T19:45:36.689182+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire RECORD text was searched for any mention of 'ImageNet' or dataset information, but none was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:36.689176+00:00",
+    "ended_at": "2026-10-17T19:45:36.689180+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_20_GR0_20, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:37.189556+00:00",
+    "ended_at": "2026-10-17T19:45:37.189583+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:37.190069+00:00",
+    "ended_at": "2026-10-17T19:45:37.190077+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:37.190069+00:00",
+    "ended_at": "2026-10-17T19:45:37.205214+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_21_GR0_21, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:37.204629+00:00",
+    "ended_at": "2026-10-17T19:45:37.204713+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_21_GR0_21, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:37.205630+00:00",
+    "ended_at": "2026-10-17T19:45:38.627717+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_21_GR0_21, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was searched for any mention of 'ImageNet' or dataset details, but none were found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:38.627762+00:00",
+    "ended_at": "2026-10-17T19:45:38.627814+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was searched for any mention of 'ImageNet' or dataset details, but none were found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:38.627762+00:00",
+    "ended_at": "2026-10-17T19:45:38.627771+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_21_GR0_21, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:39.109781+00:00",
+    "ended_at": "2026-10-17T19:45:39.109801+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:39.110780+00:00",
+    "ended_at": "2026-10-17T19:45:39.110784+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:39.110780+00:00",
+    "ended_at": "2026-10-17T19:45:39.127697+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:39.126999+00:00",
+    "ended_at": "2026-10-17T19:45:39.127039+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:39.128000+00:00",
+    "ended_at": "2026-10-17T19:45:40.733284+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire RECORD text was searched for any mention of 'ImageNet' or dataset information, but none was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:40.733138+00:00",
+    "ended_at": "2026-10-17T19:45:40.733146+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire RECORD text was searched for any mention of 'ImageNet' or dataset information, but none was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:40.733138+00:00",
+    "ended_at": "2026-10-17T19:45:40.733144+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:45:41.210077+00:00",
+    "ended_at": "2026-10-17T19:45:41.210093+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:45:41.210077+00:00",
+    "ended_at": "2026-10-17T19:45:41.210081+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:45:41.210077+00:00",
+    "ended_at": "2026-10-17T19:45:41.221081+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:45:41.221723+00:00",
+    "ended_at": "2026-10-17T19:45:41.221808+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "no ungrounded figures"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:45:41.222671+00:00",
+    "ended_at": "2026-10-17T19:45:42.551891+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of the ImageNet dataset, but it was not found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:45:42.551284+00:00",
+    "ended_at": "2026-10-17T19:45:42.551289+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The model was trained on the ImageNet dataset.\", \"searched\": \"The entire record text was checked for any mention of the ImageNet dataset, but it was not found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:45:42.551284+00:00",
+    "ended_at": "2026-10-17T19:45:42.551288+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]

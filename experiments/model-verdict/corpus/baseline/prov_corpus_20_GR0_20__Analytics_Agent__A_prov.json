@@ -1,0 +1,175 @@
+{
+  "prefix": {
+    "cb": "urn:yprov4agents:callback-baseline#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "yp": "http://hpci-lab.org/yProv4Agents#"
+  },
+  "agent": {
+    "cb:agent_4bd4a25f4d25": {
+      "prov:label": "Analytics_Agent"
+    }
+  },
+  "activity": {
+    "cb:activity_00": {
+      "prov:label": "CA3: receive provenance graph",
+      "prov:startTime": "2026-10-17T19:38:13.589654+00:00",
+      "prov:endTime": "2026-10-17T19:38:13.589667+00:00",
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_01": {
+      "prov:label": "CA3: select analytics algorithms",
+      "prov:startTime": "2026-10-17T19:38:13.589654+00:00",
+      "prov:endTime": "2026-10-17T19:38:13.589663+00:00",
+      "prov:type": {
+        "$": "yp:PlanningActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_02": {
+      "prov:label": "CA3: mine the provenance graph",
+      "prov:startTime": "2026-10-17T19:38:13.589654+00:00",
+      "prov:endTime": "2026-10-17T19:38:15.266739+00:00",
+      "prov:type": {
+        "$": "yp:AnalysisActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_03": {
+      "prov:label": "CA3: validate findings against invariants",
+      "prov:startTime": "2026-10-17T19:38:15.266231+00:00",
+      "prov:endTime": "2026-10-17T19:38:15.266242+00:00",
+      "prov:type": {
+        "$": "yp:ObservationActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_04": {
+      "prov:label": "CA3: ANOMALY",
+      "prov:startTime": "2026-10-17T19:38:15.266231+00:00",
+      "prov:endTime": "2026-10-17T19:38:15.266237+00:00",
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:verdict": "ANOMALY",
+      "cb:verdict_source": "scraped-from-label"
+    },
+    "cb:activity_05": {
+      "prov:label": "CA3: publish analytics report",
+      "prov:startTime": "2026-10-17T19:38:15.266231+00:00",
+      "prov:endTime": "2026-10-17T19:38:15.266236+00:00",
+      "prov:type": {
+        "$": "yp:ResponseActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    }
+  },
+  "entity": {
+    "cb:entity_641d514267e3": {
+      "prov:value": "provenance graph from producer.yprov4ml.prov_corpus_20_GR0_20"
+    },
+    "cb:entity_95c7f5c70f5a": {
+      "prov:value": "The anomaly identified is a significant timing gap of 1.011 seconds before 'Epoch_0', which constitutes 83.5% of the total run's wall clock time of 1.210 seconds. This is unusually large compared to the median inter-activity gap of 0.001 seconds, indicating unexpected behavior in the timing sequence. Regarding completeness gaps, there is a lack of end time recordings for 15 activities, which prevents the determination of their durations, suggesting incomplete temporal documentation. Additionally, 6 out of 114 entities are untyped, resulting in a typing coverage of 94.7%, indicating a minor gap in entity typing completeness."
+    },
+    "cb:entity_93ace94aa0ca": {
+      "prov:value": "1 invariant(s) breached, 2 completeness gap(s)"
+    }
+  },
+  "used": {
+    "_:u0": {
+      "prov:activity": "cb:activity_01",
+      "prov:entity": "cb:entity_641d514267e3"
+    },
+    "_:u1": {
+      "prov:activity": "cb:activity_02",
+      "prov:entity": "cb:entity_641d514267e3"
+    },
+    "_:u2": {
+      "prov:activity": "cb:activity_03",
+      "prov:entity": "cb:entity_95c7f5c70f5a"
+    },
+    "_:u3": {
+      "prov:activity": "cb:activity_04",
+      "prov:entity": "cb:entity_93ace94aa0ca"
+    },
+    "_:u4": {
+      "prov:activity": "cb:activity_05",
+      "prov:entity": "cb:entity_95c7f5c70f5a"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "cb:entity_641d514267e3",
+      "prov:activity": "cb:activity_00"
+    },
+    "_:g1": {
+      "prov:entity": "cb:entity_95c7f5c70f5a",
+      "prov:activity": "cb:activity_02"
+    },
+    "_:g2": {
+      "prov:entity": "cb:entity_93ace94aa0ca",
+      "prov:activity": "cb:activity_03"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "cb:activity_00",
+      "prov:agent": "cb:agent_4bd4a25f4d25"
+    },
+    "_:a1": {
+      "prov:activity": "cb:activity_01",
+      "prov:agent": "cb:agent_4bd4a25f4d25"
+    },
+    "_:a2": {
+      "prov:activity": "cb:activity_02",
+      "prov:agent": "cb:agent_4bd4a25f4d25"
+    },
+    "_:a3": {
+      "prov:activity": "cb:activity_03",
+      "prov:agent": "cb:agent_4bd4a25f4d25"
+    },
+    "_:a4": {
+      "prov:activity": "cb:activity_04",
+      "prov:agent": "cb:agent_4bd4a25f4d25"
+    },
+    "_:a5": {
+      "prov:activity": "cb:activity_05",
+      "prov:agent": "cb:agent_4bd4a25f4d25"
+    }
+  },
+  "wasInformedBy": {
+    "_:i0": {
+      "prov:informed": "cb:activity_01",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i1": {
+      "prov:informed": "cb:activity_02",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i2": {
+      "prov:informed": "cb:activity_03",
+      "prov:informant": "cb:activity_02"
+    },
+    "_:i3": {
+      "prov:informed": "cb:activity_04",
+      "prov:informant": "cb:activity_03"
+    },
+    "_:i4": {
+      "prov:informed": "cb:activity_05",
+      "prov:informant": "cb:activity_02"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d0": {
+      "prov:generatedEntity": "cb:entity_95c7f5c70f5a",
+      "prov:usedEntity": "cb:entity_641d514267e3"
+    },
+    "_:d1": {
+      "prov:generatedEntity": "cb:entity_93ace94aa0ca",
+      "prov:usedEntity": "cb:entity_95c7f5c70f5a"
+    }
+  }
+}

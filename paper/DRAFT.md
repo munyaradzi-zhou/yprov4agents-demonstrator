@@ -128,11 +128,12 @@ justified and concluded; every step is typed, dated, ended and attributed; every
 something; every `yp:pid` carries a `sha256:` hash. An agent's own runtime check is tested against
 the shapes rather than trusted to match them, which has found four disagreements, each fixed.
 
-When a model chooses the verdict, the step's rule is the model call and the code that parses
-its answer: the record names the prompt by identity and hash (Section 5.5) and the parsed
-fields as inputs, replay checks the parse, and the call itself is repeatable from its record
-rather than reproducible. Every verdict evaluated here is reached in code; a model-chosen
-verdict is where this design reaches least far.
+When a model chooses the verdict, the rule is the code that reads the model's answer. CAx
+can run that way: the model reviews the summary under a registered prompt and answers in a
+fixed form, the record names the prompt by identity and hash (Section 5.5), the parsed answer
+is the rule's input, and the code check still runs and is recorded beside it
+(`yp:code_verdict`). Replay then shows the verdict follows from what the model said; it cannot
+show the model would say it again.
 
 **Two layers.** *Layer 1, what happened* (activities, timings, model calls, dataflow) follows
 mechanically from what a framework callback receives, and the ecosystem of Section 2.2 already
@@ -293,6 +294,14 @@ computation, it reconstructed none. Of the 338 values the rules read, it named 1
 code, and 100 of those matched another case's reconstruction as well: constants read off the
 source.
 
+**When the model decides.** With CAx's verdict chosen by gpt-4o, on the reference records, the
+corpus, and the corpus again with a fabrication planted in each summary
+(`experiments/model-verdict`), all 122 decisions replay from their records. The model and
+the code agreed on every faithful summary (50) and on every invented large figure (24). On an
+invented small figure ("4 GPUs") or name ("trained on ImageNet"), which the code check cannot
+see, the model said REVISE and the code ACCEPT in all 48. Recording both is what makes that
+disagreement a fact in the record rather than a property of whichever check happened to run.
+
 **Inside the step.** A line tracer is the observer Proposition 1 leaves out, so we built one:
 `sys.settrace` over the agents' own frames, keeping each change to a scalar local, on the same
 agents and producer record as the overhead study (`experiments/line-tracer`). It holds 7 of the
@@ -411,7 +420,8 @@ people is the next step. The fact-level
 measure is coarse in both directions. A model-bearing step is repeatable from its record, not
 reproducible: three fingerprints in one run is a backend changing under a caller that changed
 nothing. The bus is at-most-once: numbered envelopes expose a partial loss, but a stream lost
-whole is silent. The evaluation uses one producer (24 real records and two bundled ones) and one machine. We
+whole is silent. The evaluation uses one producer, yProv4ML (24 real records and two bundled ones), as befits
+a demonstrator, and one machine. We
 built the main baseline ourselves, granted it every declared structural fact, and checked it
 against a real framework's handler, which saw more bytes and no more of the decisions.
 

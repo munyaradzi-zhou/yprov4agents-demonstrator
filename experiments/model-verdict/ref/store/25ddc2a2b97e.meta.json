@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-25ddc2a2b97e",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/ref/store/25ddc2a2b97e.txt",
+  "yp:contentHash": "sha256:25ddc2a2b97e7caa3439bc2d5d095297e93fce9de5408acd4dcaa3ea1efb0ade",
+  "size_bytes": 815,
+  "kind": "analytics-report",
+  "preview": "The findings indicate two significant timing anomalies: a 5.049-second gap before 'Training', which constitutes 64.7% of the total run time,…",
+  "created_at": "2026-10-17T19:35:05.623629+00:00"
+}

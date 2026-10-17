@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-776272ea5c45",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/776272ea5c45.txt",
+  "yp:contentHash": "sha256:776272ea5c45fa0cffb9cb8a19b64a0f98665e918ffd3df0aea64d79cf9e05e1",
+  "size_bytes": 705,
+  "kind": "analytics-report",
+  "preview": "The anomaly identified in the timing section indicates a significant gap of 1.008 seconds before 'Epoch_0', which constitutes 83.9% of the t…",
+  "created_at": "2026-10-17T19:37:52.314594+00:00"
+}

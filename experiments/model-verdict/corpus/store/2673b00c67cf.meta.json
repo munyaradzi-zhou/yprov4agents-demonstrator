@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-2673b00c67cf",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/2673b00c67cf.txt",
+  "yp:contentHash": "sha256:2673b00c67cff387d9574b2f921d4cd0cbdfeec13adc5231984d3d441a58a27b",
+  "size_bytes": 411,
+  "kind": "summary",
+  "preview": "The machine learning run involved 14 activities, including key processes such as corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch…",
+  "created_at": "2026-10-17T19:37:21.297530+00:00"
+}

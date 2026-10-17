@@ -1,0 +1,1 @@
+This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. Training used 4 GPUs.

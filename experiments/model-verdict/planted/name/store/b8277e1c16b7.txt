@@ -1,0 +1,1 @@
+This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The model was trained on the ImageNet dataset.

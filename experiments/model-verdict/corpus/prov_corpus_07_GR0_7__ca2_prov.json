@@ -1,0 +1,194 @@
+{
+  "prefix": {
+    "yp": "http://hpci-lab.org/yProv4Agents#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "agent": {
+    "yp:agent_prov_corpus_07_GR0_7": {
+      "prov:type": {
+        "$": "yp:OperationalAgent",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics_Visualizer"
+    }
+  },
+  "activity": {
+    "yp:ReceiveTaskActivity_prov_corpus_07_GR0_7_00": {
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: receive producer record",
+      "prov:startTime": "2026-10-17T19:37:01.975868+00:00",
+      "prov:endTime": "2026-10-17T19:37:01.975882+00:00"
+    },
+    "yp:PlanningActivity_prov_corpus_07_GR0_7_01": {
+      "prov:type": {
+        "$": "yp:PlanningActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: choose what to plot",
+      "prov:startTime": "2026-10-17T19:37:01.975868+00:00",
+      "prov:endTime": "2026-10-17T19:37:01.975930+00:00"
+    },
+    "yp:ToolCallActivity_prov_corpus_07_GR0_7_02": {
+      "prov:type": {
+        "$": "yp:ToolCallActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: render chart (matplotlib)",
+      "prov:startTime": "2026-10-17T19:37:01.975868+00:00",
+      "prov:endTime": "2026-10-17T19:37:02.099561+00:00"
+    },
+    "yp:ObservationActivity_prov_corpus_07_GR0_7_03": {
+      "prov:type": {
+        "$": "yp:ObservationActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: confirm the chart reached disk",
+      "prov:startTime": "2026-10-17T19:37:02.099659+00:00",
+      "prov:endTime": "2026-10-17T19:37:02.099722+00:00",
+      "yp:rendered_bytes": 13664
+    },
+    "yp:DecisionActivity_prov_corpus_07_GR0_7_04": {
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: revise chart",
+      "prov:startTime": "2026-10-17T19:37:02.099659+00:00",
+      "prov:endTime": "2026-10-17T19:37:02.099663+00:00",
+      "yp:justification": "The graph carries no numeric prov:value entities, so no measurement could be plotted; fell back to graph composition (14 activities / 97 entities / 114 relations), which describes the record rather than the run it documents. Wrote a non-empty png file to prov_corpus_07_GR0_7_metrics.png with matplotlib; deterministic, no model involved. Verdict REVISE — the chart is valid but less informative than intended.",
+      "yp:chart_subject": "graph-composition",
+      "yp:series_plotted": 3,
+      "yp:rule": "ca2.chart/v1",
+      "yp:rule_inputs": "{\"chart_subject\":\"graph-composition\",\"rendered_bytes\":13664}",
+      "yp:verdict": "REVISE"
+    },
+    "yp:ResponseActivity_prov_corpus_07_GR0_7_05": {
+      "prov:type": {
+        "$": "yp:ResponseActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Metrics: respond",
+      "prov:startTime": "2026-10-17T19:37:02.099659+00:00",
+      "prov:endTime": "2026-10-17T19:37:02.099662+00:00"
+    }
+  },
+  "entity": {
+    "yp:bundle_prov_corpus_07_GR0_7": {
+      "prov:type": {
+        "$": "prov:Bundle",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "provenance record emitted by Metrics_Visualizer",
+      "yp:granularity": "DATA",
+      "yp:persistence": "PERSISTENT",
+      "yp:emitted_by": "yprov4agenticai",
+      "yp:library_version": "0.2.0"
+    },
+    "yp:TaskEntity_prov_corpus_07_GR0_7": {
+      "prov:type": {
+        "$": "yp:TaskEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:value": "producer doc on producer.yprov4ml.prov_corpus_07_GR0_7"
+    },
+    "yp:ToolResultEntity_prov_corpus_07_GR0_7": {
+      "prov:type": {
+        "$": "yp:ToolResultEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:value": "prov_corpus_07_GR0_7_metrics.png",
+      "yp:pid": "21.T11999/yprovstore-6914477e50ce",
+      "yp:contentHash": "sha256:6914477e50ceaf0ec3db29417476b9d146afde18a02aef81f3d56a425664f009"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d0": {
+      "prov:generatedEntity": "yp:ToolResultEntity_prov_corpus_07_GR0_7",
+      "prov:usedEntity": "yp:TaskEntity_prov_corpus_07_GR0_7"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "yp:ReceiveTaskActivity_prov_corpus_07_GR0_7_00",
+      "prov:agent": "yp:agent_prov_corpus_07_GR0_7"
+    },
+    "_:a1": {
+      "prov:activity": "yp:PlanningActivity_prov_corpus_07_GR0_7_01",
+      "prov:agent": "yp:agent_prov_corpus_07_GR0_7"
+    },
+    "_:a2": {
+      "prov:activity": "yp:ToolCallActivity_prov_corpus_07_GR0_7_02",
+      "prov:agent": "yp:agent_prov_corpus_07_GR0_7"
+    },
+    "_:a3": {
+      "prov:activity": "yp:ObservationActivity_prov_corpus_07_GR0_7_03",
+      "prov:agent": "yp:agent_prov_corpus_07_GR0_7"
+    },
+    "_:a4": {
+      "prov:activity": "yp:DecisionActivity_prov_corpus_07_GR0_7_04",
+      "prov:agent": "yp:agent_prov_corpus_07_GR0_7"
+    },
+    "_:a5": {
+      "prov:activity": "yp:ResponseActivity_prov_corpus_07_GR0_7_05",
+      "prov:agent": "yp:agent_prov_corpus_07_GR0_7"
+    }
+  },
+  "wasInformedBy": {
+    "_:i0": {
+      "prov:informed": "yp:PlanningActivity_prov_corpus_07_GR0_7_01",
+      "prov:informant": "yp:ReceiveTaskActivity_prov_corpus_07_GR0_7_00"
+    },
+    "_:i1": {
+      "prov:informed": "yp:ToolCallActivity_prov_corpus_07_GR0_7_02",
+      "prov:informant": "yp:ReceiveTaskActivity_prov_corpus_07_GR0_7_00"
+    },
+    "_:i2": {
+      "prov:informed": "yp:ObservationActivity_prov_corpus_07_GR0_7_03",
+      "prov:informant": "yp:ToolCallActivity_prov_corpus_07_GR0_7_02"
+    },
+    "_:i3": {
+      "prov:informed": "yp:DecisionActivity_prov_corpus_07_GR0_7_04",
+      "prov:informant": "yp:ToolCallActivity_prov_corpus_07_GR0_7_02"
+    },
+    "_:i4": {
+      "prov:informed": "yp:ResponseActivity_prov_corpus_07_GR0_7_05",
+      "prov:informant": "yp:ToolCallActivity_prov_corpus_07_GR0_7_02"
+    }
+  },
+  "used": {
+    "_:u1": {
+      "prov:activity": "yp:PlanningActivity_prov_corpus_07_GR0_7_01",
+      "prov:entity": "yp:TaskEntity_prov_corpus_07_GR0_7"
+    },
+    "_:u2": {
+      "prov:activity": "yp:ToolCallActivity_prov_corpus_07_GR0_7_02",
+      "prov:entity": "yp:TaskEntity_prov_corpus_07_GR0_7"
+    },
+    "_:u3": {
+      "prov:activity": "yp:ObservationActivity_prov_corpus_07_GR0_7_03",
+      "prov:entity": "yp:ToolResultEntity_prov_corpus_07_GR0_7"
+    },
+    "_:u4": {
+      "prov:activity": "yp:DecisionActivity_prov_corpus_07_GR0_7_04",
+      "prov:entity": "yp:ToolResultEntity_prov_corpus_07_GR0_7"
+    },
+    "_:u5": {
+      "prov:activity": "yp:ResponseActivity_prov_corpus_07_GR0_7_05",
+      "prov:entity": "yp:ToolResultEntity_prov_corpus_07_GR0_7"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "yp:TaskEntity_prov_corpus_07_GR0_7",
+      "prov:activity": "yp:ReceiveTaskActivity_prov_corpus_07_GR0_7_00"
+    },
+    "_:g2": {
+      "prov:entity": "yp:ToolResultEntity_prov_corpus_07_GR0_7",
+      "prov:activity": "yp:ToolCallActivity_prov_corpus_07_GR0_7_02"
+    }
+  }
+}

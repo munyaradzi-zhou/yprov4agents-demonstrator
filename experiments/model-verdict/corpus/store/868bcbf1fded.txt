@@ -1,0 +1,1 @@
+The machine learning run involved 12 activities, including key processes such as corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, and Training. There were 80 entities involved in the run, and the relationships between these activities and entities were captured in 95 lineage relations. These activities likely represent different stages of data preparation and model training.

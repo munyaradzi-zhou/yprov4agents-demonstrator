@@ -1,0 +1,1125 @@
+{
+ "summary": {
+  "decisions": 122,
+  "replayed": 122,
+  "unparsed": 0,
+  "model_verdicts": {
+   "ACCEPT": 50,
+   "REVISE": 72
+  },
+  "code_verdicts": {
+   "ACCEPT": 98,
+   "REVISE": 24
+  },
+  "agree": 74,
+  "pairs": {
+   "model ACCEPT / code ACCEPT": 50,
+   "model REVISE / code REVISE": 24,
+   "model REVISE / code ACCEPT": 48
+  },
+  "issues": {
+   "none": 50,
+   "unsupported_specific": 72
+  }
+ },
+ "rows": [
+  {
+   "record": "ref/example_0__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "ref/example_2__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_00_GR0_0__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_01_GR0_1__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_02_GR0_2__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_03_GR0_3__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_04_GR0_4__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_05_GR0_5__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_06_GR0_6__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_07_GR0_7__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_08_GR0_8__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_09_GR0_9__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_10_GR0_10__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_11_GR0_11__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_12_GR0_12__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_13_GR0_13__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_14_GR0_14__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_15_GR0_15__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_16_GR0_16__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_17_GR0_17__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_18_GR0_18__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_19_GR0_19__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_20_GR0_20__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_21_GR0_21__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_22_GR0_22__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "corpus/prov_corpus_23_GR0_23__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_00_GR0_0__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_01_GR0_1__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_02_GR0_2__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_03_GR0_3__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_04_GR0_4__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_05_GR0_5__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_06_GR0_6__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_07_GR0_7__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_08_GR0_8__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_09_GR0_9__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_10_GR0_10__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_11_GR0_11__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_12_GR0_12__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_13_GR0_13__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_14_GR0_14__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_15_GR0_15__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_16_GR0_16__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_17_GR0_17__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_18_GR0_18__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_19_GR0_19__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_20_GR0_20__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_21_GR0_21__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_22_GR0_22__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "none/prov_corpus_23_GR0_23__cax_prov.json",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT",
+   "issue": "none",
+   "evidence": "",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_00_GR0_0__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_01_GR0_1__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_02_GR0_2__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_03_GR0_3__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_04_GR0_4__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "48,000 training samples",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_05_GR0_5__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_06_GR0_6__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_07_GR0_7__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_08_GR0_8__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_09_GR0_9__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_10_GR0_10__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_11_GR0_11__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_12_GR0_12__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_13_GR0_13__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_14_GR0_14__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_15_GR0_15__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_16_GR0_16__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_17_GR0_17__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "48,000 training samples",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_18_GR0_18__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_19_GR0_19__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_20_GR0_20__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "48,000 training samples",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_21_GR0_21__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_22_GR0_22__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "large_figure/prov_corpus_23_GR0_23__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE",
+   "issue": "unsupported_specific",
+   "evidence": "The run processed 48,000 training samples.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_00_GR0_0__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_01_GR0_1__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_02_GR0_2__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_03_GR0_3__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_04_GR0_4__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_05_GR0_5__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_06_GR0_6__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_07_GR0_7__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_08_GR0_8__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_09_GR0_9__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_10_GR0_10__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_11_GR0_11__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_12_GR0_12__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_13_GR0_13__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_14_GR0_14__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_15_GR0_15__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_16_GR0_16__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_17_GR0_17__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_18_GR0_18__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_19_GR0_19__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_20_GR0_20__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_21_GR0_21__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_22_GR0_22__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "small_figure/prov_corpus_23_GR0_23__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "Training used 4 GPUs.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_00_GR0_0__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_01_GR0_1__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_02_GR0_2__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_03_GR0_3__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_04_GR0_4__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_05_GR0_5__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_06_GR0_6__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_07_GR0_7__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_08_GR0_8__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_09_GR0_9__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_10_GR0_10__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_11_GR0_11__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_12_GR0_12__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_13_GR0_13__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_14_GR0_14__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_15_GR0_15__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_16_GR0_16__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_17_GR0_17__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_18_GR0_18__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_19_GR0_19__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_20_GR0_20__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_21_GR0_21__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_22_GR0_22__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  },
+  {
+   "record": "name/prov_corpus_23_GR0_23__cax_prov.json",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT",
+   "issue": "unsupported_specific",
+   "evidence": "The model was trained on the ImageNet dataset.",
+   "parsed": true,
+   "replays": true
+  }
+ ]
+}

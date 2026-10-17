@@ -1,0 +1,1 @@
+The machine-learning run involved 12 activities, including key processes such as corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, and Training. Additionally, there was a specific activity labeled psutil//Epoch_0. The run also included 80 entities and 95 lineage relations, which together mapped the flow and transformation of data throughout the process.

@@ -1,0 +1,770 @@
+{
+  "21.T11999/yprovstore-00a29c891c95": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/00a29c891c95.txt",
+    "yp:contentHash": "sha256:00a29c891c95bffacbf607eb80d6bf0bd94c7f7c9d9b0f06243c16aa9769fe94",
+    "size_bytes": 31685,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:53.994481\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:54.003491…",
+    "created_at": "2026-10-17T19:36:42.679417+00:00"
+  },
+  "21.T11999/yprovstore-013053e140a7": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/013053e140a7.txt",
+    "yp:contentHash": "sha256:013053e140a7c7eff04d8f990eb70a98c8149d2f381166e631d8e0c2bec4f809",
+    "size_bytes": 653,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified in the timing section indicates a significant gap of 1.008 seconds before 'Epoch_0', which constitutes 81.0% of the t…",
+    "created_at": "2026-10-17T19:38:28.073951+00:00"
+  },
+  "21.T11999/yprovstore-049dc3cae7ec": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/049dc3cae7ec.txt",
+    "yp:contentHash": "sha256:049dc3cae7ec1a294e3311b7de1b2844de044f53cd37f5f4d3b6120ac698dd63",
+    "size_bytes": 467,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine-learning run involving 16 activities, 112 entities, and 130 lineage relations. Key activities in th…",
+    "created_at": "2026-10-17T19:38:23.062643+00:00"
+  },
+  "21.T11999/yprovstore-066a38ad7e04": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/066a38ad7e04.txt",
+    "yp:contentHash": "sha256:066a38ad7e04ce12971a560ecdc7ed010c0978c0f8e96c8bf39246fa6beacb9f",
+    "size_bytes": 717,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.006 seconds before 'Epoch_0', which constitutes 84.5% of the total wall clock time o…",
+    "created_at": "2026-10-17T19:36:57.951287+00:00"
+  },
+  "21.T11999/yprovstore-07644fd67e08": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/07644fd67e08.txt",
+    "yp:contentHash": "sha256:07644fd67e08473e2f07ead43867c924d84fba46b1f704f15531fa0a366ad9c1",
+    "size_bytes": 421,
+    "kind": "summary",
+    "preview": "The machine learning run involved 14 activities, including key processes such as corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch…",
+    "created_at": "2026-10-17T19:37:15.655357+00:00"
+  },
+  "21.T11999/yprovstore-0c9f2c07b17a": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/0c9f2c07b17a.txt",
+    "yp:contentHash": "sha256:0c9f2c07b17aa03dfaee6641df26a154df47a3189be51189cad1ff52f94074e1",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:38:13.522641+00:00"
+  },
+  "21.T11999/yprovstore-0d72ea04a7ff": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/0d72ea04a7ff.txt",
+    "yp:contentHash": "sha256:0d72ea04a7ffcfe4b99b45c20ae790d87c896b504c63db148241f5030bb2b5c7",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:38:19.436770+00:00"
+  },
+  "21.T11999/yprovstore-0fdbfb851487": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/0fdbfb851487.txt",
+    "yp:contentHash": "sha256:0fdbfb8514879426fb99eebe5967a43a093ec2206fd23265336c1152fd3a6649",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:45.061502+00:00"
+  },
+  "21.T11999/yprovstore-15d1af4cc19d": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/15d1af4cc19d.txt",
+    "yp:contentHash": "sha256:15d1af4cc19d431b3eaab541ebdeeed2c903df8ea43f6181207e980f9cdca5f1",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:39.868595+00:00"
+  },
+  "21.T11999/yprovstore-1821d1f0c4d3": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/1821d1f0c4d3.txt",
+    "yp:contentHash": "sha256:1821d1f0c4d35db6b0a2f34a11fb3e4dcd5c6ed86136191df1696e899aa01e90",
+    "size_bytes": 40128,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:55.152841\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:55.161811…",
+    "created_at": "2026-10-17T19:36:47.851590+00:00"
+  },
+  "21.T11999/yprovstore-21b6a261a23f": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/21b6a261a23f.txt",
+    "yp:contentHash": "sha256:21b6a261a23f42b5a79d879862e309bf39f1335e6d755a4c17fde2cb729861cc",
+    "size_bytes": 396,
+    "kind": "summary",
+    "preview": "The machine learning run involved 16 activities, including key activities such as corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoc…",
+    "created_at": "2026-10-17T19:38:29.928772+00:00"
+  },
+  "21.T11999/yprovstore-227e30345611": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/227e30345611.txt",
+    "yp:contentHash": "sha256:227e30345611854c6b205b5d15515b3118811304f157c0480196f5000e71833f",
+    "size_bytes": 620,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.012 seconds before 'Epoch_0', which constitutes 84.2% of the total run's wall clock …",
+    "created_at": "2026-10-17T19:36:52.891611+00:00"
+  },
+  "21.T11999/yprovstore-252acae695c4": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/252acae695c4.txt",
+    "yp:contentHash": "sha256:252acae695c46ee584e57bbcc1562e17e55491b8cbc6612770925c04f3ddab87",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:50.570971+00:00"
+  },
+  "21.T11999/yprovstore-2673b00c67cf": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/2673b00c67cf.txt",
+    "yp:contentHash": "sha256:2673b00c67cff387d9574b2f921d4cd0cbdfeec13adc5231984d3d441a58a27b",
+    "size_bytes": 411,
+    "kind": "summary",
+    "preview": "The machine learning run involved 14 activities, including key processes such as corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch…",
+    "created_at": "2026-10-17T19:37:21.297530+00:00"
+  },
+  "21.T11999/yprovstore-2814d0a1d06e": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/2814d0a1d06e.txt",
+    "yp:contentHash": "sha256:2814d0a1d06e3ebbc02a8871ce1ac3e364e4de17b3499e165397a6f21cd00491",
+    "size_bytes": 655,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified in the timing section indicates a significant gap of 1.004 seconds before 'Epoch_0', which constitutes 83.0% of the t…",
+    "created_at": "2026-10-17T19:37:19.682687+00:00"
+  },
+  "21.T11999/yprovstore-2923bc8c7814": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/2923bc8c7814.txt",
+    "yp:contentHash": "sha256:2923bc8c7814f7c4ea9e9ddfe12258923b666c5b76b562efa6cbf32aeac152c2",
+    "size_bytes": 597,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap before 'Epoch_0', which accounts for 82.5% of the total wall clock time of the run. This …",
+    "created_at": "2026-10-17T19:37:41.467285+00:00"
+  },
+  "21.T11999/yprovstore-2acaf28aa2c1": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/2acaf28aa2c1.txt",
+    "yp:contentHash": "sha256:2acaf28aa2c1d6ecb1627d7efdf5984e3f9267b2cf2bb0e48c4e498caface2f7",
+    "size_bytes": 380,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine learning run involving 14 activities, 97 entities, and 114 lineage relations. Key activities includ…",
+    "created_at": "2026-10-17T19:37:10.277403+00:00"
+  },
+  "21.T11999/yprovstore-2f969ab5a8e3": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/2f969ab5a8e3.txt",
+    "yp:contentHash": "sha256:2f969ab5a8e33c80518ce6e3c23ee95aa4eb247871165ef9cd5c2e4245e3fc60",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:07.075255+00:00"
+  },
+  "21.T11999/yprovstore-3016ef7111c5": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/3016ef7111c5.txt",
+    "yp:contentHash": "sha256:3016ef7111c50c2dbab06487eb21dbbeaaaa72128a448063535019c2250c0341",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:34.465052+00:00"
+  },
+  "21.T11999/yprovstore-31381f30c0fa": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/31381f30c0fa.txt",
+    "yp:contentHash": "sha256:31381f30c0faccb3fa4d273813344868fd04d3e77c04bf935d4de89ab0949c46",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:12.184322+00:00"
+  },
+  "21.T11999/yprovstore-351c191dcfa5": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/351c191dcfa5.txt",
+    "yp:contentHash": "sha256:351c191dcfa5f269f025b15b140a43397a1dd83072a04c9b1d2b1411c963f44c",
+    "size_bytes": 419,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine-learning run involving 16 activities, 114 entities, and 133 lineage relations. Key activities inclu…",
+    "created_at": "2026-10-17T19:37:54.251297+00:00"
+  },
+  "21.T11999/yprovstore-373ed6d4b484": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/373ed6d4b484.txt",
+    "yp:contentHash": "sha256:373ed6d4b48434b6cf42c14d3407f00a3f23a2514671bcfd10bcc10a80cd853a",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:56.607327+00:00"
+  },
+  "21.T11999/yprovstore-39f06aa3f61d": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/39f06aa3f61d.txt",
+    "yp:contentHash": "sha256:39f06aa3f61d15fdf5efa5b21c277b0946e347ae97972de09fe756156d2977dd",
+    "size_bytes": 587,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.007 seconds before 'Epoch_0', which accounts for 85.1% of the total run's wall clock…",
+    "created_at": "2026-10-17T19:37:24.708954+00:00"
+  },
+  "21.T11999/yprovstore-3b0eafc73020": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/3b0eafc73020.txt",
+    "yp:contentHash": "sha256:3b0eafc7302098b5ef8086c9ab5a5aef4c980a3a87220827002ae80fc61a700c",
+    "size_bytes": 591,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap before 'Epoch_0', which accounts for 83.1% of the total wall clock time of the run. This …",
+    "created_at": "2026-10-17T19:37:03.693467+00:00"
+  },
+  "21.T11999/yprovstore-40de74b3b1f3": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/40de74b3b1f3.txt",
+    "yp:contentHash": "sha256:40de74b3b1f3c694bf5ed833850696a66da02535842e163bebd921d1f400b6d2",
+    "size_bytes": 349,
+    "kind": "summary",
+    "preview": "The machine-learning run involved 12 activities, including key processes such as corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, and Training. A…",
+    "created_at": "2026-10-17T19:36:49.329864+00:00"
+  },
+  "21.T11999/yprovstore-492bb55d881c": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/492bb55d881c.txt",
+    "yp:contentHash": "sha256:492bb55d881c25456ebc6825f00bf34cda33083590a68573153d7aa2e428ee10",
+    "size_bytes": 427,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine learning run involving 14 activities, 97 entities, and 114 lineage relations. Key activities includ…",
+    "created_at": "2026-10-17T19:37:00.103192+00:00"
+  },
+  "21.T11999/yprovstore-4b10c333a717": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/4b10c333a717.txt",
+    "yp:contentHash": "sha256:4b10c333a71791095c763351a8b479c34013f9033e93ba781cf5cc58653a1d5a",
+    "size_bytes": 40134,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:56.373218\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:56.395497…",
+    "created_at": "2026-10-17T19:36:52.910202+00:00"
+  },
+  "21.T11999/yprovstore-4b5251c5fcd3": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/4b5251c5fcd3.txt",
+    "yp:contentHash": "sha256:4b5251c5fcd3d3a1cc501ae11cb7e4ae7f31356bf677d2133de3cb146c78a9d4",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:38:02.155036+00:00"
+  },
+  "21.T11999/yprovstore-4bbe712b092e": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/4bbe712b092e.txt",
+    "yp:contentHash": "sha256:4bbe712b092ee4c4cf482333035935b50c3f26e564b9970372f6d81c91ac99a0",
+    "size_bytes": 379,
+    "kind": "summary",
+    "preview": "The W3C PROV document details a machine learning run involving 14 activities, 95 entities, and 111 lineage relations. Key activities include…",
+    "created_at": "2026-10-17T19:37:05.140256+00:00"
+  },
+  "21.T11999/yprovstore-4bbeda8b3483": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/4bbeda8b3483.txt",
+    "yp:contentHash": "sha256:4bbeda8b34833d11c2d7ce77be4a729b7ff4809ca11c3505297af86a47b7c3bf",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:36:40.945222+00:00"
+  },
+  "21.T11999/yprovstore-50fda710076c": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/50fda710076c.txt",
+    "yp:contentHash": "sha256:50fda710076ccad0ab4252821b70d5b98c039862f9b891feeb1c93f72dbddf1c",
+    "size_bytes": 652,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified in the timing section indicates a significant gap of 1.003 seconds before 'Epoch_0', which constitutes 84.8% of the t…",
+    "created_at": "2026-10-17T19:36:32.167642+00:00"
+  },
+  "21.T11999/yprovstore-57b82b2cf849": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/57b82b2cf849.txt",
+    "yp:contentHash": "sha256:57b82b2cf849dc08cee08acb359126e8b2f26787f724298e49219a15f67e6234",
+    "size_bytes": 490,
+    "kind": "summary",
+    "preview": "The machine learning run involved several key activities, including corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, and Training. Throughout the…",
+    "created_at": "2026-10-17T19:36:33.906722+00:00"
+  },
+  "21.T11999/yprovstore-59266a626c86": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/59266a626c86.txt",
+    "yp:contentHash": "sha256:59266a626c86a3ebb40dc646c6c1887b7f4007120ceb3c45c8b05206d042cfad",
+    "size_bytes": 479,
+    "kind": "summary",
+    "preview": "The machine learning run involved several key activities, including corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, and Valida…",
+    "created_at": "2026-10-17T19:36:39.363125+00:00"
+  },
+  "21.T11999/yprovstore-5ec22ecfb1d0": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/5ec22ecfb1d0.txt",
+    "yp:contentHash": "sha256:5ec22ecfb1d0e96d46deb85059a6a5482e50ca2eb3b23503b67e03348fcec840",
+    "size_bytes": 399,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine-learning run involving 16 activities, 112 entities, and 130 lineage relations. Key activities in th…",
+    "created_at": "2026-10-17T19:37:37.762754+00:00"
+  },
+  "21.T11999/yprovstore-6351ab2f5802": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/6351ab2f5802.txt",
+    "yp:contentHash": "sha256:6351ab2f58029c2670e2e6f3d2cc0f6598ea637d34a7c796c6a76580743660d5",
+    "size_bytes": 57226,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:14.976313\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:14.989100…",
+    "created_at": "2026-10-17T19:38:15.272008+00:00"
+  },
+  "21.T11999/yprovstore-63b3f4291b30": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/63b3f4291b30.txt",
+    "yp:contentHash": "sha256:63b3f4291b30a1de1ade38248624087194a9f38ed8b82cd7a359c73ec2a86064",
+    "size_bytes": 31679,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:52.797300\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:52.822064…",
+    "created_at": "2026-10-17T19:36:37.653404+00:00"
+  },
+  "21.T11999/yprovstore-65bd3687e00a": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/65bd3687e00a.txt",
+    "yp:contentHash": "sha256:65bd3687e00a7456c304c52134b00bedb03130196b13dc6fea034ad7aa1b9f2c",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:36:51.138734+00:00"
+  },
+  "21.T11999/yprovstore-68480f9327ed": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/68480f9327ed.txt",
+    "yp:contentHash": "sha256:68480f9327edd92679a43ecfb6dbc12ce86c2e9797eb7e7993064e97a77df0c4",
+    "size_bytes": 513,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine-learning run involving 16 activities, 114 entities, and 133 lineage relations. Key activities inclu…",
+    "created_at": "2026-10-17T19:38:17.052078+00:00"
+  },
+  "21.T11999/yprovstore-6914477e50ce": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/6914477e50ce.txt",
+    "yp:contentHash": "sha256:6914477e50ceaf0ec3db29417476b9d146afde18a02aef81f3d56a425664f009",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:02.082084+00:00"
+  },
+  "21.T11999/yprovstore-6928b00fc6d8": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/6928b00fc6d8.txt",
+    "yp:contentHash": "sha256:6928b00fc6d8535eebfdf9315d3858edce5e505210143701d0b7d3d0b8f6a77d",
+    "size_bytes": 656,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.003 seconds before 'Epoch_0', which accounts for 87.1% of the total wall clock time …",
+    "created_at": "2026-10-17T19:36:42.663297+00:00"
+  },
+  "21.T11999/yprovstore-6e6549413e40": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/6e6549413e40.txt",
+    "yp:contentHash": "sha256:6e6549413e40186339bfe06f66fcd2e303362edbc8a7fd579a0c76d6184a21b7",
+    "size_bytes": 30774,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:50.101175\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:50.125837…",
+    "created_at": "2026-10-17T19:36:26.822839+00:00"
+  },
+  "21.T11999/yprovstore-73ceee69e588": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/73ceee69e588.txt",
+    "yp:contentHash": "sha256:73ceee69e588d8620822915e05f0a5d6d0c20771321c1db5af8f7561ad8b89c9",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:38:25.229472+00:00"
+  },
+  "21.T11999/yprovstore-749446894a2e": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/749446894a2e.txt",
+    "yp:contentHash": "sha256:749446894a2e8cbb517184481bdfcec15022732b46f0ecc069260e0255989d78",
+    "size_bytes": 57234,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:10.024712\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:10.036903…",
+    "created_at": "2026-10-17T19:37:52.356405+00:00"
+  },
+  "21.T11999/yprovstore-776272ea5c45": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/776272ea5c45.txt",
+    "yp:contentHash": "sha256:776272ea5c45fa0cffb9cb8a19b64a0f98665e918ffd3df0aea64d79cf9e05e1",
+    "size_bytes": 705,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified in the timing section indicates a significant gap of 1.008 seconds before 'Epoch_0', which constitutes 83.9% of the t…",
+    "created_at": "2026-10-17T19:37:52.314594+00:00"
+  },
+  "21.T11999/yprovstore-78cbb197b203": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/78cbb197b203.txt",
+    "yp:contentHash": "sha256:78cbb197b2033d80289b279cd9f75bef9a998af75669d5d5748de34b7eb3455a",
+    "size_bytes": 592,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.013 seconds before 'Epoch_0', which constitutes 82.8% of the total run time of 1.223…",
+    "created_at": "2026-10-17T19:37:08.787909+00:00"
+  },
+  "21.T11999/yprovstore-7b6a4bfe3a49": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/7b6a4bfe3a49.txt",
+    "yp:contentHash": "sha256:7b6a4bfe3a491a7c3212060e96e9505c7c7155a028954c0df49e390020c91c12",
+    "size_bytes": 769,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified in the timing section indicates a significant bottleneck gap of 1.004 seconds occurring before 'Epoch_0', which const…",
+    "created_at": "2026-10-17T19:36:47.833943+00:00"
+  },
+  "21.T11999/yprovstore-7d81d246b992": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/7d81d246b992.txt",
+    "yp:contentHash": "sha256:7d81d246b9921e9e87abb714d41b9b615fdf4d436ba1c63e4990b3c18a88cdbd",
+    "size_bytes": 56309,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:13.757925\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:13.763998…",
+    "created_at": "2026-10-17T19:38:09.731862+00:00"
+  },
+  "21.T11999/yprovstore-81b26d73f8a5": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/81b26d73f8a5.txt",
+    "yp:contentHash": "sha256:81b26d73f8a50609ed16df089130f010efbd1abe2604eb3284bbeffe45cc38d4",
+    "size_bytes": 56300,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:07.554559\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:07.568871…",
+    "created_at": "2026-10-17T19:37:41.510748+00:00"
+  },
+  "21.T11999/yprovstore-83d84f9b84ac": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/83d84f9b84ac.txt",
+    "yp:contentHash": "sha256:83d84f9b84acaaf4f5ff9ef203ddadea75319f12aabf0275ef4c4e6e13919f42",
+    "size_bytes": 57233,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:12.456028\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:12.476436…",
+    "created_at": "2026-10-17T19:38:03.847087+00:00"
+  },
+  "21.T11999/yprovstore-8602173b0ae0": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/8602173b0ae0.txt",
+    "yp:contentHash": "sha256:8602173b0ae0ed9977348fef644862c29bbbb2ce2e14e62db6bf31d950289a1b",
+    "size_bytes": 644,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.008 seconds before 'Epoch_0', which constitutes 82.5% of the total run time of 1.222…",
+    "created_at": "2026-10-17T19:38:33.769708+00:00"
+  },
+  "21.T11999/yprovstore-868bcbf1fded": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/868bcbf1fded.txt",
+    "yp:contentHash": "sha256:868bcbf1fded6fd9a37946525934db274b9a59bb331eed809fe16916157e61ec",
+    "size_bytes": 381,
+    "kind": "summary",
+    "preview": "The machine learning run involved 12 activities, including key processes such as corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, and Tr…",
+    "created_at": "2026-10-17T19:36:54.461169+00:00"
+  },
+  "21.T11999/yprovstore-89a5447c8dcc": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/89a5447c8dcc.txt",
+    "yp:contentHash": "sha256:89a5447c8dccaacda7f392660b159421657517f24b58d4588facfd5f226e36b1",
+    "size_bytes": 674,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.010 seconds before 'Epoch_0', which constitutes 84.4% of the total wall clock time o…",
+    "created_at": "2026-10-17T19:36:26.812200+00:00"
+  },
+  "21.T11999/yprovstore-8f9fedb0b7de": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/8f9fedb0b7de.txt",
+    "yp:contentHash": "sha256:8f9fedb0b7de7a0b8f41c6954a4ea7e024a0ad05e63c37144b0518b9f0cae36a",
+    "size_bytes": 464,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine-learning run involving 16 activities, 114 entities, and 133 lineage relations. Key activities inclu…",
+    "created_at": "2026-10-17T19:37:59.881771+00:00"
+  },
+  "21.T11999/yprovstore-900713166a70": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/900713166a70.txt",
+    "yp:contentHash": "sha256:900713166a70d94cff52d39c162f77cfdaa2e603c71c733651dbf5584208726a",
+    "size_bytes": 48592,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:01.230430\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:01.253120…",
+    "created_at": "2026-10-17T19:37:13.906329+00:00"
+  },
+  "21.T11999/yprovstore-90fe43fa21ef": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/90fe43fa21ef.txt",
+    "yp:contentHash": "sha256:90fe43fa21efc6c531f41ae769cd2ffe822ed2fe150ef18f5feaf6684e85466e",
+    "size_bytes": 555,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap before 'Epoch_0', which accounts for 82.1% of the total run time. This suggests an unexpe…",
+    "created_at": "2026-10-17T19:37:46.643810+00:00"
+  },
+  "21.T11999/yprovstore-93d7ecfcb708": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/93d7ecfcb708.txt",
+    "yp:contentHash": "sha256:93d7ecfcb708264065e4649da788913efec68ca210e521ac593107a81aa347c9",
+    "size_bytes": 588,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.001 seconds before 'Epoch_0', which constitutes 83.0% of the total run's wall clock …",
+    "created_at": "2026-10-17T19:37:58.325324+00:00"
+  },
+  "21.T11999/yprovstore-95a9af340fdf": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/95a9af340fdf.txt",
+    "yp:contentHash": "sha256:95a9af340fdf773f6d24131fd6e42f272c9408908892910b66cf04bd3069a1e7",
+    "size_bytes": 525,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine-learning run involving 10 activities, 61 entities, and 73 lineage relations. Key activities include…",
+    "created_at": "2026-10-17T19:36:22.262481+00:00"
+  },
+  "21.T11999/yprovstore-95c7f5c70f5a": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/95c7f5c70f5a.txt",
+    "yp:contentHash": "sha256:95c7f5c70f5a6b8968a505a5e1537e0ad72e873fb7c35766ed78fbf84750d9e6",
+    "size_bytes": 631,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.011 seconds before 'Epoch_0', which constitutes 83.5% of the total run's wall clock …",
+    "created_at": "2026-10-17T19:38:15.226648+00:00"
+  },
+  "21.T11999/yprovstore-984d6cc93823": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/984d6cc93823.txt",
+    "yp:contentHash": "sha256:984d6cc9382316b178df9b214773b2dbb0da25913f7462ae739caa9cb3bcf082",
+    "size_bytes": 641,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.007 seconds before 'Epoch_0', which constitutes 83.6% of the total run's wall clock …",
+    "created_at": "2026-10-17T19:38:09.678158+00:00"
+  },
+  "21.T11999/yprovstore-9b4b3e59c936": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/9b4b3e59c936.txt",
+    "yp:contentHash": "sha256:9b4b3e59c936b6618f4fdb53259d6995ab8b0cebce2036a0e2e7b0b5335aac5f",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:36:56.214926+00:00"
+  },
+  "21.T11999/yprovstore-9be8585d4eff": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/9be8585d4eff.txt",
+    "yp:contentHash": "sha256:9be8585d4eff94c16684c5fab31ddef24774a99455bbffaf3215672af6ba7f7b",
+    "size_bytes": 465,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine-learning run involving 16 activities, 114 entities, and 133 lineage relations. Key activities inclu…",
+    "created_at": "2026-10-17T19:38:11.364693+00:00"
+  },
+  "21.T11999/yprovstore-9cf777028bf1": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/9cf777028bf1.txt",
+    "yp:contentHash": "sha256:9cf777028bf143aad7d3cda4922d7885238e068cd9144434b5a852c3fe0d40ed",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:38:32.012626+00:00"
+  },
+  "21.T11999/yprovstore-a151438c56a8": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/a151438c56a8.txt",
+    "yp:contentHash": "sha256:a151438c56a845c659fc84832331763f3a228b2a43fdc840439a513111ea326b",
+    "size_bytes": 669,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified in the timing data indicates a significant gap of 1.010 seconds before 'Epoch_0', which constitutes 78.1% of the tota…",
+    "created_at": "2026-10-17T19:38:03.797494+00:00"
+  },
+  "21.T11999/yprovstore-a17452f5d171": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/a17452f5d171.txt",
+    "yp:contentHash": "sha256:a17452f5d1719f7b51289f15fbf3f797d0998b98085dd28cd598da5d1b0a3807",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:38:07.718391+00:00"
+  },
+  "21.T11999/yprovstore-a964833ee1a7": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/a964833ee1a7.txt",
+    "yp:contentHash": "sha256:a964833ee1a7e57567b9611aad2b0b426fbba92a9fc6c1a5022b31f263c38b0b",
+    "size_bytes": 56308,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:08.786355\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:08.795076…",
+    "created_at": "2026-10-17T19:37:46.684065+00:00"
+  },
+  "21.T11999/yprovstore-ab1e7e90831f": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/ab1e7e90831f.txt",
+    "yp:contentHash": "sha256:ab1e7e90831f25a60e2fb2b85f976c5110c9dd051a166b96102930c3cc7cb07d",
+    "size_bytes": 47830,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:03.697405\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:03.704405…",
+    "created_at": "2026-10-17T19:37:24.736110+00:00"
+  },
+  "21.T11999/yprovstore-aea0aa01c1ab": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/aea0aa01c1ab.txt",
+    "yp:contentHash": "sha256:aea0aa01c1abd008cb41cd2b54639ffdae806420954eaf2d68d08a50141950fc",
+    "size_bytes": 47829,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:02.476153\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:02.489373…",
+    "created_at": "2026-10-17T19:37:19.707307+00:00"
+  },
+  "21.T11999/yprovstore-aecafc019216": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/aecafc019216.txt",
+    "yp:contentHash": "sha256:aecafc0192165214a148914d79cd89b25e4fbd901bf5493be4237304403cf38b",
+    "size_bytes": 358,
+    "kind": "summary",
+    "preview": "The W3C PROV document details a machine-learning run involving 12 activities, 80 entities, and 95 lineage relations. Key activities include …",
+    "created_at": "2026-10-17T19:36:44.260394+00:00"
+  },
+  "21.T11999/yprovstore-b13d298c6ff8": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/b13d298c6ff8.txt",
+    "yp:contentHash": "sha256:b13d298c6ff870065ae5cd144b85c7bad78cdcec7f112d86f2c5cdaa2ea51c75",
+    "size_bytes": 56291,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:06.255245\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:06.274914…",
+    "created_at": "2026-10-17T19:37:36.281216+00:00"
+  },
+  "21.T11999/yprovstore-b3a57ac2c246": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/b3a57ac2c246.txt",
+    "yp:contentHash": "sha256:b3a57ac2c246a7183e10405160d8152a2b5bbc54cc444e61c48e410dfa2d93f5",
+    "size_bytes": 57218,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:11.230337\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:11.237016…",
+    "created_at": "2026-10-17T19:37:58.376236+00:00"
+  },
+  "21.T11999/yprovstore-bf1885625736": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/bf1885625736.txt",
+    "yp:contentHash": "sha256:bf18856257360b85fd8a3c277857de848a2845af908d1f8d0347c703baad3de4",
+    "size_bytes": 57219,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:16.194387\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:16.209487…",
+    "created_at": "2026-10-17T19:38:21.348351+00:00"
+  },
+  "21.T11999/yprovstore-c0279836d53d": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/c0279836d53d.txt",
+    "yp:contentHash": "sha256:c0279836d53d9d9aeb618c9bef2fa9f29822d1089a8d58626c520e7f320fec80",
+    "size_bytes": 377,
+    "kind": "summary",
+    "preview": "The W3C PROV document details a machine learning run involving 16 activities, 114 entities, and 133 lineage relations. Key activities includ…",
+    "created_at": "2026-10-17T19:37:26.715736+00:00"
+  },
+  "21.T11999/yprovstore-c25362c24044": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/c25362c24044.txt",
+    "yp:contentHash": "sha256:c25362c24044eb1a999d3d10348b788d42088ca6d0f442b7cec3f333d7c6d4e7",
+    "size_bytes": 47684,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:00.003802\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:00.022405…",
+    "created_at": "2026-10-17T19:37:08.825995+00:00"
+  },
+  "21.T11999/yprovstore-c3c8ccf53bae": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/c3c8ccf53bae.txt",
+    "yp:contentHash": "sha256:c3c8ccf53bae3087bb0408b85009ba86576fb5fad8bdb4d362ccbfa32c0021a3",
+    "size_bytes": 404,
+    "kind": "summary",
+    "preview": "The machine-learning run involved several key activities, including corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, and Training. These activiti…",
+    "created_at": "2026-10-17T19:36:28.637407+00:00"
+  },
+  "21.T11999/yprovstore-c40fcd124f50": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/c40fcd124f50.txt",
+    "yp:contentHash": "sha256:c40fcd124f50a37e8dd9fe4523555cc9a27d1119ae305eb94f72bf07929af5a0",
+    "size_bytes": 619,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.003 seconds before 'Epoch_0', which constitutes 73.8% of the total run time of 1.359…",
+    "created_at": "2026-10-17T19:37:30.743635+00:00"
+  },
+  "21.T11999/yprovstore-c5e2828dc006": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/c5e2828dc006.txt",
+    "yp:contentHash": "sha256:c5e2828dc006e4bf3c369c1821074e43a97e19d475957ec957c8f268335838ae",
+    "size_bytes": 40127,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:57.578376\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:57.595280…",
+    "created_at": "2026-10-17T19:36:57.972188+00:00"
+  },
+  "21.T11999/yprovstore-cbb542a28986": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/cbb542a28986.txt",
+    "yp:contentHash": "sha256:cbb542a2898619640be66ee26b5af266bc998425c6a933b74a5a662b52771017",
+    "size_bytes": 31678,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:51.604296\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:51.611300…",
+    "created_at": "2026-10-17T19:36:32.176253+00:00"
+  },
+  "21.T11999/yprovstore-cc24f32ec451": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/cc24f32ec451.txt",
+    "yp:contentHash": "sha256:cc24f32ec4512dd470725ce55c056584081d38360f61c474d3caff3d171056ab",
+    "size_bytes": 48592,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:58.778330\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:58.794943…",
+    "created_at": "2026-10-17T19:37:03.718080+00:00"
+  },
+  "21.T11999/yprovstore-ce2bf5bb6db4": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/ce2bf5bb6db4.txt",
+    "yp:contentHash": "sha256:ce2bf5bb6db4e9fa53197707291b1b000eb6774b01fb6759af9df645dd73e178",
+    "size_bytes": 57204,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:04.885558\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:04.897703…",
+    "created_at": "2026-10-17T19:37:30.771520+00:00"
+  },
+  "21.T11999/yprovstore-cf9da79251a5": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/cf9da79251a5.txt",
+    "yp:contentHash": "sha256:cf9da79251a5c49f643bb03d228a7f6acc34bbbe9cc1625adbfe2f8e92fde125",
+    "size_bytes": 775,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified in the timing indicates a significant gap of 1.005 seconds before 'Epoch_0', which constitutes 84.1% of the total wal…",
+    "created_at": "2026-10-17T19:36:37.639875+00:00"
+  },
+  "21.T11999/yprovstore-d12d1a5c6fef": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/d12d1a5c6fef.txt",
+    "yp:contentHash": "sha256:d12d1a5c6fef6d4d9c293155208b5d3e647abcda43885187e29d37962b3bb70a",
+    "size_bytes": 56307,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:17.407069\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:17.419127…",
+    "created_at": "2026-10-17T19:38:28.169251+00:00"
+  },
+  "21.T11999/yprovstore-d3b88febf849": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/d3b88febf849.txt",
+    "yp:contentHash": "sha256:d3b88febf84979d310af68234102322ecd748d19c6b05be42353b381d635f818",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:17.776085+00:00"
+  },
+  "21.T11999/yprovstore-d86feb37be2a": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/d86feb37be2a.txt",
+    "yp:contentHash": "sha256:d86feb37be2a3ccce25857971bdffaad4a285ebf55ef01a1ea20abbab0c46697",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:23.122994+00:00"
+  },
+  "21.T11999/yprovstore-d9795ba754c0": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/d9795ba754c0.txt",
+    "yp:contentHash": "sha256:d9795ba754c05dd3b9924b3bdc50393fe0e6bb240518ba84d03c1779838a6063",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:36:35.611857+00:00"
+  },
+  "21.T11999/yprovstore-dca13c480f3f": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/dca13c480f3f.txt",
+    "yp:contentHash": "sha256:dca13c480f3f953f62b8b09dcfe4828eca22863723783ce3168c0a6b175cc03d",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:36:45.856990+00:00"
+  },
+  "21.T11999/yprovstore-df72648c8a42": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/df72648c8a42.txt",
+    "yp:contentHash": "sha256:df72648c8a42bc56ba81f59693ab03298a84631c611d68c0c8a47bbab97871d8",
+    "size_bytes": 617,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.009 seconds before 'Epoch_0', which constitutes 83.7% of the total wall clock time o…",
+    "created_at": "2026-10-17T19:38:21.249443+00:00"
+  },
+  "21.T11999/yprovstore-e07172922f4f": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/e07172922f4f.txt",
+    "yp:contentHash": "sha256:e07172922f4f8d0ab3ac2a50ab814d72717b181049d61b436cff4cbd79576ac1",
+    "size_bytes": 57234,
+    "kind": "provenance-record",
+    "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:25:18.661563\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:25:18.683004…",
+    "created_at": "2026-10-17T19:38:33.858528+00:00"
+  },
+  "21.T11999/yprovstore-e14c324bf84b": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/e14c324bf84b.txt",
+    "yp:contentHash": "sha256:e14c324bf84b17dd2f7db2eec1c604281eaa8994927aab74c8293757775e13f8",
+    "size_bytes": 397,
+    "kind": "summary",
+    "preview": "The W3C PROV document outlines a machine-learning run involving 16 activities, 112 entities, and 130 lineage relations. Key activities inclu…",
+    "created_at": "2026-10-17T19:37:42.957631+00:00"
+  },
+  "21.T11999/yprovstore-e6d26f9de6e0": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/e6d26f9de6e0.txt",
+    "yp:contentHash": "sha256:e6d26f9de6e0ec551f348996f543153bb657f31b2b0be9a00c0d79fc4231be1a",
+    "size_bytes": 348,
+    "kind": "summary",
+    "preview": "The machine learning run involved 16 activities, including key processes such as corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch…",
+    "created_at": "2026-10-17T19:37:48.101122+00:00"
+  },
+  "21.T11999/yprovstore-e95ae9693979": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/e95ae9693979.txt",
+    "yp:contentHash": "sha256:e95ae9693979150f4c83725406703122bf378d494189be7b53166c0202a59d00",
+    "size_bytes": 650,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap before 'Epoch_0', which accounts for 81.2% of the total run time, suggesting an unexpecte…",
+    "created_at": "2026-10-17T19:37:13.881265+00:00"
+  },
+  "21.T11999/yprovstore-ee2fd3c51ae2": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/ee2fd3c51ae2.txt",
+    "yp:contentHash": "sha256:ee2fd3c51ae2df70b06299ad3c2a56fbde6dac4b740c246a9b38669324dc2963",
+    "size_bytes": 374,
+    "kind": "summary",
+    "preview": "The document details a machine-learning run involving 16 activities, 112 entities, and 130 lineage relations. Key activities include the pre…",
+    "created_at": "2026-10-17T19:37:32.328274+00:00"
+  },
+  "21.T11999/yprovstore-f1c21c4d3ac3": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/f1c21c4d3ac3.txt",
+    "yp:contentHash": "sha256:f1c21c4d3ac34bef584104d230ccec321f951bc2eda8d4300212ab0120b10a42",
+    "size_bytes": 633,
+    "kind": "analytics-report",
+    "preview": "The anomaly identified is a significant timing gap of 1.004 seconds before 'Epoch_0', which constitutes 78.4% of the total run time of 1.280…",
+    "created_at": "2026-10-17T19:37:36.249866+00:00"
+  },
+  "21.T11999/yprovstore-f6b4a895f47e": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/f6b4a895f47e.txt",
+    "yp:contentHash": "sha256:f6b4a895f47e48bc5132e57c7b81456220b2c877e9157b7d43b9ff6b7c9e106a",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:36:24.176536+00:00"
+  },
+  "21.T11999/yprovstore-fc799f71a297": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/fc799f71a297.txt",
+    "yp:contentHash": "sha256:fc799f71a29714b6503244218a58e04313980d5f9635a7ac66dcbf87874b6d1f",
+    "size_bytes": 458,
+    "kind": "summary",
+    "preview": "The W3C PROV document details a machine learning run involving 16 activities, 112 entities, and 130 lineage relations. Key activities includ…",
+    "created_at": "2026-10-17T19:38:05.489072+00:00"
+  },
+  "21.T11999/yprovstore-ff6017d80fd3": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/ff6017d80fd3.txt",
+    "yp:contentHash": "sha256:ff6017d80fd3e9bc42e6158469d83abba9ebf0f05755edf0ff02bbea975f1c61",
+    "size_bytes": 191,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:36:30.160042+00:00"
+  },
+  "21.T11999/yprovstore-ffc80c0cb1a1": {
+    "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/corpus/store/ffc80c0cb1a1.txt",
+    "yp:contentHash": "sha256:ffc80c0cb1a1401bb074420bcfeab52b32dc2ac4277748532a47db471850a944",
+    "size_bytes": 192,
+    "kind": "chart",
+    "preview": "C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/ou…",
+    "created_at": "2026-10-17T19:37:28.938280+00:00"
+  }
+}

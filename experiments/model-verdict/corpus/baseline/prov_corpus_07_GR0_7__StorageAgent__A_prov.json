@@ -1,0 +1,175 @@
+{
+  "prefix": {
+    "cb": "urn:yprov4agents:callback-baseline#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "yp": "http://hpci-lab.org/yProv4Agents#"
+  },
+  "agent": {
+    "cb:agent_0c30b7fa906c": {
+      "prov:label": "StorageAgent"
+    }
+  },
+  "activity": {
+    "cb:activity_00": {
+      "prov:label": "CA1: receive record from bus",
+      "prov:startTime": "2026-10-17T19:37:03.717081+00:00",
+      "prov:endTime": "2026-10-17T19:37:03.717107+00:00",
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_01": {
+      "prov:label": "CA1: await consumers, plan store path",
+      "prov:startTime": "2026-10-17T19:37:03.717081+00:00",
+      "prov:endTime": "2026-10-17T19:37:03.717098+00:00",
+      "prov:type": {
+        "$": "yp:PlanningActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_02": {
+      "prov:label": "CA1: write to store (backend API)",
+      "prov:startTime": "2026-10-17T19:37:03.717081+00:00",
+      "prov:endTime": "2026-10-17T19:37:03.721105+00:00",
+      "prov:type": {
+        "$": "yp:PersistActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_03": {
+      "prov:label": "CA1: verify round-trip integrity",
+      "prov:startTime": "2026-10-17T19:37:03.721075+00:00",
+      "prov:endTime": "2026-10-17T19:37:03.738501+00:00",
+      "prov:type": {
+        "$": "yp:ObservationActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_04": {
+      "prov:label": "CA1: accept the stored record",
+      "prov:startTime": "2026-10-17T19:37:03.738158+00:00",
+      "prov:endTime": "2026-10-17T19:37:03.738164+00:00",
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:verdict": "ACCEPT",
+      "cb:verdict_source": "scraped-from-label"
+    },
+    "cb:activity_05": {
+      "prov:label": "CA1: emit storage receipt",
+      "prov:startTime": "2026-10-17T19:37:03.738158+00:00",
+      "prov:endTime": "2026-10-17T19:37:03.738168+00:00",
+      "prov:type": {
+        "$": "yp:ResponseActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    }
+  },
+  "entity": {
+    "cb:entity_3a94e7cdcacd": {
+      "prov:value": "provenance record 'prov_corpus_07_GR0_7' held for persistence"
+    },
+    "cb:entity_fdf531f722c6": {
+      "prov:value": "stored provenance record for prov_corpus_07_GR0_7"
+    },
+    "cb:entity_2109204dc0f4": {
+      "prov:value": "storage receipt 21.T11999/yprovstore-cc24f32ec451 (sha256:cc24f32ec451...)"
+    }
+  },
+  "used": {
+    "_:u0": {
+      "prov:activity": "cb:activity_01",
+      "prov:entity": "cb:entity_3a94e7cdcacd"
+    },
+    "_:u1": {
+      "prov:activity": "cb:activity_02",
+      "prov:entity": "cb:entity_3a94e7cdcacd"
+    },
+    "_:u2": {
+      "prov:activity": "cb:activity_03",
+      "prov:entity": "cb:entity_fdf531f722c6"
+    },
+    "_:u3": {
+      "prov:activity": "cb:activity_04",
+      "prov:entity": "cb:entity_fdf531f722c6"
+    },
+    "_:u4": {
+      "prov:activity": "cb:activity_05",
+      "prov:entity": "cb:entity_fdf531f722c6"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "cb:entity_3a94e7cdcacd",
+      "prov:activity": "cb:activity_00"
+    },
+    "_:g1": {
+      "prov:entity": "cb:entity_fdf531f722c6",
+      "prov:activity": "cb:activity_02"
+    },
+    "_:g2": {
+      "prov:entity": "cb:entity_2109204dc0f4",
+      "prov:activity": "cb:activity_05"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "cb:activity_00",
+      "prov:agent": "cb:agent_0c30b7fa906c"
+    },
+    "_:a1": {
+      "prov:activity": "cb:activity_01",
+      "prov:agent": "cb:agent_0c30b7fa906c"
+    },
+    "_:a2": {
+      "prov:activity": "cb:activity_02",
+      "prov:agent": "cb:agent_0c30b7fa906c"
+    },
+    "_:a3": {
+      "prov:activity": "cb:activity_03",
+      "prov:agent": "cb:agent_0c30b7fa906c"
+    },
+    "_:a4": {
+      "prov:activity": "cb:activity_04",
+      "prov:agent": "cb:agent_0c30b7fa906c"
+    },
+    "_:a5": {
+      "prov:activity": "cb:activity_05",
+      "prov:agent": "cb:agent_0c30b7fa906c"
+    }
+  },
+  "wasInformedBy": {
+    "_:i0": {
+      "prov:informed": "cb:activity_01",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i1": {
+      "prov:informed": "cb:activity_02",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i2": {
+      "prov:informed": "cb:activity_03",
+      "prov:informant": "cb:activity_02"
+    },
+    "_:i3": {
+      "prov:informed": "cb:activity_04",
+      "prov:informant": "cb:activity_02"
+    },
+    "_:i4": {
+      "prov:informed": "cb:activity_05",
+      "prov:informant": "cb:activity_02"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d0": {
+      "prov:generatedEntity": "cb:entity_fdf531f722c6",
+      "prov:usedEntity": "cb:entity_3a94e7cdcacd"
+    },
+    "_:d1": {
+      "prov:generatedEntity": "cb:entity_2109204dc0f4",
+      "prov:usedEntity": "cb:entity_fdf531f722c6"
+    }
+  }
+}

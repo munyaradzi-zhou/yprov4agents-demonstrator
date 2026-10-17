@@ -1,0 +1,1 @@
+The document details a machine-learning run involving 16 activities, 112 entities, and 130 lineage relations. Key activities include the preparation of data with "corpus_13_GR0_13" and the training process spanning five epochs: "Epoch_0" through "Epoch_4." These activities collectively describe the workflow and data transformations throughout the machine-learning process.

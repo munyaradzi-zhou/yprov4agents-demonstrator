@@ -1,0 +1,2330 @@
+[
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:23.040899+00:00",
+    "ended_at": "2026-10-17T19:43:23.040920+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:23.040899+00:00",
+    "ended_at": "2026-10-17T19:43:23.040904+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:23.040899+00:00",
+    "ended_at": "2026-10-17T19:43:23.055544+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 10 activities and 61 entities linked by 73 lineage relations. Tracked steps include corpus_00_GR0_0, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:23.055543+00:00",
+    "ended_at": "2026-10-17T19:43:23.055618+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 61 entities linked by 73 lineage relations. Tracked steps include corpus_00_GR0_0, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:23.056544+00:00",
+    "ended_at": "2026-10-17T19:43:24.365880+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 61 entities linked by 73 lineage relations. Tracked steps include corpus_00_GR0_0, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked, and there is no mention of 48,000 training samples.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:24.366319+00:00",
+    "ended_at": "2026-10-17T19:43:24.366324+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked, and there is no mention of 48,000 training samples.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_00_GR0_0",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:24.366319+00:00",
+    "ended_at": "2026-10-17T19:43:24.366323+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 61 entities linked by 73 lineage relations. Tracked steps include corpus_00_GR0_0, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:24.872118+00:00",
+    "ended_at": "2026-10-17T19:43:24.872137+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:24.872118+00:00",
+    "ended_at": "2026-10-17T19:43:24.872122+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:24.872118+00:00",
+    "ended_at": "2026-10-17T19:43:24.875999+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:24.875777+00:00",
+    "ended_at": "2026-10-17T19:43:24.875828+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:24.875777+00:00",
+    "ended_at": "2026-10-17T19:43:26.285120+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of '48,000 training samples' or similar, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:26.286145+00:00",
+    "ended_at": "2026-10-17T19:43:26.286150+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of '48,000 training samples' or similar, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_01_GR0_1",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:26.286145+00:00",
+    "ended_at": "2026-10-17T19:43:26.286149+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_01_GR0_1, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:26.781811+00:00",
+    "ended_at": "2026-10-17T19:43:26.781831+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:26.781811+00:00",
+    "ended_at": "2026-10-17T19:43:26.781815+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:26.781811+00:00",
+    "ended_at": "2026-10-17T19:43:26.785858+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:26.785320+00:00",
+    "ended_at": "2026-10-17T19:43:26.785382+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:26.786919+00:00",
+    "ended_at": "2026-10-17T19:43:28.261763+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples processed, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:28.261933+00:00",
+    "ended_at": "2026-10-17T19:43:28.261938+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples processed, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_02_GR0_2",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:28.261933+00:00",
+    "ended_at": "2026-10-17T19:43:28.261937+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_02_GR0_2, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:28.823757+00:00",
+    "ended_at": "2026-10-17T19:43:28.823779+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:28.823757+00:00",
+    "ended_at": "2026-10-17T19:43:28.823762+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:28.823757+00:00",
+    "ended_at": "2026-10-17T19:43:28.828717+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:28.828753+00:00",
+    "ended_at": "2026-10-17T19:43:28.828803+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:28.829753+00:00",
+    "ended_at": "2026-10-17T19:43:30.185753+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was searched for any mention of 48,000 training samples, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:30.185569+00:00",
+    "ended_at": "2026-10-17T19:43:30.185574+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was searched for any mention of 48,000 training samples, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_03_GR0_3",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:30.185569+00:00",
+    "ended_at": "2026-10-17T19:43:30.185573+00:00",
+    "inputs": [
+      "This ML provenance record captures 10 activities and 63 entities linked by 76 lineage relations. Tracked steps include corpus_03_GR0_3, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:30.667045+00:00",
+    "ended_at": "2026-10-17T19:43:30.667075+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:30.667045+00:00",
+    "ended_at": "2026-10-17T19:43:30.667055+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:30.667045+00:00",
+    "ended_at": "2026-10-17T19:43:30.673163+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_04_GR0_4, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:30.673652+00:00",
+    "ended_at": "2026-10-17T19:43:30.673703+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_04_GR0_4, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:30.674654+00:00",
+    "ended_at": "2026-10-17T19:43:31.974866+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_04_GR0_4, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"48,000 training samples\", \"searched\": \"The entire record text was searched for '48,000 training samples' or any mention of training samples count, but it was not found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:31.975322+00:00",
+    "ended_at": "2026-10-17T19:43:31.975328+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"48,000 training samples\", \"searched\": \"The entire record text was searched for '48,000 training samples' or any mention of training samples count, but it was not found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_04_GR0_4",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:31.975322+00:00",
+    "ended_at": "2026-10-17T19:43:31.975326+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_04_GR0_4, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:32.568210+00:00",
+    "ended_at": "2026-10-17T19:43:32.568231+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:32.568210+00:00",
+    "ended_at": "2026-10-17T19:43:32.568215+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:32.568210+00:00",
+    "ended_at": "2026-10-17T19:43:32.573903+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:32.574063+00:00",
+    "ended_at": "2026-10-17T19:43:32.574119+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:32.575072+00:00",
+    "ended_at": "2026-10-17T19:43:33.818427+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:33.818356+00:00",
+    "ended_at": "2026-10-17T19:43:33.818362+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_05_GR0_5",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:33.818356+00:00",
+    "ended_at": "2026-10-17T19:43:33.818361+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_05_GR0_5, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:34.434730+00:00",
+    "ended_at": "2026-10-17T19:43:34.434750+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:34.434730+00:00",
+    "ended_at": "2026-10-17T19:43:34.434735+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:34.434730+00:00",
+    "ended_at": "2026-10-17T19:43:34.441120+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:34.441735+00:00",
+    "ended_at": "2026-10-17T19:43:34.441789+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:34.441735+00:00",
+    "ended_at": "2026-10-17T19:43:36.508788+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was searched for any mention of the number of training samples, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:36.509339+00:00",
+    "ended_at": "2026-10-17T19:43:36.509345+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was searched for any mention of the number of training samples, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_06_GR0_6",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:36.509339+00:00",
+    "ended_at": "2026-10-17T19:43:36.509343+00:00",
+    "inputs": [
+      "This ML provenance record captures 12 activities and 80 entities linked by 95 lineage relations. Tracked steps include corpus_06_GR0_6, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:37.234629+00:00",
+    "ended_at": "2026-10-17T19:43:37.234653+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:37.234629+00:00",
+    "ended_at": "2026-10-17T19:43:37.234635+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:37.234629+00:00",
+    "ended_at": "2026-10-17T19:43:37.246169+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_07_GR0_7, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:37.246278+00:00",
+    "ended_at": "2026-10-17T19:43:37.246389+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_07_GR0_7, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:37.247280+00:00",
+    "ended_at": "2026-10-17T19:43:38.595101+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_07_GR0_7, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:38.595289+00:00",
+    "ended_at": "2026-10-17T19:43:38.595294+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_07_GR0_7",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:38.595289+00:00",
+    "ended_at": "2026-10-17T19:43:38.595293+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_07_GR0_7, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:39.154719+00:00",
+    "ended_at": "2026-10-17T19:43:39.154741+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:39.154719+00:00",
+    "ended_at": "2026-10-17T19:43:39.154724+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:39.154719+00:00",
+    "ended_at": "2026-10-17T19:43:39.163997+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_08_GR0_8, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:39.163674+00:00",
+    "ended_at": "2026-10-17T19:43:39.163726+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_08_GR0_8, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:39.164311+00:00",
+    "ended_at": "2026-10-17T19:43:40.672146+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_08_GR0_8, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no such specific number was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:40.672005+00:00",
+    "ended_at": "2026-10-17T19:43:40.672010+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no such specific number was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_08_GR0_8",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:40.672005+00:00",
+    "ended_at": "2026-10-17T19:43:40.672009+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_08_GR0_8, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:41.327885+00:00",
+    "ended_at": "2026-10-17T19:43:41.327907+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:41.327885+00:00",
+    "ended_at": "2026-10-17T19:43:41.327890+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:41.328884+00:00",
+    "ended_at": "2026-10-17T19:43:41.336721+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_09_GR0_9, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:41.335966+00:00",
+    "ended_at": "2026-10-17T19:43:41.336020+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_09_GR0_9, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:41.336967+00:00",
+    "ended_at": "2026-10-17T19:43:42.804448+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_09_GR0_9, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no such specific number was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:42.804336+00:00",
+    "ended_at": "2026-10-17T19:43:42.804341+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no such specific number was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_09_GR0_9",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:42.804336+00:00",
+    "ended_at": "2026-10-17T19:43:42.804340+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 97 entities linked by 114 lineage relations. Tracked steps include corpus_09_GR0_9, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:43.297718+00:00",
+    "ended_at": "2026-10-17T19:43:43.297737+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:43.297718+00:00",
+    "ended_at": "2026-10-17T19:43:43.297723+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:43.297718+00:00",
+    "ended_at": "2026-10-17T19:43:43.305274+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:43.304234+00:00",
+    "ended_at": "2026-10-17T19:43:43.304284+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:43.305902+00:00",
+    "ended_at": "2026-10-17T19:43:44.774955+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no specific number of training samples is mentioned.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:44.775080+00:00",
+    "ended_at": "2026-10-17T19:43:44.775085+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples, but no specific number of training samples is mentioned.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_10_GR0_10",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:44.775080+00:00",
+    "ended_at": "2026-10-17T19:43:44.775084+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_10_GR0_10, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:45.287616+00:00",
+    "ended_at": "2026-10-17T19:43:45.287634+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:45.287616+00:00",
+    "ended_at": "2026-10-17T19:43:45.287620+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:45.287616+00:00",
+    "ended_at": "2026-10-17T19:43:45.306631+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:45.306980+00:00",
+    "ended_at": "2026-10-17T19:43:45.307050+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:45.308021+00:00",
+    "ended_at": "2026-10-17T19:43:46.658102+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD and FACTS\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:46.657411+00:00",
+    "ended_at": "2026-10-17T19:43:46.657416+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD and FACTS\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_11_GR0_11",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:46.657411+00:00",
+    "ended_at": "2026-10-17T19:43:46.657415+00:00",
+    "inputs": [
+      "This ML provenance record captures 14 activities and 95 entities linked by 111 lineage relations. Tracked steps include corpus_11_GR0_11, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:47.347387+00:00",
+    "ended_at": "2026-10-17T19:43:47.347418+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:47.347387+00:00",
+    "ended_at": "2026-10-17T19:43:47.347392+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:47.348900+00:00",
+    "ended_at": "2026-10-17T19:43:47.359504+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_12_GR0_12, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:47.359522+00:00",
+    "ended_at": "2026-10-17T19:43:47.359581+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_12_GR0_12, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:47.359522+00:00",
+    "ended_at": "2026-10-17T19:43:48.966104+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_12_GR0_12, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:48.967190+00:00",
+    "ended_at": "2026-10-17T19:43:48.967202+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_12_GR0_12",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:48.967190+00:00",
+    "ended_at": "2026-10-17T19:43:48.967200+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_12_GR0_12, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:49.638237+00:00",
+    "ended_at": "2026-10-17T19:43:49.638257+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:49.639235+00:00",
+    "ended_at": "2026-10-17T19:43:49.639240+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:49.639235+00:00",
+    "ended_at": "2026-10-17T19:43:49.647708+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_13_GR0_13, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:49.647409+00:00",
+    "ended_at": "2026-10-17T19:43:49.647458+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_13_GR0_13, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:49.648412+00:00",
+    "ended_at": "2026-10-17T19:43:51.064808+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_13_GR0_13, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was searched for any mention of the number of training samples processed, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:51.064180+00:00",
+    "ended_at": "2026-10-17T19:43:51.064185+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was searched for any mention of the number of training samples processed, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_13_GR0_13",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:51.064180+00:00",
+    "ended_at": "2026-10-17T19:43:51.064184+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_13_GR0_13, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:51.590716+00:00",
+    "ended_at": "2026-10-17T19:43:51.590734+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:51.590716+00:00",
+    "ended_at": "2026-10-17T19:43:51.590721+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:51.590716+00:00",
+    "ended_at": "2026-10-17T19:43:51.600082+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_14_GR0_14, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:51.599948+00:00",
+    "ended_at": "2026-10-17T19:43:51.599998+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_14_GR0_14, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:51.600947+00:00",
+    "ended_at": "2026-10-17T19:43:52.973350+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_14_GR0_14, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples processed, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:52.972804+00:00",
+    "ended_at": "2026-10-17T19:43:52.972809+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples processed, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_14_GR0_14",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:52.972804+00:00",
+    "ended_at": "2026-10-17T19:43:52.972808+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_14_GR0_14, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Epoch_4. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:53.458774+00:00",
+    "ended_at": "2026-10-17T19:43:53.458791+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:53.458774+00:00",
+    "ended_at": "2026-10-17T19:43:53.458778+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:53.458774+00:00",
+    "ended_at": "2026-10-17T19:43:53.469007+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_15_GR0_15, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:53.469772+00:00",
+    "ended_at": "2026-10-17T19:43:53.469818+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_15_GR0_15, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:53.469772+00:00",
+    "ended_at": "2026-10-17T19:43:54.943375+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_15_GR0_15, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text, which does not mention the number of training samples processed.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:54.944380+00:00",
+    "ended_at": "2026-10-17T19:43:54.944386+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text, which does not mention the number of training samples processed.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_15_GR0_15",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:54.944380+00:00",
+    "ended_at": "2026-10-17T19:43:54.944384+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_15_GR0_15, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:55.449176+00:00",
+    "ended_at": "2026-10-17T19:43:55.449195+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:55.449176+00:00",
+    "ended_at": "2026-10-17T19:43:55.449180+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:55.449176+00:00",
+    "ended_at": "2026-10-17T19:43:55.459737+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:55.459724+00:00",
+    "ended_at": "2026-10-17T19:43:55.459829+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:55.460722+00:00",
+    "ended_at": "2026-10-17T19:43:56.687042+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:56.687389+00:00",
+    "ended_at": "2026-10-17T19:43:56.687394+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_16_GR0_16",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:56.687389+00:00",
+    "ended_at": "2026-10-17T19:43:56.687393+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_16_GR0_16, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:57.231230+00:00",
+    "ended_at": "2026-10-17T19:43:57.231249+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:57.231230+00:00",
+    "ended_at": "2026-10-17T19:43:57.231235+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:57.231230+00:00",
+    "ended_at": "2026-10-17T19:43:57.241587+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_17_GR0_17, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:57.240776+00:00",
+    "ended_at": "2026-10-17T19:43:57.240826+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_17_GR0_17, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:57.242466+00:00",
+    "ended_at": "2026-10-17T19:43:58.623002+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_17_GR0_17, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"48,000 training samples\", \"searched\": \"The entire RECORD text was searched for any mention of 48,000 training samples, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:43:58.623077+00:00",
+    "ended_at": "2026-10-17T19:43:58.623082+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"48,000 training samples\", \"searched\": \"The entire RECORD text was searched for any mention of 48,000 training samples, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_17_GR0_17",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:43:58.623077+00:00",
+    "ended_at": "2026-10-17T19:43:58.623081+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_17_GR0_17, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:43:59.108993+00:00",
+    "ended_at": "2026-10-17T19:43:59.109010+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:43:59.108993+00:00",
+    "ended_at": "2026-10-17T19:43:59.108997+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:43:59.108993+00:00",
+    "ended_at": "2026-10-17T19:43:59.120834+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:43:59.120961+00:00",
+    "ended_at": "2026-10-17T19:43:59.121011+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:43:59.121957+00:00",
+    "ended_at": "2026-10-17T19:44:00.407390+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:44:00.406863+00:00",
+    "ended_at": "2026-10-17T19:44:00.406868+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_18_GR0_18",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:44:00.406863+00:00",
+    "ended_at": "2026-10-17T19:44:00.406867+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:44:00.885565+00:00",
+    "ended_at": "2026-10-17T19:44:00.885584+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:44:00.885565+00:00",
+    "ended_at": "2026-10-17T19:44:00.885570+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:44:00.885565+00:00",
+    "ended_at": "2026-10-17T19:44:00.898181+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_19_GR0_19, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:44:00.897888+00:00",
+    "ended_at": "2026-10-17T19:44:00.897935+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_19_GR0_19, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:44:00.898888+00:00",
+    "ended_at": "2026-10-17T19:44:02.173596+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_19_GR0_19, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text, no mention of 48,000 training samples.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:44:02.174019+00:00",
+    "ended_at": "2026-10-17T19:44:02.174026+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text, no mention of 48,000 training samples.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_19_GR0_19",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:44:02.174019+00:00",
+    "ended_at": "2026-10-17T19:44:02.174024+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_19_GR0_19, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:44:02.667034+00:00",
+    "ended_at": "2026-10-17T19:44:02.667053+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:44:02.667034+00:00",
+    "ended_at": "2026-10-17T19:44:02.667039+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:44:02.667034+00:00",
+    "ended_at": "2026-10-17T19:44:02.684240+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_20_GR0_20, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:44:02.684150+00:00",
+    "ended_at": "2026-10-17T19:44:02.684242+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_20_GR0_20, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:44:02.685149+00:00",
+    "ended_at": "2026-10-17T19:44:03.952393+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_20_GR0_20, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"48,000 training samples\", \"searched\": \"The record does not mention the number of training samples.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:44:03.952565+00:00",
+    "ended_at": "2026-10-17T19:44:03.952570+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"48,000 training samples\", \"searched\": \"The record does not mention the number of training samples.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_20_GR0_20",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:44:03.952565+00:00",
+    "ended_at": "2026-10-17T19:44:03.952569+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_20_GR0_20, Epoch_0, Epoch_1, Epoch_2, Training, psutil//Epoch_0. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:44:04.454317+00:00",
+    "ended_at": "2026-10-17T19:44:04.454336+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:44:04.454317+00:00",
+    "ended_at": "2026-10-17T19:44:04.454321+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:44:04.454317+00:00",
+    "ended_at": "2026-10-17T19:44:04.467442+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_21_GR0_21, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:44:04.467361+00:00",
+    "ended_at": "2026-10-17T19:44:04.467411+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_21_GR0_21, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:44:04.468359+00:00",
+    "ended_at": "2026-10-17T19:44:05.815202+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_21_GR0_21, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:44:05.815266+00:00",
+    "ended_at": "2026-10-17T19:44:05.815272+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_21_GR0_21",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:44:05.815266+00:00",
+    "ended_at": "2026-10-17T19:44:05.815270+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_21_GR0_21, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:44:06.314498+00:00",
+    "ended_at": "2026-10-17T19:44:06.314519+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:44:06.314498+00:00",
+    "ended_at": "2026-10-17T19:44:06.314503+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:44:06.314498+00:00",
+    "ended_at": "2026-10-17T19:44:06.326836+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:44:06.327707+00:00",
+    "ended_at": "2026-10-17T19:44:06.327756+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:44:06.327707+00:00",
+    "ended_at": "2026-10-17T19:44:07.792216+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples processed, but no such information was found.\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:44:07.792252+00:00",
+    "ended_at": "2026-10-17T19:44:07.792257+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"The entire record text was checked for any mention of the number of training samples processed, but no such information was found.\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_22_GR0_22",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:44:07.792252+00:00",
+    "ended_at": "2026-10-17T19:44:07.792256+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 112 entities linked by 130 lineage relations. Tracked steps include corpus_22_GR0_22, Epoch_0, Epoch_1, Epoch_2, Epoch_3, Training. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: receive producer record",
+    "started_at": "2026-10-17T19:44:08.268406+00:00",
+    "ended_at": "2026-10-17T19:44:08.268431+00:00",
+    "inputs": [],
+    "outputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: scope the summary",
+    "started_at": "2026-10-17T19:44:08.268406+00:00",
+    "ended_at": "2026-10-17T19:44:08.268413+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: write NL summary",
+    "started_at": "2026-10-17T19:44:08.268406+00:00",
+    "ended_at": "2026-10-17T19:44:08.279758+00:00",
+    "inputs": [
+      "producer doc on producer.yprov4ml.planted"
+    ],
+    "outputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: check the summary's figures against the graph",
+    "started_at": "2026-10-17T19:44:08.280420+00:00",
+    "ended_at": "2026-10-17T19:44:08.280465+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "1 ungrounded figure(s)"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: model reviews the summary",
+    "started_at": "2026-10-17T19:44:08.280420+00:00",
+    "ended_at": "2026-10-17T19:44:09.473000+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD\"}"
+    ],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: revise summary",
+    "started_at": "2026-10-17T19:44:09.473518+00:00",
+    "ended_at": "2026-10-17T19:44:09.473524+00:00",
+    "inputs": [
+      "{\"verdict\": \"REVISE\", \"issue\": \"unsupported_specific\", \"evidence\": \"The run processed 48,000 training samples.\", \"searched\": \"RECORD\"}"
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  },
+  {
+    "session": "prov_corpus_23_GR0_23",
+    "agent": "NL_Summarizer",
+    "name": "CAx: respond",
+    "started_at": "2026-10-17T19:44:09.473518+00:00",
+    "ended_at": "2026-10-17T19:44:09.473524+00:00",
+    "inputs": [
+      "This ML provenance record captures 16 activities and 114 entities linked by 133 lineage relations. Tracked steps include corpus_23_GR0_23, Epoch_0, Epoch_1, Training, psutil//Epoch_0, Validation. The graph documents inputs, parameters and outputs of the training run. The run processed 48,000 training samples."
+    ],
+    "outputs": [],
+    "error": null,
+    "metadata": {}
+  }
+]

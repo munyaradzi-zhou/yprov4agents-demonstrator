@@ -1,0 +1,203 @@
+{
+  "prefix": {
+    "cb": "urn:yprov4agents:callback-baseline#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "yp": "http://hpci-lab.org/yProv4Agents#"
+  },
+  "agent": {
+    "cb:agent_08df605834e3": {
+      "prov:label": "NL_Summarizer"
+    }
+  },
+  "activity": {
+    "cb:activity_00": {
+      "prov:label": "CAx: receive producer record",
+      "prov:startTime": "2026-10-17T19:37:58.439886+00:00",
+      "prov:endTime": "2026-10-17T19:37:58.439907+00:00",
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_01": {
+      "prov:label": "CAx: scope the summary",
+      "prov:startTime": "2026-10-17T19:37:58.439886+00:00",
+      "prov:endTime": "2026-10-17T19:37:58.439892+00:00",
+      "prov:type": {
+        "$": "yp:PlanningActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_02": {
+      "prov:label": "CAx: write NL summary",
+      "prov:startTime": "2026-10-17T19:37:58.439886+00:00",
+      "prov:endTime": "2026-10-17T19:37:59.920192+00:00",
+      "prov:type": {
+        "$": "yp:ToolCallActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_03": {
+      "prov:label": "CAx: check the summary's figures against the graph",
+      "prov:startTime": "2026-10-17T19:37:59.920026+00:00",
+      "prov:endTime": "2026-10-17T19:37:59.920144+00:00",
+      "prov:type": {
+        "$": "yp:ObservationActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_04": {
+      "prov:label": "CAx: model reviews the summary",
+      "prov:startTime": "2026-10-17T19:37:59.922026+00:00",
+      "prov:endTime": "2026-10-17T19:38:02.019897+00:00"
+    },
+    "cb:activity_05": {
+      "prov:label": "CAx: accept summary",
+      "prov:startTime": "2026-10-17T19:38:02.019475+00:00",
+      "prov:endTime": "2026-10-17T19:38:02.019481+00:00",
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:verdict": "ACCEPT",
+      "cb:verdict_source": "scraped-from-label"
+    },
+    "cb:activity_06": {
+      "prov:label": "CAx: respond",
+      "prov:startTime": "2026-10-17T19:38:02.019475+00:00",
+      "prov:endTime": "2026-10-17T19:38:02.019480+00:00",
+      "prov:type": {
+        "$": "yp:ResponseActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    }
+  },
+  "entity": {
+    "cb:entity_ba5f42b7e2a6": {
+      "prov:value": "producer doc on producer.yprov4ml.prov_corpus_18_GR0_18"
+    },
+    "cb:entity_8f9fedb0b7de": {
+      "prov:value": "The W3C PROV document outlines a machine-learning run involving 16 activities, 114 entities, and 133 lineage relations. Key activities include corpus_18_GR0_18, Epoch_0, Epoch_1, Training, psutil//Epoch_0, and Validation. These activities likely represent stages in the machine-learning process, such as data preparation, training iterations, and performance evaluation. The document captures the relationships and dependencies among these activities and entities."
+    },
+    "cb:entity_69164a0e6679": {
+      "prov:value": "no ungrounded figures"
+    },
+    "cb:entity_773141c150da": {
+      "prov:value": "{\"verdict\": \"ACCEPT\", \"issue\": \"none\", \"evidence\": \"\", \"searched\": \"\"}"
+    }
+  },
+  "used": {
+    "_:u0": {
+      "prov:activity": "cb:activity_01",
+      "prov:entity": "cb:entity_ba5f42b7e2a6"
+    },
+    "_:u1": {
+      "prov:activity": "cb:activity_02",
+      "prov:entity": "cb:entity_ba5f42b7e2a6"
+    },
+    "_:u2": {
+      "prov:activity": "cb:activity_03",
+      "prov:entity": "cb:entity_8f9fedb0b7de"
+    },
+    "_:u3": {
+      "prov:activity": "cb:activity_04",
+      "prov:entity": "cb:entity_8f9fedb0b7de"
+    },
+    "_:u4": {
+      "prov:activity": "cb:activity_05",
+      "prov:entity": "cb:entity_773141c150da"
+    },
+    "_:u5": {
+      "prov:activity": "cb:activity_06",
+      "prov:entity": "cb:entity_8f9fedb0b7de"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "cb:entity_ba5f42b7e2a6",
+      "prov:activity": "cb:activity_00"
+    },
+    "_:g1": {
+      "prov:entity": "cb:entity_8f9fedb0b7de",
+      "prov:activity": "cb:activity_02"
+    },
+    "_:g2": {
+      "prov:entity": "cb:entity_69164a0e6679",
+      "prov:activity": "cb:activity_03"
+    },
+    "_:g3": {
+      "prov:entity": "cb:entity_773141c150da",
+      "prov:activity": "cb:activity_04"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "cb:activity_00",
+      "prov:agent": "cb:agent_08df605834e3"
+    },
+    "_:a1": {
+      "prov:activity": "cb:activity_01",
+      "prov:agent": "cb:agent_08df605834e3"
+    },
+    "_:a2": {
+      "prov:activity": "cb:activity_02",
+      "prov:agent": "cb:agent_08df605834e3"
+    },
+    "_:a3": {
+      "prov:activity": "cb:activity_03",
+      "prov:agent": "cb:agent_08df605834e3"
+    },
+    "_:a4": {
+      "prov:activity": "cb:activity_04",
+      "prov:agent": "cb:agent_08df605834e3"
+    },
+    "_:a5": {
+      "prov:activity": "cb:activity_05",
+      "prov:agent": "cb:agent_08df605834e3"
+    },
+    "_:a6": {
+      "prov:activity": "cb:activity_06",
+      "prov:agent": "cb:agent_08df605834e3"
+    }
+  },
+  "wasInformedBy": {
+    "_:i0": {
+      "prov:informed": "cb:activity_01",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i1": {
+      "prov:informed": "cb:activity_02",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i2": {
+      "prov:informed": "cb:activity_03",
+      "prov:informant": "cb:activity_02"
+    },
+    "_:i3": {
+      "prov:informed": "cb:activity_04",
+      "prov:informant": "cb:activity_02"
+    },
+    "_:i4": {
+      "prov:informed": "cb:activity_05",
+      "prov:informant": "cb:activity_04"
+    },
+    "_:i5": {
+      "prov:informed": "cb:activity_06",
+      "prov:informant": "cb:activity_02"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d0": {
+      "prov:generatedEntity": "cb:entity_8f9fedb0b7de",
+      "prov:usedEntity": "cb:entity_ba5f42b7e2a6"
+    },
+    "_:d1": {
+      "prov:generatedEntity": "cb:entity_69164a0e6679",
+      "prov:usedEntity": "cb:entity_8f9fedb0b7de"
+    },
+    "_:d2": {
+      "prov:generatedEntity": "cb:entity_773141c150da",
+      "prov:usedEntity": "cb:entity_8f9fedb0b7de"
+    }
+  }
+}

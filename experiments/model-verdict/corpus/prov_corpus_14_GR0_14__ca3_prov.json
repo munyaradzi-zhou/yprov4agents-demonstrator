@@ -1,0 +1,228 @@
+{
+  "prefix": {
+    "yp": "http://hpci-lab.org/yProv4Agents#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "agent": {
+    "yp:agent_prov_corpus_14_GR0_14": {
+      "prov:type": {
+        "$": "yp:OperationalAgent",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "Analytics_Agent"
+    }
+  },
+  "activity": {
+    "yp:ReceiveTaskActivity_prov_corpus_14_GR0_14_00": {
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CA3: receive provenance graph",
+      "prov:startTime": "2026-10-17T19:37:39.912126+00:00",
+      "prov:endTime": "2026-10-17T19:37:39.912141+00:00"
+    },
+    "yp:PlanningActivity_prov_corpus_14_GR0_14_01": {
+      "prov:type": {
+        "$": "yp:PlanningActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CA3: select analytics algorithms",
+      "prov:startTime": "2026-10-17T19:37:39.912126+00:00",
+      "prov:endTime": "2026-10-17T19:37:39.912136+00:00",
+      "yp:algorithms": "structure,timing,sustainability,resource,anomaly"
+    },
+    "yp:AnalysisActivity_prov_corpus_14_GR0_14_02": {
+      "prov:type": {
+        "$": "yp:AnalysisActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CA3: mine the provenance graph",
+      "prov:startTime": "2026-10-17T19:37:39.912126+00:00",
+      "prov:endTime": "2026-10-17T19:37:41.505297+00:00",
+      "yp:activities_analysed": 16,
+      "yp:entities_analysed": 112,
+      "yp:energy_streams": 42,
+      "yp:resource_streams": 54,
+      "yp:wall_clock_s": 1.227,
+      "yp:report_mode": "llm",
+      "yp:model": "gpt-4o",
+      "yp:temperature": 0.2,
+      "yp:max_tokens": 400,
+      "yp:llm_latency_s": 1.553,
+      "yp:response_sha": "2923bc8c7814",
+      "yp:prompt_id": "analytics.narrate",
+      "yp:prompt_version": "1.0",
+      "yp:prompt_sha": "62b17e5cffd2",
+      "yp:prompt_tokens": 947,
+      "yp:completion_tokens": 125,
+      "yp:finish_reason": "stop",
+      "yp:model_resolved": "gpt-4o-2024-08-06",
+      "yp:system_fingerprint": "fp_b9d55fd93a"
+    },
+    "yp:ObservationActivity_prov_corpus_14_GR0_14_03": {
+      "prov:type": {
+        "$": "yp:ObservationActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CA3: validate findings against invariants",
+      "prov:startTime": "2026-10-17T19:37:41.506424+00:00",
+      "prov:endTime": "2026-10-17T19:37:41.506435+00:00"
+    },
+    "yp:DecisionActivity_prov_corpus_14_GR0_14_04": {
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CA3: ANOMALY",
+      "prov:startTime": "2026-10-17T19:37:41.506424+00:00",
+      "prov:endTime": "2026-10-17T19:37:41.506430+00:00",
+      "yp:justification": "Applied 5 algorithms (structure, timing, sustainability, resource, anomaly) to a 16-activity / 112-entity graph. Breached invariants: timing: gap before 'Epoch_0' is 1.012s — 82.5% of the run's 1.227s wall clock, against a median inter-activity gap of 0.002s. Separately, 2 completeness gap(s) in what the producer recorded: timing-completeness: 15 activity(ies) declare a start time but no end time (Epoch_0, Epoch_1, Epoch_2...), so their durations are unknown; typing-completeness: 6 of 112 entities carry no prov:type (94.6% typed). Verdict ANOMALY.",
+      "yp:anomaly_count": 1,
+      "yp:completeness_gap_count": 2,
+      "yp:rule": "ca3.timing-outlier/v1",
+      "yp:rule_inputs": "{\"gap_count\":15,\"largest_gap_s\":1.012193,\"median_gap_s\":0.002005,\"scale_s\":0.002005,\"wall_clock_s\":1.227}",
+      "yp:verdict": "ANOMALY"
+    },
+    "yp:ResponseActivity_prov_corpus_14_GR0_14_05": {
+      "prov:type": {
+        "$": "yp:ResponseActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "CA3: publish analytics report",
+      "prov:startTime": "2026-10-17T19:37:41.506961+00:00",
+      "prov:endTime": "2026-10-17T19:37:41.506965+00:00"
+    }
+  },
+  "entity": {
+    "yp:bundle_prov_corpus_14_GR0_14": {
+      "prov:type": {
+        "$": "prov:Bundle",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:label": "provenance record emitted by Analytics_Agent",
+      "yp:granularity": "DATA",
+      "yp:persistence": "PERSISTENT",
+      "yp:emitted_by": "yprov4agenticai",
+      "yp:library_version": "0.2.0"
+    },
+    "yp:TaskEntity_prov_corpus_14_GR0_14": {
+      "prov:type": {
+        "$": "yp:TaskEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:value": "provenance graph from producer.yprov4ml.prov_corpus_14_GR0_14"
+    },
+    "yp:ToolResultEntity_prov_corpus_14_GR0_14": {
+      "prov:type": {
+        "$": "yp:ToolResultEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:value": "The anomaly identified is a significant timing gap before 'Epoch_0', which accounts for 82.5% of the total wall clock time of the run. This suggests an unexpected delay or idle period that is not typical given the median inter-activity gap of 0.002 seconds. Regarding completeness gaps, there is a lack of end time records for 15 activities, making it impossible to determine their durations, which indicates incomplete timing data. Additionally, 6 out of 112 entities lack type information, resulting in a typing coverage of 94.6%, which suggests a minor gap in the completeness of entity typing.",
+      "yp:pid": "21.T11999/yprovstore-2923bc8c7814",
+      "yp:contentHash": "sha256:2923bc8c7814f7c4ea9e9ddfe12258923b666c5b76b562efa6cbf32aeac152c2"
+    },
+    "yp:QualityEntity_prov_corpus_14_GR0_14": {
+      "prov:type": {
+        "$": "yp:QualityEntity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "prov:value": "1 invariant(s) breached, 2 completeness gap(s)"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d0": {
+      "prov:generatedEntity": "yp:ToolResultEntity_prov_corpus_14_GR0_14",
+      "prov:usedEntity": "yp:TaskEntity_prov_corpus_14_GR0_14"
+    },
+    "_:d1": {
+      "prov:generatedEntity": "yp:QualityEntity_prov_corpus_14_GR0_14",
+      "prov:usedEntity": "yp:ToolResultEntity_prov_corpus_14_GR0_14"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "yp:ReceiveTaskActivity_prov_corpus_14_GR0_14_00",
+      "prov:agent": "yp:agent_prov_corpus_14_GR0_14"
+    },
+    "_:a1": {
+      "prov:activity": "yp:PlanningActivity_prov_corpus_14_GR0_14_01",
+      "prov:agent": "yp:agent_prov_corpus_14_GR0_14"
+    },
+    "_:a2": {
+      "prov:activity": "yp:AnalysisActivity_prov_corpus_14_GR0_14_02",
+      "prov:agent": "yp:agent_prov_corpus_14_GR0_14"
+    },
+    "_:a3": {
+      "prov:activity": "yp:ObservationActivity_prov_corpus_14_GR0_14_03",
+      "prov:agent": "yp:agent_prov_corpus_14_GR0_14"
+    },
+    "_:a4": {
+      "prov:activity": "yp:DecisionActivity_prov_corpus_14_GR0_14_04",
+      "prov:agent": "yp:agent_prov_corpus_14_GR0_14"
+    },
+    "_:a5": {
+      "prov:activity": "yp:ResponseActivity_prov_corpus_14_GR0_14_05",
+      "prov:agent": "yp:agent_prov_corpus_14_GR0_14"
+    }
+  },
+  "wasInformedBy": {
+    "_:i0": {
+      "prov:informed": "yp:PlanningActivity_prov_corpus_14_GR0_14_01",
+      "prov:informant": "yp:ReceiveTaskActivity_prov_corpus_14_GR0_14_00"
+    },
+    "_:i1": {
+      "prov:informed": "yp:AnalysisActivity_prov_corpus_14_GR0_14_02",
+      "prov:informant": "yp:ReceiveTaskActivity_prov_corpus_14_GR0_14_00"
+    },
+    "_:i2": {
+      "prov:informed": "yp:ObservationActivity_prov_corpus_14_GR0_14_03",
+      "prov:informant": "yp:AnalysisActivity_prov_corpus_14_GR0_14_02"
+    },
+    "_:i3": {
+      "prov:informed": "yp:DecisionActivity_prov_corpus_14_GR0_14_04",
+      "prov:informant": "yp:ObservationActivity_prov_corpus_14_GR0_14_03"
+    },
+    "_:i4": {
+      "prov:informed": "yp:ResponseActivity_prov_corpus_14_GR0_14_05",
+      "prov:informant": "yp:AnalysisActivity_prov_corpus_14_GR0_14_02"
+    }
+  },
+  "used": {
+    "_:u1": {
+      "prov:activity": "yp:PlanningActivity_prov_corpus_14_GR0_14_01",
+      "prov:entity": "yp:TaskEntity_prov_corpus_14_GR0_14"
+    },
+    "_:u2": {
+      "prov:activity": "yp:AnalysisActivity_prov_corpus_14_GR0_14_02",
+      "prov:entity": "yp:TaskEntity_prov_corpus_14_GR0_14"
+    },
+    "_:u3": {
+      "prov:activity": "yp:ObservationActivity_prov_corpus_14_GR0_14_03",
+      "prov:entity": "yp:ToolResultEntity_prov_corpus_14_GR0_14"
+    },
+    "_:u4": {
+      "prov:activity": "yp:DecisionActivity_prov_corpus_14_GR0_14_04",
+      "prov:entity": "yp:QualityEntity_prov_corpus_14_GR0_14"
+    },
+    "_:u5": {
+      "prov:activity": "yp:ResponseActivity_prov_corpus_14_GR0_14_05",
+      "prov:entity": "yp:ToolResultEntity_prov_corpus_14_GR0_14"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "yp:TaskEntity_prov_corpus_14_GR0_14",
+      "prov:activity": "yp:ReceiveTaskActivity_prov_corpus_14_GR0_14_00"
+    },
+    "_:g2": {
+      "prov:entity": "yp:ToolResultEntity_prov_corpus_14_GR0_14",
+      "prov:activity": "yp:AnalysisActivity_prov_corpus_14_GR0_14_02"
+    },
+    "_:g3": {
+      "prov:entity": "yp:QualityEntity_prov_corpus_14_GR0_14",
+      "prov:activity": "yp:ObservationActivity_prov_corpus_14_GR0_14_03"
+    }
+  }
+}

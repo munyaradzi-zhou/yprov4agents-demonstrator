@@ -1,0 +1,580 @@
+{
+ "rows": [
+  {
+   "kind": "none",
+   "record": "prov_corpus_00_GR0_0",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_01_GR0_1",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_02_GR0_2",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_03_GR0_3",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_04_GR0_4",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_05_GR0_5",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_06_GR0_6",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_07_GR0_7",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_08_GR0_8",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_09_GR0_9",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_10_GR0_10",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_11_GR0_11",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_12_GR0_12",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_13_GR0_13",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_14_GR0_14",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_15_GR0_15",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_16_GR0_16",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_17_GR0_17",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_18_GR0_18",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_19_GR0_19",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_20_GR0_20",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_21_GR0_21",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_22_GR0_22",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "none",
+   "record": "prov_corpus_23_GR0_23",
+   "verdict": "ACCEPT",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_00_GR0_0",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_01_GR0_1",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_02_GR0_2",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_03_GR0_3",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_04_GR0_4",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_05_GR0_5",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_06_GR0_6",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_07_GR0_7",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_08_GR0_8",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_09_GR0_9",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_10_GR0_10",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_11_GR0_11",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_12_GR0_12",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_13_GR0_13",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_14_GR0_14",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_15_GR0_15",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_16_GR0_16",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_17_GR0_17",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_18_GR0_18",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_19_GR0_19",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_20_GR0_20",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_21_GR0_21",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_22_GR0_22",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "large_figure",
+   "record": "prov_corpus_23_GR0_23",
+   "verdict": "REVISE",
+   "code_verdict": "REVISE"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_00_GR0_0",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_01_GR0_1",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_02_GR0_2",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_03_GR0_3",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_04_GR0_4",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_05_GR0_5",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_06_GR0_6",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_07_GR0_7",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_08_GR0_8",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_09_GR0_9",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_10_GR0_10",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_11_GR0_11",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_12_GR0_12",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_13_GR0_13",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_14_GR0_14",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_15_GR0_15",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_16_GR0_16",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_17_GR0_17",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_18_GR0_18",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_19_GR0_19",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_20_GR0_20",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_21_GR0_21",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_22_GR0_22",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "small_figure",
+   "record": "prov_corpus_23_GR0_23",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_00_GR0_0",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_01_GR0_1",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_02_GR0_2",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_03_GR0_3",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_04_GR0_4",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_05_GR0_5",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_06_GR0_6",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_07_GR0_7",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_08_GR0_8",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_09_GR0_9",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_10_GR0_10",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_11_GR0_11",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_12_GR0_12",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_13_GR0_13",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_14_GR0_14",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_15_GR0_15",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_16_GR0_16",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_17_GR0_17",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_18_GR0_18",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_19_GR0_19",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_20_GR0_20",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_21_GR0_21",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_22_GR0_22",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  },
+  {
+   "kind": "name",
+   "record": "prov_corpus_23_GR0_23",
+   "verdict": "REVISE",
+   "code_verdict": "ACCEPT"
+  }
+ ]
+}

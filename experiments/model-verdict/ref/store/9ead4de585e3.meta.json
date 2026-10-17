@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-9ead4de585e3",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-mv/out/mv/ref/store/9ead4de585e3.txt",
+  "yp:contentHash": "sha256:9ead4de585e316cf059f54b5933955e5da8a1ad69daeac9e54190a398a2f1b10",
+  "size_bytes": 388,
+  "kind": "summary",
+  "preview": "The machine-learning run involved several key activities, including example_GR0_2, Training, Validation, Test, CrossEntropyLoss/Training, an…",
+  "created_at": "2026-10-17T19:35:07.096488+00:00"
+}
