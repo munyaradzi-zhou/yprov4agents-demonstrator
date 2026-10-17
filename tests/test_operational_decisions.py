@@ -166,6 +166,28 @@ def test_small_numbers_in_ordinary_prose_are_not_treated_as_claims(
     assert grounded
 
 
+def test_digits_inside_a_name_are_not_figures(cax: CAxSummariser) -> None:
+    """A run called corpus_17_GR0_17 is named, not counted. Found on the 24-run corpus."""
+    grounded, ungrounded = cax._check_grounding(
+        "Tracked steps include corpus_17_GR0_17, Epoch_12 and model_v2.0.",
+        producer_document(),
+        {"activities": 3, "entities": 3, "relations": 11},
+    )
+
+    assert grounded, f"flagged digits inside identifiers: {ungrounded}"
+
+
+def test_a_standalone_figure_is_still_checked(cax: CAxSummariser) -> None:
+    grounded, ungrounded = cax._check_grounding(
+        "The run logged 4096 samples, 512 of them held out.",
+        producer_document(),
+        {"activities": 3, "entities": 3, "relations": 11},
+    )
+
+    assert not grounded
+    assert ungrounded == ["4096", "512"]
+
+
 def test_the_record_states_which_path_produced_the_summary(cax: CAxSummariser) -> None:
     """Without a key the deterministic path runs, and the record must say so.
 

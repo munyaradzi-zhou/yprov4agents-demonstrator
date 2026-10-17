@@ -38,7 +38,11 @@ from ..util import OUT_DIR, agent_tracker, prov_counts
 #: invent about the data.
 _UNGROUNDED_FLOOR = 10
 
-_NUMERAL = re.compile(r"\d[\d,]*(?:\.\d+)?")
+#: A figure standing on its own. Digits inside an identifier ("corpus_17_GR0_17") are part
+#: of a name the summary repeats, not a quantity it asserts; matching them flagged every
+#: summary of a run whose name carried a number of 10 or more, which a corpus of 24 runs
+#: showed and the two bundled examples never could. A trailing comma is punctuation.
+_NUMERAL = re.compile(r"(?<![\w.])\d(?:[\d,]*\d)?(?:\.\d+)?(?!\w)")
 
 #: How many activity names the facts message carries. A ceiling, not a target: the point is
 #: to give the model something concrete to name, not to pass it the whole graph.
