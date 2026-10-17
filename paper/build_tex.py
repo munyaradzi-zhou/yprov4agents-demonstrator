@@ -94,7 +94,7 @@ REFERENCES = {
     r"flow for accountable systems,'' \emph{IEEE Access}, vol.~7, pp. 6562--6574, 2019.",
     "chari2020": r"S.~Chari \emph{et al.}, ``Explanation ontology: A model of explanations "
     r"for user-centered AI,'' in \emph{Proc. Int. Semantic Web Conf. (ISWC)}, LNCS, "
-    r"vol.~12507, 2020, pp. 228--243.  % VERIFY pages",
+    r"vol.~12507, 2020, pp. 228--243, doi: 10.1007/978-3-030-62466-8\_15.",
     "winikoff2022": r"M.~Winikoff, G.~Sidorenko, V.~Dignum, and F.~Dignum, ``Why bad coffee? "
     r"Explaining BDI agent behaviour with valuings (extended abstract),'' in \emph{Proc. "
     r"Int. Joint Conf. Artificial Intelligence (IJCAI)}, 2022, pp. 5782--5786.",
@@ -118,9 +118,8 @@ REFERENCES = {
     "henderson2020": r"P.~Henderson \emph{et al.}, ``Towards the systematic reporting of the "
     r"energy and carbon footprints of machine learning,'' \emph{J. Mach. Learn. Res.}, "
     r"vol.~21, no.~248, pp. 1--43, 2020.",
-    "codecarbon": r"B.~Courty, V.~Schmidt, S.~Luccioni \emph{et al.}, ``mlco2/codecarbon,'' "
-    r"version 3.3.1, Zenodo, 2025. [Online]. Available: "
-    r"\url{https://github.com/mlco2/codecarbon}  % VERIFY the v3.3.1 Zenodo DOI",
+    "codecarbon": r"B.~Courty, V.~Schmidt \emph{et al.}, ``mlco2/codecarbon: v3.3.1,'' "
+    r"Zenodo, 2026, doi: 10.5281/zenodo.22676004.",
     "shacl": r"H.~Knublauch and D.~Kontokostas, Eds., ``Shapes Constraint Language "
     r"(SHACL),'' W3C Recommendation, Jul. 2017.",
     "pyshacl": r"RDFLib contributors, ``pySHACL,'' 2025. [Online]. Available: "
