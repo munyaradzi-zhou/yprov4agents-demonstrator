@@ -1,0 +1,1 @@
+Provenance analytics for 'prov_corpus_03_GR0_3': 10 activities and 63 entities (90.5% typed), 3 derivations, 61 terminal entities. Wall-clock span 1.152s across 10 ordered activities. Energy streams: 21; resource streams: 27. Anomalies: 1; completeness findings: 2.

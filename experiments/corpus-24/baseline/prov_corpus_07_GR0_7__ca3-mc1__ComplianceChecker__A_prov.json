@@ -1,0 +1,101 @@
+{
+  "prefix": {
+    "cb": "urn:yprov4agents:callback-baseline#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "yp": "http://hpci-lab.org/yProv4Agents#"
+  },
+  "agent": {
+    "cb:agent_3447bcb6c28b": {
+      "prov:label": "ComplianceChecker"
+    }
+  },
+  "activity": {
+    "cb:activity_00": {
+      "prov:label": "MC1: receive agent PROV",
+      "prov:startTime": "2026-10-17T14:30:28.312650+00:00",
+      "prov:endTime": "2026-10-17T14:30:28.312658+00:00",
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_01": {
+      "prov:label": "MC1: check ca3 compliance",
+      "prov:startTime": "2026-10-17T14:30:28.312650+00:00",
+      "prov:endTime": "2026-10-17T14:30:28.312681+00:00",
+      "prov:type": {
+        "$": "yp:ObservationActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_02": {
+      "prov:label": "MC1: pass ca3",
+      "prov:startTime": "2026-10-17T14:30:28.312650+00:00",
+      "prov:endTime": "2026-10-17T14:30:28.312654+00:00",
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:verdict": "PASS",
+      "cb:verdict_source": "scraped-from-label"
+    }
+  },
+  "entity": {
+    "cb:entity_b262315fcd93": {
+      "prov:value": "ca3 PROV under review (prov_corpus_07_GR0_7::ca3)"
+    },
+    "cb:entity_77865e0109a2": {
+      "prov:value": "all structural checks held"
+    }
+  },
+  "used": {
+    "_:u0": {
+      "prov:activity": "cb:activity_01",
+      "prov:entity": "cb:entity_b262315fcd93"
+    },
+    "_:u1": {
+      "prov:activity": "cb:activity_02",
+      "prov:entity": "cb:entity_77865e0109a2"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "cb:entity_b262315fcd93",
+      "prov:activity": "cb:activity_00"
+    },
+    "_:g1": {
+      "prov:entity": "cb:entity_77865e0109a2",
+      "prov:activity": "cb:activity_01"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "cb:activity_00",
+      "prov:agent": "cb:agent_3447bcb6c28b"
+    },
+    "_:a1": {
+      "prov:activity": "cb:activity_01",
+      "prov:agent": "cb:agent_3447bcb6c28b"
+    },
+    "_:a2": {
+      "prov:activity": "cb:activity_02",
+      "prov:agent": "cb:agent_3447bcb6c28b"
+    }
+  },
+  "wasInformedBy": {
+    "_:i0": {
+      "prov:informed": "cb:activity_01",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i1": {
+      "prov:informed": "cb:activity_02",
+      "prov:informant": "cb:activity_01"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d0": {
+      "prov:generatedEntity": "cb:entity_77865e0109a2",
+      "prov:usedEntity": "cb:entity_b262315fcd93"
+    }
+  }
+}

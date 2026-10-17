@@ -1,0 +1,101 @@
+{
+  "prefix": {
+    "cb": "urn:yprov4agents:callback-baseline#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "yp": "http://hpci-lab.org/yProv4Agents#"
+  },
+  "agent": {
+    "cb:agent_8c450a5a1111": {
+      "prov:label": "AuditabilityAgent"
+    }
+  },
+  "activity": {
+    "cb:activity_00": {
+      "prov:label": "MC3: receive agent PROV",
+      "prov:startTime": "2026-10-17T14:30:27.133127+00:00",
+      "prov:endTime": "2026-10-17T14:30:27.133140+00:00",
+      "prov:type": {
+        "$": "yp:ReceiveTaskActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_01": {
+      "prov:label": "MC3: audit Metrics_Visualizer",
+      "prov:startTime": "2026-10-17T14:30:27.133127+00:00",
+      "prov:endTime": "2026-10-17T14:30:27.133167+00:00",
+      "prov:type": {
+        "$": "yp:AuditActivity",
+        "type": "prov:QUALIFIED_NAME"
+      }
+    },
+    "cb:activity_02": {
+      "prov:label": "MC3: trail for Metrics_Visualizer is complete",
+      "prov:startTime": "2026-10-17T14:30:27.133127+00:00",
+      "prov:endTime": "2026-10-17T14:30:27.133132+00:00",
+      "prov:type": {
+        "$": "yp:DecisionActivity",
+        "type": "prov:QUALIFIED_NAME"
+      },
+      "yp:verdict": "COMPLETE",
+      "cb:verdict_source": "scraped-from-label"
+    }
+  },
+  "entity": {
+    "cb:entity_369c5ec12597": {
+      "prov:value": "Metrics_Visualizer PROV under audit (prov_corpus_00_GR0_0::ca2)"
+    },
+    "cb:entity_8daeecc647a4": {
+      "prov:value": "agent=Metrics_Visualizer; steps=6; justifications=1; trail=ReceiveTaskActivity -> PlanningActivity -> ToolCallActivity -> ObservationActivity -> DecisionActivity -> ResponseActivity"
+    }
+  },
+  "used": {
+    "_:u0": {
+      "prov:activity": "cb:activity_01",
+      "prov:entity": "cb:entity_369c5ec12597"
+    },
+    "_:u1": {
+      "prov:activity": "cb:activity_02",
+      "prov:entity": "cb:entity_8daeecc647a4"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:g0": {
+      "prov:entity": "cb:entity_369c5ec12597",
+      "prov:activity": "cb:activity_00"
+    },
+    "_:g1": {
+      "prov:entity": "cb:entity_8daeecc647a4",
+      "prov:activity": "cb:activity_01"
+    }
+  },
+  "wasAssociatedWith": {
+    "_:a0": {
+      "prov:activity": "cb:activity_00",
+      "prov:agent": "cb:agent_8c450a5a1111"
+    },
+    "_:a1": {
+      "prov:activity": "cb:activity_01",
+      "prov:agent": "cb:agent_8c450a5a1111"
+    },
+    "_:a2": {
+      "prov:activity": "cb:activity_02",
+      "prov:agent": "cb:agent_8c450a5a1111"
+    }
+  },
+  "wasInformedBy": {
+    "_:i0": {
+      "prov:informed": "cb:activity_01",
+      "prov:informant": "cb:activity_00"
+    },
+    "_:i1": {
+      "prov:informed": "cb:activity_02",
+      "prov:informant": "cb:activity_01"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:d0": {
+      "prov:generatedEntity": "cb:entity_8daeecc647a4",
+      "prov:usedEntity": "cb:entity_369c5ec12597"
+    }
+  }
+}

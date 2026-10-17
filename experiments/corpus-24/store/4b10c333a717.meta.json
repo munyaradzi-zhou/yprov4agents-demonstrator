@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-4b10c333a717",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-corpus/out/corpus/store/4b10c333a717.txt",
+  "yp:contentHash": "sha256:4b10c333a71791095c763351a8b479c34013f9033e93ba781cf5cc58653a1d5a",
+  "size_bytes": 40134,
+  "kind": "provenance-record",
+  "preview": "{\"activity\": {\"Epoch_0\": {\"prov:startedAtTime\": \"2026-10-17T16:24:56.373218\"}, \"Epoch_1\": {\"prov:startedAtTime\": \"2026-10-17T16:24:56.395497…",
+  "created_at": "2026-10-17T14:30:27.973882+00:00"
+}

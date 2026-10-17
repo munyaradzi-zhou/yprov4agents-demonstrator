@@ -1,0 +1,16 @@
+[shacl] 288/288 records conform to vocab/shapes.ttl
+[shacl] node kinds the shapes were applied to:
+          prov:Activity (TypedActivityShape)   1152
+          prov:Agent (AgentDecidedShape)       288
+          prov:Bundle (RecordShape)            288
+          yp:AnalysisActivity                  24
+          yp:AuditActivity                     96
+          yp:ComplianceCheckActivity           96
+          yp:DecisionActivity                  288
+          yp:ObservationActivity               96
+          yp:PersistActivity                   24
+          yp:PlanningActivity                  96
+          yp:ReceiveTaskActivity               288
+          yp:ResponseActivity                  96
+          yp:ToolCallActivity                  48
+          yp:pid (PointerShape)                96

@@ -1,0 +1,9 @@
+{
+  "yp:pid": "21.T11999/yprovstore-72d24d3fc57b",
+  "uri": "file:///C:/Users/HP/AppData/Local/Temp/claude/C--Users-HP-Desktop-yprov4agents-demonstrator/19130148-b23d-4cd8-8547-e5778565c7ac/scratchpad/yp-corpus/out/corpus/store/72d24d3fc57b.txt",
+  "yp:contentHash": "sha256:72d24d3fc57b285b6b7381bab187a8bc1983a37c0a3eb6ab46532b8a69d427af",
+  "size_bytes": 268,
+  "kind": "analytics-report",
+  "preview": "Provenance analytics for 'prov_corpus_15_GR0_15': 16 activities and 112 entities (94.6% typed), 2 derivations, 110 terminal entities. Wall-c…",
+  "created_at": "2026-10-17T14:30:29.766403+00:00"
+}
