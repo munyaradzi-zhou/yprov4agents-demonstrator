@@ -94,8 +94,18 @@ class CorruptingStore(LightweightStore):
         return pointer
 
 
+#: The input record the scenarios read; ``--inputs`` repoints it, one record at a time.
+_INPUT: Path | None = None
+
+#: Scenarios whose fault is in the environment, not the record, so they mean the same thing
+#: on any input and can be repeated over a corpus.
+INPUT_INDEPENDENT = ("ca1-integrity", "ca1-timeout", "ca1-incomplete", "stream-gap")
+
+
 def _producer_record() -> dict[str, Any]:
     """A real yProv4ML record from the data the demonstrator replays."""
+    if _INPUT is not None:
+        return json.loads(_INPUT.read_text(encoding="utf-8"))
     candidates = sorted(Path("data/yprov4ml").glob("**/*.json"))
     if not candidates:
         raise SystemExit("no yProv4ML records under data/yprov4ml")
@@ -527,8 +537,15 @@ SCENARIOS: tuple[Scenario, ...] = (
 )
 
 
-def run(scenario: Scenario, out_dir: Path) -> dict[str, Any]:
-    """Run one scenario and report what verdict it provoked."""
+def run(scenario: Scenario, out_dir: Path, *, baseline: bool = False) -> dict[str, Any]:
+    """Run one scenario and report what verdict it provoked.
+
+    With ``baseline``, the callback baseline watches the scenario through the same
+    observation hook it uses on the reference run, and its event stream is kept under
+    ``baseline/`` (events only: the scenario's PROV records stay the only ``*_prov.json``).
+    The escalations are where the two records differ most, so they are where an operator
+    study needs both.
+    """
     target = out_dir / scenario.name
     # The directory belongs to this scenario alone. Cleared first because records are
     # never overwritten (runtime.util.write_prov), so a second run into the same place
@@ -536,7 +553,16 @@ def run(scenario: Scenario, out_dir: Path) -> dict[str, Any]:
     if target.exists():
         shutil.rmtree(target)
     target.mkdir(parents=True)
-    observed = scenario.run(target)
+    if baseline:
+        from eval.baseline import DEFAULT_TYPE_MAP, EVENTS_FILE, CallbackLogger, write_events
+        from yprov4agenticai.observer import observe
+
+        logger = CallbackLogger(type_map=DEFAULT_TYPE_MAP)
+        with observe(logger.record):
+            observed = scenario.run(target)
+        write_events(target / "baseline" / EVENTS_FILE, logger.events())
+    else:
+        observed = scenario.run(target)
     observed |= {
         "scenario": scenario.name,
         "agent": scenario.agent,
@@ -551,6 +577,30 @@ def run(scenario: Scenario, out_dir: Path) -> dict[str, Any]:
     return observed
 
 
+def _over_inputs(
+    selected: tuple[Scenario, ...], inputs: Path, out_dir: Path, per: int, baseline: bool
+) -> int:
+    """Each input-independent scenario on ``per`` records, a different slice for each.
+
+    Scenario *i* takes records ``i*per`` onwards (wrapping), so across scenarios the faults
+    fall on different runs, and an operator cannot learn the cause from the run.
+    """
+    global _INPUT
+    records = sorted(inputs.glob("*.json"))
+    missed = []
+    chosen = [s for s in selected if s.name in INPUT_INDEPENDENT]
+    for index, scenario in enumerate(chosen):
+        for k in range(per):
+            _INPUT = records[(index * per + k) % len(records)]
+            named = Scenario(**{**scenario.__dict__, "name": f"{scenario.name}@{_INPUT.stem}"})
+            row = run(named, out_dir, baseline=baseline)
+            if not row["as_expected"]:
+                missed.append(named.name)
+    _INPUT = None
+    print(f"{len(chosen) * per} runs over {inputs}; not as expected: {missed or 'none'}")
+    return 1 if missed else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="python -m eval.fault_injection",
@@ -560,6 +610,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--scenario", help="run one scenario by name")
     parser.add_argument("--all", action="store_true", help="run every scenario")
     parser.add_argument("--out-dir", default="out/faults", help="where records land")
+    parser.add_argument(
+        "--baseline", action="store_true", help="also keep the callback baseline's events"
+    )
+    parser.add_argument(
+        "--inputs",
+        type=Path,
+        help="repeat the input-independent scenarios over every record in this directory",
+    )
+    parser.add_argument(
+        "--per-scenario", type=int, default=8, help="with --inputs: records per scenario"
+    )
     args = parser.parse_args(argv)
 
     by_name = {scenario.name: scenario for scenario in SCENARIOS}
@@ -582,7 +643,9 @@ def main(argv: list[str] | None = None) -> int:
     # Resolved, because an emitted record's store pointer is a file URI and a relative
     # path has none.
     out_dir = Path(args.out_dir).resolve()
-    results = [run(scenario, out_dir) for scenario in selected]
+    if args.inputs:
+        return _over_inputs(selected, args.inputs, out_dir, args.per_scenario, args.baseline)
+    results = [run(scenario, out_dir, baseline=args.baseline) for scenario in selected]
 
     print(f"{'scenario':<20} {'agent':<6} {'expected':<10} {'observed':<10} reason")
     for row in results:
